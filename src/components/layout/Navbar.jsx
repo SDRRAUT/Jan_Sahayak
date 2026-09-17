@@ -138,8 +138,8 @@ export default function Navbar() {
       case 'citizen': return 'Citizen';
       case 'civic_officer':
       case 'officer':
-      case 'dept_admin': return 'Civic Officer';
-      case 'super_admin': return 'Super Admin';
+      case 'dept_admin': return 'Government Officer';
+      case 'super_admin': return 'Administrator / Admin';
       default: return 'User';
     }
   };
@@ -838,7 +838,7 @@ export default function Navbar() {
                           fontWeight: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? 700 : 400
                         }}
                       >
-                        🏛️ Civic Officer (Er. Sanjay Sharma)
+                        👷 Government Officer (Er. Sanjay Sharma)
                       </button>
                       <button
                         type="button"
@@ -853,7 +853,7 @@ export default function Navbar() {
                           fontWeight: role === 'super_admin' ? 700 : 400
                         }}
                       >
-                        🛡️ Super Admin (Dr. Meenakshi Sundaram, IAS)
+                        🛡️ Administrator / Admin (Dr. Meenakshi, IAS)
                       </button>
                     </div>
 
