@@ -118,6 +118,7 @@ out/
 .parcel-cache/
 .turbo/
 .next/
+.vercel/
 
 # ------------------------------------------------------------------------------
 # 10. Logs, Telemetry & Debug Artifacts
