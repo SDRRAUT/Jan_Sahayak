@@ -955,15 +955,23 @@ export default function Navbar() {
                 onClick={() => setShowLoginModal(true)}
                 style={{
                   fontSize: '13px',
-                  fontWeight: 600,
-                  color: 'var(--color-text-primary)',
-                  padding: '7px 16px',
+                  fontWeight: 700,
+                  color: '#FFFFFF',
+                  padding: '8px 20px',
                   borderRadius: 'var(--radius-full)',
-                  border: '1px solid var(--color-border-medium)',
-                  background: '#FFFFFF'
+                  border: 'none',
+                  background: 'linear-gradient(135deg, #0E5E3A 0%, #2563EB 100%)',
+                  boxShadow: '0 3px 12px rgba(14, 94, 58, 0.35)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  transition: 'all 150ms ease',
+                  letterSpacing: '0.01em'
                 }}
               >
-                Login
+                <LogIn style={{ width: '14px', height: '14px' }} />
+                <span>Login</span>
               </button>
             )}
 
@@ -1201,7 +1209,7 @@ export default function Navbar() {
                       background: location.pathname === '/' ? '#F0FDF4' : '#F8FAFC'
                     }}
                   >
-                    Overview
+                    Home
                   </Link>
                   <button
                     type="button"
