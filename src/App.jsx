@@ -23,25 +23,19 @@ import SuperAdmin from './pages/SuperAdmin';
 import Onboarding from './pages/Onboarding';
 
 function RoleHome() {
-  const { user, token } = useApp();
-  if (token && user) {
-    if (user.role === 'citizen') return <Navigate to="/citizen" replace />;
-    if (user.role === 'civic_officer' || user.role === 'officer' || user.role === 'dept_admin') return <Navigate to="/officer" replace />;
-    if (user.role === 'super_admin') return <Navigate to="/admin/super" replace />;
-  }
-  // Public visitor who entered the app sees the rich Home showcase
+  // Logged-in citizen or officer opening root sees the Home page with their authenticated profile
   return <Home />;
 }
 
 export default function App() {
   const location = useLocation();
-  const { user, token, hasEnteredApp } = useApp();
+  const { user, token } = useApp();
 
   // Full Screen Onboarding Condition:
   // 1. Explicitly navigating to /onboarding
-  // 2. Or landing at root '/' when user has NOT entered the app yet (and not logged in)
+  // 2. Or landing at root '/' when user has not passed and logged in
   const isFullScreenOnboarding = location.pathname === '/onboarding' || 
-    (location.pathname === '/' && !hasEnteredApp && !token);
+    (location.pathname === '/' && (!token || !user));
 
   if (isFullScreenOnboarding) {
     return <Onboarding />;

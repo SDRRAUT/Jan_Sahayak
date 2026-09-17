@@ -187,75 +187,79 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
   };
 
 
-  // Emerging Problems Radar Data (Simple English)
+  // Emerging Problems Radar Data (Simple English with Real Civic Images)
   const emergingIssues = [
     {
       id: 'ISSUE-01',
-      title: 'Dirty or low water supply in Rohini',
+      title: 'Main Drinking Water Pipe Burst & Gushing',
       category: 'Water Supply',
+      image: '/civic-problems/water_pipe_leak.jpg',
       status: 'EMERGING',
       statusLabel: '🔴 New Problem',
       badgeColor: '#DC2626',
       badgeBg: '#FEF2F2',
       badgeBorder: '#FECACA',
       wardsCount: 4,
-      wards: 'Wards 12, 14, 15, 18',
-      grievancesCount: 37,
+      wards: 'Ward 14 (Rohini Sector 14)',
+      grievancesCount: 14,
       trend: '+68% new reports in last 2 days',
-      hypothesis: 'Water pressure dropped due to a cracked underground pipe near Outer Ring Road.',
-      recommendedAction: 'Send team to inspect Sector 14 booster pump and test water purity with chlorine kit.',
+      hypothesis: 'Water main joint burst under street surface near Shree Ganesh Medicals.',
+      recommendedAction: 'Send team to isolate Sector 14 gate valve and install 150mm sleeve clamp.',
       targetGrievanceId: 'DL-2026-W14-0892'
     },
     {
       id: 'ISSUE-02',
-      title: 'Broken streetlights on main road',
-      category: 'Electricity & Lighting',
+      title: 'Deep Road Crater & Broken Drain Grate',
+      category: 'Roads & Infrastructure',
+      image: '/civic-problems/pothole_broken_drain_grate.jpg',
       status: 'GROWING',
       statusLabel: '🟠 Spreading',
       badgeColor: '#D97706',
       badgeBg: '#FFFBEB',
       badgeBorder: '#FDE68A',
       wardsCount: 3,
-      wards: 'Wards 8, 9, 11',
-      grievancesCount: 22,
+      wards: 'Ward 8 (Kothrud / Paud Road)',
+      grievancesCount: 15,
       trend: '+34% reports this week',
-      hypothesis: 'Overloaded evening power line tripped the main street circuit breaker.',
-      recommendedAction: 'Send electrician to replace burnt fuse on transformer 4B and balance electrical load.',
-      targetGrievanceId: 'DL-2026-W08-0419'
+      hypothesis: 'Heavy monsoon runoff washed subsoil; storm drain grate collapsed under traffic.',
+      recommendedAction: 'Dispatch rapid patching truck with cast iron grate replacement and cold asphalt.',
+      targetGrievanceId: 'MH-2026-W08-0419'
     },
     {
       id: 'ISSUE-03',
-      title: 'Garbage piling up on street corner',
+      title: 'Huge Roadside Garbage Heap & Trash Bags',
       category: 'Sanitation',
+      image: '/civic-problems/roadside_garbage_heap.jpg',
       status: 'IMPROVING',
       statusLabel: '🔵 Getting Fixed',
       badgeColor: '#2563EB',
       badgeBg: '#EFF6FF',
       badgeBorder: '#BFDBFE',
       wardsCount: 1,
-      wards: 'Ward 19 (Karol Bagh)',
-      grievancesCount: 14,
-      trend: 'Complaints down 40% after sending extra truck',
-      hypothesis: 'Dustbins were overflowing due to truck delay; new collection shift is clearing backlog.',
-      recommendedAction: 'Keep extra evening cleaning team until all corner bins are completely empty.',
-      targetGrievanceId: 'DL-2026-W19-0312'
+      wards: 'Ward 22 (Mayur Vihar Ph-1)',
+      grievancesCount: 16,
+      trend: 'Complaints down 40% after sending extra compactor',
+      hypothesis: 'Commercial market garbage backlog on carriageway; compactor clearing volume.',
+      recommendedAction: 'Deploy 12MT compactor truck and apply disinfectant lime wash along market street.',
+      targetGrievanceId: 'DL-2026-W22-0112'
     },
     {
       id: 'ISSUE-04',
-      title: 'Water pipeline leak repaired & closed',
-      category: 'Water Supply',
+      title: 'Severe Monsoon Inundation & Submerged Drain',
+      category: 'Drainage & Waterlogging',
+      image: '/civic-problems/monsoon_waterlogging_flood.jpg',
       status: 'RESOLVED',
-      statusLabel: '🟢 All Fixed',
+      statusLabel: '🟢 Active Response',
       badgeColor: '#059669',
       badgeBg: '#ECFDF5',
       badgeBorder: '#A7F3D0',
       wardsCount: 1,
-      wards: 'Ward 14 (Rohini Sector 14)',
-      grievancesCount: 18,
-      trend: 'Repair completed & verified by engineer',
-      hypothesis: 'High-strength steel clamp installed; citizen test confirmed clean water restored.',
-      recommendedAction: 'Mark problem as resolved and save repair record in city database.',
-      targetGrievanceId: 'DL-2026-W14-0892'
+      wards: 'Ward 3 (Karol Bagh Junction)',
+      grievancesCount: 19,
+      trend: '50HP dewatering pump deployed on site',
+      hypothesis: 'Blocked underground culvert combined with open storm drain causing knee-deep flooding.',
+      recommendedAction: 'Operate dewatering pump and install high-visibility warning barricades.',
+      targetGrievanceId: 'DL-2026-W03-0667'
     }
   ];
 
@@ -798,7 +802,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 </div>
               </div>
 
-              {/* 4 Radar Cards Grid */}
+              {/* 4 Radar Cards Grid with Real Indian Civic Photos */}
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
@@ -808,35 +812,65 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   <div
                     key={issue.id}
                     style={{
-                      padding: '18px',
-                      borderRadius: '16px',
-                      background: '#F8FAFC',
+                      borderRadius: '18px',
+                      background: '#FFFFFF',
                       border: `1px solid ${issue.badgeBorder}`,
+                      overflow: 'hidden',
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
-                      position: 'relative'
+                      boxShadow: '0 4px 14px rgba(15, 23, 42, 0.05)',
+                      transition: 'transform 150ms ease, box-shadow 150ms ease'
                     }}
                   >
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                        <span style={{
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          padding: '3px 10px',
-                          borderRadius: '9999px',
-                          background: issue.badgeBg,
-                          color: issue.badgeColor,
-                          border: `1px solid ${issue.badgeBorder}`
-                        }}>
-                          {issue.statusLabel}
-                        </span>
-                        <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B' }}>
-                          📍 {issue.wardsCount} Wards Affected
+                    {/* Top Photo Header */}
+                    <div style={{ position: 'relative', height: '140px', width: '100%', overflow: 'hidden', background: '#F1F5F9' }}>
+                      <img
+                        src={issue.image}
+                        alt={issue.title}
+                        loading="lazy"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                      <div style={{
+                        position: 'absolute', inset: 0,
+                        background: 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.65) 100%)',
+                        pointerEvents: 'none'
+                      }} />
+                      
+                      {/* Status badge on photo */}
+                      <span style={{
+                        position: 'absolute', top: '10px', left: '10px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        padding: '3px 10px',
+                        borderRadius: '9999px',
+                        background: 'rgba(255, 255, 255, 0.95)',
+                        backdropFilter: 'blur(6px)',
+                        color: issue.badgeColor,
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
+                      }}>
+                        {issue.statusLabel}
+                      </span>
+
+                      <span style={{
+                        position: 'absolute', top: '10px', right: '10px',
+                        fontSize: '10.5px', fontWeight: 700,
+                        padding: '3px 8px', borderRadius: '9999px',
+                        background: 'rgba(0,0,0,0.6)', color: '#FFFFFF',
+                        backdropFilter: 'blur(6px)'
+                      }}>
+                        📍 {issue.wardsCount} Wards
+                      </span>
+
+                      <div style={{ position: 'absolute', bottom: '8px', left: '12px', right: '12px', color: '#FFFFFF' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 700, opacity: 0.9 }}>
+                          {issue.category}
                         </span>
                       </div>
+                    </div>
 
-                      <h3 style={{ fontSize: '15px', fontWeight: 700, lineHeight: 1.3, marginBottom: '6px', color: '#0F172A' }}>
+                    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                      <h3 style={{ fontSize: '15px', fontWeight: 800, lineHeight: 1.3, marginBottom: '6px', color: '#0F172A' }}>
                         {issue.title}
                       </h3>
 
@@ -847,41 +881,141 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                       <div style={{
                         padding: '8px 10px',
                         borderRadius: '8px',
-                        background: '#FFFFFF',
+                        background: '#F8FAFC',
                         border: '1px solid #E2E8F0',
                         fontSize: '11px',
                         color: '#64748B',
-                        marginBottom: '12px',
-                        lineHeight: 1.5
+                        marginBottom: '14px',
+                        lineHeight: 1.5,
+                        marginTop: 'auto'
                       }}>
                         <div>📍 {issue.wards}</div>
                         <div>📈 {issue.grievancesCount} reports • {issue.trend}</div>
                       </div>
-                    </div>
 
+                      <button
+                        type="button"
+                        onClick={() => openInspectionForCase(issue.targetGrievanceId)}
+                        style={{
+                          width: '100%',
+                          padding: '9px 12px',
+                          borderRadius: '9999px',
+                          background: '#0F172A',
+                          color: '#FFFFFF',
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          border: 'none',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          boxShadow: '0 2px 8px rgba(15,23,42,0.18)',
+                          transition: 'background 150ms ease'
+                        }}
+                      >
+                        <span>Inspect & Fix →</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Live City Complaint Image Cards Gallery ── */}
+            <div style={{ marginBottom: '32px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px', flexWrap: 'wrap', gap: '12px' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <span style={{
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      padding: '2px 8px',
+                      borderRadius: '9999px',
+                      background: '#ECFDF5',
+                      color: '#065F46',
+                      border: '1px solid #A7F3D0'
+                    }}>
+                      📸 LIVE CITY COMPLAINT CARDS
+                    </span>
+                    <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>
+                      Showing {filteredGrievances.length} Complaints with Real Indian Photo Proof
+                    </span>
+                  </div>
+                  <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                    Active Field Complaints & Proof Gallery
+                  </h2>
+                </div>
+
+                {/* Filter Pills */}
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  {['ALL', 'CRITICAL', 'HIGH'].map((urg) => (
                     <button
+                      key={urg}
                       type="button"
-                      onClick={() => openInspectionForCase(issue.targetGrievanceId)}
+                      onClick={() => setUrgencyFilter(urg)}
                       style={{
-                        width: '100%',
-                        padding: '8px 12px',
-                        borderRadius: '10px',
-                        background: '#FFFFFF',
-                        border: `1px solid ${issue.badgeBorder}`,
-                        color: issue.badgeColor,
-                        fontSize: '12px',
+                        padding: '5px 12px',
+                        borderRadius: '9999px',
+                        fontSize: '11.5px',
                         fontWeight: 700,
+                        border: urgencyFilter === urg ? 'none' : '1px solid #CBD5E1',
+                        background: urgencyFilter === urg ? '#0F172A' : '#FFFFFF',
+                        color: urgencyFilter === urg ? '#FFFFFF' : '#475569',
                         cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px',
                         transition: 'all 150ms ease'
                       }}
                     >
-                      <span>Inspect & Fix →</span>
+                      {urg === 'ALL' ? '⚡ All Urgency' : urg === 'CRITICAL' ? '● Critical Only' : 'High Priority'}
                     </button>
-                  </div>
+                  ))}
+
+                  {['IN_PROGRESS', 'RESOLVED'].map((st) => (
+                    <button
+                      key={st}
+                      type="button"
+                      onClick={() => setStatusFilter(statusFilter === st ? 'ALL' : st)}
+                      style={{
+                        padding: '5px 12px',
+                        borderRadius: '9999px',
+                        fontSize: '11.5px',
+                        fontWeight: 700,
+                        border: statusFilter === st ? 'none' : '1px solid #CBD5E1',
+                        background: statusFilter === st ? '#059669' : '#FFFFFF',
+                        color: statusFilter === st ? '#FFFFFF' : '#475569',
+                        cursor: 'pointer',
+                        transition: 'all 150ms ease'
+                      }}
+                    >
+                      {st === 'IN_PROGRESS' ? '🔧 In Progress' : '✓ Resolved'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Grid of Complaint Cards with Matching Photos */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                gap: '20px'
+              }}>
+                {filteredGrievances.map((g) => (
+                  <EditorialComplaintCard
+                    key={g.id}
+                    item={g}
+                    role={currentOfficer?.role || 'officer'}
+                    currentUser={currentOfficer}
+                    onOpen={(item) => setSelectedModalGrievance(item)}
+                    onInspect={(caseId) => openInspectionForCase(caseId)}
+                    onResolve={(caseId) => {
+                      setSelectedId(caseId);
+                      setShowResolutionModal(true);
+                    }}
+                    onReassign={(caseId) => {
+                      setSelectedId(caseId);
+                      setShowReassignModal(true);
+                    }}
+                  />
                 ))}
               </div>
             </div>
@@ -898,10 +1032,10 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   1. What Needs Attention?
                 </span>
                 <strong style={{ fontSize: '16px', color: '#DC2626', display: 'block', marginBottom: '4px' }}>
-                  Water Supply in Rohini
+                  Water Supply & Pipe Bursts
                 </strong>
                 <p style={{ fontSize: '12px', color: '#64748B', margin: 0, lineHeight: 1.4 }}>
-                  37 complaints about low pressure near Sector 14. Pipe test recommended.
+                  Main pipeline burst & contamination in Rohini Sector 14 under emergency repair.
                 </p>
               </div>
 
@@ -910,10 +1044,10 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   2. Where is it Happening?
                 </span>
                 <strong style={{ fontSize: '16px', color: '#2563EB', display: 'block', marginBottom: '4px' }}>
-                  Wards 12, 14 & 18
+                  Rohini, Kothrud & Mayur Vihar
                 </strong>
                 <p style={{ fontSize: '12px', color: '#64748B', margin: 0, lineHeight: 1.4 }}>
-                  Clustered near Mother Dairy & Outer Ring Road water line.
+                  High density clusters active with field squads and excavators on ground.
                 </p>
               </div>
 
@@ -922,10 +1056,10 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   3. Root Cause Found
                 </span>
                 <strong style={{ fontSize: '16px', color: '#D97706', display: 'block', marginBottom: '4px' }}>
-                  Underground Pipe Leak
+                  Underground Pipe Fracture & Blocked Nullah
                 </strong>
                 <p style={{ fontSize: '12px', color: '#64748B', margin: 0, lineHeight: 1.4 }}>
-                  Water line crack causing water leakage and drop in household tap pressure.
+                  150mm main pipe joint rupture and monsoon drain blockage diagnosed by AI DNA.
                 </p>
               </div>
 
@@ -934,10 +1068,10 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   4. Ready Solutions
                 </span>
                 <strong style={{ fontSize: '16px', color: '#059669', display: 'block', marginBottom: '4px' }}>
-                  3 Fixes Ready for Approval
+                  Instant Fix Actions Dispatched
                 </strong>
                 <p style={{ fontSize: '12px', color: '#64748B', margin: 0, lineHeight: 1.4 }}>
-                  AI suggested pipe clamp & chlorine test ready for officer sign-off.
+                  High-strength pipe clamp, compactor truck, and dewatering pumps active.
                 </p>
               </div>
             </div>

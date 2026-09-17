@@ -20,10 +20,10 @@ import onboardingBg from '../../assets/onboarding-bg.jpg';
 const STEP_THEMES = {
   1: {
     name: 'warm_peach',
-    bg: 'linear-gradient(150deg, #FFF9F3 0%, #FFF2E6 100%)',
-    border: '#FED7AA',
-    shadow: '0 25px 60px -10px rgba(234, 88, 12, 0.22), 0 0 0 1px rgba(251, 146, 60, 0.15)',
-    divider: 'rgba(234, 88, 12, 0.14)',
+    bg: 'linear-gradient(155deg, #FFF8F1 0%, #FFEDD5 100%)',
+    border: '#FDBA74',
+    shadow: '0 25px 60px -10px rgba(234, 88, 12, 0.20), 0 0 0 1px rgba(251, 146, 60, 0.22)',
+    divider: 'rgba(234, 88, 12, 0.16)',
     accent: '#EA580C',
     buttonBg: '#EA580C',
     dotActive: '#EA580C',
@@ -31,10 +31,10 @@ const STEP_THEMES = {
   },
   2: {
     name: 'fresh_mint',
-    bg: 'linear-gradient(150deg, #F0FDF9 0%, #E3F8F1 100%)',
-    border: '#A7F3D0',
-    shadow: '0 25px 60px -10px rgba(5, 150, 105, 0.20), 0 0 0 1px rgba(16, 185, 129, 0.15)',
-    divider: 'rgba(5, 150, 105, 0.14)',
+    bg: 'linear-gradient(155deg, #F0FDF4 0%, #DCFCE7 100%)',
+    border: '#86EFAC',
+    shadow: '0 25px 60px -10px rgba(5, 150, 105, 0.20), 0 0 0 1px rgba(16, 185, 129, 0.22)',
+    divider: 'rgba(5, 150, 105, 0.16)',
     accent: '#059669',
     buttonBg: '#059669',
     dotActive: '#059669',
@@ -42,10 +42,10 @@ const STEP_THEMES = {
   },
   3: {
     name: 'soft_lavender',
-    bg: 'linear-gradient(150deg, #FAF5FF 0%, #F3E8FE 100%)',
+    bg: 'linear-gradient(155deg, #FAF5FF 0%, #EDE9FE 100%)',
     border: '#DDD6FE',
-    shadow: '0 25px 60px -10px rgba(124, 58, 237, 0.20), 0 0 0 1px rgba(139, 92, 246, 0.15)',
-    divider: 'rgba(124, 58, 237, 0.14)',
+    shadow: '0 25px 60px -10px rgba(124, 58, 237, 0.20), 0 0 0 1px rgba(139, 92, 246, 0.22)',
+    divider: 'rgba(124, 58, 237, 0.16)',
     accent: '#7C3AED',
     buttonBg: '#7C3AED',
     dotActive: '#7C3AED',
@@ -53,13 +53,13 @@ const STEP_THEMES = {
   },
   4: {
     name: 'sky_slate',
-    bg: 'linear-gradient(150deg, #F8FAFC 0%, #EFF6FF 100%)',
-    border: '#BFDBFE',
-    shadow: '0 25px 60px -10px rgba(37, 99, 235, 0.20), 0 0 0 1px rgba(59, 130, 246, 0.15)',
-    divider: 'rgba(37, 99, 235, 0.14)',
-    accent: '#2563EB',
-    buttonBg: '#1E2653',
-    dotActive: '#2563EB',
+    bg: 'linear-gradient(155deg, #F0F9FF 0%, #E0F2FE 100%)',
+    border: '#BAE6FD',
+    shadow: '0 25px 60px -10px rgba(2, 132, 199, 0.20), 0 0 0 1px rgba(56, 189, 248, 0.22)',
+    divider: 'rgba(2, 132, 199, 0.16)',
+    accent: '#0284C7',
+    buttonBg: '#0284C7',
+    dotActive: '#0284C7',
     dotInactive: '#93C5FD'
   }
 };
@@ -198,7 +198,7 @@ export default function OnboardingFlow({ onComplete }) {
   const handleDirectEnter = () => {
     if (enterApp) enterApp();
     if (onComplete) onComplete();
-    navigate('/');
+    navigate('/overview');
   };
 
   const handleSkip = () => {
@@ -207,7 +207,7 @@ export default function OnboardingFlow({ onComplete }) {
     } else {
       if (enterApp) enterApp();
       if (onComplete) onComplete();
-      navigate('/');
+      navigate('/overview');
     }
   };
 
@@ -401,8 +401,8 @@ export default function OnboardingFlow({ onComplete }) {
               borderRadius: '14px',
               overflow: 'hidden',
               position: 'relative',
-              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08)',
-              border: '1px solid #E2E8F0',
+              boxShadow: '0 4px 14px rgba(234, 88, 12, 0.12)',
+              border: '1.5px solid #FED7AA',
               marginBottom: '12px'
             }}>
               <img 
@@ -469,8 +469,8 @@ export default function OnboardingFlow({ onComplete }) {
               width: '100%',
               height: '160px',
               borderRadius: '14px',
-              background: 'linear-gradient(135deg, #F0FDF4 0%, #EFF6FF 100%)',
-              border: '1px solid #BFDBFE',
+              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.65) 0%, rgba(220, 252, 231, 0.65) 100%)',
+              border: '1.5px solid #86EFAC',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
@@ -480,31 +480,31 @@ export default function OnboardingFlow({ onComplete }) {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
                 {/* Stage 1 */}
-                <div style={{ flex: 1, background: '#FFFFFF', padding: '8px 6px', borderRadius: '12px', border: '1px solid #BBF7D0', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
+                <div style={{ flex: 1, background: 'rgba(255, 255, 255, 0.82)', backdropFilter: 'blur(4px)', padding: '8px 6px', borderRadius: '12px', border: '1px solid #BBF7D0', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
                   <div style={{ fontSize: '18px', marginBottom: '2px' }}>🎙️</div>
                   <strong style={{ fontSize: '11px', display: 'block', color: '#166534' }}>Voice & Photo</strong>
-                  <span style={{ fontSize: '9.5px', color: '#64748B' }}>No complex forms</span>
+                  <span style={{ fontSize: '9.5px', color: '#475569' }}>No complex forms</span>
                 </div>
-                <div style={{ color: '#94A3B8', fontWeight: 700, fontSize: '13px' }}>➔</div>
+                <div style={{ color: '#059669', fontWeight: 700, fontSize: '13px' }}>➔</div>
 
                 {/* Stage 2 */}
-                <div style={{ flex: 1.1, background: '#FFFFFF', padding: '8px 6px', borderRadius: '12px', border: '1px solid #BFDBFE', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
+                <div style={{ flex: 1.1, background: 'rgba(255, 255, 255, 0.82)', backdropFilter: 'blur(4px)', padding: '8px 6px', borderRadius: '12px', border: '1px solid #A7F3D0', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
                   <div style={{ fontSize: '18px', marginBottom: '2px' }}>🧬</div>
-                  <strong style={{ fontSize: '11px', display: 'block', color: '#1D4ED8' }}>Complaint DNA</strong>
-                  <span style={{ fontSize: '9.5px', color: '#64748B' }}>Ward + Biohazard</span>
+                  <strong style={{ fontSize: '11px', display: 'block', color: '#065F46' }}>Complaint DNA</strong>
+                  <span style={{ fontSize: '9.5px', color: '#475569' }}>Ward + Biohazard</span>
                 </div>
-                <div style={{ color: '#94A3B8', fontWeight: 700, fontSize: '13px' }}>➔</div>
+                <div style={{ color: '#059669', fontWeight: 700, fontSize: '13px' }}>➔</div>
 
                 {/* Stage 3 */}
-                <div style={{ flex: 1.1, background: '#FFFFFF', padding: '8px 6px', borderRadius: '12px', border: '1px solid #E9D5FF', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
+                <div style={{ flex: 1.1, background: 'rgba(255, 255, 255, 0.82)', backdropFilter: 'blur(4px)', padding: '8px 6px', borderRadius: '12px', border: '1px solid #6EE7B7', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
                   <div style={{ fontSize: '18px', marginBottom: '2px' }}>🔗</div>
-                  <strong style={{ fontSize: '11px', display: 'block', color: '#7E22CE' }}>Smart Clustering</strong>
-                  <span style={{ fontSize: '9.5px', color: '#64748B' }}>15 calls = 1 incident</span>
+                  <strong style={{ fontSize: '11px', display: 'block', color: '#047857' }}>Smart Clustering</strong>
+                  <span style={{ fontSize: '9.5px', color: '#475569' }}>15 calls = 1 incident</span>
                 </div>
               </div>
 
               <div style={{ marginTop: '8px', textAlign: 'center' }}>
-                <span style={{ fontSize: '10px', fontWeight: 700, color: '#2563EB', background: '#DBEAFE', padding: '2px 8px', borderRadius: '999px' }}>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: '#065F46', background: 'rgba(255, 255, 255, 0.85)', border: '1px solid #86EFAC', padding: '2px 8px', borderRadius: '999px' }}>
                   ⚡ Zero Duplicate Backlog • Instant Ground Mapping
                 </span>
               </div>
@@ -533,8 +533,8 @@ export default function OnboardingFlow({ onComplete }) {
               width: '100%',
               height: '160px',
               borderRadius: '14px',
-              background: 'linear-gradient(135deg, #F8FAFC 0%, #ECFDF5 100%)',
-              border: '1px solid #E2E8F0',
+              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.65) 0%, rgba(237, 233, 254, 0.65) 100%)',
+              border: '1.5px solid #DDD6FE',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
@@ -543,33 +543,33 @@ export default function OnboardingFlow({ onComplete }) {
               marginBottom: '12px'
             }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-                <div style={{ background: '#FFFFFF', padding: '8px 6px', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#EFF6FF', color: '#1D4ED8', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px auto' }}>
+                <div style={{ background: 'rgba(255, 255, 255, 0.82)', backdropFilter: 'blur(4px)', padding: '8px 6px', borderRadius: '12px', border: '1px solid #DDD6FE', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#F5F3FF', color: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px auto' }}>
                     <Building2 style={{ width: '15px', height: '15px' }} />
                   </div>
-                  <strong style={{ fontSize: '11px', display: 'block', color: '#0F172A' }}>Auto-Routing</strong>
-                  <span style={{ fontSize: '9.5px', color: '#64748B' }}>Direct to DJB/PWD</span>
+                  <strong style={{ fontSize: '11px', display: 'block', color: '#5B21B6' }}>Auto-Routing</strong>
+                  <span style={{ fontSize: '9.5px', color: '#475569' }}>Direct to DJB/PWD</span>
                 </div>
 
-                <div style={{ background: '#FFFFFF', padding: '8px 6px', borderRadius: '12px', border: '1px solid #BBF7D0', textAlign: 'center' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#ECFDF5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px auto' }}>
+                <div style={{ background: 'rgba(255, 255, 255, 0.82)', backdropFilter: 'blur(4px)', padding: '8px 6px', borderRadius: '12px', border: '1px solid #DDD6FE', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#F5F3FF', color: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px auto' }}>
                     <Zap style={{ width: '15px', height: '15px' }} />
                   </div>
-                  <strong style={{ fontSize: '11px', display: 'block', color: '#047857' }}>1-Click SOP</strong>
-                  <span style={{ fontSize: '9.5px', color: '#64748B' }}>Pre-computed fix</span>
+                  <strong style={{ fontSize: '11px', display: 'block', color: '#5B21B6' }}>1-Click SOP</strong>
+                  <span style={{ fontSize: '9.5px', color: '#475569' }}>Pre-computed fix</span>
                 </div>
 
-                <div style={{ background: '#FFFFFF', padding: '8px 6px', borderRadius: '12px', border: '1px solid #FED7AA', textAlign: 'center' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#FFF7ED', color: '#C2410C', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px auto' }}>
+                <div style={{ background: 'rgba(255, 255, 255, 0.82)', backdropFilter: 'blur(4px)', padding: '8px 6px', borderRadius: '12px', border: '1px solid #DDD6FE', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#F5F3FF', color: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px auto' }}>
                     <CheckCircle2 style={{ width: '15px', height: '15px' }} />
                   </div>
-                  <strong style={{ fontSize: '11px', display: 'block', color: '#9A3412' }}>Citizen Verify</strong>
-                  <span style={{ fontSize: '9.5px', color: '#64748B' }}>Closed-loop closure</span>
+                  <strong style={{ fontSize: '11px', display: 'block', color: '#5B21B6' }}>Citizen Verify</strong>
+                  <span style={{ fontSize: '9.5px', color: '#475569' }}>Closed-loop closure</span>
                 </div>
               </div>
 
               <div style={{ marginTop: '8px', textAlign: 'center' }}>
-                <span style={{ fontSize: '10px', fontWeight: 700, color: '#047857', background: '#DCFCE7', padding: '2px 8px', borderRadius: '999px' }}>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: '#6D28D9', background: 'rgba(255, 255, 255, 0.85)', border: '1px solid #DDD6FE', padding: '2px 8px', borderRadius: '999px' }}>
                   ⏱️ 12-Hour SLA Timer • On-Ground Photo Verification Mandatory
                 </span>
               </div>
@@ -641,17 +641,18 @@ export default function OnboardingFlow({ onComplete }) {
 
             {/* Username & Password Form Fields (Pre-filled for seamless 1-click test) */}
             <div style={{
-              background: '#F8FAFC',
+              background: 'rgba(255, 255, 255, 0.60)',
+              backdropFilter: 'blur(4px)',
               borderRadius: '12px',
-              border: '1px solid #E2E8F0',
+              border: '1px solid #BAE6FD',
               padding: '10px 14px',
               marginBottom: '10px',
               display: 'flex',
               flexDirection: 'column',
               gap: '8px'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#FFFFFF', padding: '6px 10px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                <Mail style={{ width: '14px', height: '14px', color: '#94A3B8' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255, 255, 255, 0.85)', padding: '6px 10px', borderRadius: '8px', border: '1px solid #BAE6FD' }}>
+                <Mail style={{ width: '14px', height: '14px', color: '#0284C7' }} />
                 <div style={{ flex: 1 }}>
                   <span style={{ fontSize: '9.5px', color: '#64748B', display: 'block', textTransform: 'uppercase', fontWeight: 700 }}>Username / Email</span>
                   <input 
@@ -661,11 +662,11 @@ export default function OnboardingFlow({ onComplete }) {
                     style={{ border: 'none', background: 'transparent', width: '100%', fontSize: '12px', fontWeight: 600, color: '#0F172A', outline: 'none', padding: 0 }}
                   />
                 </div>
-                <span style={{ fontSize: '10px', color: '#10B981', fontWeight: 700, background: '#ECFDF5', padding: '2px 6px', borderRadius: '4px' }}>Demo ID</span>
+                <span style={{ fontSize: '10px', color: '#0284C7', fontWeight: 700, background: '#E0F2FE', padding: '2px 6px', borderRadius: '4px' }}>Demo ID</span>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#FFFFFF', padding: '6px 10px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                <Lock style={{ width: '14px', height: '14px', color: '#94A3B8' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255, 255, 255, 0.85)', padding: '6px 10px', borderRadius: '8px', border: '1px solid #BAE6FD' }}>
+                <Lock style={{ width: '14px', height: '14px', color: '#0284C7' }} />
                 <div style={{ flex: 1 }}>
                   <span style={{ fontSize: '9.5px', color: '#64748B', display: 'block', textTransform: 'uppercase', fontWeight: 700 }}>Password</span>
                   <input 
