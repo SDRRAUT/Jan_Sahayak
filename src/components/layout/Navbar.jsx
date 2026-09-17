@@ -186,22 +186,24 @@ export default function Navbar() {
                 <span style={{ fontWeight: 800, fontSize: '18px', letterSpacing: '-0.03em', color: 'var(--color-text-primary)' }}>
                   JanSahayak
                 </span>
-                <span style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  padding: '1.5px 7px',
-                  background: '#ECFDF5',
-                  border: '1px solid rgba(16, 185, 129, 0.3)',
-                  color: '#065F46',
-                  borderRadius: '9999px',
-                  fontSize: '9.5px',
-                  fontWeight: 700,
-                  letterSpacing: '0.04em'
-                }}>
-                  <span className="status-dot active" style={{ width: '5px', height: '5px' }} />
-                  {role ? role.toUpperCase().replace('_', ' ') : 'CIVIC'}
-                </span>
+                {user && (
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '1.5px 7px',
+                    background: '#ECFDF5',
+                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    color: '#065F46',
+                    borderRadius: '9999px',
+                    fontSize: '9.5px',
+                    fontWeight: 700,
+                    letterSpacing: '0.04em'
+                  }}>
+                    <span className="status-dot active" style={{ width: '5px', height: '5px' }} />
+                    {getRoleDisplayLabel(user.role).toUpperCase()}
+                  </span>
+                )}
               </div>
               <span style={{ fontSize: '9.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-primary)' }}>
                 Civic Redressal Platform
@@ -211,8 +213,8 @@ export default function Navbar() {
 
           {/* Primary Navigation Links (Desktop - Role Isolated) */}
           <nav className="nav-desktop-links" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            {/* Citizen View */}
-            {role === 'citizen' && (
+            {/* Citizen View (Only when logged in) */}
+            {user && role === 'citizen' && (
               <>
                 <Link
                   to="/citizen"
@@ -238,7 +240,7 @@ export default function Navbar() {
 
             {/* Field Officer View */}
             {/* Civic Officer View (Unified Field + Dept Admin) */}
-            {(role === 'civic_officer' || role === 'officer' || role === 'dept_admin') && (
+            {user && (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') && (
               <>
                 <Link
                   to="/officer"
@@ -275,7 +277,7 @@ export default function Navbar() {
             )}
 
             {/* Super Admin View */}
-            {role === 'super_admin' && (
+            {user && role === 'super_admin' && (
               <>
                 <Link
                   to="/admin/super"
@@ -346,60 +348,61 @@ export default function Navbar() {
 
           {/* Right Action Cluster */}
           <div className="header-right-cluster">
-            {/* Action 1: Track Grievance Button */}
-            <button
-              type="button"
-              onClick={() => setShowTrackModal(true)}
-              className="header-track-btn hidden-mobile"
-              style={{
-                fontSize: '12.5px',
-                fontWeight: 600,
-                color: 'var(--color-text-secondary)',
-                padding: '7px 13px',
-                borderRadius: 'var(--radius-full)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: '#F8FAFC',
-                border: '1px solid rgba(15, 23, 42, 0.10)',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                transition: 'all 150ms ease'
-              }}
-              title="Track ticket status"
-            >
-              <Search style={{ width: '13px', height: '13px', color: 'var(--color-text-muted)' }} />
-              <span>Track Ticket</span>
-            </button>
+            {/* Logged-in Citizen Quick Actions */}
+            {user && role === 'citizen' && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setShowTrackModal(true)}
+                  className="header-track-btn hidden-mobile"
+                  style={{
+                    fontSize: '12.5px',
+                    fontWeight: 600,
+                    color: 'var(--color-text-secondary)',
+                    padding: '7px 13px',
+                    borderRadius: 'var(--radius-full)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: '#F8FAFC',
+                    border: '1px solid rgba(15, 23, 42, 0.10)',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 150ms ease'
+                  }}
+                  title="Track ticket status"
+                >
+                  <Search style={{ width: '13px', height: '13px', color: 'var(--color-text-muted)' }} />
+                  <span>Track Ticket</span>
+                </button>
 
-            {/* Action 2: Role-Segregated Primary CTA */}
-            {(!user || role === 'citizen') && (
-              <Link
-                to="/citizen/submit"
-                className="header-report-btn"
-                style={{
-                  height: '38px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  padding: '0 16px',
-                  borderRadius: 'var(--radius-full)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  background: 'linear-gradient(135deg, #0E5E3A 0%, #0A472C 100%)',
-                  color: '#FFFFFF',
-                  boxShadow: '0 2px 8px rgba(14, 94, 58, 0.28)',
-                  textDecoration: 'none',
-                  whiteSpace: 'nowrap',
-                  transition: 'all 150ms ease'
-                }}
-              >
-                <Plus style={{ width: '14px', height: '14px' }} />
-                <span>File Grievance</span>
-              </Link>
+                <Link
+                  to="/citizen/submit"
+                  className="header-report-btn"
+                  style={{
+                    height: '38px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    padding: '0 16px',
+                    borderRadius: 'var(--radius-full)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: 'linear-gradient(135deg, #0E5E3A 0%, #0A472C 100%)',
+                    color: '#FFFFFF',
+                    boxShadow: '0 2px 8px rgba(14, 94, 58, 0.28)',
+                    textDecoration: 'none',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 150ms ease'
+                  }}
+                >
+                  <Plus style={{ width: '14px', height: '14px' }} />
+                  <span>File Grievance</span>
+                </Link>
+              </>
             )}
 
-            {(role === 'civic_officer' || role === 'officer' || role === 'dept_admin') && (
+            {user && (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') && (
               <Link
                 to="/officer"
                 className="header-report-btn"
@@ -425,7 +428,7 @@ export default function Navbar() {
               </Link>
             )}
 
-            {role === 'super_admin' && (
+            {user && role === 'super_admin' && (
               <Link
                 to="/admin/super"
                 className="header-report-btn"
@@ -452,112 +455,114 @@ export default function Navbar() {
             )}
 
             {/* Notifications Bell */}
-            <div ref={notificationRef} style={{ position: 'relative' }}>
-              <button
-                type="button"
-                onClick={() => setShowNotifications(!showNotifications)}
-                style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '50%',
-                  background: showNotifications ? '#F1F5F9' : '#F8FAFC',
-                  border: showNotifications ? '1px solid rgba(15, 23, 42, 0.16)' : '1px solid rgba(15, 23, 42, 0.10)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: showNotifications ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
-                  position: 'relative',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                  transition: 'all 150ms ease'
-                }}
-                title="Notifications"
-              >
-                <Bell style={{ width: '16px', height: '16px' }} />
-                {relevantUnreadCount > 0 && (
-                  <span style={{
-                    position: 'absolute',
-                    top: '6px',
-                    right: '6px',
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: '#EF4444',
-                    boxShadow: '0 0 0 2px #FFFFFF'
-                  }} />
-                )}
-              </button>
-
-              {/* Notification Popover */}
-              {showNotifications && (
-                <div
+            {user && (
+              <div ref={notificationRef} style={{ position: 'relative' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowNotifications(!showNotifications)}
                   style={{
-                    position: 'absolute',
-                    top: '46px',
-                    right: 0,
-                    width: '340px',
-                    maxHeight: '400px',
-                    overflowY: 'auto',
-                    background: '#FFFFFF',
-                    borderRadius: 'var(--radius-lg)',
-                    border: '1px solid var(--color-border-subtle)',
-                    boxShadow: 'var(--shadow-floating)',
-                    padding: '16px',
-                    zIndex: 100
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '50%',
+                    background: showNotifications ? '#F1F5F9' : '#F8FAFC',
+                    border: showNotifications ? '1px solid rgba(15, 23, 42, 0.16)' : '1px solid rgba(15, 23, 42, 0.10)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: showNotifications ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                    position: 'relative',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                    transition: 'all 150ms ease'
                   }}
+                  title="Notifications"
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                      Activity Notifications
-                    </span>
-                    {relevantUnreadCount > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => markAllNotificationsAsRead()}
-                        style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: 600 }}
-                      >
-                        Mark all read
-                      </button>
+                  <Bell style={{ width: '16px', height: '16px' }} />
+                  {relevantUnreadCount > 0 && (
+                    <span style={{
+                      position: 'absolute',
+                      top: '6px',
+                      right: '6px',
+                      width: '8px',
+                      height: '8px',
+                      borderRadius: '50%',
+                      background: '#EF4444',
+                      boxShadow: '0 0 0 2px #FFFFFF'
+                    }} />
+                  )}
+                </button>
+
+                {/* Notification Popover */}
+                {showNotifications && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '46px',
+                      right: 0,
+                      width: '340px',
+                      maxHeight: '400px',
+                      overflowY: 'auto',
+                      background: '#FFFFFF',
+                      borderRadius: 'var(--radius-lg)',
+                      border: '1px solid var(--color-border-subtle)',
+                      boxShadow: 'var(--shadow-floating)',
+                      padding: '16px',
+                      zIndex: 100
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
+                        Activity Notifications
+                      </span>
+                      {relevantUnreadCount > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => markAllNotificationsAsRead()}
+                          style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: 600 }}
+                        >
+                          Mark all read
+                        </button>
+                      )}
+                    </div>
+                    {relevantNotifications.length === 0 ? (
+                      <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', textAlign: 'center', padding: '20px 0' }}>
+                        No notifications yet.
+                      </p>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {relevantNotifications.slice(0, 6).map((n) => (
+                          <div
+                            key={n.id}
+                            style={{
+                              padding: '10px 12px',
+                              borderRadius: 'var(--radius-md)',
+                              background: n.read ? '#FFFFFF' : '#F0FDF4',
+                              border: `1px solid ${n.read ? 'var(--color-border-subtle)' : '#BBF7D0'}`,
+                              fontSize: '12px',
+                              cursor: 'pointer'
+                            }}
+                            onClick={() => {
+                              markNotificationAsRead(n.id);
+                              if (n.link) navigate(n.link);
+                            }}
+                          >
+                            <div style={{ fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '2px' }}>
+                              {n.title}
+                            </div>
+                            <div style={{ color: 'var(--color-text-secondary)', fontSize: '11.5px', lineHeight: 1.4 }}>
+                              {n.message}
+                            </div>
+                            <div style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                              {n.timestamp || 'Just now'}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
-                  {relevantNotifications.length === 0 ? (
-                    <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', textAlign: 'center', padding: '20px 0' }}>
-                      No notifications yet.
-                    </p>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {relevantNotifications.slice(0, 6).map((n) => (
-                        <div
-                          key={n.id}
-                          style={{
-                            padding: '10px 12px',
-                            borderRadius: 'var(--radius-md)',
-                            background: n.read ? '#FFFFFF' : '#F0FDF4',
-                            border: `1px solid ${n.read ? 'var(--color-border-subtle)' : '#BBF7D0'}`,
-                            fontSize: '12px',
-                            cursor: 'pointer'
-                          }}
-                          onClick={() => {
-                            markNotificationAsRead(n.id);
-                            if (n.link) navigate(n.link);
-                          }}
-                        >
-                          <div style={{ fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '2px' }}>
-                            {n.title}
-                          </div>
-                          <div style={{ color: 'var(--color-text-secondary)', fontSize: '11.5px', lineHeight: 1.4 }}>
-                            {n.message}
-                          </div>
-                          <div style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                            {n.timestamp || 'Just now'}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
             {/* Action 3: User Account / Persona Switcher */}
             {user ? (
@@ -860,7 +865,7 @@ export default function Navbar() {
                     <div style={{ paddingTop: '8px', borderTop: '1px solid var(--color-divider)' }}>
                       <button
                         type="button"
-                        onClick={() => { logout(); setShowUserMenu(false); }}
+                        onClick={() => { logout(); setShowUserMenu(false); navigate('/'); }}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -939,7 +944,7 @@ export default function Navbar() {
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {/* Citizen Mobile Links */}
-              {role === 'citizen' && (
+              {user && role === 'citizen' && (
                 <>
                   <Link
                     to="/citizen"
@@ -988,7 +993,7 @@ export default function Navbar() {
               )}
 
               {/* Civic Officer Mobile Links */}
-              {(role === 'civic_officer' || role === 'officer' || role === 'dept_admin') && (
+              {user && (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') && (
                 <>
                   <Link
                     to="/officer"
@@ -1054,7 +1059,7 @@ export default function Navbar() {
               )}
 
               {/* Super Admin Mobile Links */}
-              {role === 'super_admin' && (
+              {user && role === 'super_admin' && (
                 <>
                   <Link
                     to="/admin/super"
@@ -1148,6 +1153,24 @@ export default function Navbar() {
                     How it Works
                   </button>
                   <Link
+                    to="/onboarding"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: 'var(--color-primary)',
+                      background: '#F0FDF4',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    <Sparkles style={{ width: '15px', height: '15px' }} />
+                    <span>System Tour</span>
+                  </Link>
+                  <Link
                     to="/impact"
                     onClick={() => setMobileMenuOpen(false)}
                     style={{
@@ -1165,105 +1188,158 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Mobile Persona Switcher */}
-            <div style={{ marginTop: '8px', paddingTop: '10px', borderTop: '1px solid var(--color-divider)' }}>
-              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '8px' }}>
-                Switch Persona (1-Click):
-              </span>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
+            {/* Mobile Actions: Guest vs Logged In */}
+            {!user ? (
+              <div style={{ marginTop: '8px', paddingTop: '12px', borderTop: '1px solid var(--color-divider)' }}>
                 <button
                   type="button"
-                  onClick={() => handleRoleLogin('citizen')}
+                  onClick={() => { setShowLoginModal(true); setMobileMenuOpen(false); }}
+                  className="btn-primary"
                   style={{
-                    padding: '8px 12px',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: '12px',
-                    textAlign: 'left',
-                    background: role === 'citizen' ? '#F0FDF4' : '#F8FAFC',
-                    color: role === 'citizen' ? 'var(--color-primary)' : 'var(--color-text-primary)',
-                    border: `1px solid ${role === 'citizen' ? 'rgba(16, 185, 129, 0.3)' : 'var(--color-border-subtle)'}`,
-                    fontWeight: role === 'citizen' ? 700 : 500
+                    width: '100%',
+                    height: '42px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
                   }}
                 >
-                  👤 Citizen (Aditya Verma)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleRoleLogin('civic_officer')}
-                  style={{
-                    padding: '8px 12px',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: '12px',
-                    textAlign: 'left',
-                    background: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? '#ECFDF5' : '#F8FAFC',
-                    color: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? '#047857' : 'var(--color-text-primary)',
-                    border: `1px solid ${(role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? 'rgba(5, 150, 105, 0.3)' : 'var(--color-border-subtle)'}`,
-                    fontWeight: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? 700 : 500
-                  }}
-                >
-                  👷 Government Officer (Er. Sanjay Sharma)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleRoleLogin('super_admin')}
-                  style={{
-                    padding: '8px 12px',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: '12px',
-                    textAlign: 'left',
-                    background: role === 'super_admin' ? '#EEF2FF' : '#F8FAFC',
-                    color: role === 'super_admin' ? '#4338CA' : 'var(--color-text-primary)',
-                    border: `1px solid ${role === 'super_admin' ? 'rgba(67, 56, 202, 0.3)' : 'var(--color-border-subtle)'}`,
-                    fontWeight: role === 'super_admin' ? 700 : 500
-                  }}
-                >
-                  🛡️ Administrator / Admin (Dr. Meenakshi, IAS)
+                  <span>Login</span>
                 </button>
               </div>
-            </div>
+            ) : (
+              <>
+                {/* Mobile Persona Switcher */}
+                <div style={{ marginTop: '8px', paddingTop: '10px', borderTop: '1px solid var(--color-divider)' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '8px' }}>
+                    Switch Persona (1-Click):
+                  </span>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleRoleLogin('citizen')}
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '12px',
+                        textAlign: 'left',
+                        background: role === 'citizen' ? '#F0FDF4' : '#F8FAFC',
+                        color: role === 'citizen' ? 'var(--color-primary)' : 'var(--color-text-primary)',
+                        border: `1px solid ${role === 'citizen' ? 'rgba(16, 185, 129, 0.3)' : 'var(--color-border-subtle)'}`,
+                        fontWeight: role === 'citizen' ? 700 : 500
+                      }}
+                    >
+                      👤 Citizen (Aditya Verma)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleRoleLogin('civic_officer')}
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '12px',
+                        textAlign: 'left',
+                        background: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? '#ECFDF5' : '#F8FAFC',
+                        color: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? '#047857' : 'var(--color-text-primary)',
+                        border: `1px solid ${(role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? 'rgba(5, 150, 105, 0.3)' : 'var(--color-border-subtle)'}`,
+                        fontWeight: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? 700 : 500
+                      }}
+                    >
+                      👷 Government Officer (Er. Sanjay Sharma)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleRoleLogin('super_admin')}
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '12px',
+                        textAlign: 'left',
+                        background: role === 'super_admin' ? '#EEF2FF' : '#F8FAFC',
+                        color: role === 'super_admin' ? '#4338CA' : 'var(--color-text-primary)',
+                        border: `1px solid ${role === 'super_admin' ? 'rgba(67, 56, 202, 0.3)' : 'var(--color-border-subtle)'}`,
+                        fontWeight: role === 'super_admin' ? 700 : 500
+                      }}
+                    >
+                      🛡️ Administrator / Admin (Dr. Meenakshi, IAS)
+                    </button>
+                  </div>
+                </div>
 
-            <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
-              <button
-                type="button"
-                onClick={() => { setShowTrackModal(true); setMobileMenuOpen(false); }}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  borderRadius: 'var(--radius-full)',
-                  border: '1px solid var(--color-border-medium)',
-                  background: '#FFFFFF',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  color: 'var(--color-text-primary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
-              >
-                <Search style={{ width: '14px', height: '14px' }} />
-                <span>Track Ticket</span>
-              </button>
+                {role === 'citizen' && (
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                    <button
+                      type="button"
+                      onClick={() => { setShowTrackModal(true); setMobileMenuOpen(false); }}
+                      style={{
+                        flex: 1,
+                        padding: '12px',
+                        borderRadius: 'var(--radius-full)',
+                        border: '1px solid var(--color-border-medium)',
+                        background: '#FFFFFF',
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: 'var(--color-text-primary)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <Search style={{ width: '14px', height: '14px' }} />
+                      <span>Track Ticket</span>
+                    </button>
 
-              <Link
-                to="/citizen/submit"
-                onClick={() => setMobileMenuOpen(false)}
-                className="btn-primary"
-                style={{
-                  flex: 1,
-                  height: '42px',
-                  borderRadius: 'var(--radius-full)',
-                  fontSize: '13px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
-              >
-                <span>Report Issue</span>
-                <ArrowRight style={{ width: '14px', height: '14px' }} />
-              </Link>
-            </div>
+                    <Link
+                      to="/citizen/submit"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="btn-primary"
+                      style={{
+                        flex: 1,
+                        height: '42px',
+                        borderRadius: 'var(--radius-full)',
+                        fontSize: '13px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <span>Report Issue</span>
+                      <ArrowRight style={{ width: '14px', height: '14px' }} />
+                    </Link>
+                  </div>
+                )}
+
+                <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--color-divider)' }}>
+                  <button
+                    type="button"
+                    onClick={() => { logout(); setMobileMenuOpen(false); navigate('/'); }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      width: '100%',
+                      padding: '10px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      color: '#EF4444',
+                      background: '#FEF2F2',
+                      border: '1px solid #FEE2E2',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <LogOut style={{ width: '14px', height: '14px' }} />
+                    <span>Log Out</span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
       </header>

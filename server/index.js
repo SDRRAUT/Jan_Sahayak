@@ -94,6 +94,17 @@ const USERS = [
     designation: 'Executive Engineer & Department Administrator',
     zone: 'Zone North-West (Rohini)',
     phone: '+91 98111-90021'
+  },
+  {
+    id: 'USR-CIVICOFFICER-02',
+    name: 'Er. Sanjay Sharma',
+    email: 'officer.djb@delhi.gov.in',
+    password: 'officer123',
+    role: 'civic_officer',
+    department: 'Delhi Jal Board (DJB)',
+    designation: 'Government Officer & Assistant Executive Engineer',
+    zone: 'Zone North-West (Rohini)',
+    phone: '+91 98111-90021'
   }
 ];
 
@@ -590,7 +601,10 @@ app.get('/api/grievances', (req, res) => {
     // Return citizen's own plus public ward issues
     return res.json({ grievances: GRIEVANCES_DB });
   } else if (user.role === 'officer' || user.role === 'civic_officer') {
-    // Return grievances matching officer's department or unassigned
+    // Return grievances matching officer's department or all if requested
+    if (req.query.all === 'true') {
+      return res.json({ grievances: GRIEVANCES_DB });
+    }
     const officerDept = user.department;
     const filtered = GRIEVANCES_DB.filter(g => !officerDept || g.department === officerDept || g.department.includes(officerDept.split(' ')[0]));
     return res.json({ grievances: filtered.length > 0 ? filtered : GRIEVANCES_DB });
@@ -598,6 +612,14 @@ app.get('/api/grievances', (req, res) => {
     // Dept Admin and Super Admin get complete database
     return res.json({ grievances: GRIEVANCES_DB });
   }
+});
+
+// GET Single Grievance by ID
+app.get('/api/grievances/:id', authenticateToken, (req, res) => {
+  const { id } = req.params;
+  const item = GRIEVANCES_DB.find(g => g.id === id);
+  if (!item) return res.status(404).json({ error: 'Grievance not found.' });
+  res.json({ grievance: item });
 });
 
 // ============================================================================
@@ -2067,7 +2089,7 @@ app.post('/api/intelligence/signals', async (req, res) => {
 
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
-  app.get('*', (req, res, next) => {
+  app.use((req, res, next) => {
     if (req.path.startsWith('/api')) {
       return next();
     }
@@ -2075,9 +2097,15 @@ if (fs.existsSync(distPath)) {
   });
 }
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`JanSahayk Express API Server running on port ${PORT}`);
-});
+// Start Server when not running inside Vercel serverless environment
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`JanSahayk Express API Server running on port ${PORT}`);
+  });
+}
+
+export default app;
+export { app };
+
 
 

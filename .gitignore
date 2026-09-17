@@ -179,3 +179,5 @@ temp/
 # 15. Docker Local Overrides
 # ------------------------------------------------------------------------------
 docker-compose.override.yml
+
+.vercel

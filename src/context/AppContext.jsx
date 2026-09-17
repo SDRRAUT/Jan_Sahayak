@@ -1265,7 +1265,7 @@ export function AppProvider({ children }) {
           ward: 'Ward 14 (Rohini Sector 14)',
           pincode: '110085'
         },
-        role: user?.role || 'citizen',
+        role: user?.role || null,
         login,
         register,
         logout,
