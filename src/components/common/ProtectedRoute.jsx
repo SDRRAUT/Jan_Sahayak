@@ -7,9 +7,9 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
   const { user, token, switchDemoRole } = useApp();
   const location = useLocation();
 
-  // 1. Unauthenticated -> Redirect to Login
+  // 1. Unauthenticated -> Redirect to Home (login is via modal on home page)
   if (!token || !user) {
-    return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
+    return <Navigate to="/" replace />;
   }
 
   // 2. Role Authorization (Civic Officer inherits both officer and dept_admin permissions)

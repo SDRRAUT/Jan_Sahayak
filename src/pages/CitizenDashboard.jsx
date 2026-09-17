@@ -23,6 +23,7 @@ import {
 import { useApp } from '../context/AppContext';
 import WhyExplainer from '../components/common/WhyExplainer';
 import CivicSignalModal from '../components/intelligence/CivicSignalModal';
+import FileGrievanceModal from '../components/common/FileGrievanceModal';
 import citizenBg from '../assets/citizen-bg.jpg';
 
 export default function CitizenDashboard() {
@@ -40,6 +41,7 @@ export default function CitizenDashboard() {
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'my' | 'verification' | 'active' | 'resolved' | 'notifications'
   const [searchQuery, setSearchQuery] = useState('');
   const [showSignalModal, setShowSignalModal] = useState(false);
+  const [showFileModal, setShowFileModal] = useState(false);
   const [dashboardData, setDashboardData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -214,10 +216,10 @@ export default function CitizenDashboard() {
                 <span>Report Civic Signal</span>
               </button>
 
-              <Link to="/citizen/submit" className="btn-primary" style={{ height: '42px', fontSize: '13px' }}>
+              <button onClick={() => setShowFileModal(true)} className="btn-primary" style={{ height: '42px', fontSize: '13px' }}>
                 <Plus style={{ width: '16px', height: '16px' }} />
                 <span>Report a Problem</span>
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -597,10 +599,10 @@ export default function CitizenDashboard() {
                   <FileText style={{ width: '36px', height: '36px', color: 'var(--color-text-muted)', margin: '0 auto 12px' }} />
                   <p style={{ color: 'var(--color-text-muted)', fontSize: '15px' }}>No reports match the selected filter.</p>
                   {activeTab === 'my' && (
-                    <Link to="/citizen/submit" className="btn-primary" style={{ marginTop: '16px', display: 'inline-flex' }}>
+                    <button onClick={() => setShowFileModal(true)} className="btn-primary" style={{ marginTop: '16px', display: 'inline-flex' }}>
                       <Plus style={{ width: '16px', height: '16px' }} />
                       <span>Submit Your First Report</span>
-                    </Link>
+                    </button>
                   )}
                 </div>
               ) : (
@@ -716,6 +718,12 @@ export default function CitizenDashboard() {
           onClose={() => setShowSignalModal(false)}
         />
       )}
+
+      {/* 4-Step File Grievance Popup Modal */}
+      <FileGrievanceModal
+        isOpen={showFileModal}
+        onClose={() => setShowFileModal(false)}
+      />
     </div>
   );
 }

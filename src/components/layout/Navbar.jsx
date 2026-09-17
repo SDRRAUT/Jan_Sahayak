@@ -393,7 +393,7 @@ export default function Navbar() {
                   to="/"
                   className={`site-nav-link ${location.pathname === '/' ? 'active' : ''}`}
                 >
-                  Overview
+                  Home
                 </Link>
                 <button
                   type="button"

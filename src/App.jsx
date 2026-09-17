@@ -81,7 +81,8 @@ export default function App() {
           
           {/* Authentication & Onboarding Gateway */}
           <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/login" element={<Login />} />
+          {/* /login redirects to home — login is handled via the navbar modal */}
+          <Route path="/login" element={<Navigate to="/" replace />} />
           <Route path="/register" element={<Register />} />
 
           {/* Citizen Routes (Role: citizen, super_admin) */}
