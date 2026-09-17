@@ -147,6 +147,13 @@ export function AppProvider({ children }) {
       eventSource.addEventListener('cluster_updated', handleServerEvent);
       eventSource.addEventListener('incident_updated', handleServerEvent);
       eventSource.addEventListener('verification_submitted', handleServerEvent);
+
+      eventSource.onerror = () => {
+        // If backend server is offline, close to avoid repetitive reconnect spam
+        if (eventSource && eventSource.readyState === EventSource.CONNECTING) {
+          eventSource.close();
+        }
+      };
     } catch (err) {
       console.warn('SSE connection unavailable, using standard sync:', err);
     }
