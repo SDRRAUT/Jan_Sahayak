@@ -7,16 +7,16 @@ import { Check, Clock, UserCheck, Wrench, ShieldCheck, Sparkles } from 'lucide-r
  */
 export default function VisualJourneyTimeline({
   status = 'IN_PROGRESS',
-  createdAt = 'Sep 16, 09:30 AM',
-  officerName = 'Er. Sanjay Sharma (AEE)',
-  department = 'Delhi Jal Board (DJB)'
+  createdAt = 'Recently',
+  officerName = 'Duty Executive Engineer',
+  department = 'Municipal Corporation of Delhi'
 }) {
   // Map internal status to 6 journey stages
   const stages = [
     {
       id: 'submitted',
       label: 'Submitted',
-      desc: 'Received via voice/text',
+      desc: 'Received via portal',
       icon: Check,
       time: createdAt,
       isPassed: true,
@@ -25,9 +25,9 @@ export default function VisualJourneyTimeline({
     {
       id: 'ai_analysed',
       label: 'AI Analysed',
-      desc: 'Extracted context & severity',
+      desc: 'Extracted context & DNA',
       icon: Sparkles,
-      time: '1 min after',
+      time: 'Completed',
       isPassed: true,
       isCurrent: false
     },
@@ -36,17 +36,17 @@ export default function VisualJourneyTimeline({
       label: 'Assigned',
       desc: `Routed to ${department}`,
       icon: UserCheck,
-      time: '45 mins after',
-      isPassed: status !== 'SUBMITTED',
-      isCurrent: status === 'SUBMITTED' || status === 'TRIAGED'
+      time: status === 'INGESTED' ? 'In queue' : 'Assigned',
+      isPassed: status !== 'INGESTED' && status !== 'SUBMITTED',
+      isCurrent: status === 'INGESTED' || status === 'TRIAGED'
     },
     {
       id: 'officer_reviewing',
       label: 'Officer Reviewing',
-      desc: officerName,
+      desc: officerName || 'Duty Engineer',
       icon: Clock,
-      time: 'In progress',
-      isPassed: status === 'IN_PROGRESS' || status === 'RESOLVED' || status === 'CLOSED',
+      time: status === 'RESOLVED' || status === 'RESOLVED_CONFIRMED' ? 'Inspected' : 'In progress',
+      isPassed: status === 'IN_PROGRESS' || status === 'RESOLVED' || status === 'RESOLVED_CONFIRMED' || status === 'CLOSED',
       isCurrent: status === 'IN_PROGRESS' || status === 'UNDER_REVIEW' || status === 'INFO_REQUESTED'
     },
     {
@@ -54,18 +54,18 @@ export default function VisualJourneyTimeline({
       label: 'Action Initiated',
       desc: 'Field squad mobilized',
       icon: Wrench,
-      time: status === 'RESOLVED' || status === 'CLOSED' ? 'Completed' : 'Expected today',
-      isPassed: status === 'RESOLVED' || status === 'CLOSED',
+      time: status === 'RESOLVED' || status === 'RESOLVED_CONFIRMED' || status === 'CLOSED' ? 'Completed' : 'Mobilized',
+      isPassed: status === 'RESOLVED' || status === 'RESOLVED_CONFIRMED' || status === 'CLOSED',
       isCurrent: status === 'IN_PROGRESS'
     },
     {
       id: 'citizen_verification',
       label: 'Citizen Verification',
-      desc: 'Resident confirms fix',
+      desc: status === 'RESOLVED_CONFIRMED' ? 'Verified by you' : (status === 'DISPUTE_REOPENED' ? 'Dispute under review' : 'Resident confirms fix'),
       icon: ShieldCheck,
-      time: status === 'RESOLVED' || status === 'CLOSED' ? 'Awaiting your review' : 'Pending resolution',
-      isPassed: status === 'CLOSED',
-      isCurrent: status === 'RESOLVED'
+      time: status === 'RESOLVED_CONFIRMED' ? 'Verified & Closed' : (status === 'RESOLVED' ? 'Awaiting your review' : (status === 'DISPUTE_REOPENED' ? 'Reopened by citizen' : 'Pending resolution')),
+      isPassed: status === 'RESOLVED_CONFIRMED' || status === 'CLOSED',
+      isCurrent: status === 'RESOLVED' || status === 'DISPUTE_REOPENED'
     }
   ];
 
