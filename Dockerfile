@@ -34,7 +34,6 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/server ./server
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.env.example ./.env.example
 
 # Expose standard production port
 EXPOSE 3001

@@ -213,14 +213,9 @@ cd Jan_Sahayak
 ```bash
 npm install
 ```
+*(Runs 100% locally out of the box with embedded AI heuristics — zero setup or external API keys needed!)*
 
-### Step 3: Set Up Environment File
-```bash
-cp .env.example .env
-```
-*(Runs 100% locally out of the box with embedded AI heuristics — no paid API keys required!)*
-
-### Step 4: Start the Application
+### Step 3: Start the Application
 Run our 1-step integrated startup script:
 ```bash
 npm start
@@ -229,7 +224,7 @@ This automatically starts:
 - 📡 **Backend API Server**: running on `http://localhost:3001`
 - ⚡ **Frontend Web Application**: running on `http://localhost:3737` (or `http://localhost:3000`)
 
-### Step 5: Verify the Build
+### Step 4: Verify the Build
 ```bash
 npm run build
 ```

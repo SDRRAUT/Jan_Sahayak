@@ -6,13 +6,13 @@
 # 1. Environment Variables & Secrets (CRITICAL: Never commit to version control)
 # ------------------------------------------------------------------------------
 .env
-.env.*
-!.env.example
+.env*
 *.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.example
 
 # ------------------------------------------------------------------------------
 # 2. Cryptographic Keys, Certificates & Credentials
@@ -80,6 +80,7 @@ server/data/*.backup.json
 # 6. Scratch Files, SingleFile Web Dumps & Local Exports
 # ------------------------------------------------------------------------------
 Product discovery web.html
+website-ui-ux.md
 *.singlefile.html
 *.saved.html
 scratch/

@@ -12,7 +12,7 @@ npm-debug.log*
 yarn-debug.log*
 .env
 .env.*
-!.env.example
+*.env
 coverage
 .cache
 tmp

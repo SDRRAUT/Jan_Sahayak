@@ -31,16 +31,11 @@ All contributors are expected to adhere to our [Code of Conduct](CODE_OF_CONDUCT
    ```bash
    npm install
    ```
+   *(Runs 100% offline out of the box with zero external configuration or API key requirements.)*
 
-3. **Configure Environment:**
+3. **Start the Integrated Development Environment:**
    ```bash
-   cp .env.example .env
-   ```
-   *(The default configuration runs 100% offline with zero external API key requirements.)*
-
-4. **Start the Integrated Development Environment:**
-   ```bash
-   # Starts both Express API server (port 3001) and Vite dev server (port 3000)
+   # Starts both Express API server (port 3001) and Vite dev server (port 3737)
    npm start
    ```
    Alternatively, you can run them in separate terminals:
