@@ -20,12 +20,12 @@ const PROBLEM_CATEGORIES = [
 ];
 
 const CATEGORY_IMAGES = {
-  'Water Supply & Contamination': 'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f8?w=800&auto=format&fit=crop&q=80',
-  'Roads & Infrastructure': 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=80',
-  'Sanitation & Solid Waste': 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=800&auto=format&fit=crop&q=80',
-  'Electricity & Power Grid': 'https://images.unsplash.com/photo-1509390144018-eeaf65052242?w=800&auto=format&fit=crop&q=80',
-  'Drainage & Waterlogging': 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?w=800&auto=format&fit=crop&q=80',
-  'Other Civic Issue': 'https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=800&auto=format&fit=crop&q=80'
+  'Water Supply & Contamination': '/civic-problems/water_pipe_leak.jpg',
+  'Roads & Infrastructure': '/civic-problems/pothole_broken_drain_grate.jpg',
+  'Sanitation & Solid Waste': '/civic-problems/roadside_garbage_heap.jpg',
+  'Electricity & Power Grid': '/civic-problems/monsoon_waterlogging_flood.jpg',
+  'Drainage & Waterlogging': '/civic-problems/open_sewage_nullah_garbage.jpg',
+  'Other Civic Issue': '/civic-problems/construction_dust_pollution.jpg'
 };
 
 const STATUS_STEPS = [
