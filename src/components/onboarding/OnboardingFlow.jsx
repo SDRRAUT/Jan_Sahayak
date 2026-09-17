@@ -4,16 +4,14 @@ import {
   ArrowRight, 
   ArrowLeft, 
   CheckCircle2, 
-  Sparkles, 
   Building2, 
   Briefcase, 
   User, 
-  Lock, 
-  Mail, 
-  Clock, 
   ShieldCheck,
   Activity, 
-  Zap
+  Zap,
+  Lock,
+  Mail
 } from 'lucide-react';
 import { useApp, DEMO_CREDENTIALS, DEMO_USERS } from '../../context/AppContext';
 import citizenBg from '../../assets/citizen-bg.jpg';
@@ -24,62 +22,83 @@ export default function OnboardingFlow({ onComplete }) {
 
   const [currentStep, setCurrentStep] = useState(1);
 
-  // Direct Enter App Handler (Skip tour / Direct visitor access)
-  const handleDirectEnterApp = () => {
-    enterApp();
-    if (onComplete) onComplete();
-    navigate('/');
-  };
-
-  // Authentication & Demo Simulation States
+  // Persona Selection State for Step 4
   const [selectedRole, setSelectedRole] = useState('citizen');
-  const [email, setEmail] = useState(DEMO_CREDENTIALS.citizen.email);
-  const [password, setPassword] = useState(DEMO_CREDENTIALS.citizen.password);
   
   // 3-Second Verification Simulation State
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifyProgress, setVerifyProgress] = useState(0);
   const [verifyStageMessage, setVerifyStageMessage] = useState('');
-  const [authError, setAuthError] = useState('');
 
-  // Update credentials when role card changes
-  const handleSelectRole = (roleKey) => {
-    setSelectedRole(roleKey);
-    const cred = DEMO_CREDENTIALS[roleKey];
-    if (cred) {
-      setEmail(cred.email);
-      setPassword(cred.password);
+  // Role definitions for Step 4
+  const roleOptions = [
+    {
+      key: 'citizen',
+      label: 'Citizen',
+      name: 'Aditya Verma',
+      badge: 'Ward 14 (Rohini)',
+      email: DEMO_CREDENTIALS.citizen.email,
+      password: DEMO_CREDENTIALS.citizen.password,
+      icon: User,
+      color: '#2563EB',
+      bg: '#EFF6FF',
+      activeBorder: '#2563EB'
+    },
+    {
+      key: 'civic_officer',
+      label: 'Civic Officer',
+      name: 'Er. Sanjay Sharma',
+      badge: 'DJB Lead Engineer',
+      email: DEMO_CREDENTIALS.civic_officer.email,
+      password: DEMO_CREDENTIALS.civic_officer.password,
+      icon: Briefcase,
+      color: '#059669',
+      bg: '#ECFDF5',
+      activeBorder: '#059669'
+    },
+    {
+      key: 'super_admin',
+      label: 'Super Admin',
+      name: 'Dr. Meenakshi, IAS',
+      badge: 'Principal Secretary',
+      email: DEMO_CREDENTIALS.super_admin.email,
+      password: DEMO_CREDENTIALS.super_admin.password,
+      icon: ShieldCheck,
+      color: '#4338CA',
+      bg: '#EEF2FF',
+      activeBorder: '#4338CA'
     }
-  };
+  ];
 
-  // 3-Second Realistic Credential Verification Sequence
+  const currentRoleData = roleOptions.find(r => r.key === selectedRole) || roleOptions[0];
+
+  // 3-Second Credential Verification Sequence
   const trigger3SecondAuth = (targetRoleKey) => {
     const roleKey = targetRoleKey || selectedRole;
     setIsVerifying(true);
-    setVerifyProgress(10);
-    setVerifyStageMessage('Contacting Delhi Municipal Auth Directory...');
-    setAuthError('');
+    setVerifyProgress(15);
+    setVerifyStageMessage('Checking credentials in Delhi Municipal Auth Directory...');
 
-    // Phase 1: 0.8s
+    // Phase 1: 0.9s
     const t1 = setTimeout(() => {
-      setVerifyProgress(45);
+      setVerifyProgress(55);
       const roleLabel = DEMO_USERS[roleKey]?.designation || roleKey.replace('_', ' ').toUpperCase();
-      setVerifyStageMessage(`Verifying security credentials & jurisdiction for ${roleLabel}...`);
+      setVerifyStageMessage(`Verifying security clearance & jurisdiction for ${roleLabel}...`);
     }, 900);
 
     // Phase 2: 2.0s
     const t2 = setTimeout(() => {
-      setVerifyProgress(85);
-      setVerifyStageMessage('Cryptographic clearance authorized. Generating session token...');
+      setVerifyProgress(88);
+      setVerifyStageMessage('Cryptographic token granted. Preparing role workspace...');
     }, 2000);
 
     // Phase 3: 3.0s -> Complete & Navigate
     const t3 = setTimeout(async () => {
       setVerifyProgress(100);
-      setVerifyStageMessage('Login Successful! Entering dedicated workspace...');
+      setVerifyStageMessage('Access Granted! Redirecting...');
 
       try {
-        enterApp();
+        if (enterApp) enterApp();
         const logged = await switchDemoRole(roleKey);
         const target = logged?.role || roleKey;
         
@@ -89,10 +108,9 @@ export default function OnboardingFlow({ onComplete }) {
           else if (target === 'civic_officer' || target === 'officer' || target === 'dept_admin') navigate('/officer');
           else if (target === 'super_admin') navigate('/admin/super');
           else navigate('/');
-        }, 400);
+        }, 300);
       } catch (err) {
         setIsVerifying(false);
-        setAuthError('Authentication failed. Please try again.');
       }
     }, 3000);
 
@@ -103,790 +121,639 @@ export default function OnboardingFlow({ onComplete }) {
     };
   };
 
-  const handleManualSubmit = (e) => {
-    e.preventDefault();
-    trigger3SecondAuth(selectedRole);
+  const handleSkip = () => {
+    if (currentStep < 4) {
+      setCurrentStep(4);
+    } else {
+      if (enterApp) enterApp();
+      if (onComplete) onComplete();
+      navigate('/overview');
+    }
   };
 
   return (
     <div style={{
-      maxWidth: '1040px',
-      margin: '0 auto',
-      padding: '24px 16px',
-      fontFamily: 'var(--font-sans)'
+      width: '100vw',
+      height: '100vh',
+      maxHeight: '100vh',
+      overflow: 'hidden',
+      background: 'linear-gradient(145deg, #374cc9 0%, #3B52D4 50%, #2f42b5 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'relative',
+      padding: '16px',
+      boxSizing: 'border-box'
     }}>
-      {/* Stepper Progress Bar */}
+      {/* Decorative Accents matching the reference design image */}
+      {/* Top Right White Pill */}
+      <div 
+        aria-hidden="true" 
+        style={{
+          position: 'absolute',
+          top: '11%',
+          right: 0,
+          width: '84px',
+          height: '30px',
+          background: '#FFFFFF',
+          borderTopLeftRadius: '15px',
+          borderBottomLeftRadius: '15px',
+          pointerEvents: 'none',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+        }} 
+      />
+      {/* Top Right White Dot */}
+      <div 
+        aria-hidden="true" 
+        style={{
+          position: 'absolute',
+          top: '13.5%',
+          right: '98px',
+          width: '10px',
+          height: '10px',
+          borderRadius: '50%',
+          background: '#FFFFFF',
+          pointerEvents: 'none'
+        }} 
+      />
+
+      {/* Bottom Left White Pill 1 */}
+      <div 
+        aria-hidden="true" 
+        style={{
+          position: 'absolute',
+          bottom: '22%',
+          left: 0,
+          width: '95px',
+          height: '30px',
+          background: '#FFFFFF',
+          borderTopRightRadius: '15px',
+          borderBottomRightRadius: '15px',
+          pointerEvents: 'none',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+        }} 
+      />
+      {/* Bottom Left White Pill 2 */}
+      <div 
+        aria-hidden="true" 
+        style={{
+          position: 'absolute',
+          bottom: '15%',
+          left: 0,
+          width: '60px',
+          height: '26px',
+          background: '#FFFFFF',
+          borderTopRightRadius: '13px',
+          borderBottomRightRadius: '13px',
+          pointerEvents: 'none'
+        }} 
+      />
+
+      {/* Central Single-Screen Non-Scrollable Card */}
       <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: '28px',
-        padding: '16px 20px',
         background: '#FFFFFF',
-        borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--color-border-subtle)',
-        boxShadow: 'var(--shadow-sm)'
+        borderRadius: '28px',
+        maxWidth: '580px',
+        width: '100%',
+        boxShadow: '0 25px 60px -10px rgba(15, 23, 42, 0.35)',
+        padding: '24px 28px 20px 28px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        position: 'relative',
+        overflow: 'hidden',
+        boxSizing: 'border-box'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-primary)' }}>
-            GUIDED SYSTEM TOUR & DEMO
-          </span>
-          <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>• Step {currentStep} of 4</span>
-        </div>
 
-        {/* Dots / Pills */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {[
-            { step: 1, label: '01 The Problem' },
-            { step: 2, label: '02 AI Intelligence' },
-            { step: 3, label: '03 Authority Handover' },
-            { step: 4, label: '04 Role Access' }
-          ].map((item) => (
-            <button
-              key={item.step}
-              type="button"
-              onClick={() => !isVerifying && setCurrentStep(item.step)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 12px',
-                borderRadius: 'var(--radius-full)',
-                border: 'none',
-                background: currentStep === item.step ? 'var(--color-primary)' : currentStep > item.step ? '#E8F7F0' : '#F1F5F9',
-                color: currentStep === item.step ? '#FFFFFF' : currentStep > item.step ? 'var(--color-primary)' : 'var(--color-text-muted)',
-                fontSize: '11.5px',
-                fontWeight: currentStep === item.step ? 700 : 600,
-                cursor: 'pointer',
-                transition: 'all 150ms ease'
-              }}
-            >
-              <span>{item.step}</span>
-              <span className="hide-on-mobile">{item.label.split(' ')[1]}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* =========================================================================
-          SCREEN 1: THE REAL PROBLEM (Asli Ground Reality)
-          ========================================================================= */}
-      {currentStep === 1 && (
-        <div className="card" style={{ padding: '36px', background: '#FFFFFF', borderRadius: 'var(--radius-xl)' }}>
-          <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 28px auto' }}>
-            <div className="category-pill" style={{ background: '#FEF2F2', color: '#991B1B', borderColor: '#FECACA', marginBottom: '12px' }}>
-              STEP 1: GROUND REALITY
-            </div>
-            <h2 style={{ fontSize: '28px', color: 'var(--color-text-primary)', marginBottom: '12px' }}>
-              Asli Samasya Kya Hai? (What's Broken on Ground)
-            </h2>
-            <p style={{ fontSize: '15px', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
-              Har din hum sabhi toote raste, gande paani ki supply, kooda aur andheri galiyon se joojhte hain. 
-              Lekin complaint darj karne ke baad <strong>shikayat gayab ho jaati hai</strong> aur koi zimmedari nahi leta.
-            </p>
-          </div>
-
-          {/* User's Uploaded Civic Collage Image Display */}
+        {/* 3-Second Security Clearance Simulation Overlay (Step 4) */}
+        {isVerifying && (
           <div style={{
-            position: 'relative',
-            borderRadius: 'var(--radius-lg)',
-            overflow: 'hidden',
-            border: '1px solid var(--color-border-medium)',
-            marginBottom: '32px',
-            boxShadow: 'var(--shadow-md)'
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(255, 255, 255, 0.98)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '24px',
+            zIndex: 50,
+            textAlign: 'center'
           }}>
-            <img 
-              src={citizenBg} 
-              alt="Real Civic Problems Across Delhi" 
-              style={{
-                width: '100%',
-                height: 'auto',
-                maxHeight: '380px',
-                objectFit: 'cover',
-                display: 'block'
-              }}
-            />
             <div style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              padding: '16px 20px',
-              background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(15, 23, 42, 0.88) 100%)',
-              color: '#FFFFFF',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '10px'
-            }}>
-              <span style={{ fontSize: '13px', fontWeight: 600 }}>
-                📍 Real Everyday Problems: Damaged Roads • Water Contamination • Stray Garbage • Blackouts
-              </span>
-              <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '4px' }}>
-                Ground Truth Capture
-              </span>
-            </div>
-          </div>
-
-          {/* 4 Core Pain Points in Plain Simple Language */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '16px',
-            marginBottom: '32px'
-          }}>
-            <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#F8FAFC', border: '1px solid var(--color-border-subtle)' }}>
-              <div style={{ fontSize: '20px', marginBottom: '8px' }}>🕳️</div>
-              <strong style={{ fontSize: '14px', display: 'block', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
-                Sadak Ke Khatarnaak Gaddhe
-              </strong>
-              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.5 }}>
-                Baarish ke baad road dhans jaati hai, do-pahia gaadiyan girti hain aur roz accident ka khatra bana rehta hai.
-              </p>
-            </div>
-
-            <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#F8FAFC', border: '1px solid var(--color-border-subtle)' }}>
-              <div style={{ fontSize: '20px', marginBottom: '8px' }}>🚰</div>
-              <strong style={{ fontSize: '14px', display: 'block', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
-                Ganda & Badbudaar Paani
-              </strong>
-              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.5 }}>
-                Pipe leakage ki wajah se naali ka ganda paani drinking line mein milta hai, jisse poori colony mein bimari failti hai.
-              </p>
-            </div>
-
-            <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#F8FAFC', border: '1px solid var(--color-border-subtle)' }}>
-              <div style={{ fontSize: '20px', marginBottom: '8px' }}>🗑️</div>
-              <strong style={{ fontSize: '14px', display: 'block', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
-                Open Dhalav & Kooda
-              </strong>
-              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.5 }}>
-                Market ke samne kooda kai dino tak nahi uthta, badboo failti hai aur aam logo ka nikalna mushkil ho jaata hai.
-              </p>
-            </div>
-
-            <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#F8FAFC', border: '1px solid var(--color-border-subtle)' }}>
-              <div style={{ fontSize: '20px', marginBottom: '8px' }}>💡</div>
-              <strong style={{ fontSize: '14px', display: 'block', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
-                Dark Spots & Streetlights
-              </strong>
-              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.5 }}>
-                Mahilaon aur buzurgon ke liye raat mein sadak par chalna unsafe hota hai kyunki feeder lines hafton band rehti hain.
-              </p>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginTop: '16px' }}>
-            <button
-              type="button"
-              onClick={handleDirectEnterApp}
-              className="btn-secondary"
-              style={{ height: '46px', padding: '0 20px', fontSize: '13px' }}
-            >
-              <span>Skip Tour & Enter App Directly</span>
-              <ArrowRight style={{ width: '14px', height: '14px' }} />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setCurrentStep(2)}
-              className="btn-primary"
-              style={{ height: '48px', padding: '0 28px', fontSize: '14px' }}
-            >
-              <span>See How We Address It (AI Intelligence)</span>
-              <ArrowRight style={{ width: '16px', height: '16px' }} />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================================
-          SCREEN 2: HOW WE ADDRESS IT USING AI INTELLIGENCE
-          ========================================================================= */}
-      {currentStep === 2 && (
-        <div className="card" style={{ padding: '36px', background: '#FFFFFF', borderRadius: 'var(--radius-xl)' }}>
-          <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 28px auto' }}>
-            <div className="category-pill" style={{ background: '#EEF2FF', color: '#4338CA', borderColor: '#C7D2FE', marginBottom: '12px' }}>
-              STEP 2: CIVIC INTELLIGENCE ENGINE
-            </div>
-            <h2 style={{ fontSize: '28px', color: 'var(--color-text-primary)', marginBottom: '12px' }}>
-              Hum Ise AI Se Kaise Solve Karte Hain?
-            </h2>
-            <p style={{ fontSize: '15px', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
-              Aam citizen ko mushkil official form bharne ki zaroorat nahi hai. Hum <strong>Voice, Hindi/Hinglish, aur Photos</strong> ko AI intelligence mein convert karte hain.
-            </p>
-          </div>
-
-          {/* Interactive 3-Stage Pipeline Diagram */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '20px',
-            marginBottom: '32px'
-          }}>
-            {/* Box 1 */}
-            <div style={{
-              padding: '22px',
-              borderRadius: 'var(--radius-lg)',
-              background: '#F0FDF4',
-              border: '1px solid #BBF7D0',
-              position: 'relative'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: '#166534', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 800 }}>
-                  1
-                </div>
-                <strong style={{ fontSize: '15px', color: '#166534' }}>Natural Voice / Multimodal Input</strong>
-              </div>
-              <p style={{ fontSize: '12.5px', color: '#14532D', lineHeight: 1.5, marginBottom: '14px' }}>
-                Citizen bas apni zubaan mein WhatsApp ya mic se bolta hai: <em>"Mother Dairy ke samne pipe toot gaya hai, ganda paani aa raha hai."</em>
-              </p>
-              <div style={{ background: '#FFFFFF', padding: '8px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid #BBF7D0', fontSize: '11.5px', color: '#047857' }}>
-                🎙️ Audio + Photo + Pincode Auto-Tagged
-              </div>
-            </div>
-
-            {/* Box 2 */}
-            <div style={{
-              padding: '22px',
-              borderRadius: 'var(--radius-lg)',
+              width: '54px',
+              height: '54px',
+              borderRadius: '50%',
               background: '#EFF6FF',
-              border: '1px solid #BFDBFE',
-              position: 'relative'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: '#1D4ED8', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 800 }}>
-                  2
-                </div>
-                <strong style={{ fontSize: '15px', color: '#1D4ED8' }}>Complaint DNA Extraction</strong>
-              </div>
-              <p style={{ fontSize: '12.5px', color: '#1E3A8A', lineHeight: 1.5, marginBottom: '14px' }}>
-                Hamara AI bina human delay ke issue ka DNA bana leta hai: Issue type (Biohazard), Ward (Ward 14), Urgency score (94/100).
-              </p>
-              <div style={{ background: '#FFFFFF', padding: '8px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid #BFDBFE', fontSize: '11.5px', color: '#1D4ED8' }}>
-                🧬 DNA: Water Contamination • Severity Critical
-              </div>
-            </div>
-
-            {/* Box 3 */}
-            <div style={{
-              padding: '22px',
-              borderRadius: 'var(--radius-lg)',
-              background: '#FAF5FF',
-              border: '1px solid #E9D5FF',
-              position: 'relative'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: '#7E22CE', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 800 }}>
-                  3
-                </div>
-                <strong style={{ fontSize: '15px', color: '#7E22CE' }}>Spatial Incident Clustering</strong>
-              </div>
-              <p style={{ fontSize: '12.5px', color: '#581C87', lineHeight: 1.5, marginBottom: '14px' }}>
-                Agar ek hi galli se 15 alag log shikayat karein, toh 15 duplicate file nahi banti. AI unhe <strong>1 Single High-Priority Incident</strong> mein jodh deta hai.
-              </p>
-              <div style={{ background: '#FFFFFF', padding: '8px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid #E9D5FF', fontSize: '11.5px', color: '#7E22CE' }}>
-                🔗 15 Signals Linked ➔ Zero Duplicate Backlog
-              </div>
-            </div>
-          </div>
-
-          {/* Navigation Controls */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginTop: '16px' }}>
-            <button
-              type="button"
-              onClick={() => setCurrentStep(1)}
-              className="btn-secondary"
-              style={{ height: '48px', padding: '0 24px', fontSize: '14px' }}
-            >
-              <ArrowLeft style={{ width: '16px', height: '16px' }} />
-              <span>Previous Step</span>
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <button
-                type="button"
-                onClick={handleDirectEnterApp}
-                className="btn-secondary"
-                style={{ height: '48px', padding: '0 20px', fontSize: '13px' }}
-              >
-                <span>Skip Tour & Enter App</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setCurrentStep(3)}
-                className="btn-primary"
-                style={{ height: '48px', padding: '0 28px', fontSize: '14px' }}
-              >
-                <span>See Authority Handover & Solutions</span>
-                <ArrowRight style={{ width: '16px', height: '16px' }} />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================================
-          SCREEN 3: GIVING ROOT PROBLEM TO AUTHORITIES WITH SOLUTION
-          ========================================================================= */}
-      {currentStep === 3 && (
-        <div className="card" style={{ padding: '36px', background: '#FFFFFF', borderRadius: 'var(--radius-xl)' }}>
-          <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 28px auto' }}>
-            <div className="category-pill" style={{ background: '#ECFDF5', color: '#065F46', borderColor: '#A7F3D0', marginBottom: '12px' }}>
-              STEP 3: ACTIONABLE AUTHORITY HANDOVER
-            </div>
-            <h2 style={{ fontSize: '28px', color: 'var(--color-text-primary)', marginBottom: '12px' }}>
-              Solution Ke Saath Authorities Ko Handover
-            </h2>
-            <p style={{ fontSize: '15px', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
-              Authorities ko sirf samasya nahi milti, balki <strong>AI pre-computed solutions aur field squad SOPs</strong> ke sath direct dispatch karta hai.
-            </p>
-          </div>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '20px',
-            marginBottom: '32px'
-          }}>
-            <div style={{ padding: '24px', borderRadius: 'var(--radius-lg)', background: '#F8FAFC', border: '1px solid var(--color-border-subtle)' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#EFF6FF', color: '#1D4ED8', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
-                <Building2 style={{ width: '20px', height: '20px' }} />
-              </div>
-              <h3 style={{ fontSize: '16px', marginBottom: '8px', color: 'var(--color-text-primary)' }}>
-                Exact Department Auto-Routing
-              </h3>
-              <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: 0 }}>
-                Koi file passing nahi. Water issue direct Delhi Jal Board (DJB) ko, pothole PWD ko, garbage MCD ko, aur streetlights BSES ko auto-route hoti hain.
-              </p>
-            </div>
-
-            <div style={{ padding: '24px', borderRadius: 'var(--radius-lg)', background: '#F8FAFC', border: '1px solid var(--color-border-subtle)' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#ECFDF5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
-                <Zap style={{ width: '20px', height: '20px' }} />
-              </div>
-              <h3 style={{ fontSize: '16px', marginBottom: '8px', color: 'var(--color-text-primary)' }}>
-                Pre-Computed SOPs for Field Officers
-              </h3>
-              <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: 0 }}>
-                Field Engineer ko ready-to-approve SOP milta hai: <em>"Deploy 100mm valve clamp squad #4 with chlorine test kit"</em>. Officer 1-click mein dispatch kar deta hai.
-              </p>
-            </div>
-
-            <div style={{ padding: '24px', borderRadius: 'var(--radius-lg)', background: '#F8FAFC', border: '1px solid var(--color-border-subtle)' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#FFF7ED', color: '#C2410C', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
-                <Clock style={{ width: '20px', height: '20px' }} />
-              </div>
-              <h3 style={{ fontSize: '16px', marginBottom: '8px', color: 'var(--color-text-primary)' }}>
-                12-Hour SLA & Citizen Verification
-              </h3>
-              <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: 0 }}>
-                Automatic timer chalta hai. Resolution ke baad actual on-site photo aati hai aur jab tak citizen verify nahi karta, case close nahi hota.
-              </p>
-            </div>
-          </div>
-
-          {/* Navigation Controls */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginTop: '16px' }}>
-            <button
-              type="button"
-              onClick={() => setCurrentStep(2)}
-              className="btn-secondary"
-              style={{ height: '48px', padding: '0 24px', fontSize: '14px' }}
-            >
-              <ArrowLeft style={{ width: '16px', height: '16px' }} />
-              <span>Back to AI Engine</span>
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <button
-                type="button"
-                onClick={handleDirectEnterApp}
-                className="btn-secondary"
-                style={{ height: '48px', padding: '0 20px', fontSize: '13px' }}
-              >
-                <span>Skip Tour & Enter App</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setCurrentStep(4)}
-                className="btn-primary"
-                style={{ height: '48px', padding: '0 28px', fontSize: '14px' }}
-              >
-                <span>Choose Role & Enter App</span>
-                <ArrowRight style={{ width: '16px', height: '16px' }} />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================================
-          SCREEN 4: ROLE SELECTION & 3-SECOND CREDENTIAL AUTHENTICATION
-          ========================================================================= */}
-      {currentStep === 4 && (
-        <div className="card" style={{ padding: '36px', background: '#FFFFFF', borderRadius: 'var(--radius-xl)', position: 'relative', overflow: 'hidden' }}>
-          
-          {/* 3-Second Verification Animated Modal Overlay */}
-          {isVerifying && (
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'rgba(255, 255, 255, 0.96)',
-              backdropFilter: 'blur(6px)',
+              color: '#3B52D4',
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '32px',
-              zIndex: 50,
-              textAlign: 'center'
+              marginBottom: '14px',
+              boxShadow: '0 0 0 8px rgba(59, 82, 212, 0.12)'
+            }}>
+              <Activity className="animate-spin" style={{ width: '26px', height: '26px' }} />
+            </div>
+
+            <span style={{
+              fontSize: '11px',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              color: '#3B52D4',
+              background: '#EFF6FF',
+              padding: '3px 10px',
+              borderRadius: '999px',
+              marginBottom: '10px'
+            }}>
+              SECURITY CLEARANCE CHECK
+            </span>
+
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}>
+              Authenticating {selectedRole.replace('_', ' ').toUpperCase()}...
+            </h3>
+
+            <p style={{ fontSize: '13px', color: '#64748B', maxWidth: '400px', minHeight: '34px', lineHeight: 1.4, marginBottom: '16px' }}>
+              {verifyStageMessage}
+            </p>
+
+            {/* Progress Bar */}
+            <div style={{
+              width: '100%',
+              maxWidth: '300px',
+              height: '7px',
+              background: '#E2E8F0',
+              borderRadius: '999px',
+              overflow: 'hidden',
+              marginBottom: '8px'
             }}>
               <div style={{
-                width: '64px',
-                height: '64px',
-                borderRadius: '50%',
-                background: '#E8F7F0',
-                color: 'var(--color-primary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '20px',
-                boxShadow: '0 0 0 8px rgba(14, 94, 58, 0.1)'
-              }}>
-                <Activity className="animate-spin" style={{ width: '32px', height: '32px' }} />
-              </div>
-
-              <div className="category-pill" style={{ marginBottom: '12px' }}>
-                SECURITY CLEARANCE VERIFICATION
-              </div>
-
-              <h3 style={{ fontSize: '22px', color: 'var(--color-text-primary)', marginBottom: '8px' }}>
-                Checking Credentials for {selectedRole.replace('_', ' ').toUpperCase()}...
-              </h3>
-
-              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', maxWidth: '460px', marginBottom: '24px', minHeight: '40px' }}>
-                {verifyStageMessage}
-              </p>
-
-              {/* Animated Progress Bar */}
-              <div style={{
-                width: '100%',
-                maxWidth: '380px',
-                height: '8px',
-                background: '#E2E8F0',
+                height: '100%',
+                width: `${verifyProgress}%`,
+                background: 'linear-gradient(90deg, #3B52D4 0%, #10B981 100%)',
                 borderRadius: '999px',
-                overflow: 'hidden',
-                marginBottom: '12px'
-              }}>
-                <div style={{
+                transition: 'width 500ms ease-in-out'
+              }} />
+            </div>
+
+            <span style={{ fontSize: '11px', color: '#94A3B8', fontFamily: 'monospace' }}>
+              Delhi Municipal Directory Auth ({verifyProgress}%)
+            </span>
+          </div>
+        )}
+
+        {/* =====================================================================
+            SCREEN 1: GROUND REALITY (Problem + Image)
+            ===================================================================== */}
+        {currentStep === 1 && (
+          <div>
+            {/* Top Visual: Framed Civic Collage Image */}
+            <div style={{
+              width: '100%',
+              height: '185px',
+              borderRadius: '16px',
+              overflow: 'hidden',
+              position: 'relative',
+              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08)',
+              border: '1px solid #E2E8F0',
+              marginBottom: '14px'
+            }}>
+              <img 
+                src={citizenBg} 
+                alt="Delhi Civic Ground Truth" 
+                style={{
+                  width: '100%',
                   height: '100%',
-                  width: `${verifyProgress}%`,
-                  background: 'linear-gradient(90deg, #0E5E3A 0%, #10B981 100%)',
-                  borderRadius: '999px',
-                  transition: 'width 600ms ease-in-out'
-                }} />
+                  objectFit: 'cover',
+                  display: 'block'
+                }} 
+              />
+              <div style={{
+                position: 'absolute',
+                top: '10px',
+                left: '12px',
+                background: 'rgba(15, 23, 42, 0.85)',
+                backdropFilter: 'blur(4px)',
+                padding: '3px 10px',
+                borderRadius: '6px',
+                fontSize: '11px',
+                fontWeight: 700,
+                color: '#FFFFFF'
+              }}>
+                📍 Delhi Municipal Ground Reality
               </div>
-
-              <span style={{ fontSize: '11.5px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-                Simulating Delhi Gov Active Directory Verification ({verifyProgress}%)
-              </span>
-            </div>
-          )}
-
-          <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 28px auto' }}>
-            <div className="category-pill" style={{ background: '#E8F7F0', color: '#0E5E3A', borderColor: 'rgba(14, 94, 58, 0.2)', marginBottom: '12px' }}>
-              STEP 4: ROLE CLEARANCE & ACCESS
-            </div>
-            <h2 style={{ fontSize: '28px', color: 'var(--color-text-primary)', marginBottom: '12px' }}>
-              Select Role & Experience 3-Second Auth
-            </h2>
-            <p style={{ fontSize: '15px', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
-              Select any role below. You can either enter credentials or click <strong>1-Click Demo Login</strong> to witness the 3-second credential verification simulation.
-            </p>
-          </div>
-
-          {/* Role Cards Grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '14px',
-            marginBottom: '28px'
-          }}>
-            {/* Role 1: Citizen */}
-            <div
-              onClick={() => handleSelectRole('citizen')}
-              style={{
-                padding: '18px',
-                borderRadius: 'var(--radius-lg)',
-                border: selectedRole === 'citizen' ? '2px solid var(--color-primary)' : '1px solid var(--color-border-subtle)',
-                background: selectedRole === 'citizen' ? '#F0FDF4' : '#FFFFFF',
-                cursor: 'pointer',
-                transition: 'all 150ms ease',
-                boxShadow: selectedRole === 'citizen' ? '0 4px 12px rgba(14, 94, 58, 0.12)' : 'none'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#E8F7F0', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <User style={{ width: '18px', height: '18px' }} />
-                </div>
-                {selectedRole === 'citizen' && (
-                  <span style={{ fontSize: '10.5px', background: 'var(--color-primary)', color: '#FFFFFF', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>
-                    SELECTED
-                  </span>
-                )}
+              <div style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                padding: '8px 12px',
+                background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(15, 23, 42, 0.85) 100%)',
+                color: '#FFFFFF',
+                fontSize: '11px',
+                display: 'flex',
+                gap: '8px',
+                justifyContent: 'center',
+                flexWrap: 'wrap'
+              }}>
+                <span>Toote Raste</span> • <span>Ganda Paani</span> • <span>Kooda Dher</span> • <span>Dark Spots</span>
               </div>
-              <strong style={{ fontSize: '14.5px', display: 'block', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
-                Citizen
-              </strong>
-              <span style={{ fontSize: '11.5px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '8px' }}>
-                Aditya Verma (Ward 14)
-              </span>
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); handleSelectRole('citizen'); trigger3SecondAuth('citizen'); }}
-                className="btn-secondary btn-sm"
-                style={{ width: '100%', fontSize: '11px', marginTop: '6px' }}
-              >
-                ⚡ 1-Click Demo Login
-              </button>
             </div>
 
-            {/* Role 2: Civic Officer */}
-            <div
-              onClick={() => handleSelectRole('civic_officer')}
-              style={{
-                padding: '18px',
-                borderRadius: 'var(--radius-lg)',
-                border: (selectedRole === 'civic_officer' || selectedRole === 'officer' || selectedRole === 'dept_admin') ? '2px solid #059669' : '1px solid var(--color-border-subtle)',
-                background: (selectedRole === 'civic_officer' || selectedRole === 'officer' || selectedRole === 'dept_admin') ? '#ECFDF5' : '#FFFFFF',
-                cursor: 'pointer',
-                transition: 'all 150ms ease',
-                boxShadow: (selectedRole === 'civic_officer' || selectedRole === 'officer' || selectedRole === 'dept_admin') ? '0 4px 12px rgba(5, 150, 105, 0.12)' : 'none'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#DCFCE7', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Briefcase style={{ width: '18px', height: '18px' }} />
-                </div>
-                {(selectedRole === 'civic_officer' || selectedRole === 'officer' || selectedRole === 'dept_admin') && (
-                  <span style={{ fontSize: '10.5px', background: '#059669', color: '#FFFFFF', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>
-                    SELECTED
-                  </span>
-                )}
-              </div>
-              <strong style={{ fontSize: '14.5px', display: 'block', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
-                🏛️ Civic Officer
-              </strong>
-              <span style={{ fontSize: '11.5px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '8px' }}>
-                Er. Sanjay Sharma (AEE & Dept Admin)
-              </span>
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); handleSelectRole('civic_officer'); trigger3SecondAuth('civic_officer'); }}
-                className="btn-secondary btn-sm"
-                style={{ width: '100%', fontSize: '11px', marginTop: '6px' }}
-              >
-                ⚡ 1-Click Demo Login
-              </button>
-            </div>
-
-            {/* Role 3: Super Admin */}
-            <div
-              onClick={() => handleSelectRole('super_admin')}
-              style={{
-                padding: '18px',
-                borderRadius: 'var(--radius-lg)',
-                border: selectedRole === 'super_admin' ? '2px solid #4338CA' : '1px solid var(--color-border-subtle)',
-                background: selectedRole === 'super_admin' ? '#EEF2FF' : '#FFFFFF',
-                cursor: 'pointer',
-                transition: 'all 150ms ease',
-                boxShadow: selectedRole === 'super_admin' ? '0 4px 12px rgba(67, 56, 202, 0.12)' : 'none'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#E0E7FF', color: '#4338CA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ShieldCheck style={{ width: '18px', height: '18px' }} />
-                </div>
-                {selectedRole === 'super_admin' && (
-                  <span style={{ fontSize: '10.5px', background: '#4338CA', color: '#FFFFFF', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>
-                    SELECTED
-                  </span>
-                )}
-              </div>
-              <strong style={{ fontSize: '14.5px', display: 'block', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
-                🛡️ Super Admin
-              </strong>
-              <span style={{ fontSize: '11.5px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '8px' }}>
-                Dr. Meenakshi Sundaram (IAS)
-              </span>
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); handleSelectRole('super_admin'); trigger3SecondAuth('super_admin'); }}
-                className="btn-secondary btn-sm"
-                style={{ width: '100%', fontSize: '11px', marginTop: '6px' }}
-              >
-                ⚡ 1-Click Demo Login
-              </button>
-            </div>
-          </div>
-
-          {/* Explicit Credentials Form Box */}
-          <div style={{
-            maxWidth: '480px',
-            margin: '0 auto',
-            padding: '24px',
-            borderRadius: 'var(--radius-lg)',
-            border: '1px solid var(--color-border-subtle)',
-            background: '#F8FAFC'
-          }}>
-            <form onSubmit={handleManualSubmit}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-                <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                  Selected Account Credentials:
-                </span>
-                <span style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: 600 }}>
-                  Pre-filled for {selectedRole.replace('_', ' ')}
-                </span>
-              </div>
-
-              {authError && (
-                <div style={{ padding: '8px 12px', borderRadius: 'var(--radius-sm)', background: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', fontSize: '12px', marginBottom: '12px' }}>
-                  {authError}
-                </div>
-              )}
-
-              <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
-                  Official Email / Username
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <Mail style={{ position: 'absolute', left: '12px', top: '13px', width: '15px', height: '15px', color: 'var(--color-text-muted)' }} />
-                  <input
-                    type="text"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    style={{
-                      width: '100%',
-                      height: '42px',
-                      borderRadius: 'var(--radius-md)',
-                      border: '1px solid var(--color-border-medium)',
-                      paddingLeft: '36px',
-                      paddingRight: '12px',
-                      fontSize: '13px',
-                      background: '#FFFFFF'
-                    }}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
-                  Secure Password
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <Lock style={{ position: 'absolute', left: '12px', top: '13px', width: '15px', height: '15px', color: 'var(--color-text-muted)' }} />
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    style={{
-                      width: '100%',
-                      height: '42px',
-                      borderRadius: 'var(--radius-md)',
-                      border: '1px solid var(--color-border-medium)',
-                      paddingLeft: '36px',
-                      paddingRight: '12px',
-                      fontSize: '13px',
-                      background: '#FFFFFF'
-                    }}
-                    required
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isVerifying}
-                className="btn-primary"
-                style={{ width: '100%', height: '46px', fontSize: '14px' }}
-              >
-                <span>Sign In with 3-Second Credential Check</span>
-                <ArrowRight style={{ width: '16px', height: '16px' }} />
-              </button>
-            </form>
-          </div>
-
-          {/* Guest / Direct Entry Card */}
-          <div style={{
-            marginTop: '28px',
-            padding: '22px 24px',
-            borderRadius: 'var(--radius-lg)',
-            background: 'linear-gradient(135deg, #ECFDF5 0%, #EFF6FF 100%)',
-            border: '2px dashed rgba(16, 185, 129, 0.45)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '16px'
-          }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                <span className="status-dot active" style={{ width: '8px', height: '8px' }} />
-                <strong style={{ fontSize: '15px', color: 'var(--color-primary)' }}>
-                  Explore Platform Directly as Public Guest?
-                </strong>
-              </div>
-              <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: 0 }}>
-                Enter the full application directly to browse live heatmaps, public reports, and civic intelligence.
+            {/* Headline & Description */}
+            <div style={{ textAlign: 'center', padding: '0 6px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#1E2653', marginBottom: '6px', letterSpacing: '-0.02em' }}>
+                Asli Samasya: Complaints Gayab Kyun Hoti Hain?
+              </h2>
+              <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.5, margin: '0 auto', maxWidth: '480px' }}>
+                Har din toote raste, gande paani aur koodedaano se hum sab joojhte hain. 
+                Lekin 10 alag departments aur duplicate tickets ke dher mein aam naagrik ki awaaz dab jaati hai.
               </p>
             </div>
+          </div>
+        )}
 
+        {/* =====================================================================
+            SCREEN 2: AI CIVIC INTELLIGENCE (How We Address It)
+            ===================================================================== */}
+        {currentStep === 2 && (
+          <div>
+            {/* Top Visual: Modern 3-Step AI Pipeline Banner */}
+            <div style={{
+              width: '100%',
+              height: '185px',
+              borderRadius: '16px',
+              background: 'linear-gradient(135deg, #F0FDF4 0%, #EFF6FF 100%)',
+              border: '1px solid #BFDBFE',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              padding: '14px 16px',
+              boxSizing: 'border-box',
+              marginBottom: '14px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                {/* Stage 1 */}
+                <div style={{ flex: 1, background: '#FFFFFF', padding: '10px 8px', borderRadius: '12px', border: '1px solid #BBF7D0', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
+                  <div style={{ fontSize: '20px', marginBottom: '2px' }}>🎙️</div>
+                  <strong style={{ fontSize: '11.5px', display: 'block', color: '#166534' }}>Voice & Photo</strong>
+                  <span style={{ fontSize: '10px', color: '#64748B' }}>No complex forms</span>
+                </div>
+                <div style={{ color: '#94A3B8', fontWeight: 700, fontSize: '13px' }}>➔</div>
+
+                {/* Stage 2 */}
+                <div style={{ flex: 1.1, background: '#FFFFFF', padding: '10px 8px', borderRadius: '12px', border: '1px solid #BFDBFE', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
+                  <div style={{ fontSize: '20px', marginBottom: '2px' }}>🧬</div>
+                  <strong style={{ fontSize: '11.5px', display: 'block', color: '#1D4ED8' }}>Complaint DNA</strong>
+                  <span style={{ fontSize: '10px', color: '#64748B' }}>Ward + Biohazard</span>
+                </div>
+                <div style={{ color: '#94A3B8', fontWeight: 700, fontSize: '13px' }}>➔</div>
+
+                {/* Stage 3 */}
+                <div style={{ flex: 1.1, background: '#FFFFFF', padding: '10px 8px', borderRadius: '12px', border: '1px solid #E9D5FF', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
+                  <div style={{ fontSize: '20px', marginBottom: '2px' }}>🔗</div>
+                  <strong style={{ fontSize: '11.5px', display: 'block', color: '#7E22CE' }}>Smart Clustering</strong>
+                  <span style={{ fontSize: '10px', color: '#64748B' }}>15 calls = 1 incident</span>
+                </div>
+              </div>
+
+              <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#2563EB', background: '#DBEAFE', padding: '3px 10px', borderRadius: '999px' }}>
+                  ⚡ Zero Duplicate Backlog • Instant Ground Mapping
+                </span>
+              </div>
+            </div>
+
+            {/* Headline & Description */}
+            <div style={{ textAlign: 'center', padding: '0 6px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#1E2653', marginBottom: '6px', letterSpacing: '-0.02em' }}>
+                Hum AI Se Ise Kaise Solve Karte Hain?
+              </h2>
+              <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.5, margin: '0 auto', maxWidth: '480px' }}>
+                Citizen bas Hindi/Hinglish mein bol kar ya photo bhej kar shikayat karta hai. 
+                AI turant Complaint DNA banata hai aur mohalle ke duplicate tickets ko 1 unified incident mein link kar deta hai.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* =====================================================================
+            SCREEN 3: AUTHORITY HANDOVER (Actionable Resolution)
+            ===================================================================== */}
+        {currentStep === 3 && (
+          <div>
+            {/* Top Visual: Authority Work Order Card */}
+            <div style={{
+              width: '100%',
+              height: '185px',
+              borderRadius: '16px',
+              background: 'linear-gradient(135deg, #F8FAFC 0%, #ECFDF5 100%)',
+              border: '1px solid #E2E8F0',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              padding: '14px 16px',
+              boxSizing: 'border-box',
+              marginBottom: '14px'
+            }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                <div style={{ background: '#FFFFFF', padding: '10px 8px', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+                  <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: '#EFF6FF', color: '#1D4ED8', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px auto' }}>
+                    <Building2 style={{ width: '15px', height: '15px' }} />
+                  </div>
+                  <strong style={{ fontSize: '11.5px', display: 'block', color: '#0F172A' }}>Auto-Routing</strong>
+                  <span style={{ fontSize: '9.5px', color: '#64748B' }}>Direct to DJB/PWD</span>
+                </div>
+
+                <div style={{ background: '#FFFFFF', padding: '10px 8px', borderRadius: '12px', border: '1px solid #BBF7D0', textAlign: 'center' }}>
+                  <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: '#ECFDF5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px auto' }}>
+                    <Zap style={{ width: '15px', height: '15px' }} />
+                  </div>
+                  <strong style={{ fontSize: '11.5px', display: 'block', color: '#047857' }}>1-Click SOP</strong>
+                  <span style={{ fontSize: '9.5px', color: '#64748B' }}>Pre-computed fix</span>
+                </div>
+
+                <div style={{ background: '#FFFFFF', padding: '10px 8px', borderRadius: '12px', border: '1px solid #FED7AA', textAlign: 'center' }}>
+                  <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: '#FFF7ED', color: '#C2410C', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px auto' }}>
+                    <CheckCircle2 style={{ width: '15px', height: '15px' }} />
+                  </div>
+                  <strong style={{ fontSize: '11.5px', display: 'block', color: '#9A3412' }}>Citizen Verify</strong>
+                  <span style={{ fontSize: '9.5px', color: '#64748B' }}>Closed-loop closure</span>
+                </div>
+              </div>
+
+              <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#047857', background: '#DCFCE7', padding: '3px 10px', borderRadius: '999px' }}>
+                  ⏱️ 12-Hour SLA Timer • On-Ground Photo Verification Mandatory
+                </span>
+              </div>
+            </div>
+
+            {/* Headline & Description */}
+            <div style={{ textAlign: 'center', padding: '0 6px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#1E2653', marginBottom: '6px', letterSpacing: '-0.02em' }}>
+                Solution Ke Saath Authorities Ko Handover
+              </h2>
+              <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.5, margin: '0 auto', maxWidth: '480px' }}>
+                Right department ke field officer ko ready-to-execute work order milta hai jo wo 1-click mein approve karta hai. 
+                Kaam ke baad photo aati hai aur citizen verification ke baad hi ticket close hota hai.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* =====================================================================
+            SCREEN 4: ROLE SELECTION & 3-SECOND DEMO AUTHENTICATION
+            ===================================================================== */}
+        {currentStep === 4 && (
+          <div>
+            {/* Top Area: Compact 3-Persona Cards */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '8px',
+              marginBottom: '10px'
+            }}>
+              {roleOptions.map((item) => {
+                const Icon = item.icon;
+                const isSelected = selectedRole === item.key;
+                return (
+                  <div
+                    key={item.key}
+                    onClick={() => setSelectedRole(item.key)}
+                    style={{
+                      padding: '10px 6px',
+                      borderRadius: '12px',
+                      border: isSelected ? `2px solid ${item.activeBorder}` : '1px solid #E2E8F0',
+                      background: isSelected ? item.bg : '#F8FAFC',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      transition: 'all 150ms ease'
+                    }}
+                  >
+                    <div style={{
+                      width: '30px',
+                      height: '30px',
+                      borderRadius: '50%',
+                      background: isSelected ? '#FFFFFF' : '#E2E8F0',
+                      color: item.color,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 4px auto'
+                    }}>
+                      <Icon style={{ width: '16px', height: '16px' }} />
+                    </div>
+                    <strong style={{ fontSize: '12px', display: 'block', color: '#0F172A' }}>{item.label}</strong>
+                    <span style={{ fontSize: '9.5px', color: '#64748B', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {item.name}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Username & Password Form Fields (Pre-filled for seamless 1-click test) */}
+            <div style={{
+              background: '#F8FAFC',
+              borderRadius: '12px',
+              border: '1px solid #E2E8F0',
+              padding: '10px 14px',
+              marginBottom: '10px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#FFFFFF', padding: '6px 10px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                <Mail style={{ width: '14px', height: '14px', color: '#94A3B8' }} />
+                <div style={{ flex: 1 }}>
+                  <span style={{ fontSize: '9.5px', color: '#64748B', display: 'block', textTransform: 'uppercase', fontWeight: 700 }}>Username / Email</span>
+                  <input 
+                    type="text" 
+                    readOnly 
+                    value={currentRoleData.email} 
+                    style={{ border: 'none', background: 'transparent', width: '100%', fontSize: '12px', fontWeight: 600, color: '#0F172A', outline: 'none', padding: 0 }}
+                  />
+                </div>
+                <span style={{ fontSize: '10px', color: '#10B981', fontWeight: 700, background: '#ECFDF5', padding: '2px 6px', borderRadius: '4px' }}>Demo ID</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#FFFFFF', padding: '6px 10px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                <Lock style={{ width: '14px', height: '14px', color: '#94A3B8' }} />
+                <div style={{ flex: 1 }}>
+                  <span style={{ fontSize: '9.5px', color: '#64748B', display: 'block', textTransform: 'uppercase', fontWeight: 700 }}>Password</span>
+                  <input 
+                    type="password" 
+                    readOnly 
+                    value={currentRoleData.password} 
+                    style={{ border: 'none', background: 'transparent', width: '100%', fontSize: '12px', fontWeight: 600, color: '#0F172A', outline: 'none', padding: 0 }}
+                  />
+                </div>
+                <span style={{ fontSize: '10px', color: '#64748B', fontFamily: 'monospace' }}>••••••••</span>
+              </div>
+            </div>
+
+            {/* Selected Persona Action Box */}
+            <div style={{ textAlign: 'center', padding: '0 6px' }}>
+              <button
+                type="button"
+                onClick={() => trigger3SecondAuth(selectedRole)}
+                style={{
+                  height: '42px',
+                  padding: '0 24px',
+                  borderRadius: '999px',
+                  background: '#1E2653',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  boxShadow: '0 4px 14px rgba(30, 38, 83, 0.35)',
+                  transition: 'transform 150ms ease'
+                }}
+              >
+                <span>⚡ 1-Click Demo Login as {currentRoleData.label} (3s Check)</span>
+                <ArrowRight style={{ width: '15px', height: '15px' }} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* =====================================================================
+            BOTTOM NAVIGATION BAR (Matching the Reference Image exactly)
+            ===================================================================== */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginTop: '14px',
+          paddingTop: '12px',
+          borderTop: '1px solid #F1F5F9'
+        }}>
+          {/* Bottom Left: Circular Back Button (visible from Step 2) */}
+          <div style={{ width: '44px', height: '44px' }}>
+            {currentStep > 1 && (
+              <button
+                type="button"
+                onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
+                aria-label="Previous slide"
+                style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '50%',
+                  background: '#F1F5F9',
+                  border: 'none',
+                  color: '#1E2653',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 150ms ease'
+                }}
+              >
+                <ArrowLeft style={{ width: '18px', height: '18px' }} />
+              </button>
+            )}
+          </div>
+
+          {/* Center: Pagination Dots + Skip link */}
+          <div style={{ textAlign: 'center' }}>
+            {/* Dots Indicator */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '3px' }}>
+              {[1, 2, 3, 4].map((step) => (
+                <button
+                  key={step}
+                  type="button"
+                  onClick={() => setCurrentStep(step)}
+                  aria-label={`Jump to step ${step}`}
+                  style={{
+                    width: currentStep === step ? '18px' : '7px',
+                    height: '7px',
+                    borderRadius: '999px',
+                    background: currentStep === step ? '#1E2653' : '#CBD5E1',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    transition: 'all 200ms ease'
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Skip Link */}
             <button
               type="button"
-              onClick={handleDirectEnterApp}
-              className="btn-primary"
+              onClick={handleSkip}
               style={{
-                height: '46px',
-                padding: '0 24px',
-                fontSize: '14px',
-                background: 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)',
-                boxShadow: '0 4px 14px rgba(14, 94, 58, 0.28)'
+                background: 'transparent',
+                border: 'none',
+                fontSize: '12.5px',
+                fontWeight: 600,
+                color: '#94A3B8',
+                cursor: 'pointer',
+                padding: '2px 8px'
               }}
             >
-              <span>Enter JanSahayak App Now</span>
-              <ArrowRight style={{ width: '16px', height: '16px' }} />
+              {currentStep < 4 ? 'Skip' : 'Enter Public View'}
             </button>
           </div>
 
-          {/* Navigation Controls */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginTop: '24px' }}>
-            <button
-              type="button"
-              onClick={() => setCurrentStep(3)}
-              className="btn-secondary"
-              style={{ height: '44px', padding: '0 20px', fontSize: '13px' }}
-            >
-              <ArrowLeft style={{ width: '15px', height: '15px' }} />
-              <span>Back to Authority Solutions</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleDirectEnterApp}
-              className="btn-primary"
-              style={{ height: '44px', padding: '0 24px', fontSize: '13.5px' }}
-            >
-              <span>Enter JanSahayak Platform</span>
-              <ArrowRight style={{ width: '15px', height: '15px' }} />
-            </button>
+          {/* Bottom Right: Circular Next Button */}
+          <div style={{ width: '44px', height: '44px' }}>
+            {currentStep < 4 ? (
+              <button
+                type="button"
+                onClick={() => setCurrentStep(prev => Math.min(4, prev + 1))}
+                aria-label="Next slide"
+                style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '50%',
+                  background: '#1E2653',
+                  border: 'none',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(30, 38, 83, 0.35)',
+                  transition: 'transform 150ms ease'
+                }}
+              >
+                <ArrowRight style={{ width: '18px', height: '18px' }} />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => trigger3SecondAuth(selectedRole)}
+                aria-label="Enter portal"
+                style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '50%',
+                  background: '#10B981',
+                  border: 'none',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.35)',
+                  transition: 'transform 150ms ease'
+                }}
+                title="1-Click Login"
+              >
+                <CheckCircle2 style={{ width: '20px', height: '20px' }} />
+              </button>
+            )}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
