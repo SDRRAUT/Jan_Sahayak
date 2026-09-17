@@ -21,6 +21,7 @@ import ProblemSpreadMap from '../components/intelligence/ProblemSpreadMap';
 import CrossDepartmentMatrix from '../components/intelligence/CrossDepartmentMatrix';
 import CivicMemoryCard from '../components/intelligence/CivicMemoryCard';
 import CivicSignalModal from '../components/intelligence/CivicSignalModal';
+import LiveComplaintLinkageSection from '../components/intelligence/LiveComplaintLinkageSection';
 
 export default function CivicIntelligenceDashboard() {
   const { civicIncidents = [], civicSignals = [], intelligenceMetrics = {} } = useApp();
@@ -188,6 +189,9 @@ export default function CivicIntelligenceDashboard() {
             </span>
           </div>
         </div>
+
+        {/* Live Citizen Signal Linkage & Incident Aggregation Engine */}
+        <LiveComplaintLinkageSection />
 
         {/* Geographic Problem Spread Map */}
         <div style={{ marginBottom: '32px' }}>
