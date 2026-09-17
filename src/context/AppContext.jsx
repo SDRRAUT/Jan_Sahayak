@@ -106,10 +106,33 @@ export function AppProvider({ children }) {
   const [authError, setAuthError] = useState(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(false);
 
+  // Onboarding & App Entry State (controls full-screen onboarding before entering app)
+  const [hasEnteredApp, setHasEnteredApp] = useState(() => {
+    return Boolean(
+      localStorage.getItem('jansahayk_entered_app') === 'true' ||
+      localStorage.getItem('jansahayk_token')
+    );
+  });
+
+  const enterApp = () => {
+    localStorage.setItem('jansahayk_entered_app', 'true');
+    setHasEnteredApp(true);
+  };
+
+  const exitToOnboarding = () => {
+    localStorage.removeItem('jansahayk_entered_app');
+    setHasEnteredApp(false);
+  };
+
   // Sync state to local storage
   useEffect(() => {
-    if (token) localStorage.setItem('jansahayk_token', token);
-    else localStorage.removeItem('jansahayk_token');
+    if (token) {
+      localStorage.setItem('jansahayk_token', token);
+      localStorage.setItem('jansahayk_entered_app', 'true');
+      setHasEnteredApp(true);
+    } else {
+      localStorage.removeItem('jansahayk_token');
+    }
   }, [token]);
 
   useEffect(() => {
@@ -1188,7 +1211,9 @@ export function AppProvider({ children }) {
         transitionStatus,
         handleDuplicateAction,
         updateUserSettings,
-        upvoteGrievance,
+        hasEnteredApp,
+        enterApp,
+        exitToOnboarding,
         metrics: SYSTEM_METRICS,
         can: (perm) => hasPermission(user, perm),
         hasPermission: (perm) => hasPermission(user, perm),

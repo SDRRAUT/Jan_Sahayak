@@ -55,6 +55,17 @@ const INITIAL_STORE = {
       role: 'super_admin',
       designation: 'Principal Secretary (IT & Public Grievance)',
       phone: '+91 11-2339-2000'
+    },
+    {
+      id: 'USR-CIVICOFFICER-01',
+      name: 'Er. Sanjay Sharma',
+      email: 'civic.officer@djb.gov.in',
+      password: 'civicofficer123',
+      role: 'civic_officer',
+      department: 'Delhi Jal Board (DJB)',
+      designation: 'Executive Engineer & Department Administrator',
+      zone: 'Zone North-West (Rohini)',
+      phone: '+91 98111-90021'
     }
   ],
   departments: [

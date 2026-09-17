@@ -332,7 +332,7 @@ export default function Navbar() {
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--color-primary)', fontWeight: 600 }}
                 >
                   <Sparkles style={{ width: '13px', height: '13px' }} />
-                  <span>3-Step Tour</span>
+                  <span>System Tour</span>
                 </Link>
                 <Link
                   to="/impact"
@@ -1507,7 +1507,7 @@ export default function Navbar() {
                 }}
               >
                 <Sparkles style={{ width: '14px', height: '14px' }} />
-                <span>Take the 3-Step Interactive Tour & Demo →</span>
+                <span>Take the Full Interactive System Tour & Demo →</span>
               </Link>
             </div>
           </div>

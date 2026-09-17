@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -24,16 +24,29 @@ import Onboarding from './pages/Onboarding';
 
 function RoleHome() {
   const { user, token } = useApp();
-  if (!token || !user) {
-    return <Onboarding />;
+  if (token && user) {
+    if (user.role === 'citizen') return <Navigate to="/citizen" replace />;
+    if (user.role === 'civic_officer' || user.role === 'officer' || user.role === 'dept_admin') return <Navigate to="/officer" replace />;
+    if (user.role === 'super_admin') return <Navigate to="/admin/super" replace />;
   }
-  if (user.role === 'citizen') return <Navigate to="/citizen" replace />;
-  if (user.role === 'civic_officer' || user.role === 'officer' || user.role === 'dept_admin') return <Navigate to="/officer" replace />;
-  if (user.role === 'super_admin') return <Navigate to="/admin/super" replace />;
-  return <Onboarding />;
+  // Public visitor who entered the app sees the rich Home showcase
+  return <Home />;
 }
 
 export default function App() {
+  const location = useLocation();
+  const { user, token, hasEnteredApp } = useApp();
+
+  // Full Screen Onboarding Condition:
+  // 1. Explicitly navigating to /onboarding
+  // 2. Or landing at root '/' when user has NOT entered the app yet (and not logged in)
+  const isFullScreenOnboarding = location.pathname === '/onboarding' || 
+    (location.pathname === '/' && !hasEnteredApp && !token);
+
+  if (isFullScreenOnboarding) {
+    return <Onboarding />;
+  }
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Docked Civic Navbar with RBAC Switcher */}

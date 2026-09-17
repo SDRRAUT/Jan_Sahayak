@@ -20,9 +20,16 @@ import citizenBg from '../../assets/citizen-bg.jpg';
 
 export default function OnboardingFlow({ onComplete }) {
   const navigate = useNavigate();
-  const { switchDemoRole } = useApp();
+  const { switchDemoRole, enterApp } = useApp();
 
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Direct Enter App Handler (Skip tour / Direct visitor access)
+  const handleDirectEnterApp = () => {
+    enterApp();
+    if (onComplete) onComplete();
+    navigate('/');
+  };
 
   // Authentication & Demo Simulation States
   const [selectedRole, setSelectedRole] = useState('citizen');
@@ -72,6 +79,7 @@ export default function OnboardingFlow({ onComplete }) {
       setVerifyStageMessage('Login Successful! Entering dedicated workspace...');
 
       try {
+        enterApp();
         const logged = await switchDemoRole(roleKey);
         const target = logged?.role || roleKey;
         
@@ -269,8 +277,18 @@ export default function OnboardingFlow({ onComplete }) {
             </div>
           </div>
 
-          {/* Next Button */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginTop: '16px' }}>
+            <button
+              type="button"
+              onClick={handleDirectEnterApp}
+              className="btn-secondary"
+              style={{ height: '46px', padding: '0 20px', fontSize: '13px' }}
+            >
+              <span>Skip Tour & Enter App Directly</span>
+              <ArrowRight style={{ width: '14px', height: '14px' }} />
+            </button>
+
             <button
               type="button"
               onClick={() => setCurrentStep(2)}
@@ -376,7 +394,7 @@ export default function OnboardingFlow({ onComplete }) {
           </div>
 
           {/* Navigation Controls */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginTop: '16px' }}>
             <button
               type="button"
               onClick={() => setCurrentStep(1)}
@@ -386,15 +404,25 @@ export default function OnboardingFlow({ onComplete }) {
               <ArrowLeft style={{ width: '16px', height: '16px' }} />
               <span>Previous Step</span>
             </button>
-            <button
-              type="button"
-              onClick={() => setCurrentStep(3)}
-              className="btn-primary"
-              style={{ height: '48px', padding: '0 28px', fontSize: '14px' }}
-            >
-              <span>See Authority Handover & Solutions</span>
-              <ArrowRight style={{ width: '16px', height: '16px' }} />
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <button
+                type="button"
+                onClick={handleDirectEnterApp}
+                className="btn-secondary"
+                style={{ height: '48px', padding: '0 20px', fontSize: '13px' }}
+              >
+                <span>Skip Tour & Enter App</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setCurrentStep(3)}
+                className="btn-primary"
+                style={{ height: '48px', padding: '0 28px', fontSize: '14px' }}
+              >
+                <span>See Authority Handover & Solutions</span>
+                <ArrowRight style={{ width: '16px', height: '16px' }} />
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -460,7 +488,7 @@ export default function OnboardingFlow({ onComplete }) {
           </div>
 
           {/* Navigation Controls */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginTop: '16px' }}>
             <button
               type="button"
               onClick={() => setCurrentStep(2)}
@@ -470,15 +498,25 @@ export default function OnboardingFlow({ onComplete }) {
               <ArrowLeft style={{ width: '16px', height: '16px' }} />
               <span>Back to AI Engine</span>
             </button>
-            <button
-              type="button"
-              onClick={() => setCurrentStep(4)}
-              className="btn-primary"
-              style={{ height: '48px', padding: '0 28px', fontSize: '14px' }}
-            >
-              <span>Choose Role & Try 3s Demo Login</span>
-              <ArrowRight style={{ width: '16px', height: '16px' }} />
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <button
+                type="button"
+                onClick={handleDirectEnterApp}
+                className="btn-secondary"
+                style={{ height: '48px', padding: '0 20px', fontSize: '13px' }}
+              >
+                <span>Skip Tour & Enter App</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setCurrentStep(4)}
+                className="btn-primary"
+                style={{ height: '48px', padding: '0 28px', fontSize: '14px' }}
+              >
+                <span>Choose Role & Enter App</span>
+                <ArrowRight style={{ width: '16px', height: '16px' }} />
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -783,8 +821,50 @@ export default function OnboardingFlow({ onComplete }) {
             </form>
           </div>
 
+          {/* Guest / Direct Entry Card */}
+          <div style={{
+            marginTop: '28px',
+            padding: '22px 24px',
+            borderRadius: 'var(--radius-lg)',
+            background: 'linear-gradient(135deg, #ECFDF5 0%, #EFF6FF 100%)',
+            border: '2px dashed rgba(16, 185, 129, 0.45)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '16px'
+          }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <span className="status-dot active" style={{ width: '8px', height: '8px' }} />
+                <strong style={{ fontSize: '15px', color: 'var(--color-primary)' }}>
+                  Explore Platform Directly as Public Guest?
+                </strong>
+              </div>
+              <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: 0 }}>
+                Enter the full application directly to browse live heatmaps, public reports, and civic intelligence.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleDirectEnterApp}
+              className="btn-primary"
+              style={{
+                height: '46px',
+                padding: '0 24px',
+                fontSize: '14px',
+                background: 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)',
+                boxShadow: '0 4px 14px rgba(14, 94, 58, 0.28)'
+              }}
+            >
+              <span>Enter JanSahayak App Now</span>
+              <ArrowRight style={{ width: '16px', height: '16px' }} />
+            </button>
+          </div>
+
           {/* Navigation Controls */}
-          <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginTop: '24px' }}>
             <button
               type="button"
               onClick={() => setCurrentStep(3)}
@@ -793,6 +873,16 @@ export default function OnboardingFlow({ onComplete }) {
             >
               <ArrowLeft style={{ width: '15px', height: '15px' }} />
               <span>Back to Authority Solutions</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDirectEnterApp}
+              className="btn-primary"
+              style={{ height: '44px', padding: '0 24px', fontSize: '13.5px' }}
+            >
+              <span>Enter JanSahayak Platform</span>
+              <ArrowRight style={{ width: '15px', height: '15px' }} />
             </button>
           </div>
         </div>

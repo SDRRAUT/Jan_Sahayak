@@ -344,7 +344,17 @@ function authenticateToken(req, res, next) {
 
 function requireRole(allowedRoles) {
   return (req, res, next) => {
-    if (!req.user || !allowedRoles.includes(req.user.role)) {
+    if (!req.user) {
+      return res.status(403).json({ error: 'Forbidden: Access token or user missing' });
+    }
+    const userRole = req.user.role;
+    // Civic Officer inherits all capabilities of both officer and dept_admin.
+    // Backward compatibility: existing officer/dept_admin sessions also satisfy civic_officer checks.
+    const isAuthorized = allowedRoles.includes(userRole) ||
+      (userRole === 'civic_officer' && (allowedRoles.includes('officer') || allowedRoles.includes('dept_admin'))) ||
+      ((userRole === 'officer' || userRole === 'dept_admin') && allowedRoles.includes('civic_officer'));
+
+    if (!isAuthorized) {
       return res.status(403).json({ 
         error: `Forbidden: Requires one of [${allowedRoles.join(', ')}] permissions. Current role: ${req.user?.role || 'None'}` 
       });
@@ -474,7 +484,7 @@ app.get('/api/grievances', (req, res) => {
   if (user.role === 'citizen') {
     // Return citizen's own plus public ward issues
     return res.json({ grievances: GRIEVANCES_DB });
-  } else if (user.role === 'officer') {
+  } else if (user.role === 'officer' || user.role === 'civic_officer') {
     // Return grievances matching officer's department or unassigned
     const officerDept = user.department;
     const filtered = GRIEVANCES_DB.filter(g => !officerDept || g.department === officerDept || g.department.includes(officerDept.split(' ')[0]));
@@ -1123,6 +1133,7 @@ app.get('/api/notifications', authenticateToken, (req, res) => {
     if (userRole === 'super_admin') return true;
     if (n.userId && n.userId === userId) return true;
     if (n.userRole && n.userRole === userRole) return true;
+    if (userRole === 'civic_officer' && (n.userRole === 'officer' || n.userRole === 'dept_admin')) return true;
     if (userRole === 'dept_admin' && n.userRole === 'officer') return true;
     return false;
   });
@@ -1149,7 +1160,11 @@ app.post('/api/notifications/mark-all-read', authenticateToken, (req, res) => {
   const userId = req.user.id;
 
   NOTIFICATIONS_DB.forEach(n => {
-    if (userRole === 'super_admin' || (n.userId && n.userId === userId) || (n.userRole && n.userRole === userRole)) {
+    if (
+      userRole === 'super_admin' ||
+      (n.userId && n.userId === userId) ||
+      (n.userRole && (n.userRole === userRole || (userRole === 'civic_officer' && (n.userRole === 'officer' || n.userRole === 'dept_admin'))))
+    ) {
       n.read = true;
     }
   });
