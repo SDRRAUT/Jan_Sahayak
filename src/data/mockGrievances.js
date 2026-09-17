@@ -29,11 +29,11 @@ export const INITIAL_GRIEVANCES = [
     citizenName: "Aditya Verma",
     citizenPhone: "+91 98712-88491",
     evidence: {
-      photoUrl: "/civic-problems/water_pipe_leak.jpg",
+      photoUrl: "/civic-problems/ai_water_pipe_leak.jpg",
       confidenceScore: 0.98,
       detectedIssue: "High Pressure Potable Pipeline Fracture"
     },
-    photoUrl: "/civic-problems/water_pipe_leak.jpg",
+    photoUrl: "/civic-problems/ai_water_pipe_leak.jpg",
     grievanceDna: {
       dnaId: "DNA-94820-W14",
       departmentConfidence: 99.2,
@@ -108,11 +108,11 @@ export const INITIAL_GRIEVANCES = [
     citizenName: "Sunita Devi",
     citizenPhone: "+91 98110-44219",
     evidence: {
-      photoUrl: "/civic-problems/dirty_tap_water.jpg",
+      photoUrl: "/civic-problems/ai_dirty_tap_water.jpg",
       confidenceScore: 0.99,
       detectedIssue: "Severe Biological / Sediment Contamination"
     },
-    photoUrl: "/civic-problems/dirty_tap_water.jpg",
+    photoUrl: "/civic-problems/ai_dirty_tap_water.jpg",
     grievanceDna: {
       dnaId: "DNA-03319-W14",
       departmentConfidence: 99.4,
@@ -185,11 +185,11 @@ export const INITIAL_GRIEVANCES = [
     citizenName: "Imran Sheikh",
     citizenPhone: "+91 98200-51920",
     evidence: {
-      photoUrl: "/civic-problems/open_sewage_nullah_garbage.jpg",
+      photoUrl: "/civic-problems/choked_nullah_mumbai.jpg",
       confidenceScore: 0.99,
       detectedIssue: "Extreme Channel Choking with Solid Municipal Waste"
     },
-    photoUrl: "/civic-problems/open_sewage_nullah_garbage.jpg",
+    photoUrl: "/civic-problems/choked_nullah_mumbai.jpg",
     grievanceDna: {
       dnaId: "DNA-07441-M09",
       departmentConfidence: 99.6,
@@ -263,11 +263,11 @@ export const INITIAL_GRIEVANCES = [
     citizenName: "Gurpreet Singh",
     citizenPhone: "+91 99532-77180",
     evidence: {
-      photoUrl: "/civic-problems/roadside_garbage_heap.jpg",
+      photoUrl: "/civic-problems/ai_garbage_dump.jpg",
       confidenceScore: 0.98,
       detectedIssue: "Commercial & Domestic Solid Waste Overflow"
     },
-    photoUrl: "/civic-problems/roadside_garbage_heap.jpg",
+    photoUrl: "/civic-problems/ai_garbage_dump.jpg",
     grievanceDna: {
       dnaId: "DNA-22112-W22",
       departmentConfidence: 99.4,
@@ -313,16 +313,16 @@ export const INITIAL_GRIEVANCES = [
   },
   {
     id: "MH-2026-W04-0551",
-    title: "Low Water Pressure & Dry Public Taps Outside Municipal Office",
-    descriptionRaw: "Mahanagar Palika office ke samne aur aaspas ke public taps mein paani bilkul nahi aa raha hai. Subah se log line laga ke khade hain par tap se sirf hawa nikal rahi hai.",
+    title: "Broken & Unhygienic Community Public Toilet Needing Urgent Repairs",
+    descriptionRaw: "Mahanagar Palika ke public toilet complex mein darwaze toote hain, paani ki pipe phati hai aur safai bilkul nahi ho rahi. Durgandh aur gandagi se aaspas ke log pareshan hain.",
     languageDetected: "Hinglish / Marathi-Hindi (Confidence 96%)",
-    category: "Water Supply & Contamination",
-    department: "Municipal Water Supply Department",
+    category: "Sanitation & Solid Waste",
+    department: "Municipal Sanitation Department",
     officerName: "Er. Ramesh Shinde",
-    officerDesignation: "Sub-Divisional Water Engineer",
+    officerDesignation: "Sub-Divisional Sanitation Engineer",
     location: {
       ward: "Ward 4 (Shivaji Nagar)",
-      area: "Near PMC Zonal Office, Main Road",
+      area: "Near PMC Bus Depot, Main Community Complex",
       city: "Pune",
       pincode: "411005",
       lat: 18.5314,
@@ -334,63 +334,63 @@ export const INITIAL_GRIEVANCES = [
     createdAt: "2026-09-17 07:45 AM",
     slaDeadline: "2026-09-17 05:00 PM",
     slaHoursLeft: 7,
-    clusterId: "CL-P04-WATER-01",
-    clusterTitle: "Shivaji Nagar Feeder Line Pressure Drop",
+    clusterId: "CL-P04-SAN-01",
+    clusterTitle: "Shivaji Nagar Public Toilet Maintenance",
     clusterCount: 8,
     upvotes: 31,
     citizenName: "Sachin Kulkarni",
     citizenPhone: "+91 97640-11823",
     evidence: {
-      photoUrl: "/civic-problems/water_shortage_tap.jpg",
+      photoUrl: "/civic-problems/ai_unhygienic_public_toilet.jpg",
       confidenceScore: 0.97,
-      detectedIssue: "Public Water Standpost Pressure Failure"
+      detectedIssue: "Public Restroom Facility Structural Damage & Unsanitary Condition"
     },
-    photoUrl: "/civic-problems/water_shortage_tap.jpg",
+    photoUrl: "/civic-problems/ai_unhygienic_public_toilet.jpg",
     grievanceDna: {
       dnaId: "DNA-05518-P04",
       departmentConfidence: 98.8,
       urgencyScore: 84,
       sentimentScore: -0.79,
-      sentimentLabel: "Public Amenity Failure & Scarcity",
+      sentimentLabel: "Public Amenity Degradation & Health Risk",
       healthRiskLevel: "MEDIUM_HIGH",
       extractedEntities: [
-        { label: "Facility Type", val: "Municipal Public Tap Standpost" },
-        { label: "Issue", val: "Low Pressure / Air Lock in Distribution Branch" },
-        { label: "Community Impact", val: "200+ Daily Morning Commuters & Residents" }
+        { label: "Facility Type", val: "Swachh Bharat Public Community Toilet" },
+        { label: "Issue", val: "Damaged Doors, Choked Fixtures & Lack of Water" },
+        { label: "Community Impact", val: "400+ Daily Commuters & Market Visitors" }
       ],
       ragMatches: [
         {
-          caseId: "PMC-WATER-2025-054",
-          summary: "Air-release valve calibration and booster pump reactivation.",
+          caseId: "PMC-TOILET-2025-054",
+          summary: "Deep sanitization wash, plumbing fixture overhaul and door latch replacement.",
           similarity: 0.94,
-          resolutionTime: "3 hours"
+          resolutionTime: "4 hours"
         }
       ]
     },
     aiOfficerBrief: [
-      "Public water standpost dry during peak morning distribution window.",
-      "Likely airlock in distribution grid line or tripped booster pump at zonal reservoir.",
-      "Valve operator must check head pressure and purge airlock from branch line."
+      "Community public toilet in severe disrepair and poor sanitary state.",
+      "Plumbing lines need reconnecting and high-pressure chemical wash required.",
+      "Sanitation maintenance team deployed for deep cleaning and door restoration."
     ],
     recommendedResolution: {
-      primaryAction: "Inspect Zonal Booster Pump & Purge Air-Release Valve",
-      standardOperatingProcedure: "WATER-GRID-AIRLOCK-SOP",
-      estimatedFixTime: "2.5 Hours",
-      equipmentRequired: ["Pressure Differential Gauge", "Valve Key Set", "Emergency Water Tanker (1x 5000L)"],
-      citizenDraftHindi: "प्रिय नागरिक, मुख्य पाइपलाइन में एयरलॉक की जांच की जा रही है। 2 घंटे में सामान्य पानी का दबाव बहाल कर दिया जाएगा।",
-      citizenDraftEnglish: "Dear Citizen, line pressure check is underway. Normal water flow will be restored to public taps within 2 hours."
+      primaryAction: "Deep Chemical Pressure Wash & Plumbing Overhaul",
+      standardOperatingProcedure: "TOILET-SWACHH-SOP",
+      estimatedFixTime: "3.5 Hours",
+      equipmentRequired: ["High Pressure Water Jet", "Disinfectant Chemicals", "Plumbing Tool Kit"],
+      citizenDraftHindi: "प्रिय नागरिक, शौचालय की मरम्मत और गहरी सफाई के लिए स्वच्छता दल को तैनात कर दिया गया है। आज दोपहर तक कार्य पूरा कर लिया जाएगा।",
+      citizenDraftEnglish: "Dear Citizen, sanitation crew has been deployed to deep-clean and repair the community toilet complex."
     },
     timeline: [
-      { stage: "Submitted", time: "Sep 17, 07:45 AM", detail: "Citizen reported dry public standpost outside PMC office", status: "completed" },
-      { stage: "AI Triage & DNA Generated", time: "Sep 17, 07:46 AM", detail: "Identified Water Supply Disruption", status: "completed" },
-      { stage: "Technician Dispatched", time: "Sep 17, 08:30 AM", detail: "Water supply valve technician en route", status: "in_progress" },
-      { stage: "Restoration & Verification", time: "Pending", detail: "Pressure verification at standpost", status: "pending" }
+      { stage: "Submitted", time: "Sep 17, 07:45 AM", detail: "Citizen reported unhygienic public toilet with photos", status: "completed" },
+      { stage: "AI Triage & DNA Generated", time: "Sep 17, 07:46 AM", detail: "Classified under Public Sanitation Facility", status: "completed" },
+      { stage: "Sanitation Crew Dispatched", time: "Sep 17, 08:30 AM", detail: "Cleaning squad en route with high-pressure jet", status: "in_progress" },
+      { stage: "Restoration & Verification", time: "Pending", detail: "Hygiene audit and photo signoff", status: "pending" }
     ]
   },
   {
     id: "MH-2026-W11-0912",
-    title: "Unpaved Road Digging Trench & Potholes Outside Commercial Complex",
-    descriptionRaw: "Commercial building ke samne rasta khod kar chhod diya hai. Potholes aur mitti ka dher laga hua hai, barish ke baad pura ganda paani jama hai aur dukanon ke samne chalna mushkil ho gaya hai.",
+    title: "Broken Pavement Footpath Tiles & Pedestrian Tripping Hazard",
+    descriptionRaw: "Commercial building ke samne footpath ke saare paver tiles toot kar bikhre hue hain. Bachhe aur buzug roz thokar khakar gir rahe hain. Footpath chalne layak bilkul nahi bacha hai.",
     languageDetected: "Hinglish (Confidence 98%)",
     category: "Roads & Infrastructure",
     department: "Public Works Department (PWD)",
@@ -398,7 +398,7 @@ export const INITIAL_GRIEVANCES = [
     officerDesignation: "Executive Engineer (Roads Division)",
     location: {
       ward: "Ward 11 (Viman Nagar)",
-      area: "Commercial Arcade, Main Avenue Road",
+      area: "Commercial Arcade, Main Avenue Footpath",
       city: "Pune",
       pincode: "411014",
       lat: 18.5679,
@@ -411,56 +411,56 @@ export const INITIAL_GRIEVANCES = [
     slaDeadline: "2026-09-18 12:00 PM",
     slaHoursLeft: 22,
     clusterId: "CL-P11-ROAD-04",
-    clusterTitle: "Viman Nagar Commercial Corridor Trench Issue",
+    clusterTitle: "Viman Nagar Commercial Corridor Footpath Tiles",
     clusterCount: 11,
     upvotes: 37,
     citizenName: "Deepak Joshi",
     citizenPhone: "+91 98901-22941",
     evidence: {
-      photoUrl: "/civic-problems/road_digging_potholes.jpg",
+      photoUrl: "/civic-problems/ai_broken_footpath.jpg",
       confidenceScore: 0.98,
-      detectedIssue: "Unfilled Utility Trench & Surface Deterioration"
+      detectedIssue: "Cracked & Dislodged Interlocking Paver Blocks"
     },
-    photoUrl: "/civic-problems/road_digging_potholes.jpg",
+    photoUrl: "/civic-problems/ai_broken_footpath.jpg",
     grievanceDna: {
       dnaId: "DNA-09122-P11",
       departmentConfidence: 99.1,
       urgencyScore: 86,
       sentimentScore: -0.78,
-      sentimentLabel: "Traffic Congestion & Pedestrian Obstacle",
+      sentimentLabel: "Pedestrian Hazard & Tripping Risk",
       healthRiskLevel: "MEDIUM_HIGH",
       extractedEntities: [
-        { label: "Corridor", val: "High-Traffic Commercial Access Road" },
-        { label: "Surface Condition", val: "Dug Up Gravel, Mud Puddles, Potholes" },
-        { label: "Safety Risk", val: "Two-Wheeler Slippage & Water Stagnation" }
+        { label: "Corridor", val: "High-Traffic Commercial Access Footpath" },
+        { label: "Surface Condition", val: "Broken Interlocking Tiles, Uneven Gaps" },
+        { label: "Safety Risk", val: "Elderly & Child Fall Hazard" }
       ],
       ragMatches: [
         {
-          caseId: "PWD-TRENCH-2025-072",
-          summary: "Gravel backfill followed by roller compaction and bituminous tack coat.",
+          caseId: "PWD-PAVER-2025-072",
+          summary: "Sand bedding levelling and interlocking paver block replacement.",
           similarity: 0.93,
-          resolutionTime: "8 hours"
+          resolutionTime: "6 hours"
         }
       ]
     },
     aiOfficerBrief: [
-      "Incomplete utility ducting left open with loose aggregates and water-filled hollows.",
-      "Vendors and pedestrians facing acute difficulty navigating the mud and potholes.",
-      "Requires immediate gravel backfilling and static roller compaction."
+      "Damaged pedestrian footpath with loose, broken tiles creating serious trip hazard.",
+      "Footpath pavers require leveling, sand bedding and replacement with fresh tiles.",
+      "PWD maintenance squad scheduled for paver resetting."
     ],
     recommendedResolution: {
-      primaryAction: "Grading, Wet Mix Macadam (WMM) Base & Asphalt Overlay",
-      standardOperatingProcedure: "PWD-ROAD-RESTORATION-SOP",
-      estimatedFixTime: "6 Hours",
-      equipmentRequired: ["Mini Road Roller (3T)", "WMM Gravel (2 Trucks)", "Cold Bituminous Mix"],
-      citizenDraftHindi: "प्रिय नागरिक, खोदी गई सड़क की मरम्मत के लिए PWD ठेकेदार को कार्य आदेश जारी कर दिया गया है। सड़क समतलीकरण का कार्य शीघ्र पूर्ण किया जाएगा।",
-      citizenDraftEnglish: "Dear Citizen, PWD road contractor has been directed to backfill the trench and complete surface levelling."
+      primaryAction: "Sand Bedding Compaction & Fresh Interlocking Tile Relaying",
+      standardOperatingProcedure: "PWD-FOOTPATH-RESTORATION-SOP",
+      estimatedFixTime: "5 Hours",
+      equipmentRequired: ["Plate Compactor", "River Sand (1 Truck)", "Interlocking Tiles (200 Units)"],
+      citizenDraftHindi: "प्रिय नागरिक, टूटे हुए फुटपाथ की मरम्मत के लिए PWD ठेकेदार को कार्य आदेश जारी कर दिया गया है। टाइल्स बदलने का कार्य शीघ्र पूर्ण किया जाएगा।",
+      citizenDraftEnglish: "Dear Citizen, PWD road maintenance team is replacing the damaged footpath pavers and leveling the walking path."
     },
     timeline: [
-      { stage: "Submitted", time: "Sep 16, 04:10 PM", detail: "Citizen logged complaint showing water puddles in dug road", status: "completed" },
-      { stage: "AI Triage & DNA Generated", time: "Sep 16, 04:11 PM", detail: "Confirmed Roadway Defect & Safety Hazard", status: "completed" },
+      { stage: "Submitted", time: "Sep 16, 04:10 PM", detail: "Citizen logged complaint showing broken footpath tiles", status: "completed" },
+      { stage: "AI Triage & DNA Generated", time: "Sep 16, 04:11 PM", detail: "Confirmed Pedestrian Infrastructure Hazard", status: "completed" },
       { stage: "Assigned to PWD Roads", time: "Sep 16, 05:30 PM", detail: "Assigned to Executive Engineer Rajesh Meena", status: "completed" },
-      { stage: "Field Levelling", time: "Pending", detail: "Truck with gravel scheduled for morning deployment", status: "pending" }
+      { stage: "Field Relaying", time: "Pending", detail: "Truck with replacement tiles scheduled for morning deployment", status: "pending" }
     ]
   },
   {
@@ -493,11 +493,11 @@ export const INITIAL_GRIEVANCES = [
     citizenName: "Harsh Vardhan",
     citizenPhone: "+91 98103-99120",
     evidence: {
-      photoUrl: "/civic-problems/monsoon_waterlogging_flood.jpg",
+      photoUrl: "/civic-problems/ai_monsoon_waterlogging.jpg",
       confidenceScore: 0.99,
       detectedIssue: "Severe Urban Waterlogging & Open Manhole Submergence"
     },
-    photoUrl: "/civic-problems/monsoon_waterlogging_flood.jpg",
+    photoUrl: "/civic-problems/ai_monsoon_waterlogging.jpg",
     grievanceDna: {
       dnaId: "DNA-06671-W03",
       departmentConfidence: 99.8,
@@ -570,11 +570,11 @@ export const INITIAL_GRIEVANCES = [
     citizenName: "Vikram Malhotra",
     citizenPhone: "+91 98118-77441",
     evidence: {
-      photoUrl: "/civic-problems/landfill_waste_jcb.jpg",
+      photoUrl: "/civic-problems/landfill_mountain_jcb.jpg",
       confidenceScore: 0.99,
       detectedIssue: "Massive Solid Waste Mound & Methane Outgassing"
     },
-    photoUrl: "/civic-problems/landfill_waste_jcb.jpg",
+    photoUrl: "/civic-problems/landfill_mountain_jcb.jpg",
     grievanceDna: {
       dnaId: "DNA-08819-W18",
       departmentConfidence: 99.7,
@@ -647,11 +647,11 @@ export const INITIAL_GRIEVANCES = [
     citizenName: "Pooja Malhotra",
     citizenPhone: "+91 98101-55829",
     evidence: {
-      photoUrl: "/civic-problems/pothole_broken_drain_grate.jpg",
+      photoUrl: "/civic-problems/ai_road_pothole.jpg",
       confidenceScore: 0.99,
       detectedIssue: "Severe Road Pothole Cavity & Damaged Iron Drain Grating"
     },
-    photoUrl: "/civic-problems/pothole_broken_drain_grate.jpg",
+    photoUrl: "/civic-problems/ai_road_pothole.jpg",
     grievanceDna: {
       dnaId: "DNA-84192-W08",
       departmentConfidence: 99.3,
@@ -696,83 +696,83 @@ export const INITIAL_GRIEVANCES = [
   },
   {
     id: "DL-2026-W16-0239",
-    title: "Unregulated Plastic Waste Dumping & Open Ground Contamination",
-    descriptionRaw: "Khali zameen par pure mohalle ka kachra aur single use plastic feka ja raha hai. Ragpickers aag laga dete hain aur dhuan gharon ke andar aata hai. MC ko turant safai karwani chahiye.",
+    title: "Dangerous Open Manhole on Busy Street Roadway",
+    descriptionRaw: "Sadak ke beech mein sewer ka manhole khula pada hai jisme koi dhakkan nahi hai. Sirf ek lakdi daal ke chhod diya hai, raat ko koi bhi bike ya gaadi gir kar mar sakti hai.",
     languageDetected: "Hinglish (Confidence 97%)",
-    category: "Sanitation & Solid Waste",
-    department: "Municipal Corporation of Delhi (MCD)",
-    officerName: "Dr. K. S. Tyagi",
-    officerDesignation: "Chief Sanitation Inspector",
+    category: "Drainage & Waterlogging",
+    department: "Delhi Jal Board (DJB) / MCD",
+    officerName: "Er. Sanjay Sharma",
+    officerDesignation: "Executive Engineer (Sewerage)",
     location: {
       ward: "Ward 16 (Dwarka Sector 16)",
-      area: "Vacant DDA Plot Perimeter, Near Metro Pillar 122",
+      area: "Main Road Intersection, Near Metro Pillar 122",
       city: "New Delhi",
       pincode: "110078",
       lat: 28.5921,
       lng: 77.0215
     },
-    urgency: "HIGH",
-    urgencyScore: 82,
+    urgency: "CRITICAL",
+    urgencyScore: 97,
     status: "TRIAGED",
     createdAt: "2026-09-17 06:30 AM",
-    slaDeadline: "2026-09-18 04:00 PM",
-    slaHoursLeft: 18,
-    clusterId: "CL-W16-SAN-02",
-    clusterTitle: "Dwarka Sector 16 Open Dumping Hotspot",
+    slaDeadline: "2026-09-17 02:00 PM",
+    slaHoursLeft: 3,
+    clusterId: "CL-W16-MANHOLE-01",
+    clusterTitle: "Dwarka Sector 16 Open Manhole Life Threat",
     clusterCount: 7,
-    upvotes: 28,
+    upvotes: 42,
     citizenName: "Ananya Roy",
     citizenPhone: "+91 98188-44912",
     evidence: {
-      photoUrl: "/civic-problems/dumping_ground_plastic_waste.jpg",
-      confidenceScore: 0.97,
-      detectedIssue: "Uncontrolled Open Ground Plastic Waste Dumping"
+      photoUrl: "/civic-problems/ai_open_manhole_danger.jpg",
+      confidenceScore: 0.99,
+      detectedIssue: "Uncovered Deep Sewer Manhole Shaft on Carriageway"
     },
-    photoUrl: "/civic-problems/dumping_ground_plastic_waste.jpg",
+    photoUrl: "/civic-problems/ai_open_manhole_danger.jpg",
     grievanceDna: {
       dnaId: "DNA-02391-W16",
-      departmentConfidence: 99.0,
-      urgencyScore: 82,
-      sentimentScore: -0.76,
-      sentimentLabel: "Environmental Neglect & Open Fire Threat",
-      healthRiskLevel: "MEDIUM_HIGH",
+      departmentConfidence: 99.8,
+      urgencyScore: 97,
+      sentimentScore: -0.95,
+      sentimentLabel: "Direct Fatal Hazard to Motorists & Pedestrians",
+      healthRiskLevel: "CRITICAL",
       extractedEntities: [
-        { label: "Site", val: "Vacant DDA Community Land" },
-        { label: "Waste Nature", val: "Scattered Plastics, Bottles, Dry Leaves" },
-        { label: "Nuisance", val: "Open Burning & Airborne Toxic Smoke" }
+        { label: "Hazard Type", val: "Open Sewer Chamber, Depth > 2.5m" },
+        { label: "Warning Measure", val: "Improvised Tree Branch with Cloth (Inadequate)" },
+        { label: "Traffic Risk", val: "Extreme Two-Wheeler Plunge Hazard" }
       ],
       ragMatches: [
         {
-          caseId: "MCD-PLOT-2025-031",
-          summary: "Tractor-loader debris clearance and installation of 'No Dumping' signpost.",
-          similarity: 0.94,
-          resolutionTime: "6 hours"
+          caseId: "DJB-MANHOLE-2025-031",
+          summary: "Emergency SFRC concrete cover installation and safety cone perimeter.",
+          similarity: 0.99,
+          resolutionTime: "2 hours"
         }
       ]
     },
     aiOfficerBrief: [
-      "Open ground converted into informal garbage dumping point.",
-      "Plastic waste scattering onto nearby footpaths and drainage gutters.",
-      "Schedule JCB clearing trip and erect barbed wire or warning signage."
+      "Open sewer manhole in the middle of active traffic lane.",
+      "High probability of fatal plunging accident; immediate barricading required.",
+      "Dispatch crew with heavy-duty SFRC circular cover to seat and seal immediately."
     ],
     recommendedResolution: {
-      primaryAction: "Clear Open Ground with JCB & Install 'No Dumping' Warning Board",
-      standardOperatingProcedure: "MCD-VACANT-PLOT-CLEAN-SOP",
-      estimatedFixTime: "4 Hours",
-      equipmentRequired: ["JCB Backhoe Loader", "2x 10MT Dumper Trucks", "Metal Caution Signboard"],
-      citizenDraftHindi: "प्रिय नागरिक, खाली प्लॉट से कचरा हटाने के लिए जेसीबी और डंपर की ड्यूटी लगा दी गई है। आज दोपहर तक कचरा साफ करवा दिया जाएगा।",
-      citizenDraftEnglish: "Dear Citizen, MCD backhoe loader has been deployed to clear the scattered waste from the vacant plot."
+      primaryAction: "Install Heavy Duty Concrete Cover & Barricade Shaft",
+      standardOperatingProcedure: "DJB-EMERGENCY-MANHOLE-SOP",
+      estimatedFixTime: "1.5 Hours",
+      equipmentRequired: ["SFRC Heavy Duty Manhole Cover", "Hydraulic Crane Truck", "Traffic Barricades (4x)"],
+      citizenDraftHindi: "प्रिय नागरिक, खुले मैनहोल की शिकायत पर त्वरित कार्रवाई करते हुए नया ढक्कन लगाने के लिए आपातकालीन टीम भेज दी गई है।",
+      citizenDraftEnglish: "Dear Citizen, DJB emergency squad has been dispatched with a replacement heavy-duty concrete cover to seal the open manhole."
     },
     timeline: [
-      { stage: "Submitted", time: "Sep 17, 06:30 AM", detail: "Citizen uploaded picture of scattered plastic dumping ground", status: "completed" },
-      { stage: "AI Triage & DNA Generated", time: "Sep 17, 06:31 AM", detail: "Classified under Sanitation & Open Waste Management", status: "completed" },
-      { stage: "Sanitary Squad Alerted", time: "Sep 17, 08:00 AM", detail: "Added to morning waste clearing roster", status: "in_progress" },
-      { stage: "Plot Cleaned & Fenced", time: "Pending", detail: "Signboard installation and final verification", status: "pending" }
+      { stage: "Submitted", time: "Sep 17, 06:30 AM", detail: "Citizen uploaded photo of open manhole on active street", status: "completed" },
+      { stage: "AI Triage & DNA Generated", time: "Sep 17, 06:31 AM", detail: "Triggered LEVEL 1 Life Safety Emergency Alert (Score 97)", status: "completed" },
+      { stage: "Emergency Unit Mobilized", time: "Sep 17, 07:00 AM", detail: "Crew loaded with concrete lid dispatched", status: "in_progress" },
+      { stage: "Cover Installed & Verified", time: "Pending", detail: "Leveling and safety confirmation", status: "pending" }
     ]
   },
   {
     id: "DL-2026-W07-0348",
-    title: "Illegal Construction Debris & Mixed Waste Dumping on Highway Plot",
+    title: "Illegal Construction Debris & Rubble Dumped on Highway Service Plot",
     descriptionRaw: "Service road ke kinare khali plot par raat ko kisi ne truck se building ka malba aur plastic bori kachra dump kar diya hai. Pure raste par gandagi phail rahi hai.",
     languageDetected: "Hinglish (Confidence 97%)",
     category: "Sanitation & Solid Waste",
@@ -800,11 +800,11 @@ export const INITIAL_GRIEVANCES = [
     citizenName: "Manish Chawla",
     citizenPhone: "+91 98112-90184",
     evidence: {
-      photoUrl: "/civic-problems/illegal_debris_dump_plot.jpg",
+      photoUrl: "/civic-problems/illegal_debris_rubble.jpg",
       confidenceScore: 0.98,
       detectedIssue: "Illegal Construction & Demolition (C&D) Debris Dumping"
     },
-    photoUrl: "/civic-problems/illegal_debris_dump_plot.jpg",
+    photoUrl: "/civic-problems/illegal_debris_rubble.jpg",
     grievanceDna: {
       dnaId: "DNA-03489-W07",
       departmentConfidence: 99.2,
@@ -876,11 +876,11 @@ export const INITIAL_GRIEVANCES = [
     citizenName: "Kavita Singhal",
     citizenPhone: "+91 98105-88301",
     evidence: {
-      photoUrl: "/civic-problems/construction_dust_pollution.jpg",
+      photoUrl: "/civic-problems/flyover_dust_pollution.jpg",
       confidenceScore: 0.99,
       detectedIssue: "Severe Construction Particulate Matter (PM10/PM2.5) Pollution"
     },
-    photoUrl: "/civic-problems/construction_dust_pollution.jpg",
+    photoUrl: "/civic-problems/flyover_dust_pollution.jpg",
     grievanceDna: {
       dnaId: "DNA-09951-W01",
       departmentConfidence: 99.5,
@@ -925,78 +925,78 @@ export const INITIAL_GRIEVANCES = [
   },
   {
     id: "MH-2026-W12-0442",
-    title: "Abandoned Concrete Drainage Pipes & Broken Pavement Blocks",
-    descriptionRaw: "Underpass ke pass footpath tod ke cement ke bade bade pipe aur tooti hui concrete blocks sadak par chhod di hain. 2 hafte se koi kaam nahi hua, chalne ki jagah nahi bachi hai.",
+    title: "Heavy Storm Fallen Banyan Tree Blocking Main Arterial Roadway",
+    descriptionRaw: "Tez toofan aur barish ke baad bohot bada bargad ka ped sadak par gir gaya hai. Dono taraf ka traffic pura band ho gaya hai aur electric wire bhi toot ke latak rahi hai. Turant hatwayein.",
     languageDetected: "Hinglish (Confidence 98%)",
     category: "Roads & Infrastructure",
-    department: "Public Works Department (PWD)",
+    department: "Tree Authority / Disaster Response (NDRF/MCD)",
     officerName: "Er. Rajesh K. Meena",
-    officerDesignation: "Executive Engineer (Infrastructure)",
+    officerDesignation: "Executive Engineer (Emergency Clearance)",
     location: {
       ward: "Ward 12 (Pimpri / Chinchwad)",
-      area: "Maan Road Underpass & Commercial Corridor",
+      area: "Main Arterial Avenue Road",
       city: "Pune",
       pincode: "411057",
       lat: 18.5912,
       lng: 73.7428
     },
-    urgency: "HIGH",
-    urgencyScore: 81,
+    urgency: "CRITICAL",
+    urgencyScore: 94,
     status: "TRIAGED",
     createdAt: "2026-09-16 03:00 PM",
-    slaDeadline: "2026-09-18 06:00 PM",
-    slaHoursLeft: 26,
-    clusterId: "CL-P12-INFRA-01",
-    clusterTitle: "Maan Underpass Drainage Pipe Abandonment",
+    slaDeadline: "2026-09-17 07:00 PM",
+    slaHoursLeft: 4,
+    clusterId: "CL-P12-TREE-01",
+    clusterTitle: "Pimpri Arterial Fallen Tree Road Blockage",
     clusterCount: 8,
-    upvotes: 33,
+    upvotes: 51,
     citizenName: "Prashant Patil",
     citizenPhone: "+91 97631-00293",
     evidence: {
-      photoUrl: "/civic-problems/underpass_excavation_pipes.jpg",
-      confidenceScore: 0.98,
-      detectedIssue: "Obstruction from Unlaid Concrete Culvert Pipes & Debris"
+      photoUrl: "/civic-problems/ai_storm_fallen_tree.jpg",
+      confidenceScore: 0.99,
+      detectedIssue: "Heavy Fallen Trunk Obstruction on Multi-Lane Road"
     },
-    photoUrl: "/civic-problems/underpass_excavation_pipes.jpg",
+    photoUrl: "/civic-problems/ai_storm_fallen_tree.jpg",
     grievanceDna: {
       dnaId: "DNA-04429-P12",
-      departmentConfidence: 99.1,
-      urgencyScore: 81,
-      sentimentScore: -0.77,
-      sentimentLabel: "Pedestrian Hazard & Civic Disarray",
-      healthRiskLevel: "MEDIUM_HIGH",
+      departmentConfidence: 99.6,
+      urgencyScore: 94,
+      sentimentScore: -0.89,
+      sentimentLabel: "Total Road Paralysis & Emergency Gridlock",
+      healthRiskLevel: "CRITICAL",
       extractedEntities: [
-        { label: "Obstacle Material", val: "900mm Reinforced Concrete Pipes + Dismantled Paver Bricks" },
-        { label: "Location", val: "Underpass Pedestrian Footpath & Road Verge" },
-        { label: "Hazard", val: "Pedestrians Forced into High-Speed Traffic" }
+        { label: "Obstacle", val: "Uprooted 40-Year Banyan Tree Trunk" },
+        { label: "Impact", val: "Both Carriageways Blocked, 100% Traffic Diverted" },
+        { label: "Secondary Hazard", val: "Snapped Low-Tension Power Conductor" }
       ],
       ragMatches: [
         {
-          caseId: "PWD-PIPE-2025-064",
-          summary: "Crane lifting of uninstalled pipes and paver block relaying.",
-          similarity: 0.95,
-          resolutionTime: "6 hours"
+          caseId: "TREE-DISASTER-2025-014",
+          summary: "Chainsaw branch sectioning, crane extraction and road sweeping.",
+          similarity: 0.98,
+          resolutionTime: "2.5 hours"
         }
       ]
     },
     aiOfficerBrief: [
-      "Large storm water concrete pipes left lying unattended on footpath and road margin.",
-      "Piles of loose interlocking paver blocks blocking commercial building access.",
-      "Instruct drainage contractor to lay pipes immediately and clear footpath."
+      "Large fallen tree completely blocking 4-lane arterial road.",
+      "Emergency response squad with motorized wood cutters and hydraulic crane dispatched.",
+      "Target opening at least one lane within 90 minutes."
     ],
     recommendedResolution: {
-      primaryAction: "Hydra Crane Shifting of Pipes & Footpath Paver Re-alignment",
-      standardOperatingProcedure: "PWD-UTILITY-CLEARANCE-SOP",
-      estimatedFixTime: "5 Hours",
-      equipmentRequired: ["12T Hydra Mobile Crane", "Paver Block Compactor", "Tractor-Trolley"],
-      citizenDraftHindi: "प्रिय नागरिक, अंडरपास के पास छोड़े गए पाइपों को हटाने और फुटपाथ को दुरुस्त करने के लिए हाइड्रा क्रेन और टीम को निर्देश दे दिया गया है।",
-      citizenDraftEnglish: "Dear Citizen, PWD crane and construction gang have been mobilized to install the drainage pipes and restore the footpath."
+      primaryAction: "Motorized Chainsaw Cutting & Hydra Crane Extraction",
+      standardOperatingProcedure: "DISASTER-FALLEN-TREE-SOP",
+      estimatedFixTime: "2.5 Hours",
+      equipmentRequired: ["Motorized Chainsaws (3x)", "14T Hydra Crane", "2x Flatbed Trucks"],
+      citizenDraftHindi: "प्रिय नागरिक, सड़क पर गिरे पेड़ को हटाने के लिए क्रेन और कटर मशीनों के साथ आपदा प्रबंधन दल मौके पर पहुंच रहा है। जल्द ही रास्ता साफ कर दिया जाएगा।",
+      citizenDraftEnglish: "Dear Citizen, emergency tree clearance crew equipped with industrial chainsaws and hydra cranes is en route to clear the fallen tree."
     },
     timeline: [
-      { stage: "Submitted", time: "Sep 16, 03:00 PM", detail: "Citizen uploaded composite image of abandoned pipes and broken pavers", status: "completed" },
-      { stage: "AI Triage & DNA Generated", time: "Sep 16, 03:01 PM", detail: "Classified under Roads & Infrastructure Encroachment", status: "completed" },
-      { stage: "Contractor Notice", time: "Sep 17, 08:30 AM", detail: "Notice issued to contractor to complete laying", status: "in_progress" },
-      { stage: "Footpath Restoration", time: "Pending", detail: "Relaying of interlocking paver blocks", status: "pending" }
+      { stage: "Submitted", time: "Sep 16, 03:00 PM", detail: "Citizen uploaded photo of uprooted tree blocking road", status: "completed" },
+      { stage: "AI Triage & DNA Generated", time: "Sep 16, 03:01 PM", detail: "Triggered Emergency Transit Blockage Alert (Score 94)", status: "completed" },
+      { stage: "Disaster Squad Dispatched", time: "Sep 16, 03:20 PM", detail: "Chainsaw crew and crane mobilized", status: "in_progress" },
+      { stage: "Road Clearance Verification", time: "Pending", detail: "Debris hauling and traffic resumption", status: "pending" }
     ]
   },
   {
@@ -1029,11 +1029,11 @@ export const INITIAL_GRIEVANCES = [
     citizenName: "Abhijeet Deshmukh",
     citizenPhone: "+91 98220-44910",
     evidence: {
-      photoUrl: "/civic-problems/pothole_repair_patchwork.jpg",
+      photoUrl: "/civic-problems/road_pothole_patching.jpg",
       confidenceScore: 0.99,
       detectedIssue: "Active Cold Asphalt Pothole Repair in Progress"
     },
-    photoUrl: "/civic-problems/pothole_repair_patchwork.jpg",
+    photoUrl: "/civic-problems/road_pothole_patching.jpg",
     grievanceDna: {
       dnaId: "DNA-01882-P10",
       departmentConfidence: 99.4,
@@ -1078,80 +1078,79 @@ export const INITIAL_GRIEVANCES = [
   },
   {
     id: "DL-2026-W05-0298",
-    title: "Untreated Toxic Industrial & Dark Sewer Discharge into Open River Nullah",
-    descriptionRaw: "Bade cement ke naale se kala jhaagdaar chemical paani seedhe naddi aur aabadi ke paas gir raha hai. Asahy badboo aa rahi hai aur paani mein phool aur plastic tair rahe hain. Jaldi band karwao.",
+    title: "Dangerous Dangling Overhead Power Cables & Sparking Transformer",
+    descriptionRaw: "Bazaar ke pole par bijli ke taar bohot neeche latak rahe hain aur transformer se chingaariyan nikal rahi hain. Niche log aur dukan wale dar rahe hain, short circuit se kabhi bhi badi aag lag sakti hai.",
     languageDetected: "Hinglish (Confidence 98%)",
-    category: "Drainage & Waterlogging",
-    department: "Delhi Pollution Control Committee & DJB",
+    category: "Electricity & Streetlights",
+    department: "BSES / Tata Power Delhi Distribution",
     officerName: "Er. Neeraj Bansal",
-    officerDesignation: "Divisional Environmental & Drainage Engineer",
+    officerDesignation: "Assistant Engineer (Electrical Safety & Distribution)",
     location: {
-      ward: "Ward 5 (Kalkaji / Okhla Canal)",
-      area: "Main Industrial Drainage Culvert, Near Yamuna Outfall",
+      ward: "Ward 5 (Kalkaji Market)",
+      area: "Main Market Commercial Electric Post #4B",
       city: "New Delhi",
-      pincode: "110020",
+      pincode: "110019",
       lat: 28.5389,
-      lng: 77.2798
+      lng: 77.2598
     },
     urgency: "CRITICAL",
     urgencyScore: 98,
     status: "IN_PROGRESS",
     createdAt: "2026-09-17 07:00 AM",
-    slaDeadline: "2026-09-17 04:00 PM",
-    slaHoursLeft: 4,
-    clusterId: "CL-W05-ENV-01",
-    clusterTitle: "Okhla Outfall Toxic Industrial Effluent Cluster",
-    clusterCount: 28,
-    upvotes: 91,
+    slaDeadline: "2026-09-17 01:00 PM",
+    slaHoursLeft: 2,
+    clusterId: "CL-W05-ELEC-01",
+    clusterTitle: "Kalkaji Market Dangling Power Cables & Sparking Hazard",
+    clusterCount: 16,
+    upvotes: 79,
     citizenName: "Rakesh Gupta",
     citizenPhone: "+91 98114-66320",
     evidence: {
-      photoUrl: "/civic-problems/toxic_sewer_discharge_canal.jpg",
+      photoUrl: "/civic-problems/ai_dangling_power_cables.jpg",
       confidenceScore: 0.99,
-      detectedIssue: "Untreated Toxic Industrial Effluent & Heavy Foam Discharge"
+      detectedIssue: "Low Hanging Live Power Lines & Transformer Spark Hazard"
     },
-    photoUrl: "/civic-problems/toxic_sewer_discharge_canal.jpg",
+    photoUrl: "/civic-problems/ai_dangling_power_cables.jpg",
     grievanceDna: {
       dnaId: "DNA-05298-W05",
       departmentConfidence: 99.8,
       urgencyScore: 98,
       sentimentScore: -0.94,
-      sentimentLabel: "Severe Environmental Crime & Ecological Hazard",
+      sentimentLabel: "Immediate Electrocution & Fire Threat",
       healthRiskLevel: "CRITICAL",
       extractedEntities: [
-        { label: "Outfall Type", val: "Dual 1500mm Reinforced Concrete Culverts" },
-        { label: "Discharge Nature", val: "Untreated Chemical Effluent + Heavy Surfactant Foam" },
-        { label: "Receiving Water", val: "Yamuna Canal Basin / Sensitive Ecosystem" },
-        { label: "Population Impact", val: "10,000+ Downstream Community Residents" }
+        { label: "Asset Type", val: "11kV Distribution Transformer & Low Tension Overhead Lines" },
+        { label: "Defect", val: "Sagging Uninsulated Lines (< 2.2m clearance), Arcing Spark Jumps" },
+        { label: "Surrounding Hazard", val: "Cloth Shop Awnings & Pedestrian Crowds" }
       ],
       ragMatches: [
         {
-          caseId: "DPCC-ENV-2025-003",
-          summary: "Immediate upstream industrial sluice gate sealing and effluent sample seizure.",
+          caseId: "BSES-CABLE-2025-003",
+          summary: "Substation feeder trip, line re-tensioning and bundle cabling upgrade.",
           similarity: 0.99,
-          resolutionTime: "3 hours"
+          resolutionTime: "2 hours"
         }
       ]
     },
     aiOfficerBrief: [
-      "Heavy frothing toxic effluent discharging unchecked from twin 1500mm drainage culverts.",
-      "Clear breach of Central Pollution Control Board (CPCB) industrial discharge standards.",
-      "Environmental enforcement team must seize chemical samples and seal illegal upstream inlet points."
+      "Severe electrocution hazard with low-hanging loose electrical cables over market walkway.",
+      "Sparks detected near transformer terminal; high fire risk to surrounding shop awnings.",
+      "Emergency line gang dispatched for immediate power isolation and aerial bundle re-tensioning."
     ],
     recommendedResolution: {
-      primaryAction: "Deploy Mobile Water Sampling Lab & Seal Illegal Industrial Inlets",
-      standardOperatingProcedure: "DPCC-CRITICAL-EFFLUENT-SOP",
-      estimatedFixTime: "4 Hours",
-      equipmentRequired: ["Chemical Water Sampling Rig", "Sluice Gate Sealing Clamp", "Real-Time Dissolved Oxygen / pH Probe"],
-      citizenDraftHindi: "प्रिय नागरिक, नाले में अवैध केमिकल डिस्चार्ज की जांच के लिए प्रदूषण नियंत्रण बोर्ड और DJB की संयुक्त टीम मौके पर पहुंच चुकी है। अवैध आउटलेट को सील किया जा रहा है।",
-      citizenDraftEnglish: "Dear Citizen, joint DPCC and DJB enforcement squad is on site collecting water samples and sealing illegal industrial discharge conduits."
+      primaryAction: "Isolate Feeder & Re-tension Overhead Cables into Aerial Bundle Conductors (ABC)",
+      standardOperatingProcedure: "BSES-EMERGENCY-ELECTRICAL-SOP",
+      estimatedFixTime: "2 Hours",
+      equipmentRequired: ["Hydraulic Cherry Picker Lift", "Insulated Hot Stick (33kV)", "Aerial Bundle Cable Clamps"],
+      citizenDraftHindi: "प्रिय नागरिक, लटकते बिजली के तारों और ट्रांसफार्मर की जांच के लिए बिजली विभाग की आपातकालीन टीम मौके पर पहुंच चुकी है। तारों को कसकर सुरक्षित किया जा रहा है।",
+      citizenDraftEnglish: "Dear Citizen, emergency electrical line squad is on site isolating the feed, re-tensioning loose cables, and securing the transformer."
     },
     timeline: [
-      { stage: "Submitted", time: "Sep 17, 07:00 AM", detail: "Citizen logged emergency complaint of black foaming toxic water discharge", status: "completed" },
-      { stage: "AI Triage & DNA Generated", time: "Sep 17, 07:01 AM", detail: "Triggered CRITICAL Environmental Biohazard Alert (Score 98)", status: "completed" },
-      { stage: "Enforcement Squad Mobilized", time: "Sep 17, 07:45 AM", detail: "DPCC Scientific Officers en route with sampling apparatus", status: "completed" },
-      { stage: "Field Inspection Active", time: "Sep 17, 08:30 AM", detail: "Upstream industrial area inspection & gate sealing underway", status: "in_progress" },
-      { stage: "Lab Report & Sluice Lock", time: "Pending", detail: "Environmental fine & permanent seal", status: "pending" }
+      { stage: "Submitted", time: "Sep 17, 07:00 AM", detail: "Citizen logged emergency complaint of sagging live wires and sparks", status: "completed" },
+      { stage: "AI Triage & DNA Generated", time: "Sep 17, 07:01 AM", detail: "Triggered CRITICAL Electrocution & Fire Risk Alert (Score 98)", status: "completed" },
+      { stage: "Line Gang Dispatched", time: "Sep 17, 07:20 AM", detail: "Hydraulic lift bucket truck en route to market", status: "completed" },
+      { stage: "Cable Re-tensioning Active", time: "Sep 17, 08:00 AM", detail: "Power temporarily isolated; cables being elevated", status: "in_progress" },
+      { stage: "Final Safety Inspection", time: "Pending", detail: "Transformer insulation testing & signoff", status: "pending" }
     ]
   }
 ];

@@ -578,12 +578,12 @@ export default function CitizenSubmit() {
               }}>
                 <Sliders style={{ width: '15px', height: '15px', color: saralMode ? '#059669' : '#64748B' }} />
                 <span style={{ fontSize: '12.5px', fontWeight: 700, color: saralMode ? '#065F46' : '#334155' }}>
-                  सरल मोड (Easy Voice)
+                  Elders Mode
                 </span>
                 <button
                   type="button"
                   onClick={() => setSaralMode(!saralMode)}
-                  aria-label="Toggle Saral Mode"
+                  aria-label="Toggle Elders Mode"
                   style={{
                     width: '38px',
                     height: '20px',

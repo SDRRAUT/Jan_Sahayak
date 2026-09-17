@@ -88,7 +88,7 @@ export function AppProvider({ children }) {
   });
 
   const [grievances, setGrievances] = useState(() => {
-    const saved = localStorage.getItem('jansahayk_grievances_v3');
+    const saved = localStorage.getItem('jansahayk_grievances_v4');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -97,19 +97,19 @@ export function AppProvider({ children }) {
         }
       } catch (e) {}
     }
-    localStorage.setItem('jansahayk_grievances_v3', JSON.stringify(INITIAL_GRIEVANCES));
+    localStorage.setItem('jansahayk_grievances_v4', JSON.stringify(INITIAL_GRIEVANCES));
     return INITIAL_GRIEVANCES;
   });
 
   const [clusters, setClusters] = useState(() => {
-    const saved = localStorage.getItem('jansahayk_clusters_v3');
+    const saved = localStorage.getItem('jansahayk_clusters_v4');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length >= MOCK_CLUSTERS.length) return parsed;
       } catch (e) {}
     }
-    localStorage.setItem('jansahayk_clusters_v3', JSON.stringify(MOCK_CLUSTERS));
+    localStorage.setItem('jansahayk_clusters_v4', JSON.stringify(MOCK_CLUSTERS));
     return MOCK_CLUSTERS;
   });
 
@@ -180,12 +180,12 @@ export function AppProvider({ children }) {
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem('jansahayk_grievances_v3', JSON.stringify(grievances));
+    localStorage.setItem('jansahayk_grievances_v4', JSON.stringify(grievances));
     localStorage.setItem('jansahayk_grievances', JSON.stringify(grievances));
   }, [grievances]);
 
   useEffect(() => {
-    localStorage.setItem('jansahayk_clusters_v3', JSON.stringify(clusters));
+    localStorage.setItem('jansahayk_clusters_v4', JSON.stringify(clusters));
     localStorage.setItem('jansahayk_clusters', JSON.stringify(clusters));
   }, [clusters]);
 

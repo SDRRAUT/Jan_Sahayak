@@ -10,6 +10,7 @@ import { aiProvider } from './agents/aiProvider.js';
 import { postgresDB, isPostgresActive } from './db/postgres.js';
 import { CANONICAL_STATUSES, normalizeStatus, isValidTransition, getRoleStatusLabel } from './constants/statuses.js';
 import { CANONICAL_EVENTS } from './constants/events.js';
+import { geminiAssistant } from './services/geminiAssistant.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -2458,6 +2459,196 @@ app.post('/api/intelligence/signals', async (req, res) => {
     signal: newSignal,
     message: 'Signal received. Your observation helps identify broader civic problems.'
   });
+});
+
+// ============================================================================
+// GEMINI-POWERED JAN_SAHAYAK AI ASSISTANT API
+// Server-Side Role-Aware Grounded Reasoning & Controlled Mutations
+// ============================================================================
+
+const ASSISTANT_CONVERSATIONS = new Map();
+
+// 1. Process Chat Message via Server-Side Gemini
+app.post('/api/assistant/chat', async (req, res) => {
+  try {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    let user = req.body.user || null;
+
+    if (token) {
+      try {
+        const { data } = await supabaseServer.auth.getUser(token);
+        if (data?.user) {
+          const profile = await postgresDB.getCivicProfile(data.user.id);
+          user = {
+            id: data.user.id,
+            name: profile?.full_name || data.user.user_metadata?.full_name || data.user.email?.split('@')[0],
+            role: (profile?.role || data.user.user_metadata?.role || 'CITIZEN').toLowerCase(),
+            department: profile?.department_id,
+            ward: profile?.ward
+          };
+        } else if (SESSIONS[token]) {
+          user = SESSIONS[token];
+        }
+      } catch (err) {}
+    }
+
+    if (!user) {
+      user = req.body.user || {
+        id: 'USR-CITIZEN-01',
+        name: 'Aditya Verma',
+        role: 'citizen',
+        ward: 'Ward 14 (Rohini Sector 14)'
+      };
+    }
+
+    const { message, conversationId, context = {} } = req.body;
+    if (!message || typeof message !== 'string' || !message.trim()) {
+      return res.status(400).json({ error: 'Message is required.' });
+    }
+
+    const convId = conversationId || `conv_${user.id || 'anon'}`;
+    const history = ASSISTANT_CONVERSATIONS.get(convId) || [];
+
+    const result = await geminiAssistant.processChatMessage({
+      message: message.trim(),
+      history,
+      user,
+      context
+    });
+
+    // Update conversation history (bounded to last 16)
+    history.push({ sender: 'user', text: message.trim(), timestamp: new Date().toISOString() });
+    history.push({ sender: 'assistant', text: result.reply, timestamp: new Date().toISOString() });
+    if (history.length > 16) {
+      history.splice(0, history.length - 16);
+    }
+    ASSISTANT_CONVERSATIONS.set(convId, history);
+
+    res.json({
+      success: true,
+      reply: result.reply,
+      toolsCalled: result.toolsCalled || [],
+      actionProposal: result.actionProposal || null,
+      conversationId: convId,
+      groundedData: result.groundedData || null
+    });
+  } catch (err) {
+    console.error('[Assistant Chat Error]:', err);
+    res.status(500).json({
+      success: false,
+      error: 'AI Assistant temporarily unavailable hai. Aap Jan_Sahayak ke normal features use kar sakte hain.',
+      reply: 'AI Assistant temporarily unavailable hai. Aap Jan_Sahayak ke normal features use kar sakte hain.'
+    });
+  }
+});
+
+// 2. Execute User-Confirmed Sensitive Action (Reopen, Escalate, Verify)
+app.post('/api/assistant/action/confirm', async (req, res) => {
+  const { actionType, entityId, entityType, reason, user } = req.body;
+  if (!actionType || !entityId) {
+    return res.status(400).json({ error: 'actionType and entityId are required for action confirmation.' });
+  }
+
+  const actingUser = user || { id: 'USR-CITIZEN-01', name: 'Aditya Verma', role: 'citizen' };
+
+  try {
+    if (actionType === 'REOPEN_COMPLAINT') {
+      const grievance = await postgresDB.getGrievanceById(entityId);
+      if (grievance) {
+        grievance.status = CANONICAL_STATUSES.REOPENED;
+        grievance.timeline = grievance.timeline || [];
+        grievance.timeline.push({
+          status: CANONICAL_STATUSES.REOPENED,
+          title: 'Complaint Reopened by Citizen',
+          timestamp: new Date().toLocaleString(),
+          description: reason || 'Citizen confirmed reopening via JanSahayak AI Assistant.'
+        });
+        await postgresDB.updateGrievance(entityId, {
+          status: CANONICAL_STATUSES.REOPENED,
+          timeline: grievance.timeline
+        });
+        db.updateGrievance(entityId, grievance);
+      }
+
+      await postgresDB.logAuditEvent(actingUser.name, 'COMPLAINT_REOPENED', entityId, reason || 'Reopened via AI Assistant confirmation');
+      orchestrator.broadcastEvent({
+        type: CANONICAL_EVENTS.GRIEVANCE_STATUS_CHANGED,
+        payload: { id: entityId, status: CANONICAL_STATUSES.REOPENED, reason }
+      });
+
+      return res.json({
+        success: true,
+        actionType,
+        entityId,
+        newStatus: CANONICAL_STATUSES.REOPENED,
+        message: `Complaint #${entityId} ko safaltapoorvak reopen kar diya gaya hai aur Superintending Engineer ko escalate kiya gaya hai.`
+      });
+    }
+
+    if (actionType === 'ESCALATE_INCIDENT') {
+      await postgresDB.logAuditEvent(actingUser.name, 'INCIDENT_ESCALATED', entityId, reason || 'Escalated by authority via Assistant');
+      orchestrator.broadcastEvent({
+        type: 'INCIDENT_ESCALATED',
+        payload: { id: entityId, severity: 'CRITICAL', reason }
+      });
+
+      return res.json({
+        success: true,
+        actionType,
+        entityId,
+        message: `Incident #${entityId} ko Priority 1 SLA ke saath escalate kar diya gaya hai.`
+      });
+    }
+
+    if (actionType === 'VERIFY_RESOLUTION') {
+      const grievance = await postgresDB.getGrievanceById(entityId);
+      if (grievance) {
+        grievance.status = CANONICAL_STATUSES.RESOLVED;
+        grievance.citizenVerification = {
+          status: 'VERIFIED',
+          verifiedAt: new Date().toISOString(),
+          verifiedBy: actingUser.name
+        };
+        await postgresDB.updateGrievance(entityId, {
+          status: CANONICAL_STATUSES.RESOLVED,
+          citizen_verification: grievance.citizenVerification
+        });
+        db.updateGrievance(entityId, grievance);
+      }
+
+      await postgresDB.logAuditEvent(actingUser.name, 'CITIZEN_VERIFIED', entityId, 'Citizen verified resolution on ground via AI Assistant');
+      orchestrator.broadcastEvent({
+        type: CANONICAL_EVENTS.VERIFICATION_RECORDED,
+        payload: { id: entityId, status: CANONICAL_STATUSES.RESOLVED }
+      });
+
+      return res.json({
+        success: true,
+        actionType,
+        entityId,
+        newStatus: CANONICAL_STATUSES.RESOLVED,
+        message: `Dhanyawad! Complaint #${entityId} ka verification confirm ho gaya hai aur iski permanent entry Civic Memory mein store kar di gayi hai.`
+      });
+    }
+
+    res.status(400).json({ error: `Unrecognized action type: ${actionType}` });
+  } catch (err) {
+    console.error('[Action Confirmation Error]:', err);
+    res.status(500).json({ error: `Action execution failed: ${err.message}` });
+  }
+});
+
+// 3. Conversation Management
+app.get('/api/assistant/conversations', (req, res) => {
+  const convId = req.query.conversationId || 'conv_default';
+  const history = ASSISTANT_CONVERSATIONS.get(convId) || [];
+  res.json({ conversationId: convId, history });
+});
+
+app.delete('/api/assistant/conversations/:id', (req, res) => {
+  ASSISTANT_CONVERSATIONS.delete(req.params.id);
+  res.json({ success: true, message: 'Conversation cleared' });
 });
 
 
