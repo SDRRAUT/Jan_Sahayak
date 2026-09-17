@@ -53,7 +53,7 @@ function FormattedMarkdown({ content }) {
   const lines = content.split('\n');
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
       {lines.map((line, lineIdx) => {
         const trimmed = line.trim();
         if (!trimmed) {
@@ -478,21 +478,21 @@ export default function JanSahayakAssistant() {
           id="jansahayak-ai-window"
           style={{
             position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            width: isMinimized ? '340px' : '460px',
-            maxWidth: 'calc(100vw - 32px)',
-            height: isMinimized ? '64px' : '640px',
-            maxHeight: 'calc(100vh - 48px)',
+            bottom: '16px',
+            right: '16px',
+            width: isMinimized ? '300px' : '440px',
+            maxWidth: 'calc(100vw - 24px)',
+            height: isMinimized ? '52px' : 'min(550px, calc(100dvh - 32px))',
+            maxHeight: 'calc(100dvh - 32px)',
             zIndex: 9999,
             display: 'flex',
             flexDirection: 'column',
             backgroundColor: '#090E17',
             backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(30, 41, 59, 0.5) 0%, rgba(9, 14, 23, 0.95) 75%)',
             color: '#F8FAFC',
-            borderRadius: '24px',
+            borderRadius: '20px',
             border: '1px solid rgba(255, 255, 255, 0.12)',
-            boxShadow: `0 30px 70px -10px rgba(0, 0, 0, 0.8), 0 0 35px ${activeRoleConfig.glow}`,
+            boxShadow: `0 24px 60px -10px rgba(0, 0, 0, 0.8), 0 0 30px ${activeRoleConfig.glow}`,
             overflow: 'hidden',
             fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             transition: 'height 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -500,14 +500,15 @@ export default function JanSahayakAssistant() {
         >
           {/* Header Bar */}
           <div style={{
-            padding: '16px 20px',
+            padding: '12px 16px',
             background: activeRoleConfig.gradient,
             borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             userSelect: 'none',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.25)'
+            boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+            flexShrink: 0
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{
@@ -628,11 +629,13 @@ export default function JanSahayakAssistant() {
             <div style={{
               flex: 1,
               overflowY: 'auto',
-              padding: '20px 18px',
+              overflowX: 'hidden',
+              padding: '16px 14px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '16px',
-              background: 'transparent'
+              gap: '14px',
+              background: 'transparent',
+              minHeight: 0
             }}>
               {messages.map((msg) => {
                 const isUser = msg.sender === 'user';
@@ -643,7 +646,8 @@ export default function JanSahayakAssistant() {
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: isUser ? 'flex-end' : 'flex-start',
-                      gap: '4px'
+                      gap: '4px',
+                      width: '100%'
                     }}
                   >
                     <div style={{
@@ -651,7 +655,7 @@ export default function JanSahayakAssistant() {
                       alignItems: 'flex-start',
                       gap: '8px',
                       flexDirection: isUser ? 'row-reverse' : 'row',
-                      maxWidth: '92%'
+                      maxWidth: '96%'
                     }}>
                       {!isUser && (
                         <div style={{
@@ -673,17 +677,20 @@ export default function JanSahayakAssistant() {
 
                       <div
                         style={{
-                          padding: '12px 16px',
-                          borderRadius: isUser ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+                          padding: '11px 14px',
+                          borderRadius: isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
                           background: isUser 
                             ? 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)' 
-                            : 'rgba(30, 41, 59, 0.65)',
+                            : 'rgba(30, 41, 59, 0.75)',
                           backdropFilter: isUser ? 'none' : 'blur(10px)',
                           color: '#F8FAFC',
                           boxShadow: isUser 
-                            ? '0 6px 16px rgba(37, 99, 235, 0.25)' 
+                            ? '0 4px 14px rgba(37, 99, 235, 0.25)' 
                             : '0 4px 16px rgba(0, 0, 0, 0.35)',
-                          border: isUser ? 'none' : '1px solid rgba(255, 255, 255, 0.08)'
+                          border: isUser ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'anywhere',
+                          maxWidth: '100%'
                         }}
                       >
                         {isUser ? (
@@ -814,14 +821,16 @@ export default function JanSahayakAssistant() {
           {/* Contextual Suggestion Pills */}
           {!isMinimized && (
             <div style={{
-              padding: '10px 18px',
-              background: 'rgba(15, 23, 42, 0.7)',
+              padding: '8px 12px',
+              background: 'rgba(15, 23, 42, 0.85)',
               borderTop: '1px solid rgba(255, 255, 255, 0.06)',
               overflowX: 'auto',
               whiteSpace: 'nowrap',
               display: 'flex',
-              gap: '8px',
-              scrollbarWidth: 'none'
+              gap: '6px',
+              scrollbarWidth: 'none',
+              WebkitOverflowScrolling: 'touch',
+              flexShrink: 0
             }}>
               {getSuggestionChips().map((chip, idx) => (
                 <button
@@ -832,9 +841,9 @@ export default function JanSahayakAssistant() {
                     background: 'rgba(255, 255, 255, 0.06)',
                     border: '1px solid rgba(255, 255, 255, 0.12)',
                     color: '#CBD5E1',
-                    fontSize: '12px',
+                    fontSize: '11.5px',
                     fontWeight: 600,
-                    padding: '6px 14px',
+                    padding: '5px 12px',
                     borderRadius: '999px',
                     cursor: 'pointer',
                     flexShrink: 0,
@@ -866,12 +875,13 @@ export default function JanSahayakAssistant() {
                 handleSendMessage();
               }}
               style={{
-                padding: '14px 18px',
-                background: 'rgba(15, 23, 42, 0.9)',
+                padding: '10px 12px',
+                background: 'rgba(15, 23, 42, 0.95)',
                 borderTop: '1px solid rgba(255, 255, 255, 0.08)',
                 display: 'flex',
-                gap: '10px',
-                alignItems: 'center'
+                gap: '8px',
+                alignItems: 'center',
+                flexShrink: 0
               }}
             >
               <input
