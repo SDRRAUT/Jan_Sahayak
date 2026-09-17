@@ -23,7 +23,7 @@ import {
   Lock
 } from 'lucide-react';
 import { useApp, DEMO_CREDENTIALS } from '../../context/AppContext';
-import UserProfileModal from '../common/UserProfileModal';
+import FileGrievanceModal from '../common/FileGrievanceModal';
 
 export default function Navbar() {
   const location = useLocation();
@@ -45,10 +45,9 @@ export default function Navbar() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showTrackModal, setShowTrackModal] = useState(false);
+  const [showFileGrievanceModal, setShowFileGrievanceModal] = useState(false);
   const [trackTicketId, setTrackTicketId] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
-  const [profileModalTab, setProfileModalTab] = useState('profile');
 
   // Login modal: role selection + 3-second auth simulation (matches onboarding Step 4)
   const [loginSelectedRole, setLoginSelectedRole] = useState('citizen');
@@ -296,12 +295,31 @@ export default function Navbar() {
                 >
                   My Grievances
                 </Link>
-                <Link
-                  to="/citizen/submit"
-                  className={`site-nav-link ${location.pathname === '/citizen/submit' ? 'active' : ''}`}
+                <button
+                  type="button"
+                  onClick={() => setShowFileGrievanceModal(true)}
+                  style={{
+                    height: '34px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    padding: '0 16px',
+                    borderRadius: '9999px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: 'linear-gradient(135deg, #0E5E3A 0%, #0A472C 100%)',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    boxShadow: '0 2px 8px rgba(14, 94, 58, 0.28)',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 150ms ease',
+                    marginLeft: '4px'
+                  }}
                 >
-                  File Grievance
-                </Link>
+                  <Plus style={{ width: '14px', height: '14px' }} />
+                  <span>File Grievance</span>
+                </button>
               </>
             )}
 
@@ -849,11 +867,7 @@ export default function Navbar() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                       <button
                         type="button"
-                        onClick={() => {
-                          setShowUserMenu(false);
-                          setProfileModalTab('profile');
-                          setShowProfileModal(true);
-                        }}
+                        onClick={() => { setShowUserMenu(false); navigate(role === 'citizen' ? '/citizen' : role === 'super_admin' ? '/admin/super' : '/officer'); }}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -864,8 +878,7 @@ export default function Navbar() {
                           fontSize: '12px',
                           color: 'var(--color-text-secondary)',
                           background: 'transparent',
-                          textAlign: 'left',
-                          cursor: 'pointer'
+                          textAlign: 'left'
                         }}
                       >
                         <User style={{ width: '13px', height: '13px' }} />
@@ -873,11 +886,7 @@ export default function Navbar() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => {
-                          setShowUserMenu(false);
-                          setProfileModalTab('settings');
-                          setShowProfileModal(true);
-                        }}
+                        onClick={() => { setShowUserMenu(false); navigate(role === 'citizen' ? '/citizen' : role === 'super_admin' ? '/admin/super' : '/officer'); }}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -888,8 +897,7 @@ export default function Navbar() {
                           fontSize: '12px',
                           color: 'var(--color-text-secondary)',
                           background: 'transparent',
-                          textAlign: 'left',
-                          cursor: 'pointer'
+                          textAlign: 'left'
                         }}
                       >
                         <Settings style={{ width: '13px', height: '13px' }} />
@@ -1020,20 +1028,27 @@ export default function Navbar() {
                   >
                     📋 My Grievances
                   </Link>
-                  <Link
-                    to="/citizen/submit"
-                    onClick={() => setMobileMenuOpen(false)}
+                  <button
+                    type="button"
+                    onClick={() => { setShowFileGrievanceModal(true); setMobileMenuOpen(false); }}
                     style={{
                       padding: '10px 14px',
                       borderRadius: 'var(--radius-md)',
                       fontSize: '14px',
                       fontWeight: 600,
-                      color: location.pathname === '/citizen/submit' ? 'var(--color-primary)' : 'var(--color-text-primary)',
-                      background: location.pathname === '/citizen/submit' ? '#F0FDF4' : '#F8FAFC'
+                      color: '#FFFFFF',
+                      background: 'linear-gradient(135deg, #0E5E3A 0%, #0A472C 100%)',
+                      border: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      textAlign: 'left'
                     }}
                   >
-                    ✍️ File Grievance
-                  </Link>
+                    <Plus style={{ width: '15px', height: '15px' }} />
+                    <span>File Grievance</span>
+                  </button>
                 </>
               )}
 
@@ -1305,62 +1320,7 @@ export default function Navbar() {
                   </div>
                 )}
 
-                {/* Mobile Profile & Settings Quick Buttons */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--color-divider)' }}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setProfileModalTab('profile');
-                      setShowProfileModal(true);
-                    }}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                      padding: '9px',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '12.5px',
-                      fontWeight: 600,
-                      color: 'var(--color-text-primary)',
-                      background: '#F8FAFC',
-                      border: '1px solid #E2E8F0',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <User style={{ width: '13px', height: '13px', color: '#2563EB' }} />
-                    <span>My Profile</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setProfileModalTab('settings');
-                      setShowProfileModal(true);
-                    }}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                      padding: '9px',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '12.5px',
-                      fontWeight: 600,
-                      color: 'var(--color-text-primary)',
-                      background: '#F8FAFC',
-                      border: '1px solid #E2E8F0',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <Settings style={{ width: '13px', height: '13px', color: '#64748B' }} />
-                    <span>Settings</span>
-                  </button>
-                </div>
-
-                <div style={{ marginTop: '8px' }}>
+                <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--color-divider)' }}>
                   <button
                     type="button"
                     onClick={() => { logout(); setMobileMenuOpen(false); navigate('/'); }}
@@ -1664,11 +1624,10 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* Universal User Profile & Account Settings Modal (Works across all roles) */}
-      <UserProfileModal 
-        isOpen={showProfileModal} 
-        onClose={() => setShowProfileModal(false)} 
-        initialTab={profileModalTab} 
+      {/* Quick Interactive File Grievance Modal */}
+      <FileGrievanceModal
+        isOpen={showFileGrievanceModal}
+        onClose={() => setShowFileGrievanceModal(false)}
       />
     </>
   );
