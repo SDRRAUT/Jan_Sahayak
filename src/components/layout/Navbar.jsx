@@ -17,9 +17,12 @@ import {
   ChevronDown,
   Sparkles,
   Plus,
-  MapPin
+  MapPin,
+  Settings,
+  Mail,
+  Lock
 } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
+import { useApp, DEMO_CREDENTIALS } from '../../context/AppContext';
 
 export default function Navbar() {
   const location = useLocation();
@@ -43,6 +46,52 @@ export default function Navbar() {
   const [showTrackModal, setShowTrackModal] = useState(false);
   const [trackTicketId, setTrackTicketId] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
+
+  // Login modal: role selection + 3-second auth simulation (matches onboarding Step 4)
+  const [loginSelectedRole, setLoginSelectedRole] = useState('citizen');
+  const [loginIsVerifying, setLoginIsVerifying] = useState(false);
+  const [loginVerifyProgress, setLoginVerifyProgress] = useState(0);
+  const [loginVerifyMsg, setLoginVerifyMsg] = useState('');
+
+  const loginRoleOptions = [
+    {
+      key: 'citizen',
+      label: 'Citizen',
+      name: 'Aditya Verma',
+      badge: 'Ward 14 (Rohini)',
+      email: DEMO_CREDENTIALS.citizen.email,
+      password: DEMO_CREDENTIALS.citizen.password,
+      icon: User,
+      color: '#2563EB',
+      bg: '#EFF6FF',
+      activeBorder: '#2563EB'
+    },
+    {
+      key: 'civic_officer',
+      label: 'Govt Officer',
+      name: 'Er. Sanjay Sharma',
+      badge: 'Field Engineer (DJB)',
+      email: DEMO_CREDENTIALS.civic_officer.email,
+      password: DEMO_CREDENTIALS.civic_officer.password,
+      icon: Briefcase,
+      color: '#059669',
+      bg: '#ECFDF5',
+      activeBorder: '#059669'
+    },
+    {
+      key: 'super_admin',
+      label: 'Administrator',
+      name: 'Dr. Meenakshi, IAS',
+      badge: 'Municipal Head',
+      email: DEMO_CREDENTIALS.super_admin.email,
+      password: DEMO_CREDENTIALS.super_admin.password,
+      icon: ShieldCheck,
+      color: '#4338CA',
+      bg: '#EEF2FF',
+      activeBorder: '#4338CA'
+    }
+  ];
+  const currentLoginRole = loginRoleOptions.find(r => r.key === loginSelectedRole) || loginRoleOptions[0];
 
   const notificationRef = useRef(null);
   const userMenuRef = useRef(null);
@@ -75,6 +124,8 @@ export default function Navbar() {
       setShowLoginModal(false);
       setShowUserMenu(false);
       setMobileMenuOpen(false);
+      setLoginIsVerifying(false);
+      setLoginVerifyProgress(0);
       const targetRole = logged?.role || roleKey;
       if (targetRole === 'citizen') navigate('/citizen');
       else if (targetRole === 'civic_officer' || targetRole === 'officer' || targetRole === 'dept_admin') navigate('/officer');
@@ -84,11 +135,34 @@ export default function Navbar() {
       setShowLoginModal(false);
       setShowUserMenu(false);
       setMobileMenuOpen(false);
+      setLoginIsVerifying(false);
+      setLoginVerifyProgress(0);
       if (roleKey === 'citizen') navigate('/citizen');
       else if (roleKey === 'civic_officer' || roleKey === 'officer' || roleKey === 'dept_admin') navigate('/officer');
       else if (roleKey === 'super_admin') navigate('/admin/super');
       else navigate('/');
     }
+  };
+
+  // 3-second verification animation matching onboarding Step 4
+  const triggerLoginAuth = (roleKey) => {
+    const key = roleKey || loginSelectedRole;
+    setLoginIsVerifying(true);
+    setLoginVerifyProgress(15);
+    setLoginVerifyMsg('Checking credentials in Delhi Municipal Auth Directory...');
+    setTimeout(() => {
+      setLoginVerifyProgress(55);
+      setLoginVerifyMsg('Verifying security clearance & jurisdiction...');
+    }, 900);
+    setTimeout(() => {
+      setLoginVerifyProgress(88);
+      setLoginVerifyMsg('Cryptographic token granted. Preparing workspace...');
+    }, 2000);
+    setTimeout(() => {
+      setLoginVerifyProgress(100);
+      setLoginVerifyMsg('Access Granted! Redirecting...');
+      handleRoleLogin(key);
+    }, 3000);
   };
 
   const handleTrackSubmit = (e) => {
@@ -809,56 +883,46 @@ export default function Navbar() {
                       )}
                     </div>
 
+                    {/* Profile Settings */}
                     <div style={{ height: '1px', background: 'var(--color-divider)', margin: '8px 0' }} />
-
-                    <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
-                      Switch Demo Persona (3 Roles):
-                    </span>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                       <button
                         type="button"
-                        onClick={() => handleRoleLogin('citizen')}
+                        onClick={() => { setShowUserMenu(false); navigate(role === 'citizen' ? '/citizen' : role === 'super_admin' ? '/admin/super' : '/officer'); }}
                         style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          width: '100%',
                           padding: '7px 8px',
                           borderRadius: 'var(--radius-sm)',
                           fontSize: '12px',
-                          textAlign: 'left',
-                          background: role === 'citizen' ? '#F0FDF4' : 'transparent',
-                          color: role === 'citizen' ? 'var(--color-primary)' : 'var(--color-text-primary)',
-                          fontWeight: role === 'citizen' ? 700 : 400
+                          color: 'var(--color-text-secondary)',
+                          background: 'transparent',
+                          textAlign: 'left'
                         }}
                       >
-                        👤 Citizen (Aditya Verma)
+                        <User style={{ width: '13px', height: '13px' }} />
+                        <span>My Profile</span>
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleRoleLogin('civic_officer')}
+                        onClick={() => { setShowUserMenu(false); navigate(role === 'citizen' ? '/citizen' : role === 'super_admin' ? '/admin/super' : '/officer'); }}
                         style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          width: '100%',
                           padding: '7px 8px',
                           borderRadius: 'var(--radius-sm)',
                           fontSize: '12px',
-                          textAlign: 'left',
-                          background: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? '#ECFDF5' : 'transparent',
-                          color: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? '#047857' : 'var(--color-text-primary)',
-                          fontWeight: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? 700 : 400
+                          color: 'var(--color-text-secondary)',
+                          background: 'transparent',
+                          textAlign: 'left'
                         }}
                       >
-                        👷 Government Officer (Er. Sanjay Sharma)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleRoleLogin('super_admin')}
-                        style={{
-                          padding: '7px 8px',
-                          borderRadius: 'var(--radius-sm)',
-                          fontSize: '12px',
-                          textAlign: 'left',
-                          background: role === 'super_admin' ? '#EEF2FF' : 'transparent',
-                          color: role === 'super_admin' ? '#4338CA' : 'var(--color-text-primary)',
-                          fontWeight: role === 'super_admin' ? 700 : 400
-                        }}
-                      >
-                        🛡️ Administrator / Admin (Dr. Meenakshi, IAS)
+                        <Settings style={{ width: '13px', height: '13px' }} />
+                        <span>Account Settings</span>
                       </button>
                     </div>
 
@@ -871,9 +935,11 @@ export default function Navbar() {
                           alignItems: 'center',
                           gap: '6px',
                           width: '100%',
-                          padding: '6px 8px',
+                          padding: '7px 8px',
+                          borderRadius: 'var(--radius-sm)',
                           fontSize: '12px',
-                          color: '#EF4444'
+                          color: '#EF4444',
+                          background: 'transparent'
                         }}
                       >
                         <LogOut style={{ width: '13px', height: '13px' }} />
@@ -1212,65 +1278,8 @@ export default function Navbar() {
               </div>
             ) : (
               <>
-                {/* Mobile Persona Switcher */}
-                <div style={{ marginTop: '8px', paddingTop: '10px', borderTop: '1px solid var(--color-divider)' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '8px' }}>
-                    Switch Persona (1-Click):
-                  </span>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
-                    <button
-                      type="button"
-                      onClick={() => handleRoleLogin('citizen')}
-                      style={{
-                        padding: '8px 12px',
-                        borderRadius: 'var(--radius-md)',
-                        fontSize: '12px',
-                        textAlign: 'left',
-                        background: role === 'citizen' ? '#F0FDF4' : '#F8FAFC',
-                        color: role === 'citizen' ? 'var(--color-primary)' : 'var(--color-text-primary)',
-                        border: `1px solid ${role === 'citizen' ? 'rgba(16, 185, 129, 0.3)' : 'var(--color-border-subtle)'}`,
-                        fontWeight: role === 'citizen' ? 700 : 500
-                      }}
-                    >
-                      👤 Citizen (Aditya Verma)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleRoleLogin('civic_officer')}
-                      style={{
-                        padding: '8px 12px',
-                        borderRadius: 'var(--radius-md)',
-                        fontSize: '12px',
-                        textAlign: 'left',
-                        background: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? '#ECFDF5' : '#F8FAFC',
-                        color: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? '#047857' : 'var(--color-text-primary)',
-                        border: `1px solid ${(role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? 'rgba(5, 150, 105, 0.3)' : 'var(--color-border-subtle)'}`,
-                        fontWeight: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? 700 : 500
-                      }}
-                    >
-                      👷 Government Officer (Er. Sanjay Sharma)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleRoleLogin('super_admin')}
-                      style={{
-                        padding: '8px 12px',
-                        borderRadius: 'var(--radius-md)',
-                        fontSize: '12px',
-                        textAlign: 'left',
-                        background: role === 'super_admin' ? '#EEF2FF' : '#F8FAFC',
-                        color: role === 'super_admin' ? '#4338CA' : 'var(--color-text-primary)',
-                        border: `1px solid ${role === 'super_admin' ? 'rgba(67, 56, 202, 0.3)' : 'var(--color-border-subtle)'}`,
-                        fontWeight: role === 'super_admin' ? 700 : 500
-                      }}
-                    >
-                      🛡️ Administrator / Admin (Dr. Meenakshi, IAS)
-                    </button>
-                  </div>
-                </div>
-
                 {role === 'citizen' && (
-                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--color-divider)' }}>
                     <button
                       type="button"
                       onClick={() => { setShowTrackModal(true); setMobileMenuOpen(false); }}
@@ -1436,154 +1445,182 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* Login / Persona Selection Modal */}
+      {/* Login Modal — Onboarding Step 4 Style */}
       {showLoginModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(15, 23, 42, 0.45)',
-          backdropFilter: 'blur(4px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 2000,
-          padding: '20px'
-        }}>
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget) { setShowLoginModal(false); setLoginIsVerifying(false); setLoginVerifyProgress(0); }}}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(15, 23, 42, 0.5)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000,
+            padding: '20px'
+          }}
+        >
           <div style={{
             background: '#FFFFFF',
-            borderRadius: 'var(--radius-xl)',
-            maxWidth: '460px',
+            borderRadius: '20px',
+            maxWidth: '440px',
             width: '100%',
-            padding: '28px',
-            boxShadow: 'var(--shadow-modal)',
+            padding: '24px',
+            boxShadow: '0 24px 60px rgba(15, 23, 42, 0.2)',
             position: 'relative'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <img src="/logo.png" alt="JanSahayak" style={{ height: '34px', width: 'auto', objectFit: 'contain' }} />
-                <h3 style={{ fontSize: '18px', color: 'var(--color-text-primary)' }}>Sign In to JanSahayak</h3>
+                <img src="/logo.png" alt="JanSahayak" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
+                <div>
+                  <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', lineHeight: 1 }}>Sign In to JanSahayak</h3>
+                  <p style={{ fontSize: '11px', color: '#64748B', marginTop: '2px' }}>Select your role to enter</p>
+                </div>
               </div>
-              <button type="button" onClick={() => setShowLoginModal(false)} style={{ color: 'var(--color-text-muted)' }}>
+              <button
+                type="button"
+                onClick={() => { setShowLoginModal(false); setLoginIsVerifying(false); setLoginVerifyProgress(0); }}
+                style={{ color: '#94A3B8', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+              >
                 <X style={{ width: '18px', height: '18px' }} />
               </button>
             </div>
 
-            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '20px', lineHeight: 1.5 }}>
-              Choose your role to enter the platform. For rapid demonstration, pre-seeded accounts are enabled.
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {/* Persona 1: Citizen */}
-              <button
-                type="button"
-                onClick={() => handleRoleLogin('citizen')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '14px',
-                  borderRadius: 'var(--radius-lg)',
-                  border: '1px solid var(--color-border-subtle)',
-                  background: '#FFFFFF',
-                  textAlign: 'left',
-                  transition: 'all 150ms ease'
-                }}
-                className="card-interactive"
-              >
-                <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: '#ECFDF5', color: '#065F46', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <User style={{ width: '18px', height: '18px' }} />
-                </div>
-                <div>
-                  <strong style={{ fontSize: '14px', color: 'var(--color-text-primary)', display: 'block' }}>
-                    Citizen Portal
-                  </strong>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
-                    Aditya Verma • Submit complaints & track live progress
-                  </span>
-                </div>
-              </button>
-
-              {/* Persona 2: Civic Officer */}
-              <button
-                type="button"
-                onClick={() => handleRoleLogin('civic_officer')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '14px',
-                  borderRadius: 'var(--radius-lg)',
-                  border: '1px solid var(--color-border-subtle)',
-                  background: '#FFFFFF',
-                  textAlign: 'left',
-                  transition: 'all 150ms ease'
-                }}
-                className="card-interactive"
-              >
-                <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: '#ECFDF5', color: '#065F46', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Briefcase style={{ width: '18px', height: '18px' }} />
-                </div>
-                <div>
-                  <strong style={{ fontSize: '14px', color: 'var(--color-text-primary)', display: 'block' }}>
-                    👷 Government Officer
-                  </strong>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
-                    Er. Sanjay Sharma • Field team, repairs, SOP approvals & solving issues
-                  </span>
-                </div>
-              </button>
-
-              {/* Persona 3: Super Admin */}
-              <button
-                type="button"
-                onClick={() => handleRoleLogin('super_admin')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '14px',
-                  borderRadius: 'var(--radius-lg)',
-                  border: '1px solid var(--color-border-subtle)',
-                  background: '#FFFFFF',
-                  textAlign: 'left',
-                  transition: 'all 150ms ease'
-                }}
-                className="card-interactive"
-              >
-                <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: '#EEF2FF', color: '#4338CA', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <ShieldCheck style={{ width: '18px', height: '18px' }} />
-                </div>
-                <div>
-                  <strong style={{ fontSize: '14px', color: 'var(--color-text-primary)', display: 'block' }}>
-                    🛡️ Administrator / Admin
-                  </strong>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
-                    Dr. Meenakshi, IAS • Municipal Boss & State-level governance
-                  </span>
-                </div>
-              </button>
+            {/* 3-Persona Role Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '14px' }}>
+              {loginRoleOptions.map((item) => {
+                const Icon = item.icon;
+                const isSelected = loginSelectedRole === item.key;
+                return (
+                  <div
+                    key={item.key}
+                    onClick={() => !loginIsVerifying && setLoginSelectedRole(item.key)}
+                    style={{
+                      padding: '10px 6px',
+                      borderRadius: '12px',
+                      border: isSelected ? `2px solid ${item.activeBorder}` : '1px solid #E2E8F0',
+                      background: isSelected ? item.bg : '#F8FAFC',
+                      textAlign: 'center',
+                      cursor: loginIsVerifying ? 'not-allowed' : 'pointer',
+                      transition: 'all 150ms ease',
+                      opacity: loginIsVerifying && !isSelected ? 0.5 : 1
+                    }}
+                  >
+                    <div style={{
+                      width: '30px',
+                      height: '30px',
+                      borderRadius: '50%',
+                      background: isSelected ? '#FFFFFF' : '#E2E8F0',
+                      color: item.color,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 4px auto'
+                    }}>
+                      <Icon style={{ width: '15px', height: '15px' }} />
+                    </div>
+                    <strong style={{ fontSize: '11px', display: 'block', color: '#0F172A', fontWeight: 700 }}>{item.label}</strong>
+                    <span style={{ fontSize: '9px', color: '#64748B', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {item.name}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
 
-            {/* Guided Product Tour Link */}
-            <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--color-divider)', textAlign: 'center' }}>
+            {/* Pre-filled Credentials */}
+            <div style={{
+              background: '#F8FAFC',
+              borderRadius: '12px',
+              border: '1px solid #E2E8F0',
+              padding: '10px 12px',
+              marginBottom: '12px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '7px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#FFFFFF', padding: '6px 10px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                <Mail style={{ width: '13px', height: '13px', color: '#94A3B8', flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ fontSize: '9px', color: '#64748B', display: 'block', textTransform: 'uppercase', fontWeight: 700 }}>Email / Username</span>
+                  <span style={{ fontSize: '11.5px', fontWeight: 600, color: '#0F172A', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {currentLoginRole.email}
+                  </span>
+                </div>
+                <span style={{ fontSize: '9px', color: '#10B981', fontWeight: 700, background: '#ECFDF5', padding: '2px 6px', borderRadius: '4px', flexShrink: 0 }}>Demo ID</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#FFFFFF', padding: '6px 10px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                <Lock style={{ width: '13px', height: '13px', color: '#94A3B8', flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  <span style={{ fontSize: '9px', color: '#64748B', display: 'block', textTransform: 'uppercase', fontWeight: 700 }}>Password</span>
+                  <span style={{ fontSize: '11.5px', fontWeight: 600, color: '#0F172A', display: 'block', fontFamily: 'monospace', letterSpacing: '2px' }}>••••••••</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Verification Progress Bar */}
+            {loginIsVerifying && (
+              <div style={{ marginBottom: '12px' }}>
+                <div style={{ height: '6px', background: '#E2E8F0', borderRadius: '999px', overflow: 'hidden', marginBottom: '6px' }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${loginVerifyProgress}%`,
+                    background: `linear-gradient(90deg, ${currentLoginRole.color}, ${currentLoginRole.activeBorder})`,
+                    borderRadius: '999px',
+                    transition: 'width 600ms ease'
+                  }} />
+                </div>
+                <p style={{ fontSize: '11px', color: '#64748B', textAlign: 'center' }}>{loginVerifyMsg}</p>
+              </div>
+            )}
+
+            {/* Login Button */}
+            <button
+              type="button"
+              disabled={loginIsVerifying}
+              onClick={() => triggerLoginAuth(loginSelectedRole)}
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '999px',
+                background: loginIsVerifying ? '#94A3B8' : '#1E2653',
+                color: '#FFFFFF',
+                border: 'none',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: loginIsVerifying ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                boxShadow: loginIsVerifying ? 'none' : '0 4px 14px rgba(30, 38, 83, 0.3)',
+                transition: 'all 150ms ease'
+              }}
+            >
+              {loginIsVerifying ? (
+                <span>Verifying... ({Math.round(loginVerifyProgress)}%)</span>
+              ) : (
+                <>
+                  <span>⚡ Login as {currentLoginRole.label}</span>
+                  <ArrowRight style={{ width: '14px', height: '14px' }} />
+                </>
+              )}
+            </button>
+
+            {/* Tour Link */}
+            <div style={{ marginTop: '14px', textAlign: 'center' }}>
               <Link
                 to="/onboarding"
-                onClick={() => setShowLoginModal(false)}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  fontSize: '12.5px',
-                  fontWeight: 600,
-                  color: 'var(--color-primary)',
-                  textDecoration: 'none'
-                }}
+                onClick={() => { setShowLoginModal(false); setLoginIsVerifying(false); setLoginVerifyProgress(0); }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '12px', fontWeight: 600, color: 'var(--color-primary)', textDecoration: 'none' }}
               >
-                <Sparkles style={{ width: '14px', height: '14px' }} />
-                <span>Take the Full Interactive System Tour & Demo →</span>
+                <Sparkles style={{ width: '13px', height: '13px' }} />
+                <span>New? Take the full interactive system tour →</span>
               </Link>
             </div>
           </div>
