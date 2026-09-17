@@ -605,6 +605,7 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
   z-index: 1000;
   transition: all 200ms ease;
+  box-sizing: border-box;
 }
 
 .site-header.scrolled {
@@ -615,22 +616,29 @@ h1, h2, h3, h4, h5, h6 {
 
 .site-header-inner {
   height: 100%;
+  width: 100%;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(16px, 2vw, 32px);
+  padding-right: clamp(16px, 2vw, 32px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: clamp(8px, 1.2vw, 18px);
+  box-sizing: border-box;
 }
 
 .site-nav-link {
   font-size: 13px;
   font-weight: 500;
   color: var(--color-text-secondary);
-  padding: 6px 13px;
+  padding: 6px clamp(7px, 0.7vw, 11px);
   border-radius: var(--radius-full);
   transition: all 180ms ease;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   text-decoration: none;
   white-space: nowrap;
   letter-spacing: -0.01em;
@@ -647,8 +655,82 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
 }
 
-/* Responsive navbar breakpoints */
-@media (max-width: 1080px) {
+/* Header Right Cluster & User Profile Styling */
+.header-right-cluster {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 0.8vw, 10px);
+  flex-shrink: 0;
+}
+
+.header-user-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 10px 3px 4px;
+  border-radius: 9999px;
+  background: #F8FAFC;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  cursor: pointer;
+  transition: all 150ms ease;
+  flex-shrink: 0;
+  max-width: 200px;
+}
+
+.header-user-btn:hover {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+}
+
+.header-user-text {
+  text-align: left;
+  line-height: 1.15;
+  min-width: 0;
+}
+
+.header-user-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 105px;
+}
+
+.header-user-role {
+  font-size: 9.5px;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  display: block;
+  white-space: nowrap;
+}
+
+/* Responsive Breakpoints for Header Elements */
+@media (max-width: 1300px) {
+  .nav-link-secondary {
+    display: none !important;
+  }
+  .header-user-role {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1200px) {
+  .header-track-btn span {
+    display: none !important;
+  }
+  .header-track-btn {
+    padding: 8px !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    justify-content: center !important;
+  }
+}
+
+@media (max-width: 1120px) {
   .nav-desktop-links {
     display: none !important;
   }
@@ -657,9 +739,19 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-@media (min-width: 1081px) {
+@media (min-width: 1121px) {
   .nav-mobile-toggle {
     display: none !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .header-user-text {
+    display: none !important;
+  }
+  .header-user-btn {
+    padding: 3px 6px 3px 3px !important;
+    gap: 4px;
   }
 }
 

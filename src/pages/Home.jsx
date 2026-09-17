@@ -36,6 +36,9 @@ export default function Home() {
   const [demoAutoPlay, setDemoAutoPlay] = useState(true);
   const [demoSeconds, setDemoSeconds] = useState(0);
   const [citizenVerified, setCitizenVerified] = useState(false);
+  const [mapCategory, setMapCategory] = useState('ALL');
+  const [activeWardIndex, setActiveWardIndex] = useState(0);
+  const [activeExampleIndex, setActiveExampleIndex] = useState(0);
 
   // 5-Stage Complete Flow from Citizen Voice to Civic Intelligence to Verified Resolution
   const demoPhases = [

@@ -135,7 +135,7 @@ export default function Navbar() {
     <>
       {/* Full-width docked Civic Header */}
       <header className={`site-header ${isScrolled ? 'scrolled' : ''}`}>
-        <div className="container site-header-inner">
+        <div className="site-header-inner">
           {/* Brand Logo: JanSahayak */}
           <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', flexShrink: 0 }}>
             <div style={{
@@ -219,7 +219,7 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => scrollToSection('how-it-works')}
-              className="site-nav-link"
+              className="site-nav-link nav-link-secondary"
             >
               How it Works
             </button>
@@ -240,18 +240,19 @@ export default function Navbar() {
 
             <Link
               to="/impact"
-              className={`site-nav-link ${location.pathname === '/impact' ? 'active' : ''}`}
+              className={`site-nav-link nav-link-secondary ${location.pathname === '/impact' ? 'active' : ''}`}
             >
               Impact
             </Link>
           </nav>
 
           {/* Right Action Cluster */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+          <div className="header-right-cluster">
             {/* Action 1: Track Grievance Button */}
             <button
               type="button"
               onClick={() => setShowTrackModal(true)}
+              className="header-track-btn hidden-mobile"
               style={{
                 fontSize: '12.5px',
                 fontWeight: 600,
@@ -267,7 +268,6 @@ export default function Navbar() {
                 whiteSpace: 'nowrap',
                 transition: 'all 150ms ease'
               }}
-              className="hidden-mobile"
               title="Track ticket status"
             >
               <Search style={{ width: '13px', height: '13px', color: 'var(--color-text-muted)' }} />
@@ -277,6 +277,7 @@ export default function Navbar() {
             {/* Action 2: Report a Problem (Primary CTA) */}
             <Link
               to="/citizen/submit"
+              className="header-report-btn"
               style={{
                 height: '38px',
                 fontSize: '13px',
@@ -412,17 +413,11 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="header-user-btn"
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '9px',
-                    padding: '4px 12px 4px 5px',
-                    borderRadius: 'var(--radius-full)',
                     background: showUserMenu ? '#F1F5F9' : '#F8FAFC',
                     border: showUserMenu ? '1px solid #CBD5E1' : '1px solid rgba(15, 23, 42, 0.12)',
-                    cursor: 'pointer',
-                    boxShadow: showUserMenu ? '0 0 0 2px rgba(14, 94, 58, 0.12)' : 'none',
-                    transition: 'all 150ms ease'
+                    boxShadow: showUserMenu ? '0 0 0 2px rgba(14, 94, 58, 0.12)' : 'none'
                   }}
                   title="Switch Persona / Account"
                 >
@@ -446,15 +441,15 @@ export default function Navbar() {
                   }}>
                     {getUserInitials(user)}
                   </div>
-                  <div style={{ textAlign: 'left', lineHeight: 1.15 }} className="hidden-mobile">
-                    <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--color-text-primary)', display: 'block', whiteSpace: 'nowrap' }}>
+                  <div className="header-user-text">
+                    <span className="header-user-name">
                       {getCleanDisplayName(user)}
                     </span>
-                    <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', fontWeight: 600, display: 'block', whiteSpace: 'nowrap' }}>
+                    <span className="header-user-role">
                       {getRoleDisplayLabel(role)}
                     </span>
                   </div>
-                  <ChevronDown style={{ width: '13px', height: '13px', color: 'var(--color-text-muted)', marginLeft: '1px' }} />
+                  <ChevronDown style={{ width: '13px', height: '13px', color: 'var(--color-text-muted)', marginLeft: '1px', flexShrink: 0 }} />
                 </button>
 
                 {showUserMenu && (
