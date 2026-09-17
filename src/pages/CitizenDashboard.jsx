@@ -11,15 +11,19 @@ import {
   AlertTriangle, 
   Filter,
   User,
-  Shield
+  Shield,
+  Radio,
+  Sparkles
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import WhyExplainer from '../components/common/WhyExplainer';
+import CivicSignalModal from '../components/intelligence/CivicSignalModal';
 
 export default function CitizenDashboard() {
-  const { grievances = [], upvoteGrievance, user, currentCitizen: contextCitizen } = useApp();
+  const { grievances = [], upvoteGrievance, user, currentCitizen: contextCitizen, civicIncidents = [] } = useApp();
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showSignalModal, setShowSignalModal] = useState(false);
 
   const citizen = user || contextCitizen || {
     name: 'Aditya Verma',
@@ -27,6 +31,8 @@ export default function CitizenDashboard() {
     pincode: '110085',
     phone: '+91 98712-88210'
   };
+
+  const activeWardIncident = civicIncidents[0]; // Ward 14 water incident
 
   const filteredGrievances = (grievances || []).filter(g => {
     const title = g?.title || '';
@@ -52,8 +58,8 @@ export default function CitizenDashboard() {
           justifyContent: 'space-between',
           flexWrap: 'wrap',
           gap: '16px',
-          marginBottom: '32px',
-          paddingBottom: '24px',
+          marginBottom: '24px',
+          paddingBottom: '20px',
           borderBottom: '1px solid var(--color-divider)'
         }}>
           <div>
@@ -69,11 +75,77 @@ export default function CitizenDashboard() {
             </p>
           </div>
 
-          <Link to="/citizen/submit" className="btn-primary">
-            <Plus style={{ width: '18px', height: '18px' }} />
-            <span>File New Grievance</span>
-          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <button
+              type="button"
+              onClick={() => setShowSignalModal(true)}
+              style={{
+                height: '42px',
+                fontSize: '13px',
+                padding: '0 16px',
+                borderRadius: 'var(--radius-full)',
+                border: '1px solid var(--color-border-medium)',
+                background: '#FFFFFF',
+                color: 'var(--color-text-primary)',
+                fontWeight: 600,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <Radio style={{ width: '15px', height: '15px', color: 'var(--color-primary)' }} />
+              <span>Report Civic Signal</span>
+            </button>
+
+            <Link to="/citizen/submit" className="btn-primary" style={{ height: '42px', fontSize: '13px' }}>
+              <Plus style={{ width: '16px', height: '16px' }} />
+              <span>File Formal Grievance</span>
+            </Link>
+          </div>
         </div>
+
+        {/* Neighborhood Coordinated Investigation Alert Banner */}
+        {activeWardIncident && (
+          <div style={{
+            padding: '14px 18px',
+            borderRadius: 'var(--radius-lg)',
+            background: '#F0FDF4',
+            border: '1px solid #BBF7D0',
+            marginBottom: '28px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '12px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Sparkles style={{ width: '18px', height: '18px', color: 'var(--color-primary)', flexShrink: 0 }} />
+              <div>
+                <strong style={{ fontSize: '13.5px', color: '#065F46', display: 'block' }}>
+                  Neighborhood Intelligence Notice: Active Coordinated Investigation
+                </strong>
+                <span style={{ fontSize: '12px', color: '#047857' }}>
+                  {activeWardIncident.title} • {activeWardIncident.signalCount} signals correlated across your sector. Authorities are taking unified action.
+                </span>
+              </div>
+            </div>
+
+            <Link
+              to={`/intelligence/incidents/${activeWardIncident.id}`}
+              style={{
+                fontSize: '12px',
+                fontWeight: 700,
+                color: 'var(--color-primary)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              <span>View Civic Incident</span>
+              <ArrowRight style={{ width: '13px', height: '13px' }} />
+            </Link>
+          </div>
+        )}
 
         {/* Quick Metric Tiles */}
         <div style={{

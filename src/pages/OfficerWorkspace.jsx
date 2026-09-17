@@ -333,6 +333,27 @@ export default function OfficerWorkspace() {
               <span>Active Case SLA: {remainingHours}h Left</span>
             </div>
 
+            <Link
+              to="/intelligence"
+              style={{
+                height: '34px',
+                padding: '0 14px',
+                borderRadius: 'var(--radius-full)',
+                background: '#EEF2FF',
+                color: '#4338CA',
+                border: '1px solid #C7D2FE',
+                fontSize: '12px',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <Sparkles style={{ width: '13px', height: '13px', color: '#4F46E5' }} />
+              <span>Civic Intelligence</span>
+              <ArrowRight style={{ width: '12px', height: '12px' }} />
+            </Link>
+
             <Link to="/admin" className="btn-secondary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
               <MapPin style={{ width: '13px', height: '13px' }} />
               <span>Full Ward Heatmap</span>

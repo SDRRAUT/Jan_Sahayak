@@ -7,6 +7,8 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import Home from './pages/Home';
 import Platform from './pages/Platform';
 import Impact from './pages/Impact';
+import CivicIntelligenceDashboard from './pages/CivicIntelligenceDashboard';
+import CivicIncidentDetail from './pages/CivicIncidentDetail';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import CitizenDashboard from './pages/CitizenDashboard';
@@ -20,7 +22,7 @@ import SuperAdmin from './pages/SuperAdmin';
 export default function App() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Floating Frosted Pill Navbar with RBAC Switcher */}
+      {/* Docked Civic Navbar with RBAC Switcher */}
       <Navbar />
 
       {/* Main Content Viewport */}
@@ -30,6 +32,10 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/platform" element={<Platform />} />
           <Route path="/impact" element={<Impact />} />
+
+          {/* Civic Intelligence & Problem Discovery Suite */}
+          <Route path="/intelligence" element={<CivicIntelligenceDashboard />} />
+          <Route path="/intelligence/incidents/:id" element={<CivicIncidentDetail />} />
           
           {/* Authentication Gateway */}
           <Route path="/login" element={<Login />} />

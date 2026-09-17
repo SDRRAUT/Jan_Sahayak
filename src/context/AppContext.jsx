@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_GRIEVANCES, MOCK_CLUSTERS, SYSTEM_METRICS, INITIAL_NOTIFICATIONS } from '../data/mockGrievances';
+import { CIVIC_INCIDENTS, CIVIC_SIGNALS, CIVIC_INTELLIGENCE_METRICS } from '../data/civicIntelligenceData';
 import { analyzeGrievanceInput } from '../services/aiEngine';
+import { ComplaintDNAService, IncidentClusteringService, ActionSimulationService } from '../services/civicIntelligenceService';
 
 const AppContext = createContext();
 
@@ -38,6 +40,16 @@ export function AppProvider({ children }) {
     return saved ? JSON.parse(saved) : MOCK_CLUSTERS;
   });
 
+  const [civicIncidents, setCivicIncidents] = useState(() => {
+    const saved = localStorage.getItem('jansahayk_incidents');
+    return saved ? JSON.parse(saved) : CIVIC_INCIDENTS;
+  });
+
+  const [civicSignals, setCivicSignals] = useState(() => {
+    const saved = localStorage.getItem('jansahayk_signals');
+    return saved ? JSON.parse(saved) : CIVIC_SIGNALS;
+  });
+
   const [notifications, setNotifications] = useState(() => {
     const saved = localStorage.getItem('jansahayk_notifications');
     return saved ? JSON.parse(saved) : INITIAL_NOTIFICATIONS;
@@ -64,6 +76,14 @@ export function AppProvider({ children }) {
   }, [grievances]);
 
   useEffect(() => {
+    localStorage.setItem('jansahayk_incidents', JSON.stringify(civicIncidents));
+  }, [civicIncidents]);
+
+  useEffect(() => {
+    localStorage.setItem('jansahayk_signals', JSON.stringify(civicSignals));
+  }, [civicSignals]);
+
+  useEffect(() => {
     localStorage.setItem('jansahayk_notifications', JSON.stringify(notifications));
   }, [notifications]);
 
@@ -71,6 +91,7 @@ export function AppProvider({ children }) {
   useEffect(() => {
     fetchGrievances();
     fetchNotifications();
+    fetchCivicIntelligence();
     if (token) {
       fetch('/api/auth/me', { headers: { 'Authorization': `Bearer ${token}` } })
         .then(res => res.ok ? res.json() : null)
@@ -80,6 +101,18 @@ export function AppProvider({ children }) {
         .catch(() => {});
     }
   }, []);
+
+  const fetchCivicIntelligence = async () => {
+    try {
+      const res = await fetch('/api/intelligence/incidents');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.incidents && data.incidents.length > 0) {
+          setCivicIncidents(data.incidents);
+        }
+      }
+    } catch (e) {}
+  };
 
   const fetchGrievances = async () => {
     try {
@@ -789,6 +822,147 @@ export function AppProvider({ children }) {
     setGrievances(prev => prev.map(g => g.id === id ? { ...g, upvotes: (g.upvotes || 0) + 1 } : g));
   };
 
+  // ============================================================================
+  // Civic Intelligence Operations (Feature #1 to #12)
+  // ============================================================================
+
+  const submitCivicSignal = async (signalData) => {
+    const rawInput = signalData.rawInput || signalData.text || '';
+    const dna = ComplaintDNAService.generateDNA(rawInput, { ward: signalData.ward });
+    const match = IncidentClusteringService.findMatchingIncident(
+      { rawText: rawInput, location: { ward: signalData.ward }, complaintDna: dna },
+      civicIncidents
+    );
+
+    const targetIncidentId = match?.matched ? match.incidentId : (civicIncidents[0]?.id || 'INC-2026-DEL-01');
+
+    const newSignal = {
+      id: `SIG-${Date.now().toString().slice(-6)}`,
+      incidentId: targetIncidentId,
+      citizenName: signalData.citizenName || user?.name || 'Anonymous Resident',
+      ward: signalData.ward || user?.ward || 'Ward 14 (Rohini Sector 14)',
+      channel: signalData.channel || 'QUICK_TEXT',
+      rawInput,
+      translatedText: rawInput,
+      category: dna.issueType,
+      inferredAsset: dna.asset,
+      hasPhoto: !!signalData.photoUrl,
+      photoUrl: signalData.photoUrl || null,
+      lat: signalData.lat || 28.7180,
+      lng: signalData.lng || 77.1260,
+      timestamp: new Date().toLocaleString(),
+      status: 'CLUSTERED',
+      confidence: 'High (92%)',
+      complaintDna: dna
+    };
+
+    setCivicSignals(prev => [newSignal, ...prev]);
+
+    // Update incident signal count & append to timeline
+    setCivicIncidents(prev => prev.map(inc => {
+      if (inc.id === targetIncidentId) {
+        return {
+          ...inc,
+          signalCount: inc.signalCount + 1,
+          citizenObservationsCount: (inc.citizenObservationsCount || 0) + 1,
+          lastUpdatedAt: 'Just now',
+          timeline: [
+            {
+              date: 'Today',
+              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              stage: 'New Citizen Signal Received',
+              desc: `Citizen observation logged via ${signalData.channel || 'Mobile Portal'}: "${rawInput.slice(0, 70)}..."`,
+              count: inc.signalCount + 1,
+              source: 'Citizen Signal'
+            },
+            ...(inc.timeline || [])
+          ]
+        };
+      }
+      return inc;
+    }));
+
+    addLocalNotification({
+      userRole: 'officer',
+      title: `Weak Signal Clustered to ${targetIncidentId}`,
+      message: `New citizen observation associated with "${dna.subIssue}" in ${newSignal.ward}.`,
+      grievanceId: targetIncidentId,
+      link: `/intelligence/incidents/${targetIncidentId}`,
+      type: 'SIGNAL_CLUSTERED'
+    });
+
+    try {
+      if (token) {
+        await fetch('/api/intelligence/signals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify(newSignal)
+        });
+      }
+    } catch (e) {}
+
+    return newSignal;
+  };
+
+  const recordIncidentDecision = async (incidentId, decisionData) => {
+    const { decision, actionSelected, notes } = decisionData;
+    const record = {
+      id: `DEC-${Date.now()}`,
+      decision,
+      actionSelected: actionSelected || 'Field Inspection & Verification',
+      officer: user?.name || 'Er. Sanjay Sharma (AEE)',
+      timestamp: new Date().toLocaleString(),
+      notes: notes || 'Verified against on-ground signals.'
+    };
+
+    setCivicIncidents(prev => prev.map(inc => {
+      if (inc.id === incidentId) {
+        const decisions = inc.humanDecisions ? [record, ...inc.humanDecisions] : [record];
+        let newStatus = inc.status;
+        if (decision === 'ACCEPT_RECOMMENDATION') newStatus = 'Action Planned';
+        else if (decision === 'REQUEST_VERIFICATION') newStatus = 'Investigating';
+
+        return {
+          ...inc,
+          status: newStatus,
+          humanDecisions: decisions
+        };
+      }
+      return inc;
+    }));
+
+    addLocalNotification({
+      userRole: 'dept_admin',
+      title: `Human Decision Recorded on ${incidentId}`,
+      message: `${user?.name || 'Officer'} recorded: ${decision} (${record.actionSelected})`,
+      grievanceId: incidentId,
+      link: `/intelligence/incidents/${incidentId}`,
+      type: 'INCIDENT_DECISION'
+    });
+
+    try {
+      if (token) {
+        await fetch(`/api/intelligence/incidents/${incidentId}/decision`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify(record)
+        });
+      }
+    } catch (e) {}
+
+    return record;
+  };
+
+  const runActionSimulation = (incidentId, actionKey) => {
+    const incident = civicIncidents.find(i => i.id === incidentId);
+    if (!incident) return null;
+    return ActionSimulationService.simulate(actionKey, incident);
+  };
+
+  const updateIncidentStage = (incidentId, newStage) => {
+    setCivicIncidents(prev => prev.map(inc => inc.id === incidentId ? { ...inc, stage: newStage, lastUpdatedAt: 'Just now' } : inc));
+  };
+
   const unreadNotificationCount = notifications.filter(n => {
     if (user?.role === 'super_admin') return !n.read;
     if (n.userId && n.userId === user?.id) return !n.read;
@@ -820,6 +994,13 @@ export function AppProvider({ children }) {
         isLoadingAuth,
         grievances,
         clusters,
+        civicIncidents,
+        civicSignals,
+        intelligenceMetrics: CIVIC_INTELLIGENCE_METRICS,
+        submitCivicSignal,
+        recordIncidentDecision,
+        runActionSimulation,
+        updateIncidentStage,
         notifications,
         unreadNotificationCount,
         markNotificationAsRead,
