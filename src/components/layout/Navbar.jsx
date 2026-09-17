@@ -138,8 +138,8 @@ export default function Navbar() {
       case 'citizen': return 'Citizen';
       case 'civic_officer':
       case 'officer':
-      case 'dept_admin': return 'Civic Officer';
-      case 'super_admin': return 'Super Admin';
+      case 'dept_admin': return 'Government Officer';
+      case 'super_admin': return 'Administrator / Admin';
       default: return 'User';
     }
   };
@@ -838,7 +838,7 @@ export default function Navbar() {
                           fontWeight: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? 700 : 400
                         }}
                       >
-                        🏛️ Civic Officer (Er. Sanjay Sharma)
+                        👷 Government Officer (Er. Sanjay Sharma)
                       </button>
                       <button
                         type="button"
@@ -853,7 +853,7 @@ export default function Navbar() {
                           fontWeight: role === 'super_admin' ? 700 : 400
                         }}
                       >
-                        🛡️ Super Admin (Dr. Meenakshi Sundaram, IAS)
+                        🛡️ Administrator / Admin (Dr. Meenakshi, IAS)
                       </button>
                     </div>
 
@@ -1201,7 +1201,7 @@ export default function Navbar() {
                     fontWeight: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? 700 : 500
                   }}
                 >
-                  🏛️ Civic Officer (Er. Sanjay Sharma)
+                  👷 Government Officer (Er. Sanjay Sharma)
                 </button>
                 <button
                   type="button"
@@ -1217,7 +1217,7 @@ export default function Navbar() {
                     fontWeight: role === 'super_admin' ? 700 : 500
                   }}
                 >
-                  🛡️ Super Admin (Dr. Meenakshi Sundaram, IAS)
+                  🛡️ Administrator / Admin (Dr. Meenakshi, IAS)
                 </button>
               </div>
             </div>
@@ -1452,10 +1452,10 @@ export default function Navbar() {
                 </div>
                 <div>
                   <strong style={{ fontSize: '14px', color: 'var(--color-text-primary)', display: 'block' }}>
-                    🏛️ Civic Officer
+                    👷 Government Officer
                   </strong>
                   <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
-                    Er. Sanjay Sharma • Field triage, dept operations, SOP approvals & AI radar
+                    Er. Sanjay Sharma • Field team, repairs, SOP approvals & solving issues
                   </span>
                 </div>
               </button>
@@ -1482,10 +1482,10 @@ export default function Navbar() {
                 </div>
                 <div>
                   <strong style={{ fontSize: '14px', color: 'var(--color-text-primary)', display: 'block' }}>
-                    🛡️ Super Admin
+                    🛡️ Administrator / Admin
                   </strong>
                   <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
-                    Dr. Meenakshi Sundaram, IAS • State-level civic intelligence & systemic governance
+                    Dr. Meenakshi, IAS • Municipal Boss & State-level governance
                   </span>
                 </div>
               </button>
