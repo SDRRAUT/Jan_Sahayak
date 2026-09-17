@@ -43,7 +43,9 @@ import {
   ClipboardList,
   Flame,
   Radio,
-  Workflow
+  Workflow,
+  LayoutGrid,
+  List
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
@@ -59,6 +61,7 @@ import CivicMemoryCard from '../components/intelligence/CivicMemoryCard';
 import CrossDepartmentMatrix from '../components/intelligence/CrossDepartmentMatrix';
 import ActionSimulationCard from '../components/intelligence/ActionSimulationCard';
 import LiveComplaintLinkageSection from '../components/intelligence/LiveComplaintLinkageSection';
+import EditorialComplaintCard, { ComplaintDetailModal } from '../components/common/EditorialComplaintCard';
 
 export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
   const { id } = useParams();
@@ -113,6 +116,8 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
   const [detailSubTab, setDetailSubTab] = useState('recommendation'); // 'recommendation' | 'brief' | 'duplicates' | 'verification' | 'history' | 'notes' | 'evidence'
   const [dispatchStatus, setDispatchStatus] = useState(null);
   const [reportExported, setReportExported] = useState(false);
+  const [selectedModalGrievance, setSelectedModalGrievance] = useState(null);
+  const [operationsViewMode, setOperationsViewMode] = useState('cards'); // 'cards' | 'table'
 
   // Modals
   const [showClarificationModal, setShowClarificationModal] = useState(false);
@@ -182,74 +187,74 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
   };
 
 
-  // Emerging Issues Radar Data (Section 1: Dashboard)
+  // Emerging Problems Radar Data (Simple English)
   const emergingIssues = [
     {
       id: 'ISSUE-01',
-      title: 'Water supply disruption & pressure drop',
+      title: 'Dirty or low water supply in Rohini',
       category: 'Water Supply',
       status: 'EMERGING',
-      statusLabel: 'Emerging',
+      statusLabel: '🔴 New Problem',
       badgeColor: '#DC2626',
       badgeBg: '#FEF2F2',
       badgeBorder: '#FECACA',
       wardsCount: 4,
       wards: 'Wards 12, 14, 15, 18',
       grievancesCount: 37,
-      trend: 'Increasing frequency (+68% in 48h)',
-      hypothesis: 'Possible common underground trunk line crack near Outer Ring Road junction.',
-      recommendedAction: 'Isolate Sector 14 booster pump line & survey soil moisture with acoustic sensors',
+      trend: '+68% new reports in last 2 days',
+      hypothesis: 'Water pressure dropped due to a cracked underground pipe near Outer Ring Road.',
+      recommendedAction: 'Send team to inspect Sector 14 booster pump and test water purity with chlorine kit.',
       targetGrievanceId: 'DL-2026-W14-0892'
     },
     {
       id: 'ISSUE-02',
-      title: 'Streetlight feeder cable trip along ring corridor',
+      title: 'Broken streetlights on main road',
       category: 'Electricity & Lighting',
       status: 'GROWING',
-      statusLabel: 'Growing',
+      statusLabel: '🟠 Spreading',
       badgeColor: '#D97706',
       badgeBg: '#FFFBEB',
       badgeBorder: '#FDE68A',
       wardsCount: 3,
       wards: 'Wards 8, 9, 11',
       grievancesCount: 22,
-      trend: 'Growing (+34% this week)',
-      hypothesis: 'Phase unbalance tripping local MCB breakers during peak evening loads.',
-      recommendedAction: 'Load-balance transformer 4B & replace burnt phase-isolator fuse',
+      trend: '+34% reports this week',
+      hypothesis: 'Overloaded evening power line tripped the main street circuit breaker.',
+      recommendedAction: 'Send electrician to replace burnt fuse on transformer 4B and balance electrical load.',
       targetGrievanceId: 'DL-2026-W08-0419'
     },
     {
       id: 'ISSUE-03',
-      title: 'Sanitation & primary waste collection backlog',
+      title: 'Garbage piling up on street corner',
       category: 'Sanitation',
       status: 'IMPROVING',
-      statusLabel: 'Improving',
+      statusLabel: '🔵 Getting Fixed',
       badgeColor: '#2563EB',
       badgeBg: '#EFF6FF',
       badgeBorder: '#BFDBFE',
       wardsCount: 1,
       wards: 'Ward 19 (Karol Bagh)',
       grievancesCount: 14,
-      trend: 'Improving (Down 40% after tipper reassignment)',
-      hypothesis: 'Temporary fleet shortage remediated; transfer station operating at nominal capacity.',
-      recommendedAction: 'Maintain current second-shift sweepers until buffer bins clear',
+      trend: 'Complaints down 40% after sending extra truck',
+      hypothesis: 'Dustbins were overflowing due to truck delay; new collection shift is clearing backlog.',
+      recommendedAction: 'Keep extra evening cleaning team until all corner bins are completely empty.',
       targetGrievanceId: 'DL-2026-W19-0312'
     },
     {
       id: 'ISSUE-04',
-      title: 'Pipeline joint fracture remediated',
+      title: 'Water pipeline leak repaired & closed',
       category: 'Water Supply',
       status: 'RESOLVED',
-      statusLabel: 'Resolved',
+      statusLabel: '🟢 All Fixed',
       badgeColor: '#059669',
       badgeBg: '#ECFDF5',
       badgeBorder: '#A7F3D0',
       wardsCount: 1,
       wards: 'Ward 14 (Rohini Sector 14)',
       grievancesCount: 18,
-      trend: 'Physical remediation signed off by AEE',
-      hypothesis: 'High-pressure clamp installed; citizen verification audit logged 94% approval.',
-      recommendedAction: 'Archive cluster and record in municipal asset maintenance ledger',
+      trend: 'Repair completed & verified by engineer',
+      hypothesis: 'High-strength steel clamp installed; citizen test confirmed clean water restored.',
+      recommendedAction: 'Mark problem as resolved and save repair record in city database.',
       targetGrievanceId: 'DL-2026-W14-0892'
     }
   ];
@@ -452,91 +457,147 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
   };
 
   return (
-    <div className="section-spacing" style={{ paddingTop: '28px' }}>
+    <div style={{ minHeight: 'calc(100vh - 72px)', background: 'linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%)', padding: '24px 0 60px 0' }}>
       <div className="container">
 
-        {/* 1. CIVIC OFFICER CONSOLE HEADER */}
+        {/* 1. GOVERNMENT OFFICER COMMAND CARD (Modern, Colorful & Clean) */}
         <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '16px',
-          marginBottom: '20px',
-          paddingBottom: '20px',
-          borderBottom: '1px solid var(--color-divider)'
+          background: 'linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%)',
+          borderRadius: '20px',
+          border: '1px solid #E2E8F0',
+          boxShadow: '0 4px 20px rgba(15, 23, 42, 0.05)',
+          padding: '24px',
+          marginBottom: '22px',
+          position: 'relative',
+          overflow: 'hidden'
         }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <span className="category-pill" style={{ background: '#ECFDF5', color: '#065F46', borderColor: '#A7F3D0' }}>
-                🏛️ CIVIC OFFICER CONSOLE • UNIFIED RESOLUTION & DEPT OPERATIONS
-              </span>
-              <span style={{ fontSize: '11px', background: '#F1F5F9', color: '#475569', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>
-                Field + Dept Admin Merged
-              </span>
+          {/* Top color accent gradient bar */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            background: 'linear-gradient(90deg, #059669 0%, #2563EB 50%, #7C3AED 100%)'
+          }} />
+
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '16px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{
+                width: '54px',
+                height: '54px',
+                borderRadius: '16px',
+                background: 'linear-gradient(135deg, #0E5E3A 0%, #059669 100%)',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '24px',
+                boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)',
+                flexShrink: 0
+              }}>
+                👷
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    background: '#ECFDF5',
+                    color: '#065F46',
+                    border: '1px solid #A7F3D0',
+                    padding: '2px 9px',
+                    borderRadius: '9999px',
+                    letterSpacing: '0.02em'
+                  }}>
+                    🏛️ Government Officer Hub
+                  </span>
+                  <span style={{
+                    fontSize: '11px',
+                    background: '#EFF6FF',
+                    color: '#1E40AF',
+                    border: '1px solid #BFDBFE',
+                    padding: '2px 8px',
+                    borderRadius: '9999px',
+                    fontWeight: 600
+                  }}>
+                    Delhi Water & Pipeline Team
+                  </span>
+                </div>
+                <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', margin: 0, lineHeight: 1.2 }}>
+                  {currentOfficer.name}
+                </h1>
+                <p style={{ fontSize: '13px', color: '#64748B', marginTop: '4px', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <MapPin style={{ width: '13px', height: '13px', color: '#059669' }} />
+                  <span>Area: <strong>Rohini & North-West Delhi</strong></span>
+                  <span>•</span>
+                  <span>Job: <strong>Fix city complaints and approve worker repairs</strong></span>
+                </p>
+              </div>
             </div>
-            <h1 style={{ fontSize: '28px', color: 'var(--color-text-primary)', margin: 0 }}>
-              {currentOfficer.name}
-            </h1>
-            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginTop: '4px', margin: 0 }}>
-              {currentOfficer.designation} • <strong>{currentOfficer.department}</strong> • Jurisdiction: <strong>{currentOfficer.zone}</strong>
-            </p>
-          </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-            <div style={{
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-full)',
-              background: slaStatus === 'AT_RISK' ? '#FFFBEB' : (slaStatus === 'OVERDUE' ? '#FEF2F2' : '#ECFDF5'),
-              border: `1px solid ${slaStatus === 'AT_RISK' ? '#FDE68A' : (slaStatus === 'OVERDUE' ? '#FECACA' : '#A7F3D0')}`,
-              color: slaStatus === 'AT_RISK' ? '#B45309' : (slaStatus === 'OVERDUE' ? '#991B1B' : '#065F46'),
-              fontSize: '12px',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}>
-              <span className="status-dot active"></span>
-              <span>Active Case SLA: {remainingHours}h Left</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <div style={{
+                padding: '7px 14px',
+                borderRadius: '9999px',
+                background: slaStatus === 'AT_RISK' ? '#FFFBEB' : (slaStatus === 'OVERDUE' ? '#FEF2F2' : '#ECFDF5'),
+                border: `1px solid ${slaStatus === 'AT_RISK' ? '#FDE68A' : (slaStatus === 'OVERDUE' ? '#FECACA' : '#A7F3D0')}`,
+                color: slaStatus === 'AT_RISK' ? '#B45309' : (slaStatus === 'OVERDUE' ? '#991B1B' : '#065F46'),
+                fontSize: '12px',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <span className="status-dot active"></span>
+                <span>⏱️ Fix Target: {remainingHours}h Left</span>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleExportReport}
+                className="btn-secondary btn-sm"
+                style={{ borderRadius: '9999px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                <Download style={{ width: '13px', height: '13px' }} />
+                <span>{reportExported ? 'Report Downloaded ✓' : 'Download Report'}</span>
+              </button>
+
+              <Link to="/admin" className="btn-secondary btn-sm" style={{ borderRadius: '9999px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <MapPin style={{ width: '13px', height: '13px' }} />
+                <span>City Problem Map</span>
+              </Link>
             </div>
-
-            <button
-              type="button"
-              onClick={handleExportReport}
-              className="btn-secondary btn-sm"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-            >
-              <Download style={{ width: '13px', height: '13px' }} />
-              <span>{reportExported ? 'Report Downloaded ✓' : 'Export Municipal PDF/CSV'}</span>
-            </button>
-
-            <Link to="/admin" className="btn-secondary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              <MapPin style={{ width: '13px', height: '13px' }} />
-              <span>Full Ward GIS</span>
-            </Link>
           </div>
         </div>
 
-        {/* 2. THE 7 MANDATED INFORMATION ARCHITECTURE TABS */}
+        {/* 2. THE 7 WORKSPACE TABS (Super Simple English) */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '4px',
-          marginBottom: '24px',
-          background: '#F1F5F9',
+          gap: '6px',
+          marginBottom: '22px',
+          background: '#FFFFFF',
           padding: '6px',
-          borderRadius: 'var(--radius-lg)',
-          overflowX: 'auto',
-          boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.04)'
+          borderRadius: '16px',
+          border: '1px solid #E2E8F0',
+          boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+          overflowX: 'auto'
         }}>
           {[
-            { id: 'dashboard', label: 'Dashboard', icon: Activity, badge: null },
-            { id: 'my_work', label: 'My Work', icon: CheckSquare, badge: myWorkGrievances.length },
-            { id: 'operations', label: 'Department Operations', icon: SlidersHorizontal, badge: filteredGrievances.length },
-            { id: 'intelligence', label: 'AI Intelligence', icon: Sparkles, badge: 'RAG' },
-            { id: 'investigation', label: `Field Investigation`, icon: Eye, badge: `#${activeItem?.id?.slice(-4) || 'CASE'}` },
-            { id: 'coordination', label: 'Coordination', icon: Network, badge: null },
-            { id: 'reports', label: 'Reports & Analytics', icon: BarChart3, badge: null }
+            { id: 'dashboard', label: '📊 Overview', icon: Activity, badge: null },
+            { id: 'my_work', label: '📌 My Tasks', icon: CheckSquare, badge: myWorkGrievances.length },
+            { id: 'operations', label: '👷 Team & Workers', icon: SlidersHorizontal, badge: filteredGrievances.length },
+            { id: 'intelligence', label: '🤖 AI Problem Helper', icon: Sparkles, badge: 'AI' },
+            { id: 'investigation', label: '🔍 Check Problem', icon: Eye, badge: `#${activeItem?.id?.slice(-4) || 'CASE'}` },
+            { id: 'coordination', label: '🤝 Other Depts', icon: Network, badge: null },
+            { id: 'reports', label: '📈 Work Results', icon: BarChart3, badge: null }
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeSection === tab.id;
@@ -546,23 +607,22 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 type="button"
                 onClick={() => switchSection(tab.id)}
                 style={{
-                  padding: '9px 16px',
-                  borderRadius: '8px',
+                  padding: '8px 16px',
+                  borderRadius: '12px',
                   fontSize: '13px',
                   fontWeight: isActive ? 700 : 500,
-                  background: isActive ? '#FFFFFF' : 'transparent',
-                  color: isActive ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-                  boxShadow: isActive ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+                  background: isActive ? 'linear-gradient(135deg, #0E5E3A 0%, #059669 100%)' : 'transparent',
+                  color: isActive ? '#FFFFFF' : '#475569',
+                  boxShadow: isActive ? '0 2px 8px rgba(14, 94, 58, 0.28)' : 'none',
                   border: 'none',
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: '6px',
                   whiteSpace: 'nowrap',
                   transition: 'all 150ms ease'
                 }}
               >
-                <Icon style={{ width: '15px', height: '15px', color: isActive ? 'var(--color-primary)' : 'var(--color-text-muted)' }} />
                 <span>{tab.label}</span>
                 {tab.badge !== null && (
                   <span style={{
@@ -570,8 +630,8 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                     fontWeight: 800,
                     padding: '1px 6px',
                     borderRadius: '9999px',
-                    background: isActive ? 'var(--color-primary)' : '#E2E8F0',
-                    color: isActive ? '#FFFFFF' : 'var(--color-text-muted)'
+                    background: isActive ? 'rgba(255,255,255,0.25)' : '#E2E8F0',
+                    color: isActive ? '#FFFFFF' : '#475569'
                   }}>
                     {tab.badge}
                   </span>
@@ -586,86 +646,159 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
         {/* ========================================================================= */}
         {activeSection === 'dashboard' && (
           <div>
-            {/* 4 Summary Stat Cards — values from Supabase via /api/stats/officer */}
+            {/* 4 Summary Stat Cards with Colorful Accents */}
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
               gap: '16px',
-              marginBottom: '28px'
+              marginBottom: '26px'
             }}>
-              <div className="card" style={{ padding: '20px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                  Department Active Queue
-                </span>
-                <div style={{ fontSize: '32px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-primary)', marginTop: '4px' }}>
+              {/* Card 1: Waiting to fix */}
+              <div style={{
+                background: '#FFFFFF',
+                borderRadius: '16px',
+                padding: '20px',
+                border: '1px solid #E2E8F0',
+                borderTop: '4px solid #2563EB',
+                boxShadow: '0 2px 10px rgba(15, 23, 42, 0.04)',
+                transition: 'transform 150ms ease'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.04em' }}>
+                    WAITING TO FIX
+                  </span>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#EFF6FF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
+                    📋
+                  </div>
+                </div>
+                <div style={{ fontSize: '32px', fontWeight: 800, color: '#1E293B', lineHeight: 1 }}>
                   {dashboardStats.active}
                 </div>
-                <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>
-                  {liveStats ? `${dashboardStats.total} total · Live from DB` : 'Across Rohini & adjacent zones'}
-                </span>
+                <p style={{ fontSize: '12px', color: '#64748B', margin: '6px 0 0 0' }}>
+                  {liveStats ? `${dashboardStats.total} total · Live from database` : 'Complaints in your area'}
+                </p>
               </div>
 
-              <div className="card" style={{ padding: '20px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                  Critical Incidents
-                </span>
-                <div style={{ fontSize: '32px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#EF4444', marginTop: '4px' }}>
+              {/* Card 2: Urgent problems */}
+              <div style={{
+                background: '#FFFFFF',
+                borderRadius: '16px',
+                padding: '20px',
+                border: '1px solid #FECACA',
+                borderTop: '4px solid #EF4444',
+                boxShadow: '0 2px 10px rgba(239, 68, 68, 0.06)',
+                transition: 'transform 150ms ease'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#DC2626', letterSpacing: '0.04em' }}>
+                    URGENT PROBLEMS
+                  </span>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#FEF2F2', color: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
+                    🚨
+                  </div>
+                </div>
+                <div style={{ fontSize: '32px', fontWeight: 800, color: '#DC2626', lineHeight: 1 }}>
                   {dashboardStats.critical}
                 </div>
-                <span style={{ fontSize: '11px', color: '#EF4444' }}>
-                  {dashboardStats.slaOverdue > 0 ? `${dashboardStats.slaOverdue} SLA overdue` : 'Biological / Contamination priority'}
-                </span>
+                <p style={{ fontSize: '12px', color: '#EF4444', margin: '6px 0 0 0', fontWeight: 600 }}>
+                  Needs immediate fix today
+                </p>
               </div>
 
-              <div className="card" style={{ padding: '20px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                  Resolved This Session
-                </span>
-                <div style={{ fontSize: '32px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#059669', marginTop: '4px' }}>
+              {/* Card 3: Solved today */}
+              <div style={{
+                background: '#FFFFFF',
+                borderRadius: '16px',
+                padding: '20px',
+                border: '1px solid #E2E8F0',
+                borderTop: '4px solid #10B981',
+                boxShadow: '0 2px 10px rgba(16, 185, 129, 0.06)',
+                transition: 'transform 150ms ease'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#059669', letterSpacing: '0.04em' }}>
+                    SOLVED TODAY
+                  </span>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#ECFDF5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
+                    ✅
+                  </div>
+                </div>
+                <div style={{ fontSize: '32px', fontWeight: 800, color: '#059669', lineHeight: 1 }}>
                   {dashboardStats.resolved}
                 </div>
-                <span style={{ fontSize: '11px', color: '#059669' }}>
-                  {liveStats ? 'Live from Supabase DB' : 'Completed & closed tickets'}
-                </span>
+                <p style={{ fontSize: '12px', color: '#059669', margin: '6px 0 0 0', fontWeight: 600 }}>
+                  Fixed & verified by citizens
+                </p>
               </div>
 
-              <div className="card" style={{ padding: '20px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                  SLA Compliance (MTD)
-                </span>
-                <div style={{ fontSize: '32px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#059669', marginTop: '4px' }}>
+              {/* Card 4: Fix speed */}
+              <div style={{
+                background: '#FFFFFF',
+                borderRadius: '16px',
+                padding: '20px',
+                border: '1px solid #E2E8F0',
+                borderTop: '4px solid #059669',
+                boxShadow: '0 2px 10px rgba(15, 23, 42, 0.04)',
+                transition: 'transform 150ms ease'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.04em' }}>
+                    ON-TIME FIX RATE
+                  </span>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#ECFDF5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
+                    ⚡
+                  </div>
+                </div>
+                <div style={{ fontSize: '32px', fontWeight: 800, color: '#059669', lineHeight: 1 }}>
                   94.8%
                 </div>
-                <span style={{ fontSize: '11px', color: dashboardStats.slaAtRisk > 0 ? '#F59E0B' : '#059669' }}>
-                  {dashboardStats.slaAtRisk > 0 ? `${dashboardStats.slaAtRisk} at risk · Avg 14.2h` : 'Average turnaround: 14.2 hours'}
-                </span>
+                <p style={{ fontSize: '12px', color: '#64748B', margin: '6px 0 0 0' }}>
+                  Average turnaround: 14.2 hours
+                </p>
               </div>
             </div>
 
-            {/* Emerging Problems: Civic Pattern Radar */}
-            <div style={{ marginBottom: '32px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+            {/* Emerging Problems: City Problem Radar */}
+            <div style={{
+              background: '#FFFFFF',
+              borderRadius: '20px',
+              padding: '24px',
+              border: '1px solid #E2E8F0',
+              boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)',
+              marginBottom: '26px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
                 <div>
-                  <span className="pilot-tag" style={{ background: '#FEF2F2', color: '#991B1B', borderColor: '#FECACA', marginBottom: '6px' }}>
-                    CIVIC PATTERN RADAR
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    padding: '2px 8px',
+                    borderRadius: '9999px',
+                    background: '#FEF2F2',
+                    color: '#DC2626',
+                    border: '1px solid #FECACA',
+                    display: 'inline-block',
+                    marginBottom: '6px'
+                  }}>
+                    🚨 CITY PROBLEM RADAR
                   </span>
-                  <h2 style={{ fontSize: '22px', color: 'var(--color-text-primary)', margin: 0 }}>
-                    What Needs Attention?
+                  <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                    What needs fixing right now?
                   </h2>
-                  <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '4px 0 0 0' }}>
-                    Macro issues surfaced across multi-ward telemetry. Ranked by urgency, spread, and service risk.
+                  <p style={{ fontSize: '13px', color: '#64748B', margin: '4px 0 0 0' }}>
+                    Biggest problems found across your area. Sorted by urgency so you can fix the most important ones first.
                   </p>
                 </div>
 
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '4px', background: '#FEF2F2', color: '#DC2626', fontWeight: 700 }}>● Emerging (1)</span>
-                  <span style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '4px', background: '#FFFBEB', color: '#D97706', fontWeight: 700 }}>● Growing (1)</span>
-                  <span style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '4px', background: '#EFF6FF', color: '#2563EB', fontWeight: 700 }}>● Improving (1)</span>
-                  <span style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '4px', background: '#ECFDF5', color: '#059669', fontWeight: 700 }}>● Resolved (1)</span>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '9999px', background: '#FEF2F2', color: '#DC2626', fontWeight: 700, border: '1px solid #FECACA' }}>🔴 New Problem (1)</span>
+                  <span style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '9999px', background: '#FFFBEB', color: '#D97706', fontWeight: 700, border: '1px solid #FDE68A' }}>🟠 Spreading (1)</span>
+                  <span style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '9999px', background: '#EFF6FF', color: '#2563EB', fontWeight: 700, border: '1px solid #BFDBFE' }}>🔵 Getting Fixed (1)</span>
+                  <span style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '9999px', background: '#ECFDF5', color: '#059669', fontWeight: 700, border: '1px solid #A7F3D0' }}>🟢 All Fixed (1)</span>
                 </div>
               </div>
 
-              {/* 4 Cards Grid */}
+              {/* 4 Radar Cards Grid */}
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
@@ -674,9 +807,10 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 {emergingIssues.map((issue) => (
                   <div
                     key={issue.id}
-                    className="card"
                     style={{
-                      padding: '20px',
+                      padding: '18px',
+                      borderRadius: '16px',
+                      background: '#F8FAFC',
                       border: `1px solid ${issue.badgeBorder}`,
                       display: 'flex',
                       flexDirection: 'column',
@@ -687,149 +821,157 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
                         <span style={{
-                          fontSize: '10px',
-                          fontWeight: 800,
-                          padding: '3px 8px',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          padding: '3px 10px',
                           borderRadius: '9999px',
                           background: issue.badgeBg,
                           color: issue.badgeColor,
-                          border: `1px solid ${issue.badgeBorder}`,
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.04em'
+                          border: `1px solid ${issue.badgeBorder}`
                         }}>
                           {issue.statusLabel}
                         </span>
-                        <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-text-muted)' }}>
-                          {issue.wardsCount} Wards Affected
+                        <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B' }}>
+                          📍 {issue.wardsCount} Wards Affected
                         </span>
                       </div>
 
-                      <h3 style={{ fontSize: '16px', lineHeight: 1.4, marginBottom: '8px', color: 'var(--color-text-primary)' }}>
+                      <h3 style={{ fontSize: '15px', fontWeight: 700, lineHeight: 1.3, marginBottom: '6px', color: '#0F172A' }}>
                         {issue.title}
                       </h3>
 
-                      <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '12px' }}>
-                        <strong>Hypothesis: </strong>{issue.hypothesis}
+                      <p style={{ fontSize: '12px', color: '#475569', lineHeight: 1.5, marginBottom: '10px' }}>
+                        <strong>Why it happened: </strong>{issue.hypothesis}
                       </p>
 
                       <div style={{
-                        padding: '10px 12px',
-                        borderRadius: '6px',
-                        background: '#F8FAFC',
-                        border: '1px solid rgba(15,23,42,0.06)',
+                        padding: '8px 10px',
+                        borderRadius: '8px',
+                        background: '#FFFFFF',
+                        border: '1px solid #E2E8F0',
                         fontSize: '11px',
-                        color: 'var(--color-text-muted)',
-                        marginBottom: '14px',
+                        color: '#64748B',
+                        marginBottom: '12px',
                         lineHeight: 1.5
                       }}>
                         <div>📍 {issue.wards}</div>
-                        <div>📈 {issue.grievancesCount} citizen reports • {issue.trend}</div>
+                        <div>📈 {issue.grievancesCount} reports • {issue.trend}</div>
                       </div>
                     </div>
 
                     <button
                       type="button"
                       onClick={() => openInspectionForCase(issue.targetGrievanceId)}
-                      className="btn-secondary btn-sm"
                       style={{
                         width: '100%',
-                        justifyContent: 'center',
-                        borderColor: issue.badgeBorder,
+                        padding: '8px 12px',
+                        borderRadius: '10px',
+                        background: '#FFFFFF',
+                        border: `1px solid ${issue.badgeBorder}`,
                         color: issue.badgeColor,
-                        fontSize: '12px'
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        transition: 'all 150ms ease'
                       }}
                     >
-                      <span>Investigate Cluster →</span>
+                      <span>Inspect & Fix →</span>
                     </button>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Core Operational Inquiries Grid */}
+            {/* Core City Questions Grid (Super Simple) */}
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
               gap: '16px',
-              marginBottom: '32px'
+              marginBottom: '26px'
             }}>
-              <div className="card" style={{ padding: '20px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
+              <div style={{ background: '#FFFFFF', borderRadius: '16px', padding: '18px', border: '1px solid #E2E8F0' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', display: 'block', marginBottom: '4px' }}>
                   1. What Needs Attention?
                 </span>
-                <strong style={{ fontSize: '18px', color: '#DC2626', display: 'block', marginBottom: '4px' }}>
+                <strong style={{ fontSize: '16px', color: '#DC2626', display: 'block', marginBottom: '4px' }}>
                   Water Supply in Rohini
                 </strong>
-                <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.4 }}>
-                  37 complaints linked to Sector 14 booster trunk conduit. Immediate pressure test recommended.
+                <p style={{ fontSize: '12px', color: '#64748B', margin: 0, lineHeight: 1.4 }}>
+                  37 complaints about low pressure near Sector 14. Pipe test recommended.
                 </p>
               </div>
 
-              <div className="card" style={{ padding: '20px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
+              <div style={{ background: '#FFFFFF', borderRadius: '16px', padding: '18px', border: '1px solid #E2E8F0' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', display: 'block', marginBottom: '4px' }}>
                   2. Where is it Happening?
                 </span>
-                <strong style={{ fontSize: '18px', color: 'var(--color-primary)', display: 'block', marginBottom: '4px' }}>
+                <strong style={{ fontSize: '16px', color: '#2563EB', display: 'block', marginBottom: '4px' }}>
                   Wards 12, 14 & 18
                 </strong>
-                <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.4 }}>
-                  Clustered in 400m radius around Mother Dairy & Outer Ring Road feeder line.
+                <p style={{ fontSize: '12px', color: '#64748B', margin: 0, lineHeight: 1.4 }}>
+                  Clustered near Mother Dairy & Outer Ring Road water line.
                 </p>
               </div>
 
-              <div className="card" style={{ padding: '20px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
-                  3. Emerging Pattern
+              <div style={{ background: '#FFFFFF', borderRadius: '16px', padding: '18px', border: '1px solid #E2E8F0' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                  3. Root Cause Found
                 </span>
-                <strong style={{ fontSize: '18px', color: '#D97706', display: 'block', marginBottom: '4px' }}>
-                  Sub-surface Drainage Leak
+                <strong style={{ fontSize: '16px', color: '#D97706', display: 'block', marginBottom: '4px' }}>
+                  Underground Pipe Leak
                 </strong>
-                <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.4 }}>
-                  Road complaints in Ward 18 correlate directly with uninspected drainage backpressure.
+                <p style={{ fontSize: '12px', color: '#64748B', margin: 0, lineHeight: 1.4 }}>
+                  Water line crack causing water leakage and drop in household tap pressure.
                 </p>
               </div>
 
-              <div className="card" style={{ padding: '20px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
-                  4. Pending AI Approvals
+              <div style={{ background: '#FFFFFF', borderRadius: '16px', padding: '18px', border: '1px solid #E2E8F0' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                  4. Ready Solutions
                 </span>
-                <strong style={{ fontSize: '18px', color: '#059669', display: 'block', marginBottom: '4px' }}>
-                  3 RAG Work Orders
+                <strong style={{ fontSize: '16px', color: '#059669', display: 'block', marginBottom: '4px' }}>
+                  3 Fixes Ready for Approval
                 </strong>
-                <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.4 }}>
-                  Awaiting engineer sign-off to authorize work orders without unnecessary duplicate dispatches.
+                <p style={{ fontSize: '12px', color: '#64748B', margin: 0, lineHeight: 1.4 }}>
+                  AI suggested pipe clamp & chlorine test ready for officer sign-off.
                 </p>
               </div>
             </div>
 
             {/* Quick Action Navigation Buttons */}
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 onClick={() => switchSection('my_work')}
                 className="btn-primary"
+                style={{ borderRadius: '9999px', fontSize: '13px' }}
               >
-                <CheckSquare style={{ width: '16px', height: '16px' }} />
-                <span>Go to My Work ({myWorkGrievances.length} Assigned)</span>
+                <CheckSquare style={{ width: '15px', height: '15px' }} />
+                <span>Go to My Tasks ({myWorkGrievances.length} Assigned)</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => switchSection('operations')}
                 className="btn-secondary"
+                style={{ borderRadius: '9999px', fontSize: '13px' }}
               >
-                <SlidersHorizontal style={{ width: '16px', height: '16px' }} />
-                <span>Department Operations Queue ({filteredGrievances.length})</span>
+                <SlidersHorizontal style={{ width: '15px', height: '15px' }} />
+                <span>See All Team Workers ({filteredGrievances.length})</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => switchSection('intelligence')}
                 className="btn-secondary"
-                style={{ color: '#4338CA', borderColor: '#C7D2FE', background: '#EEF2FF' }}
+                style={{ borderRadius: '9999px', fontSize: '13px', color: '#4338CA', borderColor: '#C7D2FE', background: '#EEF2FF' }}
               >
-                <Sparkles style={{ width: '16px', height: '16px' }} />
-                <span>Civic Intelligence Radar</span>
+                <Sparkles style={{ width: '15px', height: '15px' }} />
+                <span>AI Problem Helper</span>
               </button>
             </div>
           </div>
@@ -842,9 +984,9 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
               <div>
-                <h2 style={{ fontSize: '20px', margin: 0 }}>My Active Work & Assigned Incidents</h2>
-                <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '4px 0 0 0' }}>
-                  Cases specifically assigned to <strong>{currentOfficer.name}</strong> for field execution and verification.
+                <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', margin: 0 }}>📌 My Assigned Tasks</h2>
+                <p style={{ fontSize: '13px', color: '#64748B', margin: '4px 0 0 0' }}>
+                  Complaints assigned directly to <strong>{currentOfficer.name}</strong> for field inspection and repair.
                 </p>
               </div>
 
@@ -853,102 +995,33 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   type="button"
                   onClick={() => openInspectionForCase(myWorkGrievances[0]?.id || 'DL-2026-W14-0892')}
                   className="btn-primary btn-sm"
+                  style={{ borderRadius: '9999px' }}
                 >
                   <Eye style={{ width: '14px', height: '14px' }} />
-                  <span>Inspect Top Priority Case</span>
+                  <span>Inspect Most Urgent Task</span>
                 </button>
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '16px' }}>
-              {myWorkGrievances.map((g) => {
-                const itemHours = g.slaHoursLeft || 12;
-                const itemStatus = itemHours <= 0 ? 'OVERDUE' : (itemHours <= 6 ? 'AT_RISK' : 'ON_TRACK');
-
-                return (
-                  <div
-                    key={g.id}
-                    className="card"
-                    style={{
-                      padding: '20px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      borderLeft: g.urgency === 'CRITICAL' ? '4px solid #EF4444' : '4px solid var(--color-primary)'
-                    }}
-                  >
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                        <span className="font-mono-numbers" style={{ fontSize: '12px', fontWeight: 800, color: 'var(--color-primary)' }}>
-                          {g.id}
-                        </span>
-                        <span style={{
-                          fontSize: '10px',
-                          fontWeight: 700,
-                          padding: '2px 8px',
-                          borderRadius: '9999px',
-                          background: g.urgency === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB',
-                          color: g.urgency === 'CRITICAL' ? '#991B1B' : '#92400E'
-                        }}>
-                          ● {g.urgency}
-                        </span>
-                      </div>
-
-                      <h3 style={{ fontSize: '15px', lineHeight: 1.4, marginBottom: '8px', color: 'var(--color-text-primary)' }}>
-                        {g.title}
-                      </h3>
-
-                      <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '12px', lineHeight: 1.4 }}>
-                        {g.descriptionRaw?.slice(0, 110) || g.title}...
-                      </p>
-
-                      <div style={{
-                        padding: '10px',
-                        background: '#F8FAFC',
-                        borderRadius: '6px',
-                        fontSize: '11px',
-                        color: 'var(--color-text-muted)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '4px',
-                        marginBottom: '14px'
-                      }}>
-                        <div>📍 <strong>Location: </strong>{g.location?.ward || 'Ward 14'}</div>
-                        <div>👤 <strong>Citizen: </strong>{g.citizenName || 'Aditya Verma'} ({g.citizenPhone || '+91 98712'})</div>
-                        <div style={{ color: itemStatus === 'OVERDUE' ? '#DC2626' : (itemStatus === 'AT_RISK' ? '#D97706' : '#059669'), fontWeight: 700 }}>
-                          ⏱️ <strong>SLA: </strong>{itemHours}h Remaining ({itemStatus.replace('_', ' ')})
-                        </div>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button
-                        type="button"
-                        onClick={() => openInspectionForCase(g.id)}
-                        className="btn-primary btn-sm"
-                        style={{ flex: 1, justifyContent: 'center' }}
-                      >
-                        <Eye style={{ width: '13px', height: '13px' }} />
-                        <span>Inspect Case</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedId(g.id);
-                          setShowResolutionModal(true);
-                        }}
-                        className="btn-secondary btn-sm"
-                        style={{ borderColor: '#86EFAC', color: '#15803D' }}
-                        title="Quick complete & verify"
-                      >
-                        <CheckCircle2 style={{ width: '13px', height: '13px' }} />
-                        <span>Resolve</span>
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+              {myWorkGrievances.map((g) => (
+                <EditorialComplaintCard
+                  key={g.id}
+                  item={g}
+                  role={currentOfficer?.role || 'officer'}
+                  currentUser={currentOfficer}
+                  onOpen={(item) => setSelectedModalGrievance(item)}
+                  onInspect={(caseId) => openInspectionForCase(caseId)}
+                  onResolve={(caseId) => {
+                    setSelectedId(caseId);
+                    setShowResolutionModal(true);
+                  }}
+                  onReassign={(caseId) => {
+                    setSelectedId(caseId);
+                    setShowReassignModal(true);
+                  }}
+                />
+              ))}
             </div>
           </div>
         )}
@@ -960,9 +1033,9 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
               <div>
-                <h2 style={{ fontSize: '20px', margin: 0 }}>Department Operations & Staff Workload</h2>
-                <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '4px 0 0 0' }}>
-                  Manage cross-ward assignments, monitor field engineer shift status, and triage incoming grievances.
+                <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', margin: 0 }}>👷 Field Team & Workers Status</h2>
+                <p style={{ fontSize: '13px', color: '#64748B', margin: '4px 0 0 0' }}>
+                  See all on-duty workers, assign tasks to available teams, and track fix times.
                 </p>
               </div>
 
@@ -970,10 +1043,10 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 type="button"
                 onClick={() => setShowAddOfficerModal(true)}
                 className="btn-primary btn-sm"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                style={{ borderRadius: '9999px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
                 <Plus style={{ width: '14px', height: '14px' }} />
-                <span>Add Officer to Roster</span>
+                <span>+ Add Worker to Team</span>
               </button>
             </div>
 
@@ -1048,51 +1121,99 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   Department Incident Queue ({filteredGrievances.length} Active)
                 </h3>
 
-                {/* Filter Pills */}
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                  {['ALL', 'CRITICAL', 'HIGH'].map((urg) => (
+                {/* Filter Pills & View Toggle */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                    {['ALL', 'CRITICAL', 'HIGH'].map((urg) => (
+                      <button
+                        key={urg}
+                        type="button"
+                        onClick={() => setUrgencyFilter(urg)}
+                        style={{
+                          padding: '3px 10px',
+                          borderRadius: '9999px',
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          border: urgencyFilter === urg ? 'none' : '1px solid var(--color-border-medium)',
+                          background: urgencyFilter === urg ? 'var(--color-primary)' : '#FFFFFF',
+                          color: urgencyFilter === urg ? '#FFFFFF' : 'var(--color-text-secondary)',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {urg}
+                      </button>
+                    ))}
+                    {['IN_PROGRESS', 'RESOLVED'].map((st) => (
+                      <button
+                        key={st}
+                        type="button"
+                        onClick={() => setStatusFilter(statusFilter === st ? 'ALL' : st)}
+                        style={{
+                          padding: '3px 10px',
+                          borderRadius: '9999px',
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          border: statusFilter === st ? 'none' : '1px solid var(--color-border-medium)',
+                          background: statusFilter === st ? '#059669' : '#FFFFFF',
+                          color: statusFilter === st ? '#FFFFFF' : 'var(--color-text-secondary)',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {st.replace('_', ' ')}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* View Mode Toggle */}
+                  <div style={{ display: 'flex', background: '#F1F5F9', padding: '3px', borderRadius: '999px', border: '1px solid #E2E8F0' }}>
                     <button
-                      key={urg}
                       type="button"
-                      onClick={() => setUrgencyFilter(urg)}
+                      onClick={() => setOperationsViewMode('cards')}
                       style={{
-                        padding: '3px 10px',
-                        borderRadius: '9999px',
+                        padding: '4px 12px',
+                        borderRadius: '999px',
                         fontSize: '11px',
-                        fontWeight: 600,
-                        border: urgencyFilter === urg ? 'none' : '1px solid var(--color-border-medium)',
-                        background: urgencyFilter === urg ? 'var(--color-primary)' : '#FFFFFF',
-                        color: urgencyFilter === urg ? '#FFFFFF' : 'var(--color-text-secondary)',
-                        cursor: 'pointer'
+                        fontWeight: 700,
+                        border: 'none',
+                        background: operationsViewMode === 'cards' ? '#0F172A' : 'transparent',
+                        color: operationsViewMode === 'cards' ? '#FFFFFF' : '#64748B',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        transition: 'all 0.15s ease'
                       }}
                     >
-                      {urg}
+                      <LayoutGrid style={{ width: '12px', height: '12px' }} />
+                      <span>Cards View</span>
                     </button>
-                  ))}
-                  {['IN_PROGRESS', 'RESOLVED'].map((st) => (
                     <button
-                      key={st}
                       type="button"
-                      onClick={() => setStatusFilter(statusFilter === st ? 'ALL' : st)}
+                      onClick={() => setOperationsViewMode('table')}
                       style={{
-                        padding: '3px 10px',
-                        borderRadius: '9999px',
+                        padding: '4px 12px',
+                        borderRadius: '999px',
                         fontSize: '11px',
-                        fontWeight: 600,
-                        border: statusFilter === st ? 'none' : '1px solid var(--color-border-medium)',
-                        background: statusFilter === st ? '#059669' : '#FFFFFF',
-                        color: statusFilter === st ? '#FFFFFF' : 'var(--color-text-secondary)',
-                        cursor: 'pointer'
+                        fontWeight: 700,
+                        border: 'none',
+                        background: operationsViewMode === 'table' ? '#0F172A' : 'transparent',
+                        color: operationsViewMode === 'table' ? '#FFFFFF' : '#64748B',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        transition: 'all 0.15s ease'
                       }}
                     >
-                      {st.replace('_', ' ')}
+                      <List style={{ width: '12px', height: '12px' }} />
+                      <span>Table View</span>
                     </button>
-                  ))}
+                  </div>
                 </div>
               </div>
 
               {/* Search Bar */}
-              <div style={{ position: 'relative', marginBottom: '16px' }}>
+              <div style={{ position: 'relative', marginBottom: '20px' }}>
                 <Search style={{ position: 'absolute', left: '12px', top: '12px', width: '16px', height: '16px', color: 'var(--color-text-muted)' }} />
                 <input
                   type="text"
@@ -1110,81 +1231,105 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 />
               </div>
 
-              {/* Table of Department Incidents */}
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '2px solid var(--color-border-medium)' }}>
-                      <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>CASE ID</th>
-                      <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>TITLE & SUMMARY</th>
-                      <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>WARD</th>
-                      <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>URGENCY</th>
-                      <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>STATUS</th>
-                      <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>ASSIGNED TO</th>
-                      <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>ACTIONS</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredGrievances.map((g) => (
-                      <tr key={g.id} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
-                        <td style={{ padding: '12px 10px', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--color-primary)' }}>
-                          {g.id}
-                        </td>
-                        <td style={{ padding: '12px 10px', maxWidth: '320px' }}>
-                          <strong style={{ display: 'block', color: 'var(--color-text-primary)', marginBottom: '2px' }}>{g.title}</strong>
-                          <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>by {g.citizenName || 'Citizen'}</span>
-                        </td>
-                        <td style={{ padding: '12px 10px', color: 'var(--color-text-secondary)' }}>
-                          {g.location?.ward || 'Ward 14'}
-                        </td>
-                        <td style={{ padding: '12px 10px' }}>
-                          <span style={{
-                            fontSize: '10px',
-                            fontWeight: 800,
-                            padding: '2px 8px',
-                            borderRadius: '9999px',
-                            background: g.urgency === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB',
-                            color: g.urgency === 'CRITICAL' ? '#991B1B' : '#92400E'
-                          }}>
-                            {g.urgency}
-                          </span>
-                        </td>
-                        <td style={{ padding: '12px 10px' }}>
-                          <span style={{ fontSize: '11px', fontWeight: 600, color: g.status === 'RESOLVED' ? '#059669' : '#D97706' }}>
-                            {g.status}
-                          </span>
-                        </td>
-                        <td style={{ padding: '12px 10px', color: 'var(--color-text-secondary)', fontSize: '12px' }}>
-                          {g.officerName || 'Er. Sanjay Sharma'}
-                        </td>
-                        <td style={{ padding: '12px 10px' }}>
-                          <div style={{ display: 'flex', gap: '6px' }}>
-                            <button
-                              type="button"
-                              onClick={() => openInspectionForCase(g.id)}
-                              className="btn-secondary btn-sm"
-                              style={{ fontSize: '11px', padding: '4px 8px' }}
-                            >
-                              Inspect
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSelectedId(g.id);
-                                setShowReassignModal(true);
-                              }}
-                              className="btn-secondary btn-sm"
-                              style={{ fontSize: '11px', padding: '4px 8px' }}
-                            >
-                              Reassign
-                            </button>
-                          </div>
-                        </td>
+              {/* CARDS VIEW (Reference 2 Editorial Style) */}
+              {operationsViewMode === 'cards' ? (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+                  {filteredGrievances.map((g) => (
+                    <EditorialComplaintCard
+                      key={g.id}
+                      item={g}
+                      role={currentOfficer?.role || 'officer'}
+                      currentUser={currentOfficer}
+                      onOpen={(item) => setSelectedModalGrievance(item)}
+                      onInspect={(caseId) => openInspectionForCase(caseId)}
+                      onResolve={(caseId) => {
+                        setSelectedId(caseId);
+                        setShowResolutionModal(true);
+                      }}
+                      onReassign={(caseId) => {
+                        setSelectedId(caseId);
+                        setShowReassignModal(true);
+                      }}
+                    />
+                  ))}
+                </div>
+              ) : (
+                /* High-Density Table View */
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid var(--color-border-medium)' }}>
+                        <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>CASE ID</th>
+                        <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>TITLE & SUMMARY</th>
+                        <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>WARD</th>
+                        <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>URGENCY</th>
+                        <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>STATUS</th>
+                        <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>ASSIGNED TO</th>
+                        <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>ACTIONS</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {filteredGrievances.map((g) => (
+                        <tr key={g.id} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+                          <td style={{ padding: '12px 10px', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--color-primary)' }}>
+                            {g.id}
+                          </td>
+                          <td style={{ padding: '12px 10px', maxWidth: '320px' }}>
+                            <strong style={{ display: 'block', color: 'var(--color-text-primary)', marginBottom: '2px' }}>{g.title}</strong>
+                            <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>by {g.citizenName || 'Citizen'}</span>
+                          </td>
+                          <td style={{ padding: '12px 10px', color: 'var(--color-text-secondary)' }}>
+                            {g.location?.ward || 'Ward 14'}
+                          </td>
+                          <td style={{ padding: '12px 10px' }}>
+                            <span style={{
+                              fontSize: '10px',
+                              fontWeight: 800,
+                              padding: '2px 8px',
+                              borderRadius: '9999px',
+                              background: g.urgency === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB',
+                              color: g.urgency === 'CRITICAL' ? '#991B1B' : '#92400E'
+                            }}>
+                              {g.urgency}
+                            </span>
+                          </td>
+                          <td style={{ padding: '12px 10px' }}>
+                            <span style={{ fontSize: '11px', fontWeight: 600, color: g.status === 'RESOLVED' ? '#059669' : '#D97706' }}>
+                              {g.status}
+                            </span>
+                          </td>
+                          <td style={{ padding: '12px 10px', color: 'var(--color-text-secondary)', fontSize: '12px' }}>
+                            {g.officerName || 'Er. Sanjay Sharma'}
+                          </td>
+                          <td style={{ padding: '12px 10px' }}>
+                            <div style={{ display: 'flex', gap: '6px' }}>
+                              <button
+                                type="button"
+                                onClick={() => openInspectionForCase(g.id)}
+                                className="btn-secondary btn-sm"
+                                style={{ fontSize: '11px', padding: '4px 8px' }}
+                              >
+                                Inspect
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedId(g.id);
+                                  setShowReassignModal(true);
+                                }}
+                                className="btn-secondary btn-sm"
+                                style={{ fontSize: '11px', padding: '4px 8px' }}
+                              >
+                                Reassign
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -2415,6 +2560,30 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
               </div>
             </form>
           </div>
+        )}
+
+        {/* Full Editorial Complaint Detail Popup */}
+        {selectedModalGrievance && (
+          <ComplaintDetailModal
+            item={selectedModalGrievance}
+            onClose={() => setSelectedModalGrievance(null)}
+            role={currentOfficer?.role || 'officer'}
+            currentUser={currentOfficer}
+            onInspect={(caseId) => {
+              setSelectedModalGrievance(null);
+              openInspectionForCase(caseId);
+            }}
+            onResolve={(caseId) => {
+              setSelectedModalGrievance(null);
+              setSelectedId(caseId);
+              setShowResolutionModal(true);
+            }}
+            onReassign={(caseId) => {
+              setSelectedModalGrievance(null);
+              setSelectedId(caseId);
+              setShowReassignModal(true);
+            }}
+          />
         )}
 
       </div>
