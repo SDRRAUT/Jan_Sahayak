@@ -8,6 +8,8 @@ import { db } from './db/database.js';
 import { orchestrator } from './agents/orchestrator.js';
 import { aiProvider } from './agents/aiProvider.js';
 import { postgresDB, isPostgresActive } from './db/postgres.js';
+import { CANONICAL_STATUSES, normalizeStatus, isValidTransition, getRoleStatusLabel } from './constants/statuses.js';
+import { CANONICAL_EVENTS } from './constants/events.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -623,6 +625,15 @@ app.get('/api/grievances/:id', async (req, res) => {
   }
   if (!item) return res.status(404).json({ error: 'Grievance not found.' });
   res.json({ grievance: item });
+});
+
+// GET Authoritative Grievance Timeline
+app.get('/api/grievances/:id/timeline', async (req, res) => {
+  const { id } = req.params;
+  const item = await getGrievanceRecord(id);
+  const incidentId = item?.incidentId || item?.clusterId || null;
+  const timeline = await postgresDB.getAuthoritativeTimeline(id, incidentId);
+  res.json({ success: true, grievanceId: id, incidentId, timeline });
 });
 
 // GET Database Health & PostgreSQL Status
@@ -1303,49 +1314,54 @@ app.post('/api/grievances/:id/resolve', authenticateToken, requireRole(['officer
   res.json({ success: true, grievance: item });
 });
 
-// Formal Workflow Status Transitions (Supabase-persisted)
+// Formal Workflow Status Transitions (Supabase-persisted with canonical states)
 app.post('/api/grievances/:id/transition-status', authenticateToken, requireRole(['officer', 'dept_admin', 'super_admin']), async (req, res) => {
   const { id } = req.params;
-  const { newStatus, reason } = req.body;
+  const { newStatus, reason, actionType, notes, evidenceUrl } = req.body;
 
-  const validStatuses = ['SUBMITTED', 'AI_ANALYSED', 'ASSIGNED', 'UNDER_REVIEW', 'INFORMATION_REQUIRED', 'IN_PROGRESS', 'ESCALATED', 'RESOLVED', 'CLOSED'];
-  if (!validStatuses.includes(newStatus)) {
-    return res.status(400).json({ error: `Invalid status. Must be one of [${validStatuses.join(', ')}]` });
+  if (!newStatus) {
+    return res.status(400).json({ error: 'newStatus is required.' });
   }
 
   const item = await getGrievanceRecord(id);
   if (!item) return res.status(404).json({ error: 'Grievance not found.' });
 
-  const previousStatus = item.status;
-  item.status = newStatus;
+  const previousStatus = normalizeStatus(item.status);
+  const targetCanonicalStatus = normalizeStatus(newStatus);
+
+  if (!isValidTransition(previousStatus, targetCanonicalStatus)) {
+    console.warn(`[StatusTransition] Non-standard transition from ${previousStatus} to ${targetCanonicalStatus}`);
+  }
+
+  item.status = targetCanonicalStatus;
 
   if (!item.statusHistory) item.statusHistory = [];
   const historyEntry = {
     transitionId: `TR-${Date.now()}`,
     previousStatus,
-    newStatus,
+    newStatus: targetCanonicalStatus,
     actor: req.user.name,
     role: req.user.role,
     designation: req.user.designation || 'Municipal Authority',
     timestamp: new Date().toLocaleTimeString(),
     date: new Date().toISOString().split('T')[0],
-    reason: reason || `Status transitioned to ${newStatus}`
+    reason: reason || `Status transitioned to ${targetCanonicalStatus}`
   };
   item.statusHistory.push(historyEntry);
 
   if (!item.timeline) item.timeline = [];
   item.timeline.push({
-    stage: newStatus.replace(/_/g, ' '),
+    stage: getRoleStatusLabel(targetCanonicalStatus, 'citizen'),
     time: 'Just now',
-    detail: reason || `Workflow progressed from ${previousStatus} to ${newStatus} by ${req.user.name}`,
-    status: newStatus === 'RESOLVED' || newStatus === 'CLOSED' ? 'completed' : 'in_progress'
+    detail: reason || `Workflow progressed from ${previousStatus} to ${targetCanonicalStatus} by ${req.user.name}`,
+    status: targetCanonicalStatus === 'RESOLVED' || targetCanonicalStatus === 'ACTION_COMPLETED' ? 'completed' : 'in_progress'
   });
 
   // Persist status transition to Supabase
   await postgresDB.recordStatusTransition({
     incidentId: item.incidentId || item.id,
     fromStatus: previousStatus,
-    toStatus: newStatus,
+    toStatus: targetCanonicalStatus,
     reason: reason || `Workflow transition by ${req.user.name}`,
     trigger: 'OFFICER_MANUAL_TRANSITION',
     actorId: req.user.id,
@@ -1353,21 +1369,36 @@ app.post('/api/grievances/:id/transition-status', authenticateToken, requireRole
     actorRole: req.user.role
   });
 
-  await postgresDB.logAuditEvent(req.user.name, 'STATUS_TRANSITION', id, `${previousStatus} -> ${newStatus} (Reason: ${reason || 'Operational update'})`);
+  // If this transition involves field action (investigation or active repair)
+  if (targetCanonicalStatus === CANONICAL_STATUSES.INVESTIGATION || targetCanonicalStatus === CANONICAL_STATUSES.ACTION_IN_PROGRESS || actionType) {
+    await postgresDB.recordFieldAction({
+      incidentId: item.incidentId || null,
+      grievanceId: item.id,
+      officerId: req.user.id,
+      officerName: req.user.name,
+      actionType: actionType || (targetCanonicalStatus === CANONICAL_STATUSES.INVESTIGATION ? 'INSPECTION' : 'REMEDIATION'),
+      status: targetCanonicalStatus === CANONICAL_STATUSES.ACTION_COMPLETED ? 'COMPLETED' : 'IN_PROGRESS',
+      notes: notes || reason || `Field action under status: ${targetCanonicalStatus}`,
+      evidenceUrl: evidenceUrl || null
+    });
+  }
+
+  await postgresDB.logAuditEvent(req.user.name, 'STATUS_TRANSITION', id, `${previousStatus} -> ${targetCanonicalStatus} (Reason: ${reason || 'Operational update'})`);
   AUDIT_LOGS.unshift({
     id: `LOG-${Date.now()}`,
     timestamp: new Date().toLocaleTimeString(),
     actor: req.user.name,
     action: 'STATUS_TRANSITION',
     targetId: id,
-    details: `${previousStatus} -> ${newStatus} (Reason: ${reason || 'Operational update'})`
+    details: `${previousStatus} -> ${targetCanonicalStatus} (Reason: ${reason || 'Operational update'})`
   });
 
+  const citizenLabel = getRoleStatusLabel(targetCanonicalStatus, 'citizen');
   const citizenNotif = {
     userRole: 'citizen',
     userId: item.citizenId,
-    title: `Status: ${newStatus.replace(/_/g, ' ')}`,
-    message: `Grievance ${id} updated to ${newStatus}. ${reason || ''}`,
+    title: `Status: ${citizenLabel}`,
+    message: `Grievance ${id}: ${citizenLabel}. ${reason || ''}`,
     grievanceId: id,
     link: `/citizen/${id}`,
     type: 'STATUS_UPDATE'
@@ -1377,7 +1408,36 @@ app.post('/api/grievances/:id/transition-status', authenticateToken, requireRole
 
   await persistGrievanceRecord(item);
 
-  orchestrator.broadcastEvent('status_changed', { grievanceId: id, previousStatus, newStatus, actor: req.user.name });
+  // Map to canonical event
+  let eventType = CANONICAL_EVENTS.COMPLAINT_UPDATED;
+  if (targetCanonicalStatus === CANONICAL_STATUSES.INVESTIGATION) {
+    eventType = CANONICAL_EVENTS.INVESTIGATION_STARTED;
+  } else if (targetCanonicalStatus === CANONICAL_STATUSES.ACTION_IN_PROGRESS) {
+    eventType = CANONICAL_EVENTS.FIELD_ACTION_STARTED;
+  } else if (targetCanonicalStatus === CANONICAL_STATUSES.ACTION_COMPLETED) {
+    eventType = CANONICAL_EVENTS.FIELD_ACTION_COMPLETED;
+  } else if (targetCanonicalStatus === CANONICAL_STATUSES.RESOLVED) {
+    eventType = CANONICAL_EVENTS.INCIDENT_RESOLVED;
+  } else if (targetCanonicalStatus === CANONICAL_STATUSES.REOPENED) {
+    eventType = CANONICAL_EVENTS.INCIDENT_REOPENED;
+  }
+
+  orchestrator.broadcastEvent(eventType, { 
+    grievanceId: id, 
+    incidentId: item.incidentId,
+    previousStatus, 
+    newStatus: targetCanonicalStatus, 
+    actor: req.user.name 
+  });
+
+  // Also broadcast status_changed for legacy clients
+  orchestrator.broadcastEvent('status_changed', { 
+    grievanceId: id, 
+    incidentId: item.incidentId,
+    previousStatus, 
+    newStatus: targetCanonicalStatus, 
+    actor: req.user.name 
+  });
 
   res.json({ success: true, grievance: item, transition: historyEntry });
 });
@@ -2145,21 +2205,34 @@ app.get('/api/intelligence/events', (req, res) => {
   });
 });
 
-// GET all civic incidents (Real DB)
-app.get('/api/intelligence/incidents', (req, res) => {
-  const incidents = db.getIncidents();
+// GET all civic incidents (Authoritative Supabase PostgreSQL with fallback)
+app.get(['/api/intelligence/incidents', '/api/incidents'], async (req, res) => {
+  let incidents = await postgresDB.getAllIncidents();
+  if (!incidents || incidents.length === 0) {
+    incidents = db.getIncidents();
+  }
   res.json({
     incidents,
     total: incidents.length
   });
 });
 
-// GET single civic incident by ID (Real DB)
-app.get('/api/intelligence/incidents/:id', (req, res) => {
+// GET single civic incident by ID (with linked complaints & field actions)
+app.get(['/api/intelligence/incidents/:id', '/api/incidents/:id'], async (req, res) => {
   const { id } = req.params;
-  const incident = db.getIncidentById(id);
+  let incident = await postgresDB.getIncidentWithLinkedComplaints(id);
+  if (!incident) {
+    incident = db.getIncidentById(id);
+  }
   if (!incident) return res.status(404).json({ error: 'Civic Incident not found.' });
   res.json({ incident });
+});
+
+// GET incident authoritative timeline
+app.get(['/api/intelligence/incidents/:id/timeline', '/api/incidents/:id/timeline'], async (req, res) => {
+  const { id } = req.params;
+  const timeline = await postgresDB.getAuthoritativeTimeline(null, id);
+  res.json({ success: true, incidentId: id, timeline });
 });
 
 // GET all clusters

@@ -975,5 +975,175 @@ export const postgresDB = {
       console.error('[PostgreSQL] getOfficerStats error:', err.message);
       return null;
     }
+  },
+
+  // --- Authoritative Shared Timeline ---
+  async getAuthoritativeTimeline(grievanceId, incidentId) {
+    const p = getPool();
+    if (!p) return [];
+    try {
+      const timelineEvents = [];
+
+      // 1. Status history transitions
+      const statusRes = await p.query(`
+        SELECT * FROM public.incident_status_history
+        WHERE (incident_id = $1 OR incident_id = $2)
+        ORDER BY created_at ASC
+      `, [incidentId || grievanceId, grievanceId]);
+
+      statusRes.rows.forEach(r => {
+        timelineEvents.push({
+          id: `TR-${r.id}`,
+          type: 'STATUS_TRANSITION',
+          stage: r.to_status ? r.to_status.replace(/_/g, ' ') : 'Status Updated',
+          status: r.to_status,
+          detail: r.reason || `Status progressed to ${r.to_status} by ${r.actor_name || 'Authority'}`,
+          actor: r.actor_name,
+          role: r.actor_role,
+          trigger: r.trigger,
+          timestamp: r.created_at,
+          time: new Date(r.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          date: new Date(r.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })
+        });
+      });
+
+      // 2. Field actions
+      const fieldRes = await p.query(`
+        SELECT * FROM public.field_actions
+        WHERE (grievance_id = $1 OR incident_id = $2)
+        ORDER BY started_at ASC
+      `, [grievanceId, incidentId || grievanceId]);
+
+      fieldRes.rows.forEach(r => {
+        timelineEvents.push({
+          id: `FA-${r.id}`,
+          type: 'FIELD_ACTION',
+          stage: r.action_type ? r.action_type.replace(/_/g, ' ') : 'Field Operation',
+          status: r.status,
+          detail: r.notes || `Field inspection / remediation executed by ${r.officer_name}`,
+          officer: r.officer_name,
+          evidenceUrl: r.evidence_url,
+          timestamp: r.started_at || r.created_at,
+          time: new Date(r.started_at || r.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          date: new Date(r.started_at || r.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })
+        });
+      });
+
+      // 3. Citizen verification records
+      const verRes = await p.query(`
+        SELECT * FROM public.verification_records
+        WHERE (grievance_id = $1 OR incident_id = $2)
+        ORDER BY created_at ASC
+      `, [grievanceId, incidentId || grievanceId]);
+
+      verRes.rows.forEach(r => {
+        timelineEvents.push({
+          id: `VR-${r.id}`,
+          type: 'VERIFICATION',
+          stage: r.status === 'VERIFIED_SATISFIED' ? 'Citizen Verified & Closed' : 'Dispute Reopened by Citizen',
+          status: r.status,
+          detail: r.feedback || (r.status === 'VERIFIED_SATISFIED' ? 'Problem confirmed resolved by citizen' : 'Citizen disputed resolution'),
+          rating: r.rating,
+          photoUrl: r.photo_url,
+          timestamp: r.created_at,
+          time: new Date(r.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          date: new Date(r.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })
+        });
+      });
+
+      // 4. Relevant Audit logs
+      const auditRes = await p.query(`
+        SELECT * FROM public.audit_logs
+        WHERE (target_id = $1 OR target_id = $2)
+        ORDER BY created_at ASC
+      `, [grievanceId, incidentId || grievanceId]);
+
+      auditRes.rows.forEach(r => {
+        timelineEvents.push({
+          id: `AL-${r.id}`,
+          type: 'AUDIT',
+          stage: r.action ? r.action.replace(/_/g, ' ') : 'System Action',
+          detail: r.details,
+          actor: r.actor_name,
+          role: r.actor_role,
+          timestamp: r.created_at,
+          time: new Date(r.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          date: new Date(r.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })
+        });
+      });
+
+      // Sort all events chronologically
+      timelineEvents.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+      // If empty, provide initial ingestion step from grievance record
+      if (timelineEvents.length === 0) {
+        timelineEvents.push({
+          id: 'INIT-1',
+          type: 'INTAKE',
+          stage: 'Report Submitted',
+          status: 'REPORTED',
+          detail: 'Grievance submitted via JanSahayak Web Portal',
+          timestamp: new Date().toISOString(),
+          time: 'Just now',
+          date: 'Today'
+        });
+      }
+
+      return timelineEvents;
+    } catch (err) {
+      console.error('[PostgreSQL] getAuthoritativeTimeline error:', err.message);
+      return [];
+    }
+  },
+
+  // --- Unified Incident with Linked Complaints ---
+  async getIncidentWithLinkedComplaints(incidentId) {
+    const inc = await this.getIncidentById(incidentId);
+    if (!inc) return null;
+
+    const p = getPool();
+    let linkedComplaints = [];
+    if (p) {
+      try {
+        const compRes = await p.query(`
+          SELECT 
+            g.*,
+            extensions.ST_Y(g.geom::extensions.geometry) AS lat_val,
+            extensions.ST_X(g.geom::extensions.geometry) AS lng_val
+          FROM public.grievances g
+          WHERE g.incident_id = $1 OR g.cluster_id = ANY($2::text[])
+          ORDER BY g.created_at ASC
+        `, [incidentId, inc.clusterIds || []]);
+
+        linkedComplaints = compRes.rows.map(r => ({
+          id: r.id,
+          title: r.title,
+          descriptionRaw: r.description_raw,
+          category: r.category,
+          department: r.department,
+          officerName: r.officer_name,
+          urgency: r.urgency,
+          status: r.status,
+          citizenName: r.citizen_name,
+          citizenPhone: r.citizen_phone,
+          location: {
+            ward: r.location_ward,
+            area: r.location_area,
+            lat: r.lat_val,
+            lng: r.lng_val
+          },
+          evidence: r.evidence,
+          createdAt: r.created_at
+        }));
+      } catch (e) {
+        console.warn('Error fetching linked complaints for incident:', e.message);
+      }
+    }
+
+    return {
+      ...inc,
+      linkedComplaints,
+      complaintCount: Math.max(inc.complaintCount || 0, linkedComplaints.length)
+    };
   }
 };
