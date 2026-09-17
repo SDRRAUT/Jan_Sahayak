@@ -1,35 +1,88 @@
+# ==============================================================================
+# JanSahayk (जनसहायक) — Production .gitignore
+# ==============================================================================
+
 # Dependencies
-node_modules
+node_modules/
 .pnp
 .pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
 
-# Production build
-dist
-build
-
-# Environment variables
+# Environment variables & Secrets (Strictly prevent credential leakage)
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
 
-# Logs
+# Production build outputs
+dist/
+dist-ssr/
+build/
+out/
+.parcel-cache/
+.turbo/
+
+# Logs & Debug outputs
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# OS Files
-.DS_Store
-Thumbs.db
+# Testing & Coverage reports
+coverage/
+.nyc_output/
+*.lcov
 
-# IDE & Editor files
-.vscode
-.idea
+# Databases & Runtime state
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+server/data/*.tmp
+server/data/*.backup.json
+
+# Operating System files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# IDEs & Editor configurations
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.sublime-workspace
+*.sublime-project
+
+# Temporary, Cache & Backup files
+.cache/
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*.swo
+*~

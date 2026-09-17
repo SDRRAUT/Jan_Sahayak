@@ -383,13 +383,15 @@ export default function CitizenDetail() {
                   </div>
                 </div>
 
-                <Link
-                  to={`/officer/complaints/${item.id}`}
-                  className="btn-secondary btn-sm"
-                  style={{ width: '100%', justifyContent: 'center' }}
-                >
-                  View in Officer Workspace
-                </Link>
+                {user && user.role !== 'citizen' && (
+                  <Link
+                    to={`/officer/complaints/${item.id}`}
+                    className="btn-secondary btn-sm"
+                    style={{ width: '100%', justifyContent: 'center' }}
+                  >
+                    View in Officer Workspace
+                  </Link>
+                )}
               </div>
             </div>
           </div>

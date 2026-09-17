@@ -87,7 +87,7 @@ export function AppProvider({ children }) {
     localStorage.setItem('jansahayk_notifications', JSON.stringify(notifications));
   }, [notifications]);
 
-  // Real backend synchronization on mount
+  // Real backend synchronization and real-time SSE stream
   useEffect(() => {
     fetchGrievances();
     fetchNotifications();
@@ -100,7 +100,29 @@ export function AppProvider({ children }) {
         })
         .catch(() => {});
     }
+
+    // Subscribe to Server-Sent Events (SSE)
+    let eventSource = null;
+    try {
+      eventSource = new EventSource('/api/intelligence/events');
+      const handleServerEvent = () => {
+        fetchCivicIntelligence();
+        fetchGrievances();
+      };
+
+      eventSource.addEventListener('complaint_created', handleServerEvent);
+      eventSource.addEventListener('cluster_updated', handleServerEvent);
+      eventSource.addEventListener('incident_updated', handleServerEvent);
+      eventSource.addEventListener('verification_submitted', handleServerEvent);
+    } catch (err) {
+      console.warn('SSE connection unavailable, using standard sync:', err);
+    }
+
+    return () => {
+      if (eventSource) eventSource.close();
+    };
   }, []);
+
 
   const fetchCivicIntelligence = async () => {
     try {
@@ -953,6 +975,32 @@ export function AppProvider({ children }) {
     return record;
   };
 
+  const verifyIncidentResolution = async (incidentId, isConfirmed, notes = '') => {
+    try {
+      const res = await fetch(`/api/intelligence/incidents/${incidentId}/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          isConfirmed,
+          citizenName: user?.name || 'Verified Citizen',
+          citizenId: user?.id || 'USR-CITIZEN-01',
+          notes
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.incident) {
+          setCivicIncidents(prev => prev.map(i => i.id === incidentId ? data.incident : i));
+        }
+        fetchCivicIntelligence();
+        return data.incident;
+      }
+    } catch (e) {
+      console.error('Error verifying incident:', e);
+    }
+  };
+
   const runActionSimulation = (incidentId, actionKey) => {
     const incident = civicIncidents.find(i => i.id === incidentId);
     if (!incident) return null;
@@ -999,6 +1047,7 @@ export function AppProvider({ children }) {
         intelligenceMetrics: CIVIC_INTELLIGENCE_METRICS,
         submitCivicSignal,
         recordIncidentDecision,
+        verifyIncidentResolution,
         runActionSimulation,
         updateIncidentStage,
         notifications,

@@ -11,13 +11,17 @@ import {
   X, 
   Clock, 
   UserCheck, 
-  Globe 
+  Globe,
+  Briefcase,
+  Building2,
+  ShieldCheck,
+  User
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 export default function CommandPalette({ isOpen, onClose, onOpenSignalModal }) {
   const navigate = useNavigate();
-  const { grievances = [], civicIncidents = [], switchDemoRole } = useApp();
+  const { grievances = [], civicIncidents = [], switchDemoRole, user, role } = useApp();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef(null);
@@ -73,68 +77,185 @@ export default function CommandPalette({ isOpen, onClose, onOpenSignalModal }) {
     }
   }));
 
-  const quickActions = [
-    {
-      id: 'act-new-complaint',
-      type: 'ACTION',
-      title: 'Report a Grievance',
-      subtitle: 'Voice, photo, or conversational guided form',
-      icon: PlusCircle,
-      action: () => {
-        navigate('/citizen/submit');
-        onClose();
-      }
-    },
-    {
-      id: 'act-signal',
-      type: 'ACTION',
-      title: 'Log Ambient Civic Signal',
-      subtitle: 'Quick 15-second observation without formal complaint',
-      icon: Radio,
-      badge: 'Fast',
-      action: () => {
-        onClose();
-        if (onOpenSignalModal) onOpenSignalModal();
-      }
-    },
-    {
-      id: 'act-intelligence',
-      type: 'ACTION',
-      title: 'Open Civic Intelligence Platform',
-      subtitle: 'Corridor progression maps & root cause analysis',
-      icon: Sparkles,
-      action: () => {
-        navigate('/intelligence');
-        onClose();
-      }
-    },
-    {
-      id: 'act-heatmap',
-      type: 'ACTION',
-      title: 'Geospatial Ward Heatmap',
-      subtitle: 'Live density and cross-department incident cluster map',
-      icon: MapPin,
-      action: () => {
-        navigate('/admin/heatmap');
-        onClose();
-      }
-    },
-    {
-      id: 'act-officer',
-      type: 'ACTION',
-      title: 'Switch to Officer Console (Er. Sanjay Sharma)',
-      subtitle: 'Delhi Jal Board Assistant Executive Engineer view',
-      icon: UserCheck,
-      action: async () => {
-        await switchDemoRole('officer');
-        navigate('/officer');
-        onClose();
-      }
-    }
-  ];
+  // Role-Segregated Quick Actions
+  let quickActions = [];
 
+  if (role === 'citizen') {
+    quickActions = [
+      {
+        id: 'act-new-complaint',
+        type: 'ACTION',
+        title: 'Report a Grievance',
+        subtitle: 'Voice, photo, or conversational guided form',
+        icon: PlusCircle,
+        action: () => {
+          navigate('/citizen/submit');
+          onClose();
+        }
+      },
+      {
+        id: 'act-my-complaints',
+        type: 'ACTION',
+        title: 'My Grievance Dashboard',
+        subtitle: 'View status and track ongoing tickets',
+        icon: User,
+        action: () => {
+          navigate('/citizen');
+          onClose();
+        }
+      },
+      {
+        id: 'act-signal',
+        type: 'ACTION',
+        title: 'Log Ambient Civic Signal',
+        subtitle: 'Quick observation without formal complaint',
+        icon: Radio,
+        badge: 'Fast',
+        action: () => {
+          onClose();
+          if (onOpenSignalModal) onOpenSignalModal();
+        }
+      }
+    ];
+  } else if (role === 'officer') {
+    quickActions = [
+      {
+        id: 'act-officer-triage',
+        type: 'ACTION',
+        title: 'Officer Triage Workspace',
+        subtitle: 'Inspect tickets, AI SOPs & dispatch work orders',
+        icon: Briefcase,
+        action: () => {
+          navigate('/officer');
+          onClose();
+        }
+      },
+      {
+        id: 'act-heatmap',
+        type: 'ACTION',
+        title: 'Geospatial Ward Heatmap',
+        subtitle: 'Live density and cross-department incident cluster map',
+        icon: MapPin,
+        action: () => {
+          navigate('/admin');
+          onClose();
+        }
+      },
+      {
+        id: 'act-intelligence',
+        type: 'ACTION',
+        title: 'Civic Intelligence Suite',
+        subtitle: 'Corridor progression maps & root cause analysis',
+        icon: Sparkles,
+        action: () => {
+          navigate('/intelligence');
+          onClose();
+        }
+      }
+    ];
+  } else if (role === 'dept_admin') {
+    quickActions = [
+      {
+        id: 'act-dept-console',
+        type: 'ACTION',
+        title: 'Department Admin Console',
+        subtitle: 'SLA compliance, queue health & reports',
+        icon: Building2,
+        action: () => {
+          navigate('/admin/department');
+          onClose();
+        }
+      },
+      {
+        id: 'act-officer-queue',
+        type: 'ACTION',
+        title: 'Officer Roster & Triage Queue',
+        subtitle: 'Manage duty rosters and active case loads',
+        icon: Briefcase,
+        action: () => {
+          navigate('/officer');
+          onClose();
+        }
+      },
+      {
+        id: 'act-heatmap',
+        type: 'ACTION',
+        title: 'Geospatial Ward Heatmap',
+        subtitle: 'Live density and cross-department incident cluster map',
+        icon: MapPin,
+        action: () => {
+          navigate('/admin');
+          onClose();
+        }
+      }
+    ];
+  } else if (role === 'super_admin') {
+    quickActions = [
+      {
+        id: 'act-super-console',
+        type: 'ACTION',
+        title: 'Super Admin Console',
+        subtitle: 'Municipal directory, SLA rules & audit trail',
+        icon: ShieldCheck,
+        action: () => {
+          navigate('/admin/super');
+          onClose();
+        }
+      },
+      {
+        id: 'act-dept-directory',
+        type: 'ACTION',
+        title: 'Department Directory',
+        subtitle: 'Oversight across DJB, PWD, MCD, BSES',
+        icon: Building2,
+        action: () => {
+          navigate('/admin/department');
+          onClose();
+        }
+      },
+      {
+        id: 'act-officer-queue',
+        type: 'ACTION',
+        title: 'Field Officer Workspace',
+        subtitle: 'Review triage decisions & field squad dispatches',
+        icon: Briefcase,
+        action: () => {
+          navigate('/officer');
+          onClose();
+        }
+      }
+    ];
+  } else {
+    quickActions = [
+      {
+        id: 'act-new-complaint',
+        type: 'ACTION',
+        title: 'Report a Grievance',
+        subtitle: 'Voice, photo, or conversational guided form',
+        icon: PlusCircle,
+        action: () => {
+          navigate('/citizen/submit');
+          onClose();
+        }
+      },
+      {
+        id: 'act-impact',
+        type: 'ACTION',
+        title: 'View Platform Impact',
+        subtitle: 'Public transparency & resolution metrics',
+        icon: Globe,
+        action: () => {
+          navigate('/impact');
+          onClose();
+        }
+      }
+    ];
+  }
+
+  // Active Incidents are only visible to officers and administrators
+  const canViewIncidents = role && role !== 'citizen';
   const allItems = [
-    ...activeIncidents,
+    ...(canViewIncidents ? activeIncidents : []),
     ...recentComplaints,
     ...quickActions
   ];

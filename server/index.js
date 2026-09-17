@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import { db } from './db/database.js';
+import { orchestrator } from './agents/orchestrator.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -445,7 +447,7 @@ app.get('/api/grievances', (req, res) => {
 });
 
 // Create Grievance (Citizen or Admin)
-app.post('/api/grievances', authenticateToken, requireRole(['citizen', 'super_admin']), (req, res) => {
+app.post('/api/grievances', authenticateToken, requireRole(['citizen', 'super_admin']), async (req, res) => {
   const { title, description, category, department, location, urgency, urgencyScore, evidence } = req.body;
   
   if (!description) {
@@ -461,11 +463,12 @@ app.post('/api/grievances', authenticateToken, requireRole(['citizen', 'super_ad
     category: category || 'General Civic Infrastructure',
     department: department || 'Municipal Corporation of Delhi (MCD)',
     officerName: 'Pending Assignment',
-    location: location || { ward: req.user.ward, area: 'Local Area', city: 'New Delhi', pincode: req.user.pincode },
+    location: location || { ward: req.user.ward, area: 'Local Area', city: 'New Delhi', pincode: req.user.pincode, lat: 28.7185, lng: 77.1250 },
     urgency: urgency || 'HIGH',
     urgencyScore: urgencyScore || 85,
     status: 'TRIAGED',
     createdAt: 'Just now',
+    timestamp: new Date().toISOString(),
     slaDeadline: '24 Hours from now',
     slaHoursLeft: 24,
     upvotes: 1,
@@ -482,7 +485,11 @@ app.post('/api/grievances', authenticateToken, requireRole(['citizen', 'super_ad
     ]
   };
 
+  // Run through multi-agent orchestrator pipeline
+  const orchestration = await orchestrator.processComplaint(newGrievance);
+
   GRIEVANCES_DB.unshift(newGrievance);
+  db.saveComplaint(newGrievance);
 
   AUDIT_LOGS.unshift({
     id: `LOG-${Date.now()}`,
@@ -512,8 +519,48 @@ app.post('/api/grievances', authenticateToken, requireRole(['citizen', 'super_ad
     type: 'ASSIGNMENT'
   });
 
-  res.status(201).json({ success: true, grievance: newGrievance });
+  res.status(201).json({ success: true, grievance: newGrievance, incident: orchestration.incident, cluster: orchestration.cluster });
 });
+
+// Direct Public Complaints API (Used for test suite and external reporting)
+app.post('/api/complaints', async (req, res) => {
+  const { text, description, title, location, category, citizenName, citizenId, ward, lat, lng } = req.body;
+  const content = text || description;
+  if (!content) return res.status(400).json({ error: 'Complaint text or description is required.' });
+
+  const newId = `DL-2026-W${Math.floor(10 + Math.random() * 89)}-${Math.floor(1000 + Math.random() * 9000)}`;
+  const loc = location || {
+    ward: ward || 'Ward 14 (Rohini Sector 14)',
+    lat: Number(lat) || 28.7185,
+    lng: Number(lng) || 77.1250,
+    area: 'Local Corridor'
+  };
+
+  const complaintPayload = {
+    id: newId,
+    title: title || content.slice(0, 55),
+    descriptionRaw: content,
+    category: category || 'General Civic Infrastructure',
+    department: 'Municipal Corporation of Delhi (MCD)',
+    location: loc,
+    citizenName: citizenName || 'Verified Citizen',
+    citizenId: citizenId || 'USR-CITIZEN-01',
+    createdAt: 'Just now',
+    timestamp: new Date().toISOString(),
+    status: 'INGESTED'
+  };
+
+  const orchestration = await orchestrator.processComplaint(complaintPayload);
+  GRIEVANCES_DB.unshift(complaintPayload);
+
+  res.status(201).json({
+    success: true,
+    complaint: orchestration.complaint,
+    cluster: orchestration.cluster,
+    incident: orchestration.incident
+  });
+});
+
 
 // Officer requests additional information from citizen
 app.post('/api/grievances/:id/request-info', authenticateToken, requireRole(['officer', 'dept_admin', 'super_admin']), (req, res) => {
@@ -1420,27 +1467,142 @@ let CIVIC_INCIDENTS_DB = [
   }
 ];
 
-// GET all civic incidents
-app.get('/api/intelligence/incidents', (req, res) => {
-  res.json({
-    incidents: CIVIC_INCIDENTS_DB,
-    total: CIVIC_INCIDENTS_DB.length
+// Real-time Server-Sent Events (SSE) Stream
+app.get('/api/intelligence/events', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  orchestrator.addSSEClient(res);
+  res.write(`event: connected\ndata: ${JSON.stringify({ status: 'connected', time: new Date().toISOString() })}\n\n`);
+
+  req.on('close', () => {
+    orchestrator.removeSSEClient(res);
   });
 });
 
-// GET single civic incident by ID
+// GET all civic incidents (Real DB)
+app.get('/api/intelligence/incidents', (req, res) => {
+  const incidents = db.getIncidents();
+  res.json({
+    incidents,
+    total: incidents.length
+  });
+});
+
+// GET single civic incident by ID (Real DB)
 app.get('/api/intelligence/incidents/:id', (req, res) => {
   const { id } = req.params;
-  const incident = CIVIC_INCIDENTS_DB.find(inc => inc.id === id);
+  const incident = db.getIncidentById(id);
   if (!incident) return res.status(404).json({ error: 'Civic Incident not found.' });
   res.json({ incident });
+});
+
+// GET all clusters
+app.get('/api/intelligence/clusters', (req, res) => {
+  res.json({ clusters: db.getClusters() });
+});
+
+// GET real-time graph data for Live Complaint Linkage section
+app.get('/api/intelligence/graph', (req, res) => {
+  const incidents = db.getIncidents();
+  const clusters = db.getClusters();
+  const complaints = db.getComplaints();
+
+  const activeIncident = incidents[0] || null;
+
+  // Format real complaints from database into linkage graph nodes
+  const nodes = complaints.slice(0, 40).map((c, idx) => {
+    const isWater = (c.category || '').toLowerCase().includes('water') || (c.title || '').toLowerCase().includes('water');
+    const isRoad = (c.category || '').toLowerCase().includes('road') || (c.title || '').toLowerCase().includes('road');
+    
+    return {
+      id: c.id,
+      citizen: c.citizenName || `Citizen #${idx + 1}`,
+      channel: c.evidence?.hasAudio ? '🎙 Voice Note' : c.evidence?.hasPhoto ? '📷 Geo-Photo' : '✍ Quick Text',
+      type: isWater ? 'water' : isRoad ? 'road' : 'other',
+      icon: isWater ? '💧' : isRoad ? '🛣️' : '⚠️',
+      text: c.descriptionRaw || c.title || '',
+      ward: c.location?.ward || 'Ward 14 (Rohini)',
+      lat: Number(c.location?.lat) || 28.7180,
+      lng: Number(c.location?.lng) || 77.1260,
+      matchScore: Math.round((c.clusterConfidence || 0.94) * 100),
+      linkedTo: c.incidentId || activeIncident?.id || 'INC-2026-DEL-01',
+      clusterId: c.clusterId,
+      dna: c.dna,
+      analysis: c.analysis,
+      timestamp: c.createdAt || c.timestamp || 'Just now',
+      status: c.status
+    };
+  });
+
+  res.json({
+    incident: activeIncident,
+    clusters,
+    nodes,
+    totalNodes: nodes.length
+  });
+});
+
+// POST simulate incoming signal (Demo data generator feeding REAL pipeline)
+app.post('/api/intelligence/simulate-signal', async (req, res) => {
+  const { citizen, channel, text, ward, lat, lng, category } = req.body;
+  const newId = `DL-2026-W${Math.floor(10 + Math.random() * 89)}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+  const complaintPayload = {
+    id: newId,
+    title: text ? text.slice(0, 50) : `Citizen Signal in ${ward || 'Ward 14'}`,
+    descriptionRaw: text || 'Observation of municipal infrastructure degradation.',
+    category: category || 'General Civic Infrastructure',
+    location: {
+      ward: ward || 'Ward 14 (Rohini Sector 14)',
+      lat: Number(lat) || 28.7185,
+      lng: Number(lng) || 77.1250
+    },
+    citizenName: citizen || 'Verified Resident',
+    citizenId: 'USR-SIMULATED',
+    evidence: {
+      hasAudio: channel ? channel.includes('Voice') : false,
+      hasPhoto: channel ? channel.includes('Photo') : false
+    },
+    isSimulatedDemo: true
+  };
+
+  const orchestration = await orchestrator.processComplaint(complaintPayload);
+
+  res.json({
+    success: true,
+    complaint: orchestration.complaint,
+    cluster: orchestration.cluster,
+    incident: orchestration.incident
+  });
+});
+
+// POST closed-loop citizen verification
+app.post('/api/intelligence/incidents/:id/verify', (req, res) => {
+  const { id } = req.params;
+  const { isConfirmed, citizenName, citizenId, notes } = req.body;
+
+  try {
+    const result = orchestrator.processVerification(id, {
+      isConfirmed,
+      citizenName,
+      citizenId,
+      notes
+    });
+
+    res.json({ success: true, incident: result.incident });
+  } catch (err) {
+    res.status(404).json({ error: err.message });
+  }
 });
 
 // POST human decision on incident recommendation
 app.post('/api/intelligence/incidents/:id/decision', authenticateToken, requireRole(['officer', 'dept_admin', 'super_admin']), (req, res) => {
   const { id } = req.params;
   const { decision, actionSelected, notes } = req.body;
-  const incident = CIVIC_INCIDENTS_DB.find(inc => inc.id === id);
+  const incident = db.getIncidentById(id);
   if (!incident) return res.status(404).json({ error: 'Civic Incident not found.' });
 
   const record = {
@@ -1457,17 +1619,19 @@ app.post('/api/intelligence/incidents/:id/decision', authenticateToken, requireR
 
   if (decision === 'ACCEPT_RECOMMENDATION') {
     incident.status = 'Action Planned';
+    incident.stage = 'RESOLVING';
   } else if (decision === 'REQUEST_VERIFICATION') {
     incident.status = 'Investigating';
   }
 
-  AUDIT_LOGS.unshift({
-    id: `LOG-${Date.now()}`,
-    timestamp: new Date().toLocaleTimeString(),
-    actor: req.user.name,
-    action: 'INCIDENT_DECISION_RECORDED',
-    targetId: id,
-    details: `${decision}: ${record.actionSelected}`
+  db.saveIncident(incident);
+
+  db.logEvent({
+    incidentId: id,
+    eventType: 'INCIDENT_DECISION_RECORDED',
+    actorType: 'OFFICER',
+    actorId: req.user.id,
+    payload: { decision, actionSelected: record.actionSelected, officer: req.user.name }
   });
 
   createNotification({
@@ -1484,18 +1648,19 @@ app.post('/api/intelligence/incidents/:id/decision', authenticateToken, requireR
 
 // GET citizen signals
 app.get('/api/intelligence/signals', (req, res) => {
+  const signals = db.getSignals();
   res.json({
-    signals: CIVIC_SIGNALS_DB,
-    total: CIVIC_SIGNALS_DB.length
+    signals,
+    total: signals.length
   });
 });
 
 // POST citizen signal
-app.post('/api/intelligence/signals', (req, res) => {
+app.post('/api/intelligence/signals', async (req, res) => {
   const { rawInput, citizenName, ward, channel, hasPhoto, photoUrl, lat, lng, category } = req.body;
   const newSignal = {
     id: `SIG-${Date.now().toString().slice(-6)}`,
-    incidentId: "INC-2026-DEL-01", // Automatically clustered to active corridor
+    incidentId: "INC-2026-DEL-01",
     citizenName: citizenName || 'Anonymous Citizen',
     ward: ward || 'Ward 14 (Rohini Sector 14)',
     channel: channel || 'QUICK_TEXT',
@@ -1512,15 +1677,19 @@ app.post('/api/intelligence/signals', (req, res) => {
     confidence: 'High (92%)'
   };
 
-  CIVIC_SIGNALS_DB.unshift(newSignal);
+  db.saveSignal(newSignal);
 
-  // Update incident signal count
-  const targetIncident = CIVIC_INCIDENTS_DB.find(i => i.id === newSignal.incidentId);
-  if (targetIncident) {
-    targetIncident.signalCount += 1;
-    targetIncident.citizenObservationsCount += 1;
-    targetIncident.lastUpdatedAt = 'Just now';
-  }
+  // Ingest into pipeline to update incident observations
+  const complaintPayload = {
+    id: newSignal.id,
+    title: (rawInput || 'Citizen Signal').slice(0, 50),
+    descriptionRaw: rawInput,
+    category: newSignal.category,
+    location: { ward: newSignal.ward, lat: newSignal.lat, lng: newSignal.lng },
+    citizenName: newSignal.citizenName,
+    citizenId: 'USR-SIGNAL-CITIZEN'
+  };
+  await orchestrator.processComplaint(complaintPayload);
 
   res.json({
     success: true,
@@ -1528,6 +1697,7 @@ app.post('/api/intelligence/signals', (req, res) => {
     message: 'Signal received. Your observation helps identify broader civic problems.'
   });
 });
+
 
 // Start Server
 app.listen(PORT, () => {

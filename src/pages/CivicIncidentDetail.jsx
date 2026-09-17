@@ -29,7 +29,7 @@ import WhyExplainer from '../components/common/WhyExplainer';
 
 export default function CivicIncidentDetail() {
   const { id } = useParams();
-  const { civicIncidents = [], recordIncidentDecision, user } = useApp();
+  const { civicIncidents = [], recordIncidentDecision, verifyIncidentResolution, user } = useApp();
   
   const incident = civicIncidents.find(inc => inc.id === id) || civicIncidents[0];
 
@@ -38,6 +38,11 @@ export default function CivicIncidentDetail() {
   const [actionChoice, setActionChoice] = useState(incident?.simulations?.[1]?.title || 'Option B: Full 24-Meter Ductile Iron Segment Replacement');
   const [officerNote, setOfficerNote] = useState('');
   const [decisionSuccess, setDecisionSuccess] = useState(false);
+
+  // Closed-loop verification state
+  const [verificationNotes, setVerificationNotes] = useState('');
+  const [verificationSubmitting, setVerificationSubmitting] = useState(false);
+  const [verificationMessage, setVerificationMessage] = useState('');
 
   if (!incident) {
     return (
@@ -64,6 +69,18 @@ export default function CivicIncidentDetail() {
     setSelectedDecision('ACCEPT_RECOMMENDATION');
     const el = document.getElementById('human-decision-section');
     if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleVerify = async (isConfirmed) => {
+    setVerificationSubmitting(true);
+    await verifyIncidentResolution(incident.id, isConfirmed, verificationNotes);
+    setVerificationSubmitting(false);
+    setVerificationMessage(
+      isConfirmed
+        ? '✓ Ground resolution confirmed! Incident officially verified and closed with citizen consensus.'
+        : '⚠ Problem persistence logged! Incident automatically reopened for re-intervention.'
+    );
+    setTimeout(() => setVerificationMessage(''), 6000);
   };
 
   return (
@@ -138,7 +155,7 @@ export default function CivicIncidentDetail() {
                 <span>•</span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Clock style={{ width: '14px', height: '14px', color: 'var(--color-text-muted)' }} />
-                  First Detected: {incident.firstDetectedAt}
+                  First Detected: {(incident.firstDetectedAt && !incident.firstDetectedAt.includes('Invalid')) ? incident.firstDetectedAt : 'Recently observed'}
                 </span>
               </div>
             </div>
@@ -148,10 +165,10 @@ export default function CivicIncidentDetail() {
                 Total Connected Signals
               </span>
               <div style={{ fontSize: '32px', fontWeight: 800, color: 'var(--color-text-primary)' }}>
-                {incident.signalCount}
+                {incident.signalCount || incident.complaintCount || 1}
               </div>
               <span style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: 600 }}>
-                {incident.formalComplaintsCount} Formal + {incident.citizenObservationsCount} Observations
+                {incident.formalComplaintsCount || incident.complaintCount || 1} Formal + {incident.citizenObservationsCount || 0} Observations
               </span>
             </div>
           </div>
@@ -386,6 +403,146 @@ export default function CivicIncidentDetail() {
             onSelectAction={handleSelectSimAction}
             incidentId={incident.id}
           />
+        </div>
+
+        {/* Section 11B: Closed-Loop Citizen Verification & Audit */}
+        <div style={{
+          background: '#FFFFFF',
+          borderRadius: 'var(--radius-xl)',
+          border: '1px solid var(--color-border-subtle)',
+          padding: '24px 28px',
+          boxShadow: 'var(--shadow-card)',
+          marginBottom: '28px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#ECFDF5', color: '#065F46', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <CheckCircle2 style={{ width: '20px', height: '20px' }} />
+              </div>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', letterSpacing: '0.05em' }}>
+                  Section 20 Protocol
+                </span>
+                <h3 style={{ fontSize: '20px', color: 'var(--color-text-primary)' }}>
+                  Closed-Loop Citizen Verification & Physical Audit
+                </h3>
+              </div>
+            </div>
+
+            <span style={{
+              fontSize: '12px',
+              fontWeight: 700,
+              padding: '4px 12px',
+              borderRadius: 'var(--radius-full)',
+              background: incident.verificationStatus === 'VERIFIED' ? '#ECFDF5' : incident.verificationStatus === 'REOPENED' ? '#FEF2F2' : '#FFFBEB',
+              color: incident.verificationStatus === 'VERIFIED' ? '#065F46' : incident.verificationStatus === 'REOPENED' ? '#DC2626' : '#D97706',
+              border: '1px solid currentColor'
+            }}>
+              ● Status: {incident.verificationStatus || 'PENDING_FIELD_WORK'} ({incident.status})
+            </span>
+          </div>
+
+          <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '18px' }}>
+            A civic incident cannot be marked officially resolved by administrative closure alone. Municipal resolution requires ground audit confirmation and citizen verification.
+          </p>
+
+          <div style={{
+            background: '#F8FAFC',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--color-border-subtle)',
+            padding: '16px',
+            marginBottom: '16px'
+          }}>
+            <label style={{ fontSize: '12px', fontWeight: 700, display: 'block', marginBottom: '6px', color: 'var(--color-text-primary)' }}>
+              Citizen / Field Inspector Observation Notes:
+            </label>
+            <textarea
+              value={verificationNotes}
+              onChange={(e) => setVerificationNotes(e.target.value)}
+              placeholder="e.g. Ground culvert inspected — stormwater drained completely, road traffic restored without waterlogging."
+              rows={2}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-border-medium)',
+                fontSize: '13px',
+                marginBottom: '12px'
+              }}
+            />
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '10px' }}>
+              <button
+                type="button"
+                disabled={verificationSubmitting}
+                onClick={() => handleVerify(false)}
+                style={{
+                  height: '38px',
+                  padding: '0 18px',
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  background: '#FFFFFF',
+                  color: '#DC2626',
+                  border: '1.5px solid #F87171',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <X style={{ width: '14px', height: '14px' }} />
+                <span>Issue Persists (Reopen Incident)</span>
+              </button>
+
+              <button
+                type="button"
+                disabled={verificationSubmitting}
+                onClick={() => handleVerify(true)}
+                className="btn-primary"
+                style={{
+                  height: '38px',
+                  padding: '0 20px',
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: '13px',
+                  cursor: 'pointer'
+                }}
+              >
+                <Check style={{ width: '15px', height: '15px' }} />
+                <span>Verify Ground Resolution</span>
+              </button>
+            </div>
+          </div>
+
+          {verificationMessage && (
+            <div style={{
+              padding: '10px 14px',
+              borderRadius: 'var(--radius-md)',
+              background: verificationMessage.includes('verified') ? '#ECFDF5' : '#FEF2F2',
+              color: verificationMessage.includes('verified') ? '#065F46' : '#991B1B',
+              fontSize: '13px',
+              fontWeight: 600
+            }}>
+              {verificationMessage}
+            </div>
+          )}
+
+          {/* Verification Audit Trail */}
+          {incident.verificationAudit && incident.verificationAudit.length > 0 && (
+            <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--color-divider)' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '8px' }}>
+                Audit Register of Verification Submissions:
+              </span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {incident.verificationAudit.map((va, i) => (
+                  <div key={i} style={{ padding: '8px 12px', borderRadius: 'var(--radius-sm)', background: '#F8FAFC', border: '1px solid var(--color-border-subtle)', fontSize: '12px' }}>
+                    <strong>{va.result === 'VERIFIED' ? '✓ Verified by Citizen' : '⚠ Issue Flagged by Citizen'}: {va.verifiedBy}</strong> — <span style={{ color: 'var(--color-text-muted)' }}>{va.verifiedAt}</span>
+                    {va.notes && <div style={{ color: 'var(--color-text-secondary)', marginTop: '2px' }}>"{va.notes}"</div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Section 12: Human Decision Recording Workspace */}

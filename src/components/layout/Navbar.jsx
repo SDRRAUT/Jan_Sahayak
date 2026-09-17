@@ -15,7 +15,9 @@ import {
   Search,
   CheckCircle2,
   ChevronDown,
-  Sparkles
+  Sparkles,
+  Plus,
+  MapPin
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
@@ -131,13 +133,33 @@ export default function Navbar() {
     }
   };
 
+  const getHomeLink = () => {
+    if (!user) return '/';
+    if (role === 'citizen') return '/citizen';
+    if (role === 'officer') return '/officer';
+    if (role === 'dept_admin') return '/admin/department';
+    if (role === 'super_admin') return '/admin/super';
+    return '/';
+  };
+
+  // Filter notifications strictly relevant to active role/user
+  const relevantNotifications = notifications.filter(n => {
+    if (!user) return false;
+    if (user.role === 'super_admin') return true;
+    if (n.userId && n.userId === user.id) return true;
+    if (n.userRole && n.userRole === user.role) return true;
+    if (user.role === 'dept_admin' && n.userRole === 'officer') return true;
+    return false;
+  });
+  const relevantUnreadCount = relevantNotifications.filter(n => !n.read).length;
+
   return (
     <>
       {/* Full-width docked Civic Header */}
       <header className={`site-header ${isScrolled ? 'scrolled' : ''}`}>
         <div className="site-header-inner">
           {/* Brand Logo: JanSahayak */}
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', flexShrink: 0 }}>
+          <Link to={getHomeLink()} style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', flexShrink: 0 }}>
             <div style={{
               width: '40px',
               height: '40px',
@@ -171,79 +193,169 @@ export default function Navbar() {
                   letterSpacing: '0.04em'
                 }}>
                   <span className="status-dot active" style={{ width: '5px', height: '5px' }} />
-                  LIVE
+                  {role ? role.toUpperCase().replace('_', ' ') : 'CIVIC'}
                 </span>
               </div>
               <span style={{ fontSize: '9.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-primary)' }}>
-                Civic Intelligence Platform
+                Civic Redressal Platform
               </span>
             </div>
           </Link>
 
-          {/* Primary Navigation Links (Desktop) */}
+          {/* Primary Navigation Links (Desktop - Role Isolated) */}
           <nav className="nav-desktop-links" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Link
-              to="/"
-              className={`site-nav-link ${location.pathname === '/' ? 'active' : ''}`}
-            >
-              Overview
-            </Link>
+            {/* Citizen View */}
+            {role === 'citizen' && (
+              <>
+                <Link
+                  to="/citizen"
+                  className={`site-nav-link ${location.pathname === '/citizen' ? 'active' : ''}`}
+                >
+                  My Grievances
+                </Link>
+                <Link
+                  to="/citizen/submit"
+                  className={`site-nav-link ${location.pathname === '/citizen/submit' ? 'active' : ''}`}
+                >
+                  File Grievance
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => scrollToSection('how-it-works')}
+                  className="site-nav-link nav-link-secondary"
+                >
+                  How it Works
+                </button>
+              </>
+            )}
 
-            <Link
-              to="/intelligence"
-              className={`site-nav-link ${location.pathname.startsWith('/intelligence') ? 'active' : ''}`}
-              style={{
-                position: 'relative',
-                color: location.pathname.startsWith('/intelligence') ? '#4338CA' : undefined,
-                background: location.pathname.startsWith('/intelligence') ? '#EEF2FF' : undefined,
-                fontWeight: location.pathname.startsWith('/intelligence') ? 700 : 500
-              }}
-            >
-              <Sparkles style={{ width: '13px', height: '13px', color: '#4F46E5', flexShrink: 0 }} />
-              <span>Civic Intelligence</span>
-              <span style={{
-                fontSize: '9px',
-                padding: '1px 5px',
-                borderRadius: '9999px',
-                background: '#4F46E5',
-                color: '#FFFFFF',
-                fontWeight: 700,
-                letterSpacing: '0.04em',
-                marginLeft: '2px',
-                lineHeight: 1.2
-              }}>
-                NEW
-              </span>
-            </Link>
+            {/* Field Officer View */}
+            {role === 'officer' && (
+              <>
+                <Link
+                  to="/officer"
+                  className={`site-nav-link ${location.pathname.startsWith('/officer') ? 'active' : ''}`}
+                >
+                  Triage Workspace
+                </Link>
+                <Link
+                  to="/admin"
+                  className={`site-nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
+                >
+                  Ward Heatmap
+                </Link>
+                <Link
+                  to="/intelligence"
+                  className={`site-nav-link ${location.pathname.startsWith('/intelligence') ? 'active' : ''}`}
+                  style={{
+                    position: 'relative',
+                    color: location.pathname.startsWith('/intelligence') ? '#4338CA' : undefined,
+                    background: location.pathname.startsWith('/intelligence') ? '#EEF2FF' : undefined,
+                    fontWeight: location.pathname.startsWith('/intelligence') ? 700 : 500
+                  }}
+                >
+                  <Sparkles style={{ width: '13px', height: '13px', color: '#4F46E5', flexShrink: 0 }} />
+                  <span>Civic Intelligence</span>
+                </Link>
+              </>
+            )}
 
-            <button
-              type="button"
-              onClick={() => scrollToSection('how-it-works')}
-              className="site-nav-link nav-link-secondary"
-            >
-              How it Works
-            </button>
+            {/* Dept Admin View */}
+            {role === 'dept_admin' && (
+              <>
+                <Link
+                  to="/admin/department"
+                  className={`site-nav-link ${location.pathname === '/admin/department' ? 'active' : ''}`}
+                >
+                  Department Console
+                </Link>
+                <Link
+                  to="/officer"
+                  className={`site-nav-link ${location.pathname.startsWith('/officer') ? 'active' : ''}`}
+                >
+                  Officer Queue
+                </Link>
+                <Link
+                  to="/admin"
+                  className={`site-nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
+                >
+                  Geospatial Heatmap
+                </Link>
+                <Link
+                  to="/intelligence"
+                  className={`site-nav-link ${location.pathname.startsWith('/intelligence') ? 'active' : ''}`}
+                  style={{
+                    color: location.pathname.startsWith('/intelligence') ? '#4338CA' : undefined,
+                    background: location.pathname.startsWith('/intelligence') ? '#EEF2FF' : undefined,
+                    fontWeight: location.pathname.startsWith('/intelligence') ? 700 : 500
+                  }}
+                >
+                  <Sparkles style={{ width: '13px', height: '13px', color: '#4F46E5', flexShrink: 0 }} />
+                  <span>Civic Hotspots</span>
+                </Link>
+              </>
+            )}
 
-            <Link
-              to="/citizen"
-              className={`site-nav-link ${location.pathname.startsWith('/citizen') && !location.pathname.includes('/submit') ? 'active' : ''}`}
-            >
-              For Citizens
-            </Link>
+            {/* Super Admin View */}
+            {role === 'super_admin' && (
+              <>
+                <Link
+                  to="/admin/super"
+                  className={`site-nav-link ${location.pathname === '/admin/super' ? 'active' : ''}`}
+                >
+                  Super Admin Console
+                </Link>
+                <Link
+                  to="/admin/department"
+                  className={`site-nav-link ${location.pathname === '/admin/department' ? 'active' : ''}`}
+                >
+                  Departments
+                </Link>
+                <Link
+                  to="/officer"
+                  className={`site-nav-link ${location.pathname.startsWith('/officer') ? 'active' : ''}`}
+                >
+                  Officers
+                </Link>
+                <Link
+                  to="/admin"
+                  className={`site-nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
+                >
+                  Heatmap
+                </Link>
+                <Link
+                  to="/intelligence"
+                  className={`site-nav-link ${location.pathname.startsWith('/intelligence') ? 'active' : ''}`}
+                >
+                  Intelligence
+                </Link>
+              </>
+            )}
 
-            <Link
-              to="/officer"
-              className={`site-nav-link ${location.pathname.startsWith('/officer') ? 'active' : ''}`}
-            >
-              For Authorities
-            </Link>
-
-            <Link
-              to="/impact"
-              className={`site-nav-link nav-link-secondary ${location.pathname === '/impact' ? 'active' : ''}`}
-            >
-              Impact
-            </Link>
+            {/* Guest View */}
+            {!user && (
+              <>
+                <Link
+                  to="/"
+                  className={`site-nav-link ${location.pathname === '/' ? 'active' : ''}`}
+                >
+                  Overview
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => scrollToSection('how-it-works')}
+                  className="site-nav-link nav-link-secondary"
+                >
+                  How it Works
+                </button>
+                <Link
+                  to="/impact"
+                  className={`site-nav-link nav-link-secondary ${location.pathname === '/impact' ? 'active' : ''}`}
+                >
+                  Impact
+                </Link>
+              </>
+            )}
           </nav>
 
           {/* Right Action Cluster */}
@@ -274,30 +386,110 @@ export default function Navbar() {
               <span>Track Ticket</span>
             </button>
 
-            {/* Action 2: Report a Problem (Primary CTA) */}
-            <Link
-              to="/citizen/submit"
-              className="header-report-btn"
-              style={{
-                height: '38px',
-                fontSize: '13px',
-                fontWeight: 600,
-                padding: '0 16px',
-                borderRadius: 'var(--radius-full)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: 'linear-gradient(135deg, #0E5E3A 0%, #0A472C 100%)',
-                color: '#FFFFFF',
-                boxShadow: '0 2px 8px rgba(14, 94, 58, 0.28)',
-                textDecoration: 'none',
-                whiteSpace: 'nowrap',
-                transition: 'all 150ms ease'
-              }}
-            >
-              <span>Report Issue</span>
-              <ArrowRight style={{ width: '13px', height: '13px' }} />
-            </Link>
+            {/* Action 2: Role-Segregated Primary CTA */}
+            {(!user || role === 'citizen') && (
+              <Link
+                to="/citizen/submit"
+                className="header-report-btn"
+                style={{
+                  height: '38px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  padding: '0 16px',
+                  borderRadius: 'var(--radius-full)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'linear-gradient(135deg, #0E5E3A 0%, #0A472C 100%)',
+                  color: '#FFFFFF',
+                  boxShadow: '0 2px 8px rgba(14, 94, 58, 0.28)',
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 150ms ease'
+                }}
+              >
+                <Plus style={{ width: '14px', height: '14px' }} />
+                <span>File Grievance</span>
+              </Link>
+            )}
+
+            {role === 'officer' && (
+              <Link
+                to="/officer"
+                className="header-report-btn"
+                style={{
+                  height: '38px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  padding: '0 16px',
+                  borderRadius: 'var(--radius-full)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                  color: '#FFFFFF',
+                  boxShadow: '0 2px 8px rgba(5, 150, 105, 0.28)',
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 150ms ease'
+                }}
+              >
+                <Briefcase style={{ width: '14px', height: '14px' }} />
+                <span>Triage Queue</span>
+              </Link>
+            )}
+
+            {role === 'dept_admin' && (
+              <Link
+                to="/admin/department"
+                className="header-report-btn"
+                style={{
+                  height: '38px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  padding: '0 16px',
+                  borderRadius: 'var(--radius-full)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
+                  color: '#FFFFFF',
+                  boxShadow: '0 2px 8px rgba(2, 132, 199, 0.28)',
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 150ms ease'
+                }}
+              >
+                <Building2 style={{ width: '14px', height: '14px' }} />
+                <span>Dept Console</span>
+              </Link>
+            )}
+
+            {role === 'super_admin' && (
+              <Link
+                to="/admin/super"
+                className="header-report-btn"
+                style={{
+                  height: '38px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  padding: '0 16px',
+                  borderRadius: 'var(--radius-full)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'linear-gradient(135deg, #4338CA 0%, #312E81 100%)',
+                  color: '#FFFFFF',
+                  boxShadow: '0 2px 8px rgba(67, 56, 202, 0.28)',
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 150ms ease'
+                }}
+              >
+                <ShieldCheck style={{ width: '14px', height: '14px' }} />
+                <span>Admin Console</span>
+              </Link>
+            )}
 
             {/* Notifications Bell */}
             <div ref={notificationRef} style={{ position: 'relative' }}>
@@ -322,7 +514,7 @@ export default function Navbar() {
                 title="Notifications"
               >
                 <Bell style={{ width: '16px', height: '16px' }} />
-                {unreadNotificationCount > 0 && (
+                {relevantUnreadCount > 0 && (
                   <span style={{
                     position: 'absolute',
                     top: '6px',
@@ -358,7 +550,7 @@ export default function Navbar() {
                     <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
                       Activity Notifications
                     </span>
-                    {unreadNotificationCount > 0 && (
+                    {relevantUnreadCount > 0 && (
                       <button
                         type="button"
                         onClick={() => markAllNotificationsAsRead()}
@@ -368,13 +560,13 @@ export default function Navbar() {
                       </button>
                     )}
                   </div>
-                  {notifications.length === 0 ? (
+                  {relevantNotifications.length === 0 ? (
                     <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', textAlign: 'center', padding: '20px 0' }}>
                       No notifications yet.
                     </p>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {notifications.slice(0, 5).map((n) => (
+                      {relevantNotifications.slice(0, 6).map((n) => (
                         <div
                           key={n.id}
                           style={{
@@ -473,6 +665,214 @@ export default function Navbar() {
                         {role?.replace('_', ' ')} • {user.ward || user.department || 'Delhi'}
                       </span>
                     </div>
+
+                    {/* Active Role Workspace */}
+                    <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
+                      Current Workspace:
+                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '8px' }}>
+                      {role === 'citizen' && (
+                        <>
+                          <Link
+                            to="/citizen"
+                            onClick={() => setShowUserMenu(false)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '7px 10px',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '12px',
+                              textDecoration: 'none',
+                              color: 'var(--color-primary)',
+                              background: '#F0FDF4',
+                              border: '1px solid rgba(16, 185, 129, 0.2)',
+                              fontWeight: 600
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <User style={{ width: '14px', height: '14px', color: 'var(--color-primary)' }} />
+                              <span>My Grievance Portal</span>
+                            </div>
+                            <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
+                          </Link>
+                          <Link
+                            to="/citizen/submit"
+                            onClick={() => setShowUserMenu(false)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '7px 10px',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '12px',
+                              textDecoration: 'none',
+                              color: 'var(--color-text-primary)',
+                              background: '#F8FAFC',
+                              border: '1px solid rgba(15, 23, 42, 0.06)'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <Plus style={{ width: '14px', height: '14px', color: 'var(--color-primary)' }} />
+                              <span>File New Grievance</span>
+                            </div>
+                            <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>+</span>
+                          </Link>
+                        </>
+                      )}
+
+                      {role === 'officer' && (
+                        <>
+                          <Link
+                            to="/officer"
+                            onClick={() => setShowUserMenu(false)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '7px 10px',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '12px',
+                              textDecoration: 'none',
+                              color: '#047857',
+                              background: '#ECFDF5',
+                              border: '1px solid rgba(5, 150, 105, 0.2)',
+                              fontWeight: 600
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <Briefcase style={{ width: '14px', height: '14px', color: '#059669' }} />
+                              <span>Officer Triage Workspace</span>
+                            </div>
+                            <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
+                          </Link>
+                          <Link
+                            to="/admin"
+                            onClick={() => setShowUserMenu(false)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '7px 10px',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '12px',
+                              textDecoration: 'none',
+                              color: 'var(--color-text-primary)',
+                              background: '#F8FAFC',
+                              border: '1px solid rgba(15, 23, 42, 0.06)'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <MapPin style={{ width: '14px', height: '14px', color: '#059669' }} />
+                              <span>Ward Heatmap</span>
+                            </div>
+                            <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
+                          </Link>
+                        </>
+                      )}
+
+                      {role === 'dept_admin' && (
+                        <>
+                          <Link
+                            to="/admin/department"
+                            onClick={() => setShowUserMenu(false)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '7px 10px',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '12px',
+                              textDecoration: 'none',
+                              color: '#0369A1',
+                              background: '#F0F9FF',
+                              border: '1px solid rgba(2, 132, 199, 0.2)',
+                              fontWeight: 600
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <Building2 style={{ width: '14px', height: '14px', color: '#0284C7' }} />
+                              <span>Department Console</span>
+                            </div>
+                            <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
+                          </Link>
+                          <Link
+                            to="/officer"
+                            onClick={() => setShowUserMenu(false)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '7px 10px',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '12px',
+                              textDecoration: 'none',
+                              color: 'var(--color-text-primary)',
+                              background: '#F8FAFC',
+                              border: '1px solid rgba(15, 23, 42, 0.06)'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <Briefcase style={{ width: '14px', height: '14px', color: '#0284C7' }} />
+                              <span>Officer Queue</span>
+                            </div>
+                            <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
+                          </Link>
+                        </>
+                      )}
+
+                      {role === 'super_admin' && (
+                        <>
+                          <Link
+                            to="/admin/super"
+                            onClick={() => setShowUserMenu(false)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '7px 10px',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '12px',
+                              textDecoration: 'none',
+                              color: '#4338CA',
+                              background: '#EEF2FF',
+                              border: '1px solid rgba(67, 56, 202, 0.2)',
+                              fontWeight: 600
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <ShieldCheck style={{ width: '14px', height: '14px', color: '#4338CA' }} />
+                              <span>Super Admin Console</span>
+                            </div>
+                            <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
+                          </Link>
+                          <Link
+                            to="/admin/department"
+                            onClick={() => setShowUserMenu(false)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '7px 10px',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '12px',
+                              textDecoration: 'none',
+                              color: 'var(--color-text-primary)',
+                              background: '#F8FAFC',
+                              border: '1px solid rgba(15, 23, 42, 0.06)'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <Building2 style={{ width: '14px', height: '14px', color: '#4338CA' }} />
+                              <span>Department Directory</span>
+                            </div>
+                            <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
+                          </Link>
+                        </>
+                      )}
+                    </div>
+
+                    <div style={{ height: '1px', background: 'var(--color-divider)', margin: '8px 0' }} />
 
                     <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
                       Switch Demo Persona:
@@ -621,89 +1021,283 @@ export default function Navbar() {
             }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <Link
-                to="/"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  padding: '10px 14px',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: location.pathname === '/' ? 'var(--color-primary)' : 'var(--color-text-primary)',
-                  background: location.pathname === '/' ? '#F0FDF4' : '#F8FAFC'
-                }}
-              >
-                Overview
-              </Link>
+              {/* Citizen Mobile Links */}
+              {role === 'citizen' && (
+                <>
+                  <Link
+                    to="/citizen"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname === '/citizen' ? 'var(--color-primary)' : 'var(--color-text-primary)',
+                      background: location.pathname === '/citizen' ? '#F0FDF4' : '#F8FAFC'
+                    }}
+                  >
+                    📋 My Grievances
+                  </Link>
+                  <Link
+                    to="/citizen/submit"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname === '/citizen/submit' ? 'var(--color-primary)' : 'var(--color-text-primary)',
+                      background: location.pathname === '/citizen/submit' ? '#F0FDF4' : '#F8FAFC'
+                    }}
+                  >
+                    ✍️ File Grievance
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => { scrollToSection('how-it-works'); setMobileMenuOpen(false); }}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      color: 'var(--color-text-secondary)',
+                      background: 'transparent',
+                      textAlign: 'left'
+                    }}
+                  >
+                    How it Works
+                  </button>
+                </>
+              )}
 
-              <Link
-                to="/intelligence"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  padding: '10px 14px',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '14px',
-                  fontWeight: 700,
-                  color: '#4338CA',
-                  background: '#EEF2FF',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Sparkles style={{ width: '16px', height: '16px', color: '#4F46E5' }} />
-                  <span>Civic Intelligence Dashboard</span>
-                </div>
-                <span style={{ fontSize: '10px', background: '#4F46E5', color: '#FFFFFF', padding: '2px 6px', borderRadius: '9999px' }}>
-                  NEW
-                </span>
-              </Link>
+              {/* Officer Mobile Links */}
+              {role === 'officer' && (
+                <>
+                  <Link
+                    to="/officer"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname.startsWith('/officer') ? '#059669' : 'var(--color-text-primary)',
+                      background: location.pathname.startsWith('/officer') ? '#ECFDF5' : '#F8FAFC'
+                    }}
+                  >
+                    📥 Triage Workspace
+                  </Link>
+                  <Link
+                    to="/admin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname === '/admin' ? '#059669' : 'var(--color-text-primary)',
+                      background: location.pathname === '/admin' ? '#ECFDF5' : '#F8FAFC'
+                    }}
+                  >
+                    🗺️ Ward Heatmap
+                  </Link>
+                  <Link
+                    to="/intelligence"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 700,
+                      color: '#4338CA',
+                      background: '#EEF2FF',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <Sparkles style={{ width: '16px', height: '16px', color: '#4F46E5' }} />
+                    <span>Civic Intelligence</span>
+                  </Link>
+                </>
+              )}
 
-              <Link
-                to="/citizen"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  padding: '10px 14px',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: location.pathname.startsWith('/citizen') ? 'var(--color-primary)' : 'var(--color-text-primary)',
-                  background: location.pathname.startsWith('/citizen') ? '#F0FDF4' : '#F8FAFC'
-                }}
-              >
-                Citizen Portal
-              </Link>
+              {/* Dept Admin Mobile Links */}
+              {role === 'dept_admin' && (
+                <>
+                  <Link
+                    to="/admin/department"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname === '/admin/department' ? '#0284C7' : 'var(--color-text-primary)',
+                      background: location.pathname === '/admin/department' ? '#F0F9FF' : '#F8FAFC'
+                    }}
+                  >
+                    🏢 Department Console
+                  </Link>
+                  <Link
+                    to="/officer"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname.startsWith('/officer') ? '#0284C7' : 'var(--color-text-primary)',
+                      background: location.pathname.startsWith('/officer') ? '#F0F9FF' : '#F8FAFC'
+                    }}
+                  >
+                    👥 Officer Workload
+                  </Link>
+                  <Link
+                    to="/admin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname === '/admin' ? '#0284C7' : 'var(--color-text-primary)',
+                      background: location.pathname === '/admin' ? '#F0F9FF' : '#F8FAFC'
+                    }}
+                  >
+                    🗺️ Geospatial Heatmap
+                  </Link>
+                  <Link
+                    to="/intelligence"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 700,
+                      color: '#4338CA',
+                      background: '#EEF2FF',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <Sparkles style={{ width: '16px', height: '16px', color: '#4F46E5' }} />
+                    <span>Civic Hotspots</span>
+                  </Link>
+                </>
+              )}
 
-              <Link
-                to="/officer"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  padding: '10px 14px',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: location.pathname.startsWith('/officer') ? 'var(--color-primary)' : 'var(--color-text-primary)',
-                  background: location.pathname.startsWith('/officer') ? '#F0FDF4' : '#F8FAFC'
-                }}
-              >
-                Officer Console
-              </Link>
+              {/* Super Admin Mobile Links */}
+              {role === 'super_admin' && (
+                <>
+                  <Link
+                    to="/admin/super"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname === '/admin/super' ? '#4338CA' : 'var(--color-text-primary)',
+                      background: location.pathname === '/admin/super' ? '#EEF2FF' : '#F8FAFC'
+                    }}
+                  >
+                    🛡️ Super Admin Console
+                  </Link>
+                  <Link
+                    to="/admin/department"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname === '/admin/department' ? '#4338CA' : 'var(--color-text-primary)',
+                      background: location.pathname === '/admin/department' ? '#EEF2FF' : '#F8FAFC'
+                    }}
+                  >
+                    🏢 Departments
+                  </Link>
+                  <Link
+                    to="/officer"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname.startsWith('/officer') ? '#4338CA' : 'var(--color-text-primary)',
+                      background: location.pathname.startsWith('/officer') ? '#EEF2FF' : '#F8FAFC'
+                    }}
+                  >
+                    👥 Officer Workspaces
+                  </Link>
+                  <Link
+                    to="/admin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname === '/admin' ? '#4338CA' : 'var(--color-text-primary)',
+                      background: location.pathname === '/admin' ? '#EEF2FF' : '#F8FAFC'
+                    }}
+                  >
+                    🗺️ Heatmap
+                  </Link>
+                </>
+              )}
 
-              <Link
-                to="/impact"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  padding: '10px 14px',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: location.pathname === '/impact' ? 'var(--color-primary)' : 'var(--color-text-primary)',
-                  background: location.pathname === '/impact' ? '#F0FDF4' : '#F8FAFC'
-                }}
-              >
-                Impact
-              </Link>
+              {/* Guest Mobile Links */}
+              {!user && (
+                <>
+                  <Link
+                    to="/"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname === '/' ? 'var(--color-primary)' : 'var(--color-text-primary)',
+                      background: location.pathname === '/' ? '#F0FDF4' : '#F8FAFC'
+                    }}
+                  >
+                    Overview
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => { scrollToSection('how-it-works'); setMobileMenuOpen(false); }}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      color: 'var(--color-text-secondary)',
+                      background: 'transparent',
+                      textAlign: 'left'
+                    }}
+                  >
+                    How it Works
+                  </button>
+                  <Link
+                    to="/impact"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname === '/impact' ? 'var(--color-primary)' : 'var(--color-text-primary)',
+                      background: location.pathname === '/impact' ? '#F0FDF4' : '#F8FAFC'
+                    }}
+                  >
+                    Impact
+                  </Link>
+                </>
+              )}
             </div>
 
             <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>

@@ -160,38 +160,74 @@ const SIMULATED_STREAM_POOL = [
 export default function LiveComplaintLinkageSection() {
   const [signals, setSignals] = useState(INITIAL_SIGNALS);
   const [activeSignal, setActiveSignal] = useState(INITIAL_SIGNALS[4]);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [coreIncident, setCoreIncident] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [streamIndex, setStreamIndex] = useState(0);
   const [latestLinkedId, setLatestLinkedId] = useState(null);
   const [filterType, setFilterType] = useState('ALL');
   const canvasRef = useRef(null);
 
-  // Add next simulated complaint
-  const handleAddComplaint = () => {
-    const nextTemplate = SIMULATED_STREAM_POOL[streamIndex % SIMULATED_STREAM_POOL.length];
-    const newId = `SIG-2026-${String(signals.length + 1).padStart(3, '0')}`;
-    const newSignal = {
-      ...nextTemplate,
-      id: newId,
-      time: 'Just now',
-      linkedTo: 'INC-CORE-1'
-    };
+  // Fetch real graph data from server
+  const fetchGraphData = async () => {
+    try {
+      const res = await fetch('/api/intelligence/graph');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.nodes && data.nodes.length > 0) {
+          setSignals(data.nodes);
+          if (!activeSignal || !data.nodes.some(n => n.id === activeSignal.id)) {
+            setActiveSignal(data.nodes[0]);
+          }
+        }
+        if (data.incident) {
+          setCoreIncident(data.incident);
+        }
+      }
+    } catch (e) {
+      console.warn('Could not fetch real graph data, keeping local cache:', e);
+    }
+  };
 
-    setSignals(prev => [newSignal, ...prev]);
-    setActiveSignal(newSignal);
-    setLatestLinkedId(newId);
+  useEffect(() => {
+    fetchGraphData();
+  }, []);
+
+  // Add real simulated complaint through the backend multi-agent pipeline
+  const handleAddComplaint = async () => {
+    const nextTemplate = SIMULATED_STREAM_POOL[streamIndex % SIMULATED_STREAM_POOL.length];
     setStreamIndex(prev => prev + 1);
 
-    // clear link highlight after 3.5s
-    setTimeout(() => {
-      setLatestLinkedId(null);
-    }, 3500);
+    try {
+      const res = await fetch('/api/intelligence/simulate-signal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          citizen: nextTemplate.citizen,
+          channel: nextTemplate.channel,
+          text: nextTemplate.text,
+          ward: nextTemplate.ward || 'Ward 14 (Rohini)',
+          category: nextTemplate.type === 'water' ? 'Water Supply & Contamination' : 'Roads & Infrastructure',
+          lat: 28.7180 + (Math.random() - 0.5) * 0.006,
+          lng: 77.1260 + (Math.random() - 0.5) * 0.006
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.complaint) {
+          setLatestLinkedId(data.complaint.id);
+          setTimeout(() => setLatestLinkedId(null), 3500);
+        }
+        await fetchGraphData();
+      }
+    } catch (e) {
+      console.error('Error simulating complaint:', e);
+    }
   };
 
   // Reset to initial state
-  const handleReset = () => {
-    setSignals(INITIAL_SIGNALS);
-    setActiveSignal(INITIAL_SIGNALS[4]);
+  const handleReset = async () => {
+    await fetchGraphData();
     setLatestLinkedId(null);
     setStreamIndex(0);
   };
@@ -200,14 +236,11 @@ export default function LiveComplaintLinkageSection() {
   useEffect(() => {
     if (!isPlaying) return;
     const interval = setInterval(() => {
-      if (signals.length < 16) {
-        handleAddComplaint();
-      } else {
-        setIsPlaying(false);
-      }
+      handleAddComplaint();
     }, 4500);
     return () => clearInterval(interval);
-  }, [isPlaying, signals.length, streamIndex]);
+  }, [isPlaying, streamIndex]);
+
 
   // Interactive Canvas Node Linkage Animation
   useEffect(() => {
@@ -552,8 +585,12 @@ export default function LiveComplaintLinkageSection() {
             Cluster Target Incident
           </span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: '2px' }}>
-            <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--color-text-primary)' }}>INC-2026-DEL-01</span>
-            <span style={{ fontSize: '10.5px', color: '#B45309', background: '#FEF3C7', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>GROWING</span>
+            <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--color-text-primary)' }}>
+              {coreIncident?.id || 'INC-2026-DEL-01'}
+            </span>
+            <span style={{ fontSize: '10.5px', color: '#B45309', background: '#FEF3C7', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
+              {coreIncident?.stage || 'GROWING'}
+            </span>
           </div>
         </div>
 
@@ -562,7 +599,9 @@ export default function LiveComplaintLinkageSection() {
             Mean DNA Match Score
           </span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: '2px' }}>
-            <span style={{ fontSize: '22px', fontWeight: 800, color: '#0E5E3A' }}>95.4%</span>
+            <span style={{ fontSize: '22px', fontWeight: 800, color: '#0E5E3A' }}>
+              {signals.length > 0 ? Math.round(signals.reduce((acc, s) => acc + (s.matchScore || 92), 0) / signals.length) : 95}%
+            </span>
             <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>spatial & symptom fit</span>
           </div>
         </div>
@@ -571,10 +610,19 @@ export default function LiveComplaintLinkageSection() {
           <span style={{ fontSize: '10.5px', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', display: 'block' }}>
             Inter-Agency Interlock
           </span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#0284C7', background: '#E0F2FE', padding: '2px 6px', borderRadius: '4px' }}>DJB</span>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#0E5E3A', background: '#E8F7F0', padding: '2px 6px', borderRadius: '4px' }}>PWD</span>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#92400E', background: '#FEF3C7', padding: '2px 6px', borderRadius: '4px' }}>MCD</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', flexWrap: 'wrap' }}>
+            {(coreIncident?.participatingDepartments || ['Delhi Jal Board (DJB)', 'Public Works Department (PWD)']).map((dept, i) => (
+              <span key={dept} style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                color: i === 0 ? '#0284C7' : i === 1 ? '#0E5E3A' : '#92400E',
+                background: i === 0 ? '#E0F2FE' : i === 1 ? '#E8F7F0' : '#FEF3C7',
+                padding: '2px 6px',
+                borderRadius: '4px'
+              }}>
+                {dept.split(' ')[0]}
+              </span>
+            ))}
           </div>
         </div>
       </div>

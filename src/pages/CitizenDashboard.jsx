@@ -130,20 +130,20 @@ export default function CitizenDashboard() {
               </div>
             </div>
 
-            <Link
-              to={`/intelligence/incidents/${activeWardIncident.id}`}
-              style={{
-                fontSize: '12px',
-                fontWeight: 700,
-                color: 'var(--color-primary)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px'
-              }}
-            >
-              <span>View Civic Incident</span>
-              <ArrowRight style={{ width: '13px', height: '13px' }} />
-            </Link>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-full)',
+              background: '#DCFCE7',
+              color: '#166534',
+              fontSize: '11.5px',
+              fontWeight: 700
+            }}>
+              <CheckCircle2 style={{ width: '13px', height: '13px' }} />
+              <span>Coordinated Dispatch Mobilized</span>
+            </div>
           </div>
         )}
 

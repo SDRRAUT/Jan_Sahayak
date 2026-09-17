@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Sparkles, Heart, Globe, ArrowUpRight } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
 
 export default function Footer() {
+  const { user, role } = useApp();
   return (
     <footer
       style={{
@@ -78,30 +80,81 @@ export default function Footer() {
               <Link to="/platform" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
                 RAG Resolution Precedents
               </Link>
-              <Link to="/admin" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
-                Root-Cause Cluster Detection
+              <Link to="/impact" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
+                Public Impact
               </Link>
             </div>
           </div>
 
-          {/* Col 2: Stakeholders */}
+          {/* Col 2: Role Portals */}
           <div>
             <h4 style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#FFFFFF', marginBottom: '16px' }}>
-              Portals
+              {role ? `${role.replace('_', ' ').toUpperCase()} PORTAL` : 'PORTALS'}
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '14px', color: 'var(--color-text-inverse-muted)' }}>
-              <Link to="/citizen" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
-                Citizen Submission Portal
-              </Link>
-              <Link to="/officer" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
-                Officer Triage Workspace
-              </Link>
-              <Link to="/admin" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
-                Municipal Heatmap & SLA
-              </Link>
-              <Link to="/impact" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
-                Public Impact Dashboard
-              </Link>
+              {role === 'citizen' && (
+                <>
+                  <Link to="/citizen" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
+                    My Grievances
+                  </Link>
+                  <Link to="/citizen/submit" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
+                    File New Complaint
+                  </Link>
+                </>
+              )}
+
+              {role === 'officer' && (
+                <>
+                  <Link to="/officer" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
+                    Officer Triage Workspace
+                  </Link>
+                  <Link to="/admin" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
+                    Ward Heatmap
+                  </Link>
+                  <Link to="/intelligence" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
+                    Civic Intelligence
+                  </Link>
+                </>
+              )}
+
+              {role === 'dept_admin' && (
+                <>
+                  <Link to="/admin/department" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
+                    Department Health & SLA
+                  </Link>
+                  <Link to="/officer" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
+                    Officer Rosters
+                  </Link>
+                  <Link to="/admin" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
+                    Geospatial Heatmap
+                  </Link>
+                </>
+              )}
+
+              {role === 'super_admin' && (
+                <>
+                  <Link to="/admin/super" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
+                    Super Admin Console
+                  </Link>
+                  <Link to="/admin/department" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
+                    Departments Directory
+                  </Link>
+                  <Link to="/officer" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
+                    Officer Workspace
+                  </Link>
+                </>
+              )}
+
+              {!user && (
+                <>
+                  <Link to="/citizen/submit" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
+                    Citizen Grievance Portal
+                  </Link>
+                  <Link to="/login" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
+                    Official Login
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 

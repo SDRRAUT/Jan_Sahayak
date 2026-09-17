@@ -2,7 +2,11 @@ import React from 'react';
 import { History, BookOpen, AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function CivicMemoryCard({ memories = [] }) {
-  const records = memories.length > 0 ? memories : [
+  const records = Array.isArray(memories) && memories.length > 0
+    ? memories
+    : (memories?.previous_incidents && memories.previous_incidents.length > 0)
+      ? memories.previous_incidents
+      : [
     {
       year: "2025",
       date: "14 June 2025",
@@ -22,6 +26,8 @@ export default function CivicMemoryCard({ memories = [] }) {
       lessonsLearned: "Patching road surface without replacing defective pipe guarantees structural pavement collapse."
     }
   ];
+
+  const warrantyStatus = memories?.warranty_info || 'Warranty information unavailable';
 
   return (
     <div style={{
@@ -140,6 +146,32 @@ export default function CivicMemoryCard({ memories = [] }) {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Contractor / Asset Warranty Registry Status */}
+      <div style={{
+        marginTop: '16px',
+        paddingTop: '12px',
+        borderTop: '1px solid var(--color-divider)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '8px',
+        fontSize: '11px',
+        color: 'var(--color-text-muted)'
+      }}>
+        <span>Official Contractor / Asset Warranty Registry:</span>
+        <span style={{
+          fontWeight: 600,
+          padding: '2px 8px',
+          borderRadius: 'var(--radius-sm)',
+          background: warrantyStatus.includes('Active') ? '#ECFDF5' : '#F8FAFC',
+          color: warrantyStatus.includes('Active') ? '#065F46' : 'var(--color-text-secondary)',
+          border: '1px solid var(--color-border-subtle)'
+        }}>
+          {warrantyStatus}
+        </span>
       </div>
     </div>
   );

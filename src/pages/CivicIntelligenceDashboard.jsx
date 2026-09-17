@@ -273,7 +273,7 @@ export default function CivicIntelligenceDashboard() {
                     <div style={{ textAlign: 'right' }}>
                       <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', display: 'block' }}>Connected Signals</span>
                       <strong style={{ fontSize: '16px', color: 'var(--color-text-primary)' }}>
-                        {incident.signalCount} <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 400 }}>({incident.formalComplaintsCount} Formal + {incident.citizenObservationsCount} Signals)</span>
+                        {incident.signalCount || incident.complaintCount || 1} <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 400 }}>({incident.formalComplaintsCount || incident.complaintCount || 1} Formal + {incident.citizenObservationsCount || 0} Signals)</span>
                       </strong>
                     </div>
 
@@ -329,9 +329,13 @@ export default function CivicIntelligenceDashboard() {
                   gap: '12px',
                   fontSize: '12px'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     <span style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>Departments:</span>
-                    {incident.departments.map((d) => (
+                    {(incident.departments || (incident.participatingDepartments || [incident.leadDepartment || 'MCD']).map(d => ({
+                      name: typeof d === 'string' ? d : (d?.name || 'Department'),
+                      cases: incident.complaintCount || 1,
+                      lead: typeof d === 'string' ? d.includes(incident.leadDepartment?.split(' ')[0] || 'DJB') : !!d?.lead
+                    }))).map((d) => (
                       <span
                         key={d.name}
                         style={{
@@ -344,13 +348,13 @@ export default function CivicIntelligenceDashboard() {
                           border: d.lead ? '1px solid #A7F3D0' : '1px solid #E2E8F0'
                         }}
                       >
-                        {d.name.split('(')[0].trim()} ({d.cases}) {d.lead ? '★ Lead' : ''}
+                        {d.name.split('(')[0].trim()} ({d.cases || 1}) {d.lead ? '★ Lead' : ''}
                       </span>
                     ))}
                   </div>
 
                   <div style={{ color: 'var(--color-text-muted)' }}>
-                    First Detected: <strong>{incident.firstDetectedAt}</strong> • Status: <strong style={{ color: 'var(--color-primary)' }}>{incident.status}</strong>
+                    First Detected: <strong>{(incident.firstDetectedAt && !incident.firstDetectedAt.includes('Invalid')) ? incident.firstDetectedAt : 'Recently observed'}</strong> • Status: <strong style={{ color: 'var(--color-primary)' }}>{incident.status}</strong>
                   </div>
                 </div>
               </div>

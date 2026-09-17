@@ -4,6 +4,8 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
+import { useApp } from './context/AppContext';
+
 import Home from './pages/Home';
 import Platform from './pages/Platform';
 import Impact from './pages/Impact';
@@ -19,6 +21,18 @@ import AdminHeatmap from './pages/AdminHeatmap';
 import DeptAdmin from './pages/DeptAdmin';
 import SuperAdmin from './pages/SuperAdmin';
 
+function RoleHome() {
+  const { user, token } = useApp();
+  if (!token || !user) {
+    return <Home />;
+  }
+  if (user.role === 'citizen') return <Navigate to="/citizen" replace />;
+  if (user.role === 'officer') return <Navigate to="/officer" replace />;
+  if (user.role === 'dept_admin') return <Navigate to="/admin/department" replace />;
+  if (user.role === 'super_admin') return <Navigate to="/admin/super" replace />;
+  return <Home />;
+}
+
 export default function App() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -28,14 +42,29 @@ export default function App() {
       {/* Main Content Viewport */}
       <main style={{ flex: 1 }}>
         <Routes>
-          {/* Public Showcase & Information */}
-          <Route path="/" element={<Home />} />
+          {/* Public Showcase & Role-Based Root */}
+          <Route path="/" element={<RoleHome />} />
+          <Route path="/overview" element={<Home />} />
           <Route path="/platform" element={<Platform />} />
           <Route path="/impact" element={<Impact />} />
 
-          {/* Civic Intelligence & Problem Discovery Suite */}
-          <Route path="/intelligence" element={<CivicIntelligenceDashboard />} />
-          <Route path="/intelligence/incidents/:id" element={<CivicIncidentDetail />} />
+          {/* Civic Intelligence & Problem Discovery Suite (Authorities Only) */}
+          <Route 
+            path="/intelligence" 
+            element={
+              <ProtectedRoute allowedRoles={['officer', 'dept_admin', 'super_admin']}>
+                <CivicIntelligenceDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/intelligence/incidents/:id" 
+            element={
+              <ProtectedRoute allowedRoles={['officer', 'dept_admin', 'super_admin']}>
+                <CivicIncidentDetail />
+              </ProtectedRoute>
+            } 
+          />
           
           {/* Authentication Gateway */}
           <Route path="/login" element={<Login />} />
@@ -58,7 +87,14 @@ export default function App() {
               </ProtectedRoute>
             } 
           />
-          <Route path="/citizen/complaints/:id" element={<CitizenDetail />} />
+          <Route 
+            path="/citizen/complaints/:id" 
+            element={
+              <ProtectedRoute allowedRoles={['citizen', 'super_admin']}>
+                <CitizenDetail />
+              </ProtectedRoute>
+            } 
+          />
 
           {/* Government Officer Routes (Role: officer, dept_admin, super_admin) */}
           <Route 
