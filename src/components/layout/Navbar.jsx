@@ -243,46 +243,37 @@ export default function Navbar() {
       <header className={`site-header ${isScrolled ? 'scrolled' : ''}`}>
         <div className="site-header-inner">
           {/* Brand Logo: JanSahayak */}
-          <Link to={getHomeLink()} style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', flexShrink: 0 }}>
+          <Link to={getHomeLink()} style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', flexShrink: 0 }}>
             <img 
               src="/logo.png" 
               alt="JanSahayak Logo" 
               style={{
-                height: '44px',
+                height: '32px',
                 width: 'auto',
                 objectFit: 'contain',
-                filter: 'drop-shadow(0 2px 8px rgba(14, 94, 58, 0.2))',
                 flexShrink: 0
               }} 
             />
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontWeight: 800, fontSize: '18px', letterSpacing: '-0.03em', color: 'var(--color-text-primary)' }}>
-                  JanSahayak
-                </span>
-                {user && (
-                  <span style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    padding: '1.5px 7px',
-                    background: '#ECFDF5',
-                    border: '1px solid rgba(16, 185, 129, 0.3)',
-                    color: '#065F46',
-                    borderRadius: '9999px',
-                    fontSize: '9.5px',
-                    fontWeight: 700,
-                    letterSpacing: '0.04em'
-                  }}>
-                    <span className="status-dot active" style={{ width: '5px', height: '5px' }} />
-                    {getRoleDisplayLabel(user.role).toUpperCase()}
-                  </span>
-                )}
-              </div>
-              <span style={{ fontSize: '9.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-primary)' }}>
-                Civic Redressal Platform
+            <span style={{ fontWeight: 800, fontSize: '16.5px', letterSpacing: '-0.02em', color: '#0F172A' }}>
+              JanSahayak
+            </span>
+            {user && (
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '2px 8px',
+                background: '#F1F5F9',
+                color: '#475569',
+                borderRadius: '9999px',
+                fontSize: '10px',
+                fontWeight: 600,
+                letterSpacing: '0.02em'
+              }}>
+                <span className="status-dot active" style={{ width: '5px', height: '5px' }} />
+                {getRoleDisplayLabel(user.role)}
               </span>
-            </div>
+            )}
           </Link>
 
           {/* Primary Navigation Links (Desktop - Role Isolated) */}
@@ -954,24 +945,23 @@ export default function Navbar() {
                 type="button"
                 onClick={() => setShowLoginModal(true)}
                 style={{
-                  fontSize: '13px',
-                  fontWeight: 700,
+                  fontSize: '13.5px',
+                  fontWeight: 600,
                   color: '#FFFFFF',
-                  padding: '8px 20px',
-                  borderRadius: 'var(--radius-full)',
+                  padding: '7px 22px',
+                  borderRadius: '9999px',
                   border: 'none',
-                  background: 'linear-gradient(135deg, #0E5E3A 0%, #2563EB 100%)',
-                  boxShadow: '0 3px 12px rgba(14, 94, 58, 0.35)',
-                  display: 'flex',
+                  background: '#2563EB',
+                  boxShadow: '0 2px 8px rgba(37, 99, 235, 0.28)',
+                  display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
                   cursor: 'pointer',
                   transition: 'all 150ms ease',
-                  letterSpacing: '0.01em'
+                  letterSpacing: '-0.01em'
                 }}
               >
-                <LogIn style={{ width: '14px', height: '14px' }} />
-                <span>Login</span>
+                <span>Sign in</span>
               </button>
             )}
 
@@ -981,19 +971,20 @@ export default function Navbar() {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="nav-mobile-toggle"
               style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: 'var(--radius-md)',
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
                 display: 'none',
                 alignItems: 'center',
                 justifyContent: 'center',
                 background: mobileMenuOpen ? '#F1F5F9' : '#F8FAFC',
-                border: '1px solid var(--color-border-subtle)',
-                color: 'var(--color-text-primary)'
+                border: '1px solid rgba(15, 23, 42, 0.10)',
+                color: 'var(--color-text-primary)',
+                cursor: 'pointer'
               }}
               aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? <X style={{ width: '20px', height: '20px' }} /> : <Menu style={{ width: '20px', height: '20px' }} />}
+              {mobileMenuOpen ? <X style={{ width: '18px', height: '18px' }} /> : <Menu style={{ width: '18px', height: '18px' }} />}
             </button>
           </div>
         </div>
@@ -1003,13 +994,14 @@ export default function Navbar() {
           <div
             style={{
               position: 'absolute',
-              top: '68px',
-              left: 0,
-              right: 0,
+              top: '64px',
+              left: '4px',
+              right: '4px',
               background: '#FFFFFF',
-              borderBottom: '1px solid var(--color-divider)',
-              boxShadow: '0 12px 24px rgba(15, 23, 42, 0.08)',
-              padding: '20px',
+              borderRadius: '20px',
+              border: '1px solid rgba(15, 23, 42, 0.08)',
+              boxShadow: '0 16px 40px rgba(15, 23, 42, 0.12)',
+              padding: '18px',
               display: 'flex',
               flexDirection: 'column',
               gap: '12px',
