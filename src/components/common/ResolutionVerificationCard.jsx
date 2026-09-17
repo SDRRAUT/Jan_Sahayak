@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
-import { CheckCircle2, XCircle, Star, ShieldCheck, Camera, ArrowRight, MessageSquare, AlertCircle } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { CheckCircle2, XCircle, AlertTriangle, ShieldCheck, Camera, Star, AlertCircle, Upload, Check } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 /**
  * Closed Loop Citizen Verification Card
  * Closes the municipal loop: Government Action -> Citizen Verification -> System Learning
+ * Offers 3 distinct Citizen verification states:
+ * 1. 😊 Yes, fixed
+ * 2. 😐 Partially fixed
+ * 3. 😟 Still a problem
  */
 export default function ResolutionVerificationCard({
   grievance,
@@ -12,37 +16,81 @@ export default function ResolutionVerificationCard({
   onReopenDispute,
   onSubmitFeedback
 }) {
-  const [verifiedStatus, setVerifiedStatus] = useState(null); // 'FIXED' | 'DISPUTED'
-  const [rating, setRating] = useState(5);
+  const [selectedChoice, setSelectedChoice] = useState(null); // 'FIXED' | 'PARTIAL' | 'UNRESOLVED'
   const [comment, setComment] = useState('');
-  const [disputeReason, setDisputeReason] = useState('');
+  const [evidencePhoto, setEvidencePhoto] = useState(null);
+  const [rating, setRating] = useState(5);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const fileInputRef = useRef(null);
 
-  const handleFixed = async () => {
-    setVerifiedStatus('FIXED');
-    if (onVerifyFixed) {
-      await onVerifyFixed(grievance.id);
+  // If this grievance was already verified, display the historical verification record
+  if (grievance?.citizenVerification || grievance?.status === 'RESOLVED_CONFIRMED') {
+    const record = grievance.citizenVerification || {};
+    return (
+      <div className="card" style={{ padding: '24px', border: '1px solid #10B981', background: '#F0FDF4' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+          <CheckCircle2 style={{ width: '20px', height: '20px', color: '#059669' }} />
+          <div>
+            <strong style={{ fontSize: '15px', color: '#065F46', display: 'block' }}>
+              Citizen Resolution Confirmed & Logged to Civic Memory
+            </strong>
+            <span style={{ fontSize: '12px', color: '#047857' }}>
+              Verified: {record.verifiedAt ? new Date(record.verifiedAt).toLocaleString() : 'Recently'}
+            </span>
+          </div>
+        </div>
+        <p style={{ fontSize: '13px', color: '#065F46', lineHeight: 1.5, marginLeft: '30px' }}>
+          "{record.feedbackText || 'Problem resolved on ground to citizen satisfaction.'}"
+        </p>
+      </div>
+    );
+  }
+
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setEvidencePhoto(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
+  };
+
+  const handleSubmitVerification = async (e) => {
+    e.preventDefault();
+    if (!selectedChoice) return;
+    setIsSubmitting(true);
+
+    const photos = evidencePhoto ? [evidencePhoto] : [];
+
     try {
-      confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-    } catch (e) {}
-  };
-
-  const handleDisputeSubmit = async (e) => {
-    e.preventDefault();
-    if (!disputeReason.trim()) return;
-    if (onReopenDispute) {
-      await onReopenDispute(grievance.id, disputeReason);
+      if (selectedChoice === 'FIXED') {
+        if (onVerifyFixed) {
+          await onVerifyFixed(grievance.id, comment || 'Yes, fully fixed', photos);
+        }
+        if (onSubmitFeedback) {
+          await onSubmitFeedback(grievance.id, rating, comment);
+        }
+        try {
+          confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+        } catch (e) {}
+      } else if (selectedChoice === 'PARTIAL') {
+        if (onReopenDispute) {
+          await onReopenDispute(grievance.id, `[Partially Fixed] ${comment || 'Issue partially resolved but requires follow-up inspection.'}`, photos);
+        }
+      } else if (selectedChoice === 'UNRESOLVED') {
+        if (onReopenDispute) {
+          await onReopenDispute(grievance.id, `[Still a Problem] ${comment || 'Work reported as completed, but problem remains on ground.'}`, photos);
+        }
+      }
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Verification submit error:', err);
+    } finally {
+      setIsSubmitting(false);
     }
-    setSubmitted(true);
-  };
-
-  const handleFeedbackSubmit = async (e) => {
-    e.preventDefault();
-    if (onSubmitFeedback) {
-      await onSubmitFeedback(grievance.id, rating, comment);
-    }
-    setSubmitted(true);
   };
 
   return (
@@ -107,7 +155,7 @@ export default function ResolutionVerificationCard({
           </span>
           <div style={{ minHeight: '80px', borderRadius: 'var(--radius-sm)', background: '#ECFDF5', border: '1px solid #A7F3D0', padding: '10px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <p style={{ fontSize: '12px', color: '#065F46', fontWeight: 500, lineHeight: 1.4 }}>
-              {grievance.resolutionNotes || 'Repair squad replaced fractured 100mm valve clamp and verified normalized water pressure.'}
+              {grievance.resolutionNotes || 'Repair squad completed field inspection and intervention.'}
             </p>
             <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '6px' }}>
               Inspected by: {grievance.officerName || 'Duty Executive Engineer'}
@@ -116,132 +164,212 @@ export default function ResolutionVerificationCard({
         </div>
       </div>
 
-      {/* Decision State */}
-      {!verifiedStatus && !submitted ? (
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            <button
-              type="button"
-              onClick={handleFixed}
-              className="btn-primary"
-              style={{ background: '#10B981', color: '#FFFFFF' }}
-            >
-              <CheckCircle2 style={{ width: '16px', height: '16px' }} />
-              <span>Yes, It's Fixed</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setVerifiedStatus('DISPUTED')}
-              className="btn-secondary"
-              style={{ borderColor: '#EF4444', color: '#991B1B' }}
-            >
-              <XCircle style={{ width: '16px', height: '16px', color: '#EF4444' }} />
-              <span>No, The Problem Remains</span>
-            </button>
-          </div>
-          <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', display: 'block', marginTop: '10px' }}>
-            If unresolved, your case is automatically escalated to the Superintending Engineer.
-          </span>
-        </div>
-      ) : verifiedStatus === 'FIXED' && !submitted ? (
-        /* Citizen 5-Star Rating Form */
-        <form onSubmit={handleFeedbackSubmit} style={{ animation: 'fadeIn 200ms ease-out' }}>
-          <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#ECFDF5', border: '1px solid #A7F3D0', marginBottom: '16px' }}>
-            <strong style={{ fontSize: '14px', color: '#065F46', display: 'block', marginBottom: '6px' }}>
-              ✓ Thank you for confirming resolution!
+      {submitted ? (
+        <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#F0FDF4', border: '1px solid #BBF7D0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <CheckCircle2 style={{ width: '20px', height: '20px', color: '#16A34A' }} />
+          <div>
+            <strong style={{ fontSize: '14px', color: '#166534', display: 'block' }}>
+              Your verification has been recorded in the database.
             </strong>
-            <p style={{ fontSize: '12px', color: '#065F46' }}>
-              How satisfied were you with the speed and communication of the response crew?
-            </p>
+            <span style={{ fontSize: '12px', color: '#15803D' }}>
+              Audit entry created and sent to Civic Officer & Civic Memory.
+            </span>
+          </div>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmitVerification}>
+          {/* 3 Real Citizen Choices */}
+          <div style={{ marginBottom: '18px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', display: 'block', marginBottom: '10px' }}>
+              Select ground reality:
+            </span>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={() => setSelectedChoice('FIXED')}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  border: selectedChoice === 'FIXED' ? '2px solid #10B981' : '1px solid var(--color-border-medium)',
+                  background: selectedChoice === 'FIXED' ? '#ECFDF5' : '#FFFFFF',
+                  color: selectedChoice === 'FIXED' ? '#065F46' : 'var(--color-text-primary)',
+                  fontWeight: 600,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  justifyContent: 'center',
+                  transition: 'all 150ms ease'
+                }}
+              >
+                <span style={{ fontSize: '18px' }}>😊</span>
+                <span>Yes, fixed</span>
+              </button>
 
-            {/* Stars */}
-            <div style={{ display: 'flex', gap: '6px', margin: '12px 0' }}>
-              {[1, 2, 3, 4, 5].map((s) => (
+              <button
+                type="button"
+                onClick={() => setSelectedChoice('PARTIAL')}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  border: selectedChoice === 'PARTIAL' ? '2px solid #F59E0B' : '1px solid var(--color-border-medium)',
+                  background: selectedChoice === 'PARTIAL' ? '#FFFBEB' : '#FFFFFF',
+                  color: selectedChoice === 'PARTIAL' ? '#92400E' : 'var(--color-text-primary)',
+                  fontWeight: 600,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  justifyContent: 'center',
+                  transition: 'all 150ms ease'
+                }}
+              >
+                <span style={{ fontSize: '18px' }}>😐</span>
+                <span>Partially fixed</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedChoice('UNRESOLVED')}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  border: selectedChoice === 'UNRESOLVED' ? '2px solid #EF4444' : '1px solid var(--color-border-medium)',
+                  background: selectedChoice === 'UNRESOLVED' ? '#FEF2F2' : '#FFFFFF',
+                  color: selectedChoice === 'UNRESOLVED' ? '#991B1B' : 'var(--color-text-primary)',
+                  fontWeight: 600,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  justifyContent: 'center',
+                  transition: 'all 150ms ease'
+                }}
+              >
+                <span style={{ fontSize: '18px' }}>😟</span>
+                <span>Still a problem</span>
+              </button>
+            </div>
+          </div>
+
+          {/* If YES: Star Rating */}
+          {selectedChoice === 'FIXED' && (
+            <div style={{ marginBottom: '16px', padding: '14px', borderRadius: 'var(--radius-md)', background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#166534', display: 'block', marginBottom: '8px' }}>
+                Rate Response Quality & Speed:
+              </span>
+              <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setRating(s)}
+                    style={{
+                      fontSize: '22px',
+                      color: s <= rating ? '#F59E0B' : '#D1D5DB',
+                      background: 'transparent',
+                      cursor: 'pointer',
+                      padding: '2px',
+                      border: 'none'
+                    }}
+                  >
+                    ★
+                  </button>
+                ))}
+                <span style={{ fontSize: '13px', fontWeight: 700, color: '#166534', alignSelf: 'center', marginLeft: '8px' }}>
+                  {rating}/5 Stars
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Feedback or Dispute Explanation Box */}
+          {selectedChoice && (
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)', display: 'block', marginBottom: '6px' }}>
+                {selectedChoice === 'FIXED' ? 'Add optional verification remarks:' : 'Please explain what remains unfixed (Required for escalation):'}
+              </label>
+              <textarea
+                rows={3}
+                required={selectedChoice !== 'FIXED'}
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder={selectedChoice === 'FIXED' ? 'Water pressure is clean and normal now, thank you.' : 'e.g. Debris was cleared but asphalt hole still open; or water is still discolored...'}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: selectedChoice === 'UNRESOLVED' ? '1px solid #F87171' : '1px solid var(--color-border-medium)',
+                  fontSize: '13px',
+                  resize: 'vertical',
+                  fontFamily: 'inherit'
+                }}
+              />
+            </div>
+          )}
+
+          {/* Optional Ground Photo Evidence */}
+          {selectedChoice && (
+            <div style={{ marginBottom: '20px' }}>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handlePhotoUpload}
+              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <button
-                  key={s}
                   type="button"
-                  onClick={() => setRating(s)}
+                  onClick={() => fileInputRef.current?.click()}
                   style={{
-                    fontSize: '22px',
-                    color: s <= rating ? '#F59E0B' : '#D1D5DB',
-                    background: 'transparent',
-                    cursor: 'pointer',
-                    padding: '2px'
+                    height: '36px',
+                    padding: '0 12px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid var(--color-border-medium)',
+                    background: '#FFFFFF',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    color: 'var(--color-text-secondary)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    cursor: 'pointer'
                   }}
                 >
-                  ★
+                  <Camera style={{ width: '14px', height: '14px', color: 'var(--color-primary)' }} />
+                  <span>{evidencePhoto ? 'Change Verification Photo' : 'Attach Verification Photo'}</span>
                 </button>
-              ))}
-              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', alignSelf: 'center', marginLeft: '6px' }}>
-                {rating}/5 Stars
-              </span>
+                {evidencePhoto && (
+                  <span style={{ fontSize: '11.5px', color: '#16A34A', fontWeight: 600 }}>
+                    ✓ 1 Ground Photo Attached
+                  </span>
+                )}
+              </div>
             </div>
+          )}
 
-            <textarea
-              rows={2}
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Optional comment for the ward council..."
+          {selectedChoice && (
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn-primary"
               style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid rgba(15,23,42,0.12)',
-                fontSize: '12px',
-                resize: 'none'
+                background: selectedChoice === 'UNRESOLVED' ? '#DC2626' : (selectedChoice === 'PARTIAL' ? '#D97706' : '#10B981'),
+                color: '#FFFFFF'
               }}
-            />
-
-            <button type="submit" className="btn-primary btn-sm" style={{ marginTop: '10px' }}>
-              Submit Citizen Verification
+            >
+              {isSubmitting ? 'Recording Verification...' : (
+                selectedChoice === 'FIXED' ? 'Confirm Resolution & Close Ticket' : 'Submit Reopen & Escalation Notice'
+              )}
             </button>
-          </div>
+          )}
         </form>
-      ) : verifiedStatus === 'DISPUTED' && !submitted ? (
-        /* Dispute Form */
-        <form onSubmit={handleDisputeSubmit} style={{ animation: 'fadeIn 200ms ease-out' }}>
-          <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#FEF2F2', border: '1px solid #FECACA', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#991B1B', marginBottom: '8px' }}>
-              <AlertCircle style={{ width: '18px', height: '18px' }} />
-              <strong style={{ fontSize: '13px' }}>Reopen Grievance with Escalation</strong>
-            </div>
-            <p style={{ fontSize: '12px', color: '#991B1B', marginBottom: '10px' }}>
-              Please explain why the issue remains unresolved. This will immediately alert the Department Superintending Engineer.
-            </p>
-            <textarea
-              rows={3}
-              required
-              value={disputeReason}
-              onChange={(e) => setDisputeReason(e.target.value)}
-              placeholder="e.g. Water dirty again this morning; or crew excavated but didn't seal pipe..."
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid #F87171',
-                fontSize: '13px',
-                resize: 'none'
-              }}
-            />
-            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-              <button type="submit" className="btn-primary btn-sm" style={{ background: '#DC2626', color: '#FFFFFF' }}>
-                Submit Dispute Appeal
-              </button>
-              <button type="button" onClick={() => setVerifiedStatus(null)} className="btn-secondary btn-sm">
-                Cancel
-              </button>
-            </div>
-          </div>
-        </form>
-      ) : (
-        <div style={{ padding: '12px 16px', borderRadius: 'var(--radius-md)', background: '#F8F9FA', border: '1px solid var(--color-border-subtle)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <CheckCircle2 style={{ width: '16px', height: '16px', color: '#10B981' }} />
-          <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)' }}>
-            Your citizen response has been logged into the municipal audit trail.
-          </span>
-        </div>
       )}
     </div>
   );
 }
+
