@@ -152,6 +152,36 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
     { name: 'Er. Tariq Ahmad', designation: 'AEE (East Zone)', activeCases: 5, resolvedThisMonth: 31, avgResolutionHours: '19.5h', rating: 4.4, status: 'FIELD_INSPECTION' }
   ]);
 
+  // Live stats from Supabase via /api/stats/officer
+  const [liveStats, setLiveStats] = useState(null);
+  useEffect(() => {
+    const token = localStorage.getItem('jansahayk_token');
+    if (!token) return;
+    fetch('/api/stats/officer', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.stats) {
+          setLiveStats(data.stats);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Compute dashboard metric values — prefer live DB stats, fall back to grievances array
+  const dashboardStats = {
+    total: liveStats?.total ?? grievances.length,
+    active: liveStats?.active ?? grievances.filter(g => g.status !== 'RESOLVED' && g.status !== 'CLOSED').length,
+    resolved: liveStats?.resolved ?? grievances.filter(g => g.status === 'RESOLVED' || g.status === 'CLOSED').length,
+    critical: liveStats?.critical ?? grievances.filter(g => g.urgency === 'CRITICAL' && g.status !== 'RESOLVED').length,
+    inProgress: liveStats?.inProgress ?? grievances.filter(g => g.status === 'IN_PROGRESS').length,
+    escalated: liveStats?.escalated ?? grievances.filter(g => g.status === 'ESCALATED').length,
+    slaOverdue: liveStats?.slaOverdue ?? 0,
+    slaAtRisk: liveStats?.slaAtRisk ?? 0,
+  };
+
+
   // Emerging Issues Radar Data (Section 1: Dashboard)
   const emergingIssues = [
     {
@@ -556,7 +586,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
         {/* ========================================================================= */}
         {activeSection === 'dashboard' && (
           <div>
-            {/* 4 Summary Stat Cards */}
+            {/* 4 Summary Stat Cards — values from Supabase via /api/stats/officer */}
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
@@ -568,9 +598,11 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   Department Active Queue
                 </span>
                 <div style={{ fontSize: '32px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-primary)', marginTop: '4px' }}>
-                  {grievances.length}
+                  {dashboardStats.active}
                 </div>
-                <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>Across Rohini & adjacent zones</span>
+                <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>
+                  {liveStats ? `${dashboardStats.total} total · Live from DB` : 'Across Rohini & adjacent zones'}
+                </span>
               </div>
 
               <div className="card" style={{ padding: '20px' }}>
@@ -578,19 +610,23 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   Critical Incidents
                 </span>
                 <div style={{ fontSize: '32px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#EF4444', marginTop: '4px' }}>
-                  {criticalCases.length}
+                  {dashboardStats.critical}
                 </div>
-                <span style={{ fontSize: '11px', color: '#EF4444' }}>Biological / Contamination priority</span>
+                <span style={{ fontSize: '11px', color: '#EF4444' }}>
+                  {dashboardStats.slaOverdue > 0 ? `${dashboardStats.slaOverdue} SLA overdue` : 'Biological / Contamination priority'}
+                </span>
               </div>
 
               <div className="card" style={{ padding: '20px' }}>
                 <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                  Citizen Satisfaction Score
+                  Resolved This Session
                 </span>
-                <div style={{ fontSize: '32px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#F59E0B', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  4.8 <Star style={{ width: '22px', height: '22px', fill: '#F59E0B', color: '#F59E0B' }} />
+                <div style={{ fontSize: '32px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#059669', marginTop: '4px' }}>
+                  {dashboardStats.resolved}
                 </div>
-                <span style={{ fontSize: '11px', color: '#059669' }}>Based on 145 verified citizen ratings</span>
+                <span style={{ fontSize: '11px', color: '#059669' }}>
+                  {liveStats ? 'Live from Supabase DB' : 'Completed & closed tickets'}
+                </span>
               </div>
 
               <div className="card" style={{ padding: '20px' }}>
@@ -600,7 +636,9 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 <div style={{ fontSize: '32px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#059669', marginTop: '4px' }}>
                   94.8%
                 </div>
-                <span style={{ fontSize: '11px', color: '#059669' }}>Average turnaround: 14.2 hours</span>
+                <span style={{ fontSize: '11px', color: dashboardStats.slaAtRisk > 0 ? '#F59E0B' : '#059669' }}>
+                  {dashboardStats.slaAtRisk > 0 ? `${dashboardStats.slaAtRisk} at risk · Avg 14.2h` : 'Average turnaround: 14.2 hours'}
+                </span>
               </div>
             </div>
 

@@ -440,8 +440,12 @@ export function AppProvider({ children }) {
     }
   };
 
-  // Logout
+  // Logout — clears Supabase session + custom token
   const logout = async () => {
+    try {
+      // Sign out from Supabase Auth (invalidates the session server-side)
+      await supabase.auth.signOut();
+    } catch (e) {}
     try {
       if (token) {
         const controller = new AbortController();
@@ -458,6 +462,8 @@ export function AppProvider({ children }) {
     setUser(null);
     localStorage.removeItem('jansahayk_token');
     localStorage.removeItem('jansahayk_user');
+    localStorage.removeItem('jansahayk_entered_app');
+    setHasEnteredApp(false);
   };
 
   // 1-Click Quick Demo Switcher (Instant & Offline Resilient)

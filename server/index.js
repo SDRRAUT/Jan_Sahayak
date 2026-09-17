@@ -240,130 +240,29 @@ function createNotification({ userId, userRole, title, message, grievanceId, lin
   return notif;
 }
 
-// Seed grievances storage
-let GRIEVANCES_DB = [
-  {
-    id: "DL-2026-W14-0892",
-    title: "Contaminated Drinking Water & Main Supply Pipe Leakage",
-    descriptionRaw: "Bhai pichle 3 din se hamare Sector 14, Pocket 2 mein naali ka ganda badbudaar paani supply mein mix hoke aa raha hai. Bacche bimaar pad rahe hain, jaldi theek karwao please near Mother Dairy.",
-    languageDetected: "Hinglish / Hindi (Confidence 98%)",
-    category: "Water Supply & Contamination",
-    department: "Delhi Jal Board (DJB)",
-    officerName: "Er. Sanjay Sharma (AEE)",
-    location: {
-      ward: "Ward 14 (Rohini Sector 14)",
-      area: "Pocket 2, Near Mother Dairy Booth",
-      city: "New Delhi",
-      pincode: "110085",
-      lat: 28.7189,
-      lng: 77.1265
-    },
-    urgency: "CRITICAL",
-    urgencyScore: 94,
-    status: "IN_PROGRESS",
-    createdAt: "2026-09-16 09:30 AM",
-    slaDeadline: "2026-09-17 06:00 PM",
-    slaHoursLeft: 16,
-    clusterId: "CL-W14-WATER-03",
-    clusterTitle: "Ward 14 Sector 14 Main Pipeline Fracture Cluster",
-    clusterCount: 18,
-    upvotes: 42,
-    citizenId: "USR-CITIZEN-01",
-    citizenName: "Aditya Verma",
-    citizenPhone: "+91 98712-XXXXX",
-    evidence: {
-      hasPhoto: true,
-      photoUrl: 'https://images.unsplash.com/photo-1584467735815-f778f274e296?auto=format&fit=crop&w=600&q=80',
-      hasAudio: true,
-      audioTranscript: 'Voice intake: Bhai pichle 3 din se hamare Sector 14 mein ganda paani aa raha hai...'
-    },
-    informationRequests: [],
-    reopenedDispute: null,
-    timeline: [
-      { stage: "Submitted", time: "Sep 16, 09:30 AM", detail: "Complaint submitted via Voice-to-Grievance (Hinglish)", status: "completed" },
-      { stage: "AI Triage & DNA Generated", time: "Sep 16, 09:31 AM", detail: "Autoclassified as Critical Biological Hazard, routed to DJB", status: "completed" },
-      { stage: "Cluster Merged", time: "Sep 16, 09:35 AM", detail: "Merged into Cluster CL-W14-WATER-03 (18 citizen complaints linked)", status: "completed" },
-      { stage: "Officer Assigned", time: "Sep 16, 10:15 AM", detail: "Assigned to AEE Sanjay Sharma; Rapid team mobilized", status: "completed" },
-      { stage: "Field Repair", time: "Sep 16, 02:40 PM", detail: "Excavation and clamp installation currently active", status: "in_progress" }
-    ]
-  },
-  {
-    id: "DL-2026-W08-0419",
-    title: "Deep Road Cave-in / Dangerous Pothole Near Traffic Junction",
-    descriptionRaw: "Moolchand flyover ke neeche Lajpat Nagar wali road pe bohot bada gaddha ho gaya hai barish ke baad. 2 scooter gir chuke hain aaj subah. Accidents ho rahe hain bar bar!",
-    languageDetected: "Hinglish (Confidence 97%)",
-    category: "Roads & Infrastructure",
-    department: "Public Works Department (PWD)",
-    officerName: "Er. Rajesh K. Meena",
-    location: {
-      ward: "Ward 8 (Lajpat Nagar / Moolchand)",
-      area: "Ring Road, Moolchand Underpass Entry",
-      city: "New Delhi",
-      pincode: "110024",
-      lat: 28.5684,
-      lng: 77.2341
-    },
-    urgency: "HIGH",
-    urgencyScore: 88,
-    status: "TRIAGED",
-    createdAt: "2026-09-16 11:20 AM",
-    slaDeadline: "2026-09-18 11:00 AM",
-    slaHoursLeft: 38,
-    clusterId: "CL-W08-ROAD-01",
-    clusterCount: 7,
-    upvotes: 29,
-    citizenId: "USR-CITIZEN-02",
-    citizenName: "Pooja Malhotra",
-    citizenPhone: "+91 98101-XXXXX",
-    evidence: { hasPhoto: true, photoUrl: null, hasAudio: false },
-    informationRequests: [],
-    reopenedDispute: null,
-    timeline: [
-      { stage: "Submitted", time: "Sep 16, 11:20 AM", detail: "Photo + location pin submitted by commuter", status: "completed" },
-      { stage: "AI Triage & DNA Generated", time: "Sep 16, 11:21 AM", detail: "Computer vision confirmed severe cavity on arterial road", status: "completed" }
-    ]
-  },
-  {
-    id: "DL-2026-W22-0112",
-    title: "Overflowing Garbage Dump & Solid Waste Burning",
-    descriptionRaw: "Sector 6 main market ke saamne open kude ka dher hai, 5 din se MCD ka dumper nahi aaya. Kal raat ko kisi ne aag laga di jisse bohot zyaada toxic smoke ho gaya hai.",
-    languageDetected: "Hinglish (Confidence 99%)",
-    category: "Sanitation & Solid Waste",
-    department: "Municipal Corporation of Delhi (MCD)",
-    officerName: "Dr. K. S. Tyagi (Sanitary Inspector)",
-    location: {
-      ward: "Ward 22 (Mayur Vihar Ph-1)",
-      area: "Sector 6 DDA Market Complex",
-      city: "New Delhi",
-      pincode: "110091",
-      lat: 28.6012,
-      lng: 77.2982
-    },
-    urgency: "HIGH",
-    urgencyScore: 82,
-    status: "RESOLVED",
-    createdAt: "2026-09-15 08:15 AM",
-    slaDeadline: "2026-09-16 08:00 PM",
-    slaHoursLeft: 0,
-    clusterId: "CL-W22-SAN-09",
-    clusterCount: 11,
-    upvotes: 35,
-    citizenId: "USR-CITIZEN-03",
-    citizenName: "Gurpreet Singh",
-    citizenPhone: "+91 99532-XXXXX",
-    evidence: { hasPhoto: true, photoUrl: null, hasAudio: false },
-    informationRequests: [],
-    reopenedDispute: null,
-    timeline: [
-      { stage: "Submitted", time: "Sep 15, 08:15 AM", detail: "Citizen logged complaint", status: "completed" },
-      { stage: "Resolved & Closed", time: "Sep 15, 03:00 PM", detail: "Two 12MT trucks loaded; lime powder scrubbed", status: "completed" }
-    ]
+// GRIEVANCES_DB starts empty — Supabase PostgreSQL is the sole source of truth.
+// This in-memory cache is a write-through layer to reduce DB round-trips within a session.
+let GRIEVANCES_DB = [];
+
+// Boot: Pre-load existing grievances from Supabase into in-memory cache
+(async () => {
+  try {
+    const existing = await postgresDB.getAllGrievances();
+    if (existing && existing.length > 0) {
+      GRIEVANCES_DB = existing;
+      console.log(`📦 [Boot] Loaded ${existing.length} grievances from Supabase into memory cache`);
+    } else {
+      console.log('📦 [Boot] No existing grievances in Supabase — starting fresh');
+    }
+  } catch (e) {
+    console.warn('[Boot] Could not pre-load grievances from DB:', e.message);
   }
-];
+})();
 
 // ============================================================================
 // Authentication & Authorization Middleware
 // ============================================================================
+
 
 async function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
@@ -1722,25 +1621,69 @@ app.put('/api/auth/settings', authenticateToken, (req, res) => {
 // Admin Endpoints (Dept Admin & Super Admin)
 // ============================================================================
 
-// Department Admin Analytics
-app.get('/api/admin/analytics', authenticateToken, requireRole(['dept_admin', 'super_admin']), (req, res) => {
-  const total = GRIEVANCES_DB.length;
-  const resolved = GRIEVANCES_DB.filter(g => g.status === 'RESOLVED').length;
-  const active = total - resolved;
-  const critical = GRIEVANCES_DB.filter(g => g.urgency === 'CRITICAL' && g.status !== 'RESOLVED').length;
-  const disputed = GRIEVANCES_DB.filter(g => g.status === 'DISPUTE_REOPENED').length;
+// Department Admin Analytics — live Supabase counts
+app.get('/api/admin/analytics', authenticateToken, requireRole(['dept_admin', 'super_admin', 'civic_officer']), async (req, res) => {
+  try {
+    const result = await postgresDB.query(`
+      SELECT
+        COUNT(*) AS total,
+        COUNT(*) FILTER (WHERE status IN ('RESOLVED','CLOSED')) AS resolved,
+        COUNT(*) FILTER (WHERE urgency = 'CRITICAL' AND status NOT IN ('RESOLVED','CLOSED')) AS critical,
+        COUNT(*) FILTER (WHERE status = 'DISPUTE_REOPENED') AS disputed,
+        COUNT(*) FILTER (WHERE status NOT IN ('RESOLVED','CLOSED')) AS active
+      FROM public.grievances
+    `);
+    const row = result?.rows?.[0] || {};
+    const depts = await postgresDB.getDepartments();
+    return res.json({
+      metrics: {
+        totalGrievances: parseInt(row.total) || GRIEVANCES_DB.length,
+        activeGrievances: parseInt(row.active) || 0,
+        resolvedGrievances: parseInt(row.resolved) || 0,
+        criticalUrgency: parseInt(row.critical) || 0,
+        reopenedDisputes: parseInt(row.disputed) || 0,
+        avgSlaHours: '38.4 Hours',
+        slaComplianceRate: '94.2%'
+      },
+      departments: depts.length > 0 ? depts : DEPARTMENTS
+    });
+  } catch (e) {
+    console.warn('[Analytics] DB query failed:', e.message);
+    const total = GRIEVANCES_DB.length;
+    const resolved = GRIEVANCES_DB.filter(g => g.status === 'RESOLVED').length;
+    return res.json({
+      metrics: { totalGrievances: total, activeGrievances: total - resolved, resolvedGrievances: resolved, criticalUrgency: 0, reopenedDisputes: 0, avgSlaHours: '38.4 Hours', slaComplianceRate: '94.2%' },
+      departments: DEPARTMENTS
+    });
+  }
+});
 
-  res.json({
-    metrics: {
-      totalGrievances: total,
-      activeGrievances: active,
-      resolvedGrievances: resolved,
-      criticalUrgency: critical,
-      reopenedDisputes: disputed,
-      avgSlaHours: '38.4 Hours',
-      slaComplianceRate: '94.2%'
-    },
-    departments: DEPARTMENTS
+// Officer Live Stats — for the Officer Dashboard metrics section
+app.get('/api/stats/officer', authenticateToken, requireRole(['officer', 'civic_officer', 'dept_admin', 'super_admin']), async (req, res) => {
+  try {
+    const stats = await postgresDB.getOfficerStats(req.user.id);
+    if (stats) {
+      return res.json({ stats });
+    }
+  } catch (e) {
+    console.warn('[OfficerStats] DB query failed:', e.message);
+  }
+  // Fallback from memory cache
+  const total = GRIEVANCES_DB.length;
+  const resolved = GRIEVANCES_DB.filter(g => g.status === 'RESOLVED' || g.status === 'CLOSED').length;
+  const active = total - resolved;
+  return res.json({
+    stats: {
+      total,
+      active,
+      resolved,
+      critical: GRIEVANCES_DB.filter(g => g.urgency === 'CRITICAL' && g.status !== 'RESOLVED').length,
+      disputed: GRIEVANCES_DB.filter(g => g.status === 'DISPUTE_REOPENED').length,
+      inProgress: GRIEVANCES_DB.filter(g => g.status === 'IN_PROGRESS').length,
+      escalated: GRIEVANCES_DB.filter(g => g.status === 'ESCALATED').length,
+      slaOverdue: 0,
+      slaAtRisk: 0
+    }
   });
 });
 
@@ -1772,38 +1715,47 @@ app.post('/api/admin/sla-rules', authenticateToken, requireRole(['super_admin'])
 // Notifications Endpoints
 // ============================================================================
 
-// Get Notifications for Current User
-app.get('/api/notifications', authenticateToken, (req, res) => {
+// Get Notifications for Current User — primary source: Supabase PostgreSQL
+app.get('/api/notifications', authenticateToken, async (req, res) => {
   const userRole = req.user.role;
   const userId = req.user.id;
 
+  try {
+    const dbNotifs = await postgresDB.getNotifications(userId, userRole);
+    if (dbNotifs && dbNotifs.length > 0) {
+      return res.json({
+        notifications: dbNotifs,
+        unreadCount: dbNotifs.filter(n => !n.read).length
+      });
+    }
+  } catch (e) {
+    console.warn('[Notifications] DB read failed, using memory fallback:', e.message);
+  }
+
+  // Memory fallback
   const relevant = NOTIFICATIONS_DB.filter(n => {
     if (userRole === 'super_admin') return true;
     if (n.userId && n.userId === userId) return true;
     if (n.userRole && n.userRole === userRole) return true;
     if (userRole === 'civic_officer' && (n.userRole === 'officer' || n.userRole === 'dept_admin')) return true;
-    if (userRole === 'dept_admin' && n.userRole === 'officer') return true;
     return false;
   });
-
-  res.json({
-    notifications: relevant,
-    unreadCount: relevant.filter(n => !n.read).length
-  });
+  res.json({ notifications: relevant, unreadCount: relevant.filter(n => !n.read).length });
 });
 
-// Mark single notification as read
-app.post('/api/notifications/:id/read', authenticateToken, (req, res) => {
+// Mark single notification as read (memory + DB)
+app.post('/api/notifications/:id/read', authenticateToken, async (req, res) => {
   const { id } = req.params;
   const item = NOTIFICATIONS_DB.find(n => n.id === id);
-  if (item) {
-    item.read = true;
-  }
+  if (item) item.read = true;
+  try {
+    await postgresDB.query(`UPDATE public.notifications SET read = true WHERE id::text = $1`, [id]);
+  } catch (e) {}
   res.json({ success: true, notification: item });
 });
 
-// Mark all notifications as read for current user
-app.post('/api/notifications/mark-all-read', authenticateToken, (req, res) => {
+// Mark all notifications as read for current user (memory + DB)
+app.post('/api/notifications/mark-all-read', authenticateToken, async (req, res) => {
   const userRole = req.user.role;
   const userId = req.user.id;
 
@@ -1816,7 +1768,16 @@ app.post('/api/notifications/mark-all-read', authenticateToken, (req, res) => {
       n.read = true;
     }
   });
-
+  try {
+    if (userRole === 'super_admin') {
+      await postgresDB.query(`UPDATE public.notifications SET read = true`, []);
+    } else {
+      await postgresDB.query(
+        `UPDATE public.notifications SET read = true WHERE user_id = $1 OR user_role = $2`,
+        [userId, userRole]
+      );
+    }
+  } catch (e) {}
   res.json({ success: true });
 });
 

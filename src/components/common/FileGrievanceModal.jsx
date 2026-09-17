@@ -47,6 +47,8 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
   const [pincode, setPincode] = useState(user?.pincode || '110085');
   const [gpsLocked, setGpsLocked] = useState(false);
   const [gpsCoordinates, setGpsCoordinates] = useState(null);
+  const [gpsErrorMsg, setGpsErrorMsg] = useState('');
+  const [stepErrorMsg, setStepErrorMsg] = useState('');
 
   // Step 4: Contact & Urgency
   const [citizenName, setCitizenName] = useState(user?.name || 'Aditya Verma');
@@ -341,8 +343,9 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
   };
 
   const handleDetectLocation = () => {
+    setGpsErrorMsg('');
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser.');
+      setGpsErrorMsg('📍 Geolocation is not supported by your browser. Please enter area manually below.');
       return;
     }
 
@@ -369,20 +372,22 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
               setPincode(data.pincode || pincode);
               setLandmark(data.formattedAddress?.split(',')[0] || 'Near current location');
               setGpsLocked(true);
+              setGpsErrorMsg('');
             }
           }
         } catch (e) {
           setGpsLocked(true);
           setArea(`GPS: ${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E`);
+          setGpsErrorMsg('');
         } finally {
           setIsDetectingGps(false);
         }
       },
       () => {
         setIsDetectingGps(false);
-        alert('Could not access GPS location. Please enter area manually.');
+        setGpsErrorMsg('📍 GPS permission unavailable or timed out. Default ward is pre-filled, or you can edit manually below.');
       },
-      { timeout: 10000, enableHighAccuracy: true }
+      { timeout: 6000, enableHighAccuracy: true }
     );
   };
 
@@ -967,8 +972,22 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                       @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
                       @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
                     `}</style>
-                  </div>
 
+                    {stepErrorMsg && (
+                      <div style={{
+                        marginTop: '6px',
+                        padding: '6px 10px',
+                        borderRadius: '8px',
+                        background: '#FEF2F2',
+                        border: '1px solid #FECACA',
+                        color: '#DC2626',
+                        fontSize: '11.5px',
+                        fontWeight: 600
+                      }}>
+                        {stepErrorMsg}
+                      </div>
+                    )}
+                  </div>
 
                   <div>
                     <span style={{ fontSize: '11px', color: '#64748B', display: 'block', marginBottom: '4px' }}>
@@ -1187,6 +1206,21 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                       </>
                     )}
                   </button>
+
+                  {gpsErrorMsg && (
+                    <div style={{
+                      marginBottom: '12px',
+                      padding: '8px 12px',
+                      borderRadius: '10px',
+                      background: '#FFFBEB',
+                      border: '1px solid #FDE68A',
+                      color: '#B45309',
+                      fontSize: '11.5px',
+                      lineHeight: 1.4
+                    }}>
+                      {gpsErrorMsg}
+                    </div>
+                  )}
 
                   <div style={{ marginBottom: '10px' }}>
                     <label style={{ fontSize: '12px', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '4px' }}>
@@ -1449,9 +1483,10 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                 type="button"
                 onClick={() => {
                   if (currentStep === 1 && !description.trim()) {
-                    alert('Please enter or speak a description of the problem.');
+                    setStepErrorMsg('⚠️ Please enter or speak a description of the problem.');
                     return;
                   }
+                  setStepErrorMsg('');
                   setCurrentStep(prev => prev + 1);
                 }}
                 style={{

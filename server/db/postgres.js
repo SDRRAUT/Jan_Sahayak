@@ -892,5 +892,88 @@ export const postgresDB = {
       console.error('[PostgreSQL] addCivicMemoryFromResolution error:', err.message);
       return false;
     }
+  },
+
+  // --- Notifications: Fetch from Supabase ---
+  async getNotifications(userId, userRole) {
+    const p = getPool();
+    if (!p) return null;
+    try {
+      let result;
+      if (userRole === 'super_admin') {
+        result = await p.query(`
+          SELECT * FROM public.notifications
+          ORDER BY created_at DESC
+          LIMIT 100
+        `);
+      } else if (userRole === 'civic_officer' || userRole === 'officer' || userRole === 'dept_admin') {
+        result = await p.query(`
+          SELECT * FROM public.notifications
+          WHERE user_id = $1
+             OR user_role IN ('officer', 'dept_admin', 'civic_officer')
+          ORDER BY created_at DESC
+          LIMIT 50
+        `, [userId]);
+      } else {
+        result = await p.query(`
+          SELECT * FROM public.notifications
+          WHERE user_id = $1 OR user_role = 'citizen'
+          ORDER BY created_at DESC
+          LIMIT 50
+        `, [userId]);
+      }
+      return result.rows.map(r => ({
+        id: r.id,
+        userId: r.user_id,
+        userRole: r.user_role,
+        title: r.title,
+        message: r.message,
+        grievanceId: r.grievance_id,
+        link: r.link,
+        type: r.type,
+        read: r.read,
+        createdAt: r.created_at,
+        timestamp: r.created_at
+      }));
+    } catch (err) {
+      console.error('[PostgreSQL] getNotifications error:', err.message);
+      return null;
+    }
+  },
+
+  // --- Officer Stats: Live counts from Supabase ---
+  async getOfficerStats(officerId) {
+    const p = getPool();
+    if (!p) return null;
+    try {
+      const result = await p.query(`
+        SELECT
+          COUNT(*) AS total,
+          COUNT(*) FILTER (WHERE status NOT IN ('RESOLVED','CLOSED')) AS active,
+          COUNT(*) FILTER (WHERE status IN ('RESOLVED','CLOSED')) AS resolved,
+          COUNT(*) FILTER (WHERE urgency = 'CRITICAL' AND status NOT IN ('RESOLVED','CLOSED')) AS critical,
+          COUNT(*) FILTER (WHERE status = 'DISPUTE_REOPENED') AS disputed,
+          COUNT(*) FILTER (WHERE status = 'IN_PROGRESS') AS in_progress,
+          COUNT(*) FILTER (WHERE status = 'ESCALATED') AS escalated,
+          COUNT(*) FILTER (WHERE sla_hours_left <= 0 AND status NOT IN ('RESOLVED','CLOSED')) AS sla_overdue,
+          COUNT(*) FILTER (WHERE sla_hours_left > 0 AND sla_hours_left <= 6 AND status NOT IN ('RESOLVED','CLOSED')) AS sla_at_risk
+        FROM public.grievances
+      `);
+      const row = result.rows[0] || {};
+      return {
+        total: parseInt(row.total) || 0,
+        active: parseInt(row.active) || 0,
+        resolved: parseInt(row.resolved) || 0,
+        critical: parseInt(row.critical) || 0,
+        disputed: parseInt(row.disputed) || 0,
+        inProgress: parseInt(row.in_progress) || 0,
+        escalated: parseInt(row.escalated) || 0,
+        slaOverdue: parseInt(row.sla_overdue) || 0,
+        slaAtRisk: parseInt(row.sla_at_risk) || 0
+      };
+    } catch (err) {
+      console.error('[PostgreSQL] getOfficerStats error:', err.message);
+      return null;
+    }
   }
 };
