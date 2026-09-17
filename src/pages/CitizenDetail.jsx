@@ -21,6 +21,7 @@ import GrievanceDnaCard from '../components/common/GrievanceDnaCard';
 import VisualJourneyTimeline from '../components/common/VisualJourneyTimeline';
 import ResolutionVerificationCard from '../components/common/ResolutionVerificationCard';
 import WhyExplainer from '../components/common/WhyExplainer';
+import ResolutionIntelligenceCard from '../components/common/ResolutionIntelligenceCard';
 
 export default function CitizenDetail() {
   const { id } = useParams();
@@ -196,6 +197,34 @@ export default function CitizenDetail() {
                   </button>
                 </div>
               )}
+            </div>
+
+            {/* AI Resolution Intelligence Card (Section 24) */}
+            <div style={{ marginBottom: '24px' }}>
+              <ResolutionIntelligenceCard
+                title="RESOLUTION INTELLIGENCE"
+                recommendedAction={item.recommendedResolution?.recommendedAction || "Inspect drainage infrastructure before initiating road resurfacing."}
+                standardOperatingProcedure={item.recommendedResolution?.standardOperatingProcedure || "Municipal Standard Operating Procedure Sec-4B"}
+                estimatedDuration="6 Hours"
+                whyPoints={[
+                  `${item.clusterCount || 12} similar complaints recorded in ${item.location?.ward || 'this ward'}`,
+                  "Nearby locations experiencing secondary overflow",
+                  "Previous related municipal repairs logged in knowledge base",
+                  "Relevant engineering standard operating procedure verified",
+                  "Location clustering pattern identified across adjacent corridors"
+                ]}
+                supportingEvidence={[
+                  { label: `${item.clusterCount || 12} Similar Cases`, tag: item.location?.ward || 'Ward Area' },
+                  { label: "Relevant Policy", tag: "SOP Sec-4B" },
+                  { label: "Previous Resolution", tag: "Case #JS-0891" },
+                  { label: "Location Pattern", tag: "Flow Telemetry" }
+                ]}
+                engineeringReasoning={item.recommendedResolution?.reasoning || "Sub-surface inspection prevents recurrence of structural failure."}
+                potentialSlaRisk="Dispatch authorized within municipal SLA guidelines."
+                onApprove={() => setActionMessage('Citizen endorsed the AI recommended resolution path.')}
+                onModify={() => setActionMessage('Citizen suggested custom feedback on the resolution path.')}
+                onRequestMoreEvidence={() => setActionMessage('Citizen requested more diagnostic telemetry.')}
+              />
             </div>
 
             {/* Officer Information Requests & Citizen Clarification Chat */}

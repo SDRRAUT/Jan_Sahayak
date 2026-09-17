@@ -22,19 +22,27 @@ import {
   Share2,
   FileText,
   Camera,
-  Video,
   Layers,
   ChevronRight,
   MessageSquare,
   AlertTriangle,
   History,
   GitBranch,
-  ShieldCheck
+  ShieldCheck,
+  TrendingUp,
+  Activity,
+  Eye,
+  SlidersHorizontal,
+  Compass
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
 import { analyzeGrievanceInput } from '../services/aiEngine';
 import GrievanceDnaCard from '../components/common/GrievanceDnaCard';
+import WhyExplainer from '../components/common/WhyExplainer';
+import VisualJourneyTimeline from '../components/common/VisualJourneyTimeline';
+import ResolutionVerificationCard from '../components/common/ResolutionVerificationCard';
+import ResolutionIntelligenceCard from '../components/common/ResolutionIntelligenceCard';
 
 export default function OfficerWorkspace() {
   const { id } = useParams();
@@ -60,10 +68,11 @@ export default function OfficerWorkspace() {
 
   // Selected grievance for deep workspace inspection
   const [selectedId, setSelectedId] = useState(id || grievances[0]?.id);
+  const [activeAuthorityTab, setActiveAuthorityTab] = useState(id ? 'detail' : 'overview'); // 'overview' | 'queue' | 'detail' | 'map'
   const [searchQuery, setSearchQuery] = useState('');
   const [urgencyFilter, setUrgencyFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [activeTab, setActiveTab] = useState('brief'); // 'brief' | 'resolution' | 'duplicates' | 'history' | 'workflow' | 'notes'
+  const [detailSubTab, setDetailSubTab] = useState('recommendation'); // 'recommendation' | 'brief' | 'duplicates' | 'history' | 'workflow' | 'notes'
   const [dispatchStatus, setDispatchStatus] = useState(null);
 
   // Modals
@@ -92,6 +101,78 @@ export default function OfficerWorkspace() {
   const [transitionReason, setTransitionReason] = useState('');
 
   const [internalNoteInput, setInternalNoteInput] = useState('');
+
+  // 4 AI Detected Issues for "What Needs Attention?"
+  const emergingIssues = [
+    {
+      id: 'ISSUE-01',
+      title: 'Water supply disruption & pressure drop',
+      category: 'Water Supply',
+      status: 'EMERGING',
+      statusLabel: 'Emerging',
+      badgeColor: '#DC2626',
+      badgeBg: '#FEF2F2',
+      badgeBorder: '#FECACA',
+      wardsCount: 4,
+      wards: 'Wards 12, 14, 15, 18',
+      grievancesCount: 37,
+      trend: 'Increasing frequency (+68% in 48h)',
+      hypothesis: 'Possible common underground trunk line crack near Outer Ring Road junction.',
+      recommendedAction: 'Isolate Sector 14 booster pump line & survey soil moisture with acoustic sensors',
+      targetGrievanceId: 'GRV-2025-001'
+    },
+    {
+      id: 'ISSUE-02',
+      title: 'Streetlight feeder cable trip along ring corridor',
+      category: 'Electricity & Lighting',
+      status: 'GROWING',
+      statusLabel: 'Growing',
+      badgeColor: '#D97706',
+      badgeBg: '#FFFBEB',
+      badgeBorder: '#FDE68A',
+      wardsCount: 3,
+      wards: 'Wards 8, 9, 11',
+      grievancesCount: 22,
+      trend: 'Growing (+34% this week)',
+      hypothesis: 'Phase unbalance tripping local MCB breakers during peak evening loads.',
+      recommendedAction: 'Load-balance transformer 4B & replace burnt phase-isolator fuse',
+      targetGrievanceId: 'GRV-2025-004'
+    },
+    {
+      id: 'ISSUE-03',
+      title: 'Sanitation & primary waste collection backlog',
+      category: 'Sanitation',
+      status: 'IMPROVING',
+      statusLabel: 'Improving',
+      badgeColor: '#2563EB',
+      badgeBg: '#EFF6FF',
+      badgeBorder: '#BFDBFE',
+      wardsCount: 1,
+      wards: 'Ward 19 (Karol Bagh)',
+      grievancesCount: 14,
+      trend: 'Improving (Down 40% after tipper reassignment)',
+      hypothesis: 'Temporary fleet shortage remediated; transfer station operating at nominal capacity.',
+      recommendedAction: 'Maintain current second-shift sweepers until buffer bins clear',
+      targetGrievanceId: 'GRV-2025-003'
+    },
+    {
+      id: 'ISSUE-04',
+      title: 'Pipeline joint fracture remediated',
+      category: 'Water Supply',
+      status: 'RESOLVED',
+      statusLabel: 'Resolved',
+      badgeColor: '#059669',
+      badgeBg: '#ECFDF5',
+      badgeBorder: '#A7F3D0',
+      wardsCount: 1,
+      wards: 'Ward 14 (Rohini Sector 14)',
+      grievancesCount: 18,
+      trend: 'Physical remediation signed off by AEE',
+      hypothesis: 'High-pressure clamp installed; citizen verification audit logged 94% approval.',
+      recommendedAction: 'Archive cluster and record in municipal asset maintenance ledger',
+      targetGrievanceId: 'GRV-2025-002'
+    }
+  ];
 
   // Filter queue
   const filteredGrievances = grievances.filter(g => {
@@ -181,7 +262,10 @@ export default function OfficerWorkspace() {
 
   const handleAcceptRecommendation = async () => {
     await actionRecommendation(activeItem.id, 'ACCEPT');
-    setDispatchStatus('DISPATCHED');
+    setDispatchStatus('APPROVED');
+    try {
+      confetti({ particleCount: 50, spread: 50, origin: { y: 0.8 } });
+    } catch(e) {}
   };
 
   const handleModifyRecommendationSubmit = async (e) => {
@@ -198,10 +282,18 @@ export default function OfficerWorkspace() {
     setDispatchStatus('REJECTED');
   };
 
+  const openInspectionForCase = (caseId) => {
+    setSelectedId(caseId);
+    setActiveAuthorityTab('detail');
+    setDispatchStatus(null);
+    window.scrollTo({ top: 300, behavior: 'smooth' });
+  };
+
   return (
     <div className="section-spacing" style={{ paddingTop: '28px' }}>
       <div className="container">
-        {/* Officer Context Bar */}
+
+        {/* 1. Officer Context & Authority Header */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -214,846 +306,1184 @@ export default function OfficerWorkspace() {
         }}>
           <div>
             <div className="category-pill" style={{ marginBottom: '8px' }}>
-              OFFICER CASE WORKSPACE & SLA INTELLIGENCE
+              AUTHORITY WORKSPACE • CIVIC RESOLUTION CONSOLE
             </div>
-            <h1 style={{ fontSize: '30px', color: 'var(--color-text-primary)' }}>
-              {currentOfficer.name} ({currentOfficer.designation})
+            <h1 style={{ fontSize: '28px', color: 'var(--color-text-primary)' }}>
+              {currentOfficer.name}
             </h1>
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
-              {currentOfficer.department} • Assigned Jurisdiction: <strong>{currentOfficer.zone}</strong>
+              {currentOfficer.designation} • <strong>{currentOfficer.department}</strong> • Jurisdiction: <strong>{currentOfficer.zone}</strong>
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <div style={{
-              padding: '8px 16px',
+              padding: '6px 14px',
               borderRadius: 'var(--radius-full)',
               background: slaStatus === 'AT_RISK' ? '#FFFBEB' : (slaStatus === 'OVERDUE' ? '#FEF2F2' : '#ECFDF5'),
               border: `1px solid ${slaStatus === 'AT_RISK' ? '#FDE68A' : (slaStatus === 'OVERDUE' ? '#FECACA' : '#A7F3D0')}`,
               color: slaStatus === 'AT_RISK' ? '#B45309' : (slaStatus === 'OVERDUE' ? '#991B1B' : '#065F46'),
               fontSize: '12px',
-              fontWeight: 700
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
             }}>
-              ● Case SLA: {remainingHours}h Left ({slaStatus.replace('_', ' ')})
+              <span className="status-dot active"></span>
+              <span>Active Case SLA: {remainingHours}h Left</span>
             </div>
-            <Link to="/admin" className="btn-secondary btn-sm">
-              Open Ward Heatmap
+
+            <Link to="/admin" className="btn-secondary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <MapPin style={{ width: '13px', height: '13px' }} />
+              <span>Full Ward Heatmap</span>
             </Link>
           </div>
         </div>
 
-        {/* Master-Detail Split Workspace Layout */}
+        {/* 2. Authority Navigation Tabs (Overview, Queue, Detail, Map) */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(12, 1fr)',
-          gap: '24px',
-          alignItems: 'start'
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          marginBottom: '24px',
+          background: '#F1F5F9',
+          padding: '6px',
+          borderRadius: 'var(--radius-md)',
+          width: 'fit-content',
+          flexWrap: 'wrap'
         }}>
-          {/* Left Column (4 Cols): Priority Triage Queue & Search Filter */}
-          <div style={{ gridColumn: 'span 4' }} className="hero-left-col">
-            <div className="card" style={{ padding: '20px' }}>
-              
-              {/* Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-                <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-text-muted)' }}>
-                  Grievance Inbox ({filteredGrievances.length})
+          <button
+            type="button"
+            onClick={() => setActiveAuthorityTab('overview')}
+            style={{
+              padding: '8px 18px',
+              borderRadius: '6px',
+              fontSize: '13px',
+              fontWeight: 600,
+              background: activeAuthorityTab === 'overview' ? '#FFFFFF' : 'transparent',
+              color: activeAuthorityTab === 'overview' ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+              boxShadow: activeAuthorityTab === 'overview' ? 'var(--shadow-xs)' : 'none',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <Activity style={{ width: '14px', height: '14px' }} />
+            <span>Overview & What Needs Attention</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveAuthorityTab('queue')}
+            style={{
+              padding: '8px 18px',
+              borderRadius: '6px',
+              fontSize: '13px',
+              fontWeight: 600,
+              background: activeAuthorityTab === 'queue' ? '#FFFFFF' : 'transparent',
+              color: activeAuthorityTab === 'queue' ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+              boxShadow: activeAuthorityTab === 'queue' ? 'var(--shadow-xs)' : 'none',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <SlidersHorizontal style={{ width: '14px', height: '14px' }} />
+            <span>Grievance Triage Queue ({filteredGrievances.length})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveAuthorityTab('detail')}
+            style={{
+              padding: '8px 18px',
+              borderRadius: '6px',
+              fontSize: '13px',
+              fontWeight: 600,
+              background: activeAuthorityTab === 'detail' ? '#FFFFFF' : 'transparent',
+              color: activeAuthorityTab === 'detail' ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+              boxShadow: activeAuthorityTab === 'detail' ? 'var(--shadow-xs)' : 'none',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <Eye style={{ width: '14px', height: '14px' }} />
+            <span>Case Inspection (#{activeItem?.id || 'JS-10482'})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveAuthorityTab('map')}
+            style={{
+              padding: '8px 18px',
+              borderRadius: '6px',
+              fontSize: '13px',
+              fontWeight: 600,
+              background: activeAuthorityTab === 'map' ? '#FFFFFF' : 'transparent',
+              color: activeAuthorityTab === 'map' ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+              boxShadow: activeAuthorityTab === 'map' ? 'var(--shadow-xs)' : 'none',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <Compass style={{ width: '14px', height: '14px' }} />
+            <span>Civic Hotspots</span>
+          </button>
+        </div>
+
+        {/* 3. SECTION 22: WHAT NEEDS ATTENTION? (Prominent on Overview and top of dashboard) */}
+        {(activeAuthorityTab === 'overview' || activeAuthorityTab === 'queue') && (
+          <div style={{ marginBottom: '32px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+              <div>
+                <span className="pilot-tag" style={{ background: '#FEF2F2', color: '#991B1B', borderColor: '#FECACA', marginBottom: '6px' }}>
+                  CIVIC PATTERN RADAR
                 </span>
-                <span className="category-pill" style={{ height: '20px', fontSize: '10px' }}>
-                  Live Queue
+                <h2 style={{ fontSize: '22px', color: 'var(--color-text-primary)', margin: 0 }}>
+                  What Needs Attention?
+                </h2>
+                <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '4px 0 0 0' }}>
+                  Macro issues surfaced across multi-ward telemetry. Ranked by urgency, spread, and service risk.
+                </p>
+              </div>
+
+              {/* Status filter indicators */}
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '4px', background: '#FEF2F2', color: '#DC2626', fontWeight: 700 }}>
+                  ● Emerging (1)
                 </span>
-              </div>
-
-              {/* Search Bar */}
-              <div style={{ position: 'relative', marginBottom: '12px' }}>
-                <Search style={{ position: 'absolute', left: '10px', top: '10px', width: '15px', height: '15px', color: 'var(--color-text-muted)' }} />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search ID, keyword, or ward..."
-                  style={{
-                    width: '100%',
-                    height: '36px',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid var(--color-border-medium)',
-                    padding: '0 10px 0 32px',
-                    fontSize: '12px',
-                    background: '#FFFFFF'
-                  }}
-                />
-              </div>
-
-              {/* Filter Pills */}
-              <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', flexWrap: 'wrap' }}>
-                {['ALL', 'CRITICAL', 'HIGH'].map((urg) => (
-                  <button
-                    key={urg}
-                    type="button"
-                    onClick={() => setUrgencyFilter(urg)}
-                    style={{
-                      padding: '3px 10px',
-                      borderRadius: '9999px',
-                      fontSize: '11px',
-                      fontWeight: 600,
-                      border: urgencyFilter === urg ? 'none' : '1px solid var(--color-border-medium)',
-                      background: urgencyFilter === urg ? 'var(--color-primary)' : '#FFFFFF',
-                      color: urgencyFilter === urg ? '#FFFFFF' : 'var(--color-text-secondary)',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {urg}
-                  </button>
-                ))}
-                {['IN_PROGRESS', 'RESOLVED'].map((st) => (
-                  <button
-                    key={st}
-                    type="button"
-                    onClick={() => setStatusFilter(statusFilter === st ? 'ALL' : st)}
-                    style={{
-                      padding: '3px 10px',
-                      borderRadius: '9999px',
-                      fontSize: '11px',
-                      fontWeight: 600,
-                      border: statusFilter === st ? 'none' : '1px solid var(--color-border-medium)',
-                      background: statusFilter === st ? '#059669' : '#FFFFFF',
-                      color: statusFilter === st ? '#FFFFFF' : 'var(--color-text-secondary)',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {st.replace('_', ' ')}
-                  </button>
-                ))}
-              </div>
-
-              {/* Triage items list */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '720px', overflowY: 'auto' }}>
-                {filteredGrievances.length === 0 ? (
-                  <div style={{ padding: '20px', textAlign: 'center', fontSize: '12px', color: 'var(--color-text-muted)' }}>
-                    No matching grievances found in inbox.
-                  </div>
-                ) : (
-                  filteredGrievances.map((g) => {
-                    const isSelected = g.id === activeItem?.id;
-                    const itemHours = g.slaHoursLeft || 12;
-                    const itemStatus = itemHours <= 0 ? 'OVERDUE' : (itemHours <= 6 ? 'AT_RISK' : 'ON_TRACK');
-
-                    return (
-                      <div
-                        key={g.id}
-                        onClick={() => {
-                          setSelectedId(g.id);
-                          setDispatchStatus(null);
-                        }}
-                        style={{
-                          padding: '14px',
-                          borderRadius: 'var(--radius-md)',
-                          background: isSelected ? 'var(--color-accent-tint)' : '#FFFFFF',
-                          border: isSelected ? '1px solid var(--color-primary)' : '1px solid var(--color-border-subtle)',
-                          cursor: 'pointer',
-                          transition: 'all 150ms ease'
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                          <span className="font-mono-numbers" style={{ fontSize: '11px', fontWeight: 700, color: isSelected ? 'var(--color-primary)' : 'var(--color-text-muted)' }}>
-                            {g.id}
-                          </span>
-                          <span style={{
-                            fontSize: '10px',
-                            fontWeight: 700,
-                            padding: '2px 6px',
-                            borderRadius: '9999px',
-                            background: g.urgency === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB',
-                            color: g.urgency === 'CRITICAL' ? '#991B1B' : '#92400E'
-                          }}>
-                            {g.urgency} ({g.urgencyScore || 85})
-                          </span>
-                        </div>
-
-                        <h4 style={{ fontSize: '13px', lineHeight: 1.4, marginBottom: '6px', color: 'var(--color-text-primary)' }}>
-                          {g.title}
-                        </h4>
-
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px' }}>
-                          <span style={{ color: 'var(--color-text-muted)' }}>{g.department ? g.department.split('(')[0] : 'DJB'}</span>
-                          <span style={{
-                            color: itemStatus === 'OVERDUE' ? '#DC2626' : (itemStatus === 'AT_RISK' ? '#D97706' : '#059669'),
-                            fontWeight: 700
-                          }}>
-                            SLA: {itemHours}h ({itemStatus.replace('_', ' ')})
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
+                <span style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '4px', background: '#FFFBEB', color: '#D97706', fontWeight: 700 }}>
+                  ● Growing (1)
+                </span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '4px', background: '#EFF6FF', color: '#2563EB', fontWeight: 700 }}>
+                  ● Improving (1)
+                </span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '4px', background: '#ECFDF5', color: '#059669', fontWeight: 700 }}>
+                  ● Resolved (1)
+                </span>
               </div>
             </div>
+
+            {/* 4 Cards Grid */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '16px'
+            }}>
+              {emergingIssues.map((issue) => (
+                <div
+                  key={issue.id}
+                  className="card"
+                  style={{
+                    padding: '20px',
+                    border: `1px solid ${issue.badgeBorder}`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    position: 'relative',
+                    transition: 'all 200ms ease'
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                      <span style={{
+                        fontSize: '10px',
+                        fontWeight: 800,
+                        padding: '3px 8px',
+                        borderRadius: '9999px',
+                        background: issue.badgeBg,
+                        color: issue.badgeColor,
+                        border: `1px solid ${issue.badgeBorder}`,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.04em'
+                      }}>
+                        {issue.statusLabel}
+                      </span>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-text-muted)' }}>
+                        {issue.wardsCount} Wards Affected
+                      </span>
+                    </div>
+
+                    <h3 style={{ fontSize: '16px', lineHeight: 1.4, marginBottom: '8px', color: 'var(--color-text-primary)' }}>
+                      {issue.title}
+                    </h3>
+
+                    <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '12px' }}>
+                      <strong>Hypothesis: </strong>{issue.hypothesis}
+                    </p>
+
+                    <div style={{
+                      padding: '10px 12px',
+                      borderRadius: '6px',
+                      background: '#F8FAFC',
+                      border: '1px solid rgba(15,23,42,0.06)',
+                      fontSize: '11px',
+                      color: 'var(--color-text-muted)',
+                      marginBottom: '14px',
+                      lineHeight: 1.5
+                    }}>
+                      <div>📍 {issue.wards}</div>
+                      <div>📈 {issue.grievancesCount} citizen reports • {issue.trend}</div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => openInspectionForCase(issue.targetGrievanceId)}
+                    className="btn-secondary btn-sm"
+                    style={{
+                      width: '100%',
+                      justifyContent: 'center',
+                      borderColor: issue.badgeBorder,
+                      color: issue.badgeColor,
+                      fontSize: '12px'
+                    }}
+                  >
+                    <span>Investigate Cluster →</span>
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
+        )}
 
-          {/* Right Column (8 Cols): Deep Inspection Case Workspace */}
-          <div style={{ gridColumn: 'span 8' }} className="hero-right-col">
-            <div className="card" style={{ padding: '28px', marginBottom: '20px' }}>
-              
-              {/* Header Bar of Selected Case */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  <span className="font-mono-numbers" style={{ fontSize: '13px', fontWeight: 700, background: '#F1F5F9', padding: '4px 10px', borderRadius: '4px' }}>
-                    {activeItem.id}
-                  </span>
-                  <span className="category-pill">{activeItem.category}</span>
-                  <span style={{
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    padding: '3px 10px',
-                    borderRadius: '9999px',
-                    background: activeItem.status === 'RESOLVED' ? '#ECFDF5' : (activeItem.status === 'ESCALATED' ? '#FEF2F2' : '#FFFBEB'),
-                    color: activeItem.status === 'RESOLVED' ? '#065F46' : (activeItem.status === 'ESCALATED' ? '#991B1B' : '#92400E')
-                  }}>
-                    ● {activeItem.status.replace('_', ' ')}
-                  </span>
-                </div>
-
-                <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
-                  Citizen: <strong>{activeItem.citizenName || 'Aditya Verma'}</strong> ({activeItem.citizenPhone || '+91 98712-88210'})
-                </div>
+        {/* 4. OVERVIEW MODE: Key Inquiries answered: What, Where, Patterns, Review */}
+        {activeAuthorityTab === 'overview' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', marginBottom: '40px' }}>
+            {/* The 4 Core Questions Grid */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: '16px'
+            }}>
+              <div className="card" style={{ padding: '20px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
+                  1. What Needs Attention?
+                </span>
+                <strong style={{ fontSize: '20px', color: '#DC2626', display: 'block', marginBottom: '4px' }}>
+                  Water Supply in Rohini
+                </strong>
+                <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                  37 complaints linked to Sector 14 booster trunk conduit. Immediate pressure test recommended.
+                </p>
               </div>
 
-              <h2 style={{ fontSize: '24px', lineHeight: 1.3, marginBottom: '14px' }}>
-                {activeItem.title}
-              </h2>
+              <div className="card" style={{ padding: '20px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
+                  2. Where is it Happening?
+                </span>
+                <strong style={{ fontSize: '20px', color: 'var(--color-primary)', display: 'block', marginBottom: '4px' }}>
+                  Wards 12, 14 & 18
+                </strong>
+                <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                  Clustered in 400m radius around Mother Dairy & Outer Ring Road feeder line.
+                </p>
+              </div>
 
-              {/* 14. SLA INTELLIGENCE METER */}
-              <div style={{
-                padding: '14px 18px',
-                borderRadius: 'var(--radius-md)',
-                background: slaStatus === 'AT_RISK' ? '#FFFDF5' : (slaStatus === 'OVERDUE' ? '#FEF2F2' : '#F8F9FA'),
-                border: `1px solid ${slaStatus === 'AT_RISK' ? '#FDE68A' : (slaStatus === 'OVERDUE' ? '#FECACA' : 'var(--color-border-subtle)')}`,
-                marginBottom: '18px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '12px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <div>
-                    <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block' }}>SLA Target Window</span>
-                    <strong className="font-mono-numbers" style={{ fontSize: '13px' }}>{targetSlaHours} Hours</strong>
-                  </div>
-                  <div>
-                    <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block' }}>Elapsed Time</span>
-                    <strong className="font-mono-numbers" style={{ fontSize: '13px' }}>{elapsedHours} Hours</strong>
-                  </div>
-                  <div>
-                    <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block' }}>Remaining Time</span>
-                    <strong className="font-mono-numbers" style={{ fontSize: '13px', color: slaStatus === 'OVERDUE' ? '#DC2626' : (slaStatus === 'AT_RISK' ? '#D97706' : '#059669') }}>
-                      {remainingHours} Hours
-                    </strong>
-                  </div>
+              <div className="card" style={{ padding: '20px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
+                  3. What Patterns are Emerging?
+                </span>
+                <strong style={{ fontSize: '20px', color: '#D97706', display: 'block', marginBottom: '4px' }}>
+                  Sub-surface Drainage Leak
+                </strong>
+                <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                  Road complaints in Ward 18 correlate directly with uninspected drainage backpressure.
+                </p>
+              </div>
+
+              <div className="card" style={{ padding: '20px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
+                  4. What Should Be Reviewed?
+                </span>
+                <strong style={{ fontSize: '20px', color: '#059669', display: 'block', marginBottom: '4px' }}>
+                  3 RAG SOP Recommendations
+                </strong>
+                <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                  Awaiting engineer sign-off to authorize work orders without unnecessary duplicate dispatches.
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Link to Queue or Inspection */}
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => setActiveAuthorityTab('queue')}
+                className="btn-primary"
+              >
+                <span>View Full Triage Queue ({grievances.length} Active Cases)</span>
+                <ArrowRight className="btn-arrow" style={{ width: '16px', height: '16px' }} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => openInspectionForCase(activeItem?.id || 'GRV-2025-001')}
+                className="btn-secondary"
+              >
+                <span>Inspect Priority Case #{activeItem?.id || 'GRV-2025-001'}</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 5. SPLIT WORKSPACE / QUEUE & CASE INSPECTION */}
+        {(activeAuthorityTab === 'queue' || activeAuthorityTab === 'detail') && (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(12, 1fr)',
+            gap: '24px',
+            alignItems: 'start'
+          }}>
+            {/* Left Column (4 Cols): Priority Triage Queue & Search Filter */}
+            <div style={{ gridColumn: activeAuthorityTab === 'queue' ? 'span 12' : 'span 4' }} className="hero-left-col">
+              <div className="card" style={{ padding: '20px' }}>
+                
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-text-muted)' }}>
+                    Grievance Queue ({filteredGrievances.length})
+                  </span>
+                  <span className="category-pill" style={{ height: '20px', fontSize: '10px' }}>
+                    Live Queue
+                  </span>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{
-                    fontSize: '11px',
-                    fontWeight: 800,
-                    padding: '4px 10px',
-                    borderRadius: '9999px',
-                    background: slaStatus === 'OVERDUE' ? '#EF4444' : (slaStatus === 'AT_RISK' ? '#F59E0B' : '#059669'),
-                    color: '#FFFFFF'
-                  }}>
-                    {slaStatus === 'AT_RISK' ? '⚠️ AT RISK OF BREACH' : (slaStatus === 'OVERDUE' ? '🚨 SLA BREACHED' : '✓ ON TRACK')}
-                  </span>
-                  {liveAnalysis.autoEscalationTriggered && (
-                    <span style={{ fontSize: '11px', color: '#DC2626', fontWeight: 700 }}>
-                      [Auto-Escalated to Chief Engineer]
-                    </span>
+                {/* Search Bar */}
+                <div style={{ position: 'relative', marginBottom: '12px' }}>
+                  <Search style={{ position: 'absolute', left: '10px', top: '10px', width: '15px', height: '15px', color: 'var(--color-text-muted)' }} />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search ID, keyword, or ward..."
+                    style={{
+                      width: '100%',
+                      height: '36px',
+                      borderRadius: 'var(--radius-sm)',
+                      border: '1px solid var(--color-border-medium)',
+                      padding: '0 10px 0 32px',
+                      fontSize: '12px',
+                      background: '#FFFFFF'
+                    }}
+                  />
+                </div>
+
+                {/* Filter Pills */}
+                <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', flexWrap: 'wrap' }}>
+                  {['ALL', 'CRITICAL', 'HIGH'].map((urg) => (
+                    <button
+                      key={urg}
+                      type="button"
+                      onClick={() => setUrgencyFilter(urg)}
+                      style={{
+                        padding: '3px 10px',
+                        borderRadius: '9999px',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        border: urgencyFilter === urg ? 'none' : '1px solid var(--color-border-medium)',
+                        background: urgencyFilter === urg ? 'var(--color-primary)' : '#FFFFFF',
+                        color: urgencyFilter === urg ? '#FFFFFF' : 'var(--color-text-secondary)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {urg}
+                    </button>
+                  ))}
+                  {['IN_PROGRESS', 'RESOLVED'].map((st) => (
+                    <button
+                      key={st}
+                      type="button"
+                      onClick={() => setStatusFilter(statusFilter === st ? 'ALL' : st)}
+                      style={{
+                        padding: '3px 10px',
+                        borderRadius: '9999px',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        border: statusFilter === st ? 'none' : '1px solid var(--color-border-medium)',
+                        background: statusFilter === st ? '#059669' : '#FFFFFF',
+                        color: statusFilter === st ? '#FFFFFF' : 'var(--color-text-secondary)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {st.replace('_', ' ')}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Triage items list */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  maxHeight: activeAuthorityTab === 'queue' ? 'none' : '720px',
+                  overflowY: 'auto'
+                }}>
+                  {filteredGrievances.length === 0 ? (
+                    <div style={{ padding: '20px', textAlign: 'center', fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                      No matching grievances found in inbox.
+                    </div>
+                  ) : (
+                    filteredGrievances.map((g) => {
+                      const isSelected = g.id === activeItem?.id;
+                      const itemHours = g.slaHoursLeft || 12;
+                      const itemStatus = itemHours <= 0 ? 'OVERDUE' : (itemHours <= 6 ? 'AT_RISK' : 'ON_TRACK');
+
+                      return (
+                        <div
+                          key={g.id}
+                          onClick={() => {
+                            setSelectedId(g.id);
+                            setActiveAuthorityTab('detail');
+                            setDispatchStatus(null);
+                          }}
+                          style={{
+                            padding: '14px',
+                            borderRadius: 'var(--radius-md)',
+                            background: isSelected ? 'var(--color-accent-tint)' : '#FFFFFF',
+                            border: isSelected ? '1px solid var(--color-primary)' : '1px solid var(--color-border-subtle)',
+                            cursor: 'pointer',
+                            transition: 'all 150ms ease'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                            <span className="font-mono-numbers" style={{ fontSize: '11px', fontWeight: 700, color: isSelected ? 'var(--color-primary)' : 'var(--color-text-muted)' }}>
+                              {g.id}
+                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{
+                                fontSize: '10px',
+                                fontWeight: 700,
+                                padding: '2px 6px',
+                                borderRadius: '9999px',
+                                background: g.urgency === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB',
+                                color: g.urgency === 'CRITICAL' ? '#991B1B' : '#92400E'
+                              }}>
+                                {g.urgency} ({g.urgencyScore || 85})
+                              </span>
+                              <WhyExplainer
+                                label="Why?"
+                                title={`Why ${g.urgency} Priority?`}
+                                reasons={[
+                                  'Duration exceeds municipal threshold',
+                                  'Multiple adjacent household reports',
+                                  'High-risk infrastructure keywords verified'
+                                ]}
+                                align="right"
+                              />
+                            </div>
+                          </div>
+
+                          <h4 style={{ fontSize: '13px', lineHeight: 1.4, marginBottom: '6px', color: 'var(--color-text-primary)' }}>
+                            {g.title}
+                          </h4>
+
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px' }}>
+                            <span style={{ color: 'var(--color-text-muted)' }}>{g.department ? g.department.split('(')[0] : 'DJB'} • {g.location?.ward || 'Ward 14'}</span>
+                            <span style={{
+                              color: itemStatus === 'OVERDUE' ? '#DC2626' : (itemStatus === 'AT_RISK' ? '#D97706' : '#059669'),
+                              fontWeight: 700
+                            }}>
+                              SLA: {itemHours}h ({itemStatus.replace('_', ' ')})
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               </div>
+            </div>
 
-              {/* 13. RESOLUTION WORKFLOW PROGRESSION STEPPER */}
-              <div style={{
-                padding: '16px',
-                borderRadius: 'var(--radius-md)',
-                background: '#F8F9FA',
-                border: '1px solid var(--color-border-subtle)',
-                marginBottom: '20px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <GitBranch style={{ width: '14px', height: '14px', color: 'var(--color-primary)' }} />
-                    <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-text-primary)' }}>
-                      Formal Resolution Workflow (Discovery Protocol)
-                    </span>
+            {/* Right Column (8 Cols): SECTION 23 GRIEVANCE DETAIL PAGE */}
+            {activeAuthorityTab === 'detail' && (
+              <div style={{ gridColumn: 'span 8' }} className="hero-right-col">
+                <div className="card" style={{ padding: '28px', marginBottom: '20px' }}>
+                  
+                  {/* Header Bar of Selected Case (Section 23) */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      <span className="font-mono-numbers" style={{ fontSize: '13px', fontWeight: 800, background: '#F1F5F9', padding: '4px 10px', borderRadius: '4px' }}>
+                        GRIEVANCE #{activeItem.id}
+                      </span>
+                      <span className="category-pill">{activeItem.category}</span>
+                      <span style={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        padding: '3px 10px',
+                        borderRadius: '9999px',
+                        background: activeItem.urgency === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB',
+                        color: activeItem.urgency === 'CRITICAL' ? '#991B1B' : '#92400E'
+                      }}>
+                        ● {activeItem.urgency} PRIORITY
+                      </span>
+                      <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
+                        {activeItem.location?.ward || 'Ward 18'}
+                      </span>
+                    </div>
+
+                    <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                      Citizen: <strong>{activeItem.citizenName || 'Aditya Verma'}</strong> ({activeItem.citizenPhone || '+91 98712-88210'})
+                    </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowTransitionModal(true)}
-                    className="btn-secondary btn-sm"
-                    style={{ height: '28px', fontSize: '11px' }}
-                  >
-                    Advance Status →
-                  </button>
-                </div>
 
-                {/* Stepper Dots */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', overflowX: 'auto', gap: '4px', paddingBottom: '4px' }}>
-                  {workflowStages.map((stage, idx) => {
-                    const isPassed = idx < currentStatusIndex;
-                    const isCurrent = idx === currentStatusIndex;
-                    return (
-                      <div key={stage.key} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <div style={{
-                          padding: '4px 8px',
-                          borderRadius: '4px',
-                          background: isCurrent ? 'var(--color-primary)' : (isPassed ? '#DCFCE7' : '#FFFFFF'),
-                          color: isCurrent ? '#FFFFFF' : (isPassed ? '#15803D' : 'var(--color-text-muted)'),
-                          border: isCurrent ? 'none' : '1px solid rgba(15,23,42,0.08)',
-                          fontSize: '10px',
-                          fontWeight: 700,
-                          whiteSpace: 'nowrap'
-                        }}>
-                          {isPassed ? '✓ ' : ''}{stage.label}
-                        </div>
-                        {idx < workflowStages.length - 1 && (
-                          <span style={{ color: 'var(--color-border-medium)', fontSize: '10px' }}>›</span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+                  <h2 style={{ fontSize: '24px', lineHeight: 1.3, marginBottom: '14px' }}>
+                    {activeItem.title}
+                  </h2>
 
-              {/* Action Toolbar: Clarify, Reassign, Escalate, Resolve */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                flexWrap: 'wrap',
-                padding: '10px 14px',
-                borderRadius: 'var(--radius-md)',
-                background: '#FFFFFF',
-                border: '1px solid var(--color-border-subtle)',
-                marginBottom: '20px'
-              }}>
-                <button
-                  type="button"
-                  onClick={handleAcceptRecommendation}
-                  className="btn-primary btn-sm"
-                  style={{ background: 'var(--color-primary)' }}
-                >
-                  <Check style={{ width: '13px', height: '13px' }} />
-                  <span>Accept SOP & Dispatch Crew</span>
-                </button>
+                  {/* VISUAL JOURNEY TIMELINE (Section 23: Citizen Report → AI Understanding → Related Cases → Evidence → Recommendation → Officer Decision → Citizen Verification) */}
+                  <div style={{ marginBottom: '20px' }}>
+                    <VisualJourneyTimeline currentStep={activeItem.status === 'RESOLVED' ? 6 : 4} />
+                  </div>
 
-                <button
-                  type="button"
-                  onClick={() => setShowClarificationModal(true)}
-                  className="btn-secondary btn-sm"
-                  style={{ borderColor: '#FCD34D', color: '#B45309' }}
-                >
-                  <MessageSquare style={{ width: '13px', height: '13px' }} />
-                  <span>Request Info</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowReassignModal(true)}
-                  className="btn-secondary btn-sm"
-                >
-                  <Users style={{ width: '13px', height: '13px' }} />
-                  <span>Reassign</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowEscalateModal(true)}
-                  className="btn-secondary btn-sm"
-                  style={{ borderColor: '#FECACA', color: '#B91C1C' }}
-                >
-                  <AlertOctagon style={{ width: '13px', height: '13px' }} />
-                  <span>Escalate</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowResolutionModal(true)}
-                  className="btn-secondary btn-sm"
-                  style={{ borderColor: '#86EFAC', color: '#14532D', marginLeft: 'auto' }}
-                >
-                  <CheckCircle2 style={{ width: '13px', height: '13px' }} />
-                  <span>Attach Evidence & Resolve</span>
-                </button>
-              </div>
-
-              {/* Status Banner after action */}
-              {dispatchStatus && (
-                <div style={{
-                  padding: '10px 14px',
-                  borderRadius: 'var(--radius-sm)',
-                  background: '#ECFDF5',
-                  border: '1px solid #A7F3D0',
-                  color: '#065F46',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  marginBottom: '16px'
-                }}>
-                  <CheckCircle2 style={{ width: '14px', height: '14px' }} />
-                  <span>Action processed successfully: {dispatchStatus}</span>
-                </div>
-              )}
-
-              {/* Deep Inspection Tabs */}
-              <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--color-divider)', paddingBottom: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
-                {[
-                  { id: 'brief', label: 'AI Case Brief & Original Complaint' },
-                  { id: 'resolution', label: 'AI Recommendation (RAG SOP)' },
-                  { id: 'duplicates', label: `Duplicate Candidates (${liveAnalysis.duplicateCandidates?.length || 0})` },
-                  { id: 'history', label: `Historical Precedents (${liveAnalysis.historicalCases?.length || 0})` },
-                  { id: 'workflow', label: `Workflow History (${activeItem.statusHistory?.length || 1})` },
-                  { id: 'notes', label: `Internal Notes (${activeItem.internalNotes?.length || 0})` }
-                ].map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setActiveTab(t.id)}
-                    style={{
-                      padding: '6px 14px',
-                      borderRadius: '9999px',
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      border: 'none',
-                      background: activeTab === t.id ? 'var(--color-primary)' : '#F1F5F9',
-                      color: activeTab === t.id ? '#FFFFFF' : 'var(--color-text-secondary)',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* TAB 1: AI Case Brief & Original Complaint */}
-              {activeTab === 'brief' && (
-                <div>
-                  {/* Original Complaint Verbatim */}
+                  {/* SLA INTELLIGENCE METER */}
                   <div style={{
-                    padding: '16px 18px',
+                    padding: '14px 18px',
+                    borderRadius: 'var(--radius-md)',
+                    background: slaStatus === 'AT_RISK' ? '#FFFDF5' : (slaStatus === 'OVERDUE' ? '#FEF2F2' : '#F8F9FA'),
+                    border: `1px solid ${slaStatus === 'AT_RISK' ? '#FDE68A' : (slaStatus === 'OVERDUE' ? '#FECACA' : 'var(--color-border-subtle)')}`,
+                    marginBottom: '18px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '12px'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <div>
+                        <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block' }}>SLA Target Window</span>
+                        <strong className="font-mono-numbers" style={{ fontSize: '13px' }}>{targetSlaHours} Hours</strong>
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block' }}>Elapsed Time</span>
+                        <strong className="font-mono-numbers" style={{ fontSize: '13px' }}>{elapsedHours} Hours</strong>
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block' }}>Remaining Time</span>
+                        <strong className="font-mono-numbers" style={{ fontSize: '13px', color: slaStatus === 'OVERDUE' ? '#DC2626' : (slaStatus === 'AT_RISK' ? '#D97706' : '#059669') }}>
+                          {remainingHours} Hours
+                        </strong>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{
+                        fontSize: '11px',
+                        fontWeight: 800,
+                        padding: '4px 10px',
+                        borderRadius: '9999px',
+                        background: slaStatus === 'OVERDUE' ? '#EF4444' : (slaStatus === 'AT_RISK' ? '#F59E0B' : '#059669'),
+                        color: '#FFFFFF'
+                      }}>
+                        {slaStatus === 'AT_RISK' ? '⚠️ AT RISK OF BREACH' : (slaStatus === 'OVERDUE' ? '🚨 SLA BREACHED' : '✓ ON TRACK')}
+                      </span>
+                      <WhyExplainer
+                        label="SLA Formula"
+                        title="SLA Computation Factors"
+                        reasons={[
+                          'Category: Water & Sewage standard turnaround is 12 hours',
+                          'Ward vulnerability score: Elevated (school zone)',
+                          'Priority multiplier applied: 1.25x'
+                        ]}
+                        align="right"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Formal Workflow Progression Stepper */}
+                  <div style={{
+                    padding: '16px',
                     borderRadius: 'var(--radius-md)',
                     background: '#F8F9FA',
                     border: '1px solid var(--color-border-subtle)',
-                    marginBottom: '18px'
+                    marginBottom: '20px'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                      <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                        Original Citizen Submission ({liveAnalysis.detectedLang}):
-                      </span>
-                      <span style={{ fontSize: '10px', color: '#059669', fontWeight: 700 }}>
-                        ✓ Verbatim Record Preserved
-                      </span>
-                    </div>
-                    <p style={{ fontSize: '14px', color: 'var(--color-text-primary)', lineHeight: 1.6, margin: 0, fontStyle: 'italic' }}>
-                      "{activeItem.descriptionRaw || activeItem.title}"
-                    </p>
-                    {liveAnalysis.translatedText && liveAnalysis.translatedText !== activeItem.descriptionRaw && (
-                      <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid rgba(15,23,42,0.06)', fontSize: '12px' }}>
-                        <strong style={{ color: 'var(--color-primary)' }}>Official English Translation: </strong>
-                        <span style={{ color: 'var(--color-text-secondary)' }}>"{liveAnalysis.translatedText}"</span>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <GitBranch style={{ width: '14px', height: '14px', color: 'var(--color-primary)' }} />
+                        <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-text-primary)' }}>
+                          Formal Workflow Stage
+                        </span>
                       </div>
-                    )}
+                      <button
+                        type="button"
+                        onClick={() => setShowTransitionModal(true)}
+                        className="btn-secondary btn-sm"
+                        style={{ height: '28px', fontSize: '11px' }}
+                      >
+                        Advance Status →
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', overflowX: 'auto', gap: '4px', paddingBottom: '4px' }}>
+                      {workflowStages.map((stage, idx) => {
+                        const isPassed = idx < currentStatusIndex;
+                        const isCurrent = idx === currentStatusIndex;
+                        return (
+                          <div key={stage.key} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <div style={{
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              background: isCurrent ? 'var(--color-primary)' : (isPassed ? '#DCFCE7' : '#FFFFFF'),
+                              color: isCurrent ? '#FFFFFF' : (isPassed ? '#15803D' : 'var(--color-text-muted)'),
+                              border: isCurrent ? 'none' : '1px solid rgba(15,23,42,0.08)',
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {isPassed ? '✓ ' : ''}{stage.label}
+                            </div>
+                            {idx < workflowStages.length - 1 && (
+                              <span style={{ color: 'var(--color-border-medium)', fontSize: '10px' }}>›</span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
 
-                  {/* Classification Grid */}
+                  {/* Action Toolbar: Clarify, Reassign, Escalate, Resolve */}
                   <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(4, 1fr)',
-                    gap: '12px',
-                    padding: '14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    flexWrap: 'wrap',
+                    padding: '10px 14px',
                     borderRadius: 'var(--radius-md)',
                     background: '#FFFFFF',
-                    border: '1px solid var(--color-border-medium)',
-                    marginBottom: '18px',
-                    fontSize: '12px'
-                  }}>
-                    <div>
-                      <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '10px', textTransform: 'uppercase', fontWeight: 700 }}>Department</span>
-                      <strong style={{ color: 'var(--color-primary)' }}>{liveAnalysis.department}</strong>
-                      <span style={{ fontSize: '10px', color: '#059669', display: 'block' }}>{liveAnalysis.confidence}% Confidence</span>
-                    </div>
-                    <div>
-                      <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '10px', textTransform: 'uppercase', fontWeight: 700 }}>Subcategory</span>
-                      <strong>{liveAnalysis.subcategory}</strong>
-                    </div>
-                    <div>
-                      <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '10px', textTransform: 'uppercase', fontWeight: 700 }}>Priority</span>
-                      <strong style={{ color: activeItem.urgency === 'CRITICAL' ? '#DC2626' : '#D97706' }}>{liveAnalysis.priority}</strong>
-                    </div>
-                    <div>
-                      <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '10px', textTransform: 'uppercase', fontWeight: 700 }}>Severity</span>
-                      <strong style={{ color: activeItem.urgency === 'CRITICAL' ? '#DC2626' : '#D97706' }}>{activeItem.urgency} ({activeItem.urgencyScore || 94})</strong>
-                    </div>
-                  </div>
-
-                  {/* AI 3-Bullet Brief */}
-                  <div style={{
-                    padding: '18px 20px',
-                    borderRadius: 'var(--radius-lg)',
-                    background: 'linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%)',
-                    border: '1px solid rgba(14, 94, 58, 0.2)',
+                    border: '1px solid var(--color-border-subtle)',
                     marginBottom: '20px'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-                      <Sparkles style={{ width: '15px', height: '15px', color: 'var(--color-primary)' }} />
-                      <strong style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-primary)' }}>
-                        AI Officer Executive Brief (Saved ~10 Min Reading Raw Report):
-                      </strong>
-                    </div>
-                    <ul style={{ paddingLeft: '18px', fontSize: '13px', lineHeight: 1.7, color: 'var(--color-text-primary)', margin: 0 }}>
-                      {activeItem.aiOfficerBrief ? (
-                        activeItem.aiOfficerBrief.map((bullet, i) => (
-                          <li key={i} style={{ marginBottom: '4px' }}>{bullet}</li>
-                        ))
-                      ) : (
-                        <>
-                          <li>Biological contamination hazard reported; drinking water mixed with sewage line runoff.</li>
-                          <li>Joint crack at 100mm underground junction 40m south of Mother Dairy.</li>
-                          <li>Cluster of 18 corroborating citizen complaints detected in 300m radius.</li>
-                        </>
-                      )}
-                    </ul>
+                    <button
+                      type="button"
+                      onClick={handleAcceptRecommendation}
+                      className="btn-primary btn-sm"
+                      style={{ background: 'var(--color-primary)' }}
+                    >
+                      <Check style={{ width: '13px', height: '13px' }} />
+                      <span>Accept SOP & Dispatch Crew</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowClarificationModal(true)}
+                      className="btn-secondary btn-sm"
+                      style={{ borderColor: '#FCD34D', color: '#B45309' }}
+                    >
+                      <MessageSquare style={{ width: '13px', height: '13px' }} />
+                      <span>Request Info</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowReassignModal(true)}
+                      className="btn-secondary btn-sm"
+                    >
+                      <Users style={{ width: '13px', height: '13px' }} />
+                      <span>Reassign</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowEscalateModal(true)}
+                      className="btn-secondary btn-sm"
+                      style={{ borderColor: '#FECACA', color: '#B91C1C' }}
+                    >
+                      <AlertOctagon style={{ width: '13px', height: '13px' }} />
+                      <span>Escalate</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowResolutionModal(true)}
+                      className="btn-secondary btn-sm"
+                      style={{ borderColor: '#86EFAC', color: '#14532D', marginLeft: 'auto' }}
+                    >
+                      <CheckCircle2 style={{ width: '13px', height: '13px' }} />
+                      <span>Attach Evidence & Resolve</span>
+                    </button>
                   </div>
 
-                  {/* Grievance DNA Component */}
-                  <GrievanceDnaCard dna={activeItem.grievanceDna} compact={false} />
-                </div>
-              )}
-
-              {/* TAB 2: AI Recommendation (RAG SOP) */}
-              {activeTab === 'resolution' && (
-                <div>
-                  <div style={{
-                    padding: '20px',
-                    borderRadius: 'var(--radius-lg)',
-                    background: '#F0FDF4',
-                    border: '1px solid #BBF7D0',
-                    marginBottom: '20px'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div className="icon-squircle" style={{ width: '32px', height: '32px', background: '#DCFCE7' }}>
-                          <FileCheck style={{ width: '16px', height: '16px', color: 'var(--color-primary)' }} />
-                        </div>
-                        <div>
-                          <strong style={{ fontSize: '14px', color: '#14532D' }}>
-                            AI Recommended Action (RAG Retrieval)
-                          </strong>
-                          <span style={{ fontSize: '11px', color: '#166534', display: 'block' }}>
-                            Derived from: {liveAnalysis.aiRecommendation?.standardOperatingProcedure}
-                          </span>
-                        </div>
-                      </div>
-                      <span style={{ fontSize: '11px', fontWeight: 700, background: '#DCFCE7', color: '#15803D', padding: '4px 8px', borderRadius: '4px' }}>
-                        Est. Fix: 6 Hours
-                      </span>
+                  {/* Status Banner after action */}
+                  {dispatchStatus && (
+                    <div style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-sm)',
+                      background: '#ECFDF5',
+                      border: '1px solid #A7F3D0',
+                      color: '#065F46',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      marginBottom: '16px'
+                    }}>
+                      <CheckCircle2 style={{ width: '14px', height: '14px' }} />
+                      <span>Action processed successfully: {dispatchStatus}</span>
                     </div>
+                  )}
 
-                    <p style={{ fontSize: '13px', color: '#166534', marginBottom: '12px', lineHeight: 1.5 }}>
-                      <strong>Recommended Action: </strong>
-                      {liveAnalysis.aiRecommendation?.recommendedAction}
-                    </p>
-
-                    <div style={{ padding: '10px 14px', borderRadius: '6px', background: '#FFFFFF', border: '1px solid #86EFAC', fontSize: '12px', color: '#14532D', marginBottom: '14px' }}>
-                      <strong>Engineering Reasoning: </strong>
-                      {liveAnalysis.aiRecommendation?.reasoning}
-                    </div>
-
-                    {/* Supporting Evidence */}
-                    <div style={{ marginBottom: '14px' }}>
-                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#15803D', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
-                        Supporting Evidence & Telemetry:
-                      </span>
-                      <ul style={{ paddingLeft: '18px', fontSize: '12px', color: '#166534', margin: 0 }}>
-                        {liveAnalysis.aiRecommendation?.supportingEvidence?.map((ev, i) => (
-                          <li key={i}>{ev}</li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* SLA Implications */}
-                    <div style={{ padding: '10px 14px', borderRadius: '6px', background: '#FFFBEB', border: '1px solid #FDE68A', fontSize: '12px', color: '#92400E', marginBottom: '16px' }}>
-                      <strong>Potential SLA Implications: </strong>
-                      {liveAnalysis.aiRecommendation?.potentialSlaImplications}
-                    </div>
-
-                    {/* Decision Buttons (Accept, Modify, Reject) */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', paddingTop: '12px', borderTop: '1px solid #DCFCE7' }}>
+                  {/* Deep Inspection Sub-Tabs */}
+                  <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--color-divider)', paddingBottom: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
+                    {[
+                      { id: 'recommendation', label: 'Resolution Intelligence' },
+                      { id: 'brief', label: 'Citizen Report & DNA' },
+                      { id: 'duplicates', label: `Duplicate Review (${liveAnalysis.duplicateCandidates?.length || 0})` },
+                      { id: 'verification', label: 'Resolution Verification' },
+                      { id: 'history', label: `Historical Precedents (${liveAnalysis.historicalCases?.length || 0})` },
+                      { id: 'notes', label: `Internal Notes (${activeItem.internalNotes?.length || 0})` }
+                    ].map((t) => (
                       <button
+                        key={t.id}
                         type="button"
-                        onClick={handleAcceptRecommendation}
-                        className="btn-primary btn-sm"
-                        style={{ background: '#15803D' }}
+                        onClick={() => setDetailSubTab(t.id)}
+                        style={{
+                          padding: '6px 14px',
+                          borderRadius: '9999px',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          border: 'none',
+                          background: detailSubTab === t.id ? 'var(--color-primary)' : '#F1F5F9',
+                          color: detailSubTab === t.id ? '#FFFFFF' : 'var(--color-text-secondary)',
+                          cursor: 'pointer'
+                        }}
                       >
-                        <Check style={{ width: '13px', height: '13px' }} />
-                        <span>Accept Recommendation</span>
+                        {t.label}
                       </button>
+                    ))}
+                  </div>
 
-                      <button
-                        type="button"
-                        onClick={() => {
+                  {/* SUB-TAB 1: SECTION 24 RESOLUTION INTELLIGENCE CARD */}
+                  {detailSubTab === 'recommendation' && (
+                    <div style={{ marginBottom: '20px' }}>
+                      <ResolutionIntelligenceCard
+                        title="RESOLUTION INTELLIGENCE"
+                        recommendedAction={liveAnalysis.aiRecommendation?.recommendedAction || "Inspect drainage infrastructure before initiating road resurfacing."}
+                        standardOperatingProcedure={liveAnalysis.aiRecommendation?.standardOperatingProcedure || "Municipal Standard Operating Procedure Sec-4B"}
+                        estimatedDuration="6 Hours"
+                        whyPoints={[
+                          `${liveAnalysis.duplicateCandidates?.length || 12} similar complaints recorded in ${activeItem.location?.ward || 'Ward 18'}`,
+                          "3 nearby locations experiencing secondary drainage overflow",
+                          "2 previous related drainage repairs logged in municipal ledger",
+                          "Relevant standard operating procedure found and verified",
+                          "Location clustering pattern detected across adjacent transit corridor"
+                        ]}
+                        supportingEvidence={[
+                          { label: `${liveAnalysis.duplicateCandidates?.length || 12} Similar Cases`, tag: activeItem.location?.ward || 'Ward 18' },
+                          { label: "Relevant Policy", tag: "SOP Sec-4B" },
+                          { label: "Previous Resolution", tag: "Case #JS-0891" },
+                          { label: "Location Pattern", tag: "Drainage Backpressure" }
+                        ]}
+                        engineeringReasoning={liveAnalysis.aiRecommendation?.reasoning || "Sub-surface inspection prevents premature resurfacing failures."}
+                        potentialSlaRisk={liveAnalysis.aiRecommendation?.potentialSlaImplications || "Dispatch can be executed within the 12h SLA deadline."}
+                        decisionStatus={dispatchStatus}
+                        onApprove={handleAcceptRecommendation}
+                        onModify={() => {
                           setModifiedSopText(liveAnalysis.aiRecommendation?.recommendedAction || '');
                           setShowModifyModal(true);
                         }}
-                        className="btn-secondary btn-sm"
-                        style={{ background: '#FFFFFF', borderColor: '#86EFAC', color: '#166534' }}
-                      >
-                        <Edit3 style={{ width: '13px', height: '13px' }} />
-                        <span>Modify SOP / Work Order</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setShowRejectModal(true)}
-                        className="btn-secondary btn-sm"
-                        style={{ background: '#FFFFFF', borderColor: '#FECACA', color: '#B91C1C' }}
-                      >
-                        <X style={{ width: '13px', height: '13px' }} />
-                        <span>Reject Recommendation</span>
-                      </button>
+                        onRequestMoreEvidence={() => setShowClarificationModal(true)}
+                      />
                     </div>
-                  </div>
-                </div>
-              )}
+                  )}
 
-              {/* TAB 3: Duplicate Candidates & Similar Complaints */}
-              {activeTab === 'duplicates' && (
-                <div>
-                  {/* Human-in-the-loop guarantee banner */}
+                  {/* SUB-TAB 2: CITIZEN REPORT & GRIEVANCE DNA */}
+                  {detailSubTab === 'brief' && (
+                    <div>
+                      {/* Original Citizen Submission */}
+                      <div style={{
+                        padding: '16px 18px',
+                        borderRadius: 'var(--radius-md)',
+                        background: '#F8F9FA',
+                        border: '1px solid var(--color-border-subtle)',
+                        marginBottom: '18px'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
+                            Original Citizen Submission ({liveAnalysis.detectedLang}):
+                          </span>
+                          <span style={{ fontSize: '10px', color: '#059669', fontWeight: 700 }}>
+                            ✓ Verbatim Record Preserved
+                          </span>
+                        </div>
+                        <p style={{ fontSize: '14px', color: 'var(--color-text-primary)', lineHeight: 1.6, margin: 0, fontStyle: 'italic' }}>
+                          "{activeItem.descriptionRaw || activeItem.title}"
+                        </p>
+                        {liveAnalysis.translatedText && liveAnalysis.translatedText !== activeItem.descriptionRaw && (
+                          <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid rgba(15,23,42,0.06)', fontSize: '12px' }}>
+                            <strong style={{ color: 'var(--color-primary)' }}>Official English Translation: </strong>
+                            <span style={{ color: 'var(--color-text-secondary)' }}>"{liveAnalysis.translatedText}"</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Classification Grid */}
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                        gap: '12px',
+                        padding: '14px',
+                        borderRadius: 'var(--radius-md)',
+                        background: '#FFFFFF',
+                        border: '1px solid var(--color-border-medium)',
+                        marginBottom: '18px',
+                        fontSize: '12px'
+                      }}>
+                        <div>
+                          <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '10px', textTransform: 'uppercase', fontWeight: 700 }}>Department</span>
+                          <strong style={{ color: 'var(--color-primary)' }}>{liveAnalysis.department}</strong>
+                          <span style={{ fontSize: '10px', color: '#059669', display: 'block' }}>{liveAnalysis.confidence}% Confidence</span>
+                        </div>
+                        <div>
+                          <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '10px', textTransform: 'uppercase', fontWeight: 700 }}>Subcategory</span>
+                          <strong>{liveAnalysis.subcategory}</strong>
+                        </div>
+                        <div>
+                          <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '10px', textTransform: 'uppercase', fontWeight: 700 }}>Priority</span>
+                          <strong style={{ color: activeItem.urgency === 'CRITICAL' ? '#DC2626' : '#D97706' }}>{liveAnalysis.priority}</strong>
+                        </div>
+                        <div>
+                          <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '10px', textTransform: 'uppercase', fontWeight: 700 }}>Severity</span>
+                          <strong style={{ color: activeItem.urgency === 'CRITICAL' ? '#DC2626' : '#D97706' }}>{activeItem.urgency} ({activeItem.urgencyScore || 94})</strong>
+                        </div>
+                      </div>
+
+                      {/* Grievance DNA Component */}
+                      <GrievanceDnaCard dna={activeItem.grievanceDna} compact={false} />
+                    </div>
+                  )}
+
+                  {/* SUB-TAB 3: DUPLICATE CANDIDATES & HUMAN-IN-THE-LOOP REVIEW */}
+                  {detailSubTab === 'duplicates' && (
+                    <div>
+                      <div style={{
+                        padding: '12px 16px',
+                        borderRadius: 'var(--radius-md)',
+                        background: '#EFF6FF',
+                        border: '1px solid #BFDBFE',
+                        fontSize: '12px',
+                        color: '#1E40AF',
+                        marginBottom: '16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}>
+                        <ShieldCheck style={{ width: '18px', height: '18px', flexShrink: 0 }} />
+                        <span>
+                          <strong>Human Authorization Mandate: </strong>
+                          AI clusters candidates by semantic distance but will NEVER automatically merge citizen tickets without officer review.
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {liveAnalysis.duplicateCandidates?.map((candidate) => (
+                          <div
+                            key={candidate.id}
+                            style={{
+                              padding: '16px',
+                              borderRadius: 'var(--radius-md)',
+                              background: '#FFFFFF',
+                              border: `1px solid ${candidate.matchClassification === 'LIKELY_DUPLICATE' ? '#FECACA' : '#E2E8F0'}`,
+                              boxShadow: 'var(--shadow-xs)'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px', flexWrap: 'wrap', gap: '8px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <strong className="font-mono-numbers" style={{ fontSize: '13px' }}>{candidate.id}</strong>
+                                <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>by {candidate.citizenName}</span>
+                                <span style={{
+                                  fontSize: '10px',
+                                  fontWeight: 800,
+                                  padding: '2px 8px',
+                                  borderRadius: '9999px',
+                                  background: candidate.matchClassification === 'LIKELY_DUPLICATE' ? '#FEF2F2' : (candidate.matchClassification === 'RELATED_COMPLAINT' ? '#FFFBEB' : '#EFF6FF'),
+                                  color: candidate.badgeColor
+                                }}>
+                                  {candidate.matchBadge}
+                                </span>
+                              </div>
+
+                              <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                                Distance: {candidate.distanceMeters}m away
+                              </span>
+                            </div>
+
+                            <p style={{ fontSize: '13px', color: 'var(--color-text-primary)', marginBottom: '6px' }}>
+                              "{candidate.title}"
+                            </p>
+                            <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '12px', fontStyle: 'italic' }}>
+                              <strong>Reasoning: </strong>{candidate.reason}
+                            </p>
+
+                            {/* Officer Actions on Candidate */}
+                            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                              <button
+                                type="button"
+                                onClick={() => handleDuplicateAction(activeItem.id, candidate.id, 'MERGE_AS_DUPLICATE', 'Confirmed identical pipeline fracture')}
+                                className="btn-primary btn-sm"
+                                style={{ fontSize: '11px', height: '30px' }}
+                              >
+                                ✓ Confirm Duplicate & Merge Cluster
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDuplicateAction(activeItem.id, candidate.id, 'LINK_AS_RELATED', 'Confirmed related downstream effect')}
+                                className="btn-secondary btn-sm"
+                                style={{ fontSize: '11px', height: '30px' }}
+                              >
+                                🔗 Link as Related Incident
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDuplicateAction(activeItem.id, candidate.id, 'MARK_INDEPENDENT', 'Confirmed separate issue')}
+                                className="btn-secondary btn-sm"
+                                style={{ fontSize: '11px', height: '30px', color: 'var(--color-text-muted)' }}
+                              >
+                                Keep Independent
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SUB-TAB 4: SECTION 20 RESOLUTION VERIFICATION */}
+                  {detailSubTab === 'verification' && (
+                    <div>
+                      <ResolutionVerificationCard
+                        grievanceId={activeItem.id}
+                        title={activeItem.title}
+                        isResolved={activeItem.status === 'RESOLVED'}
+                        remediationNotes={resolutionNotes}
+                        verifiedBy={currentOfficer.name}
+                        onVerifyYes={() => {
+                          setDispatchStatus('CITIZEN_CONFIRMED_FIXED');
+                          try { confetti({ particleCount: 60, spread: 60 }); } catch(e) {}
+                        }}
+                        onVerifyNo={() => {
+                          setDispatchStatus('CITIZEN_REOPENED_CASE');
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {/* SUB-TAB 5: HISTORICAL PRECEDENTS */}
+                  {detailSubTab === 'history' && (
+                    <div>
+                      <h4 style={{ fontSize: '14px', marginBottom: '8px' }}>Previously Resolved Cases in this Infrastructure Sector</h4>
+                      <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '14px' }}>
+                        JanSahayak vector matching retrieved these past municipal work orders for reference.
+                      </p>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {liveAnalysis.historicalCases?.map((hist) => (
+                          <div key={hist.caseId} style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#F8F9FA', border: '1px solid var(--color-border-subtle)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '12px' }}>
+                              <strong>{hist.title} ({hist.caseId})</strong>
+                              <span style={{ color: 'var(--color-text-muted)' }}>Resolved on {hist.dateResolved}</span>
+                            </div>
+                            <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
+                              <strong>SOP Used: </strong>{hist.sopUsed}
+                            </p>
+                            <p style={{ fontSize: '12px', color: 'var(--color-text-primary)', marginBottom: '6px' }}>
+                              <strong>Action Taken: </strong>{hist.resolutionSummary}
+                            </p>
+                            <div style={{ display: 'flex', gap: '16px', fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                              <span>Fix Duration: <strong>{hist.fixDurationHours}</strong></span>
+                              <span>Quality Verification: <strong>{hist.chlorineResidualTest}</strong></span>
+                              <span>Signoff Officer: <strong>{hist.officer}</strong></span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SUB-TAB 6: INTERNAL PERSONNEL NOTES */}
+                  {detailSubTab === 'notes' && (
+                    <div>
+                      <h4 style={{ fontSize: '14px', marginBottom: '12px' }}>Personnel-Only Internal Case Log</h4>
+                      
+                      {/* Notes Feed */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
+                        {(!activeItem.internalNotes || activeItem.internalNotes.length === 0) ? (
+                          <div style={{ padding: '16px', background: '#F8F9FA', borderRadius: 'var(--radius-md)', fontSize: '12px', color: 'var(--color-text-muted)', textAlign: 'center' }}>
+                            No internal notes recorded yet. Add an update below for the field crew.
+                          </div>
+                        ) : (
+                          activeItem.internalNotes.map((note) => (
+                            <div key={note.id} style={{ padding: '12px 14px', borderRadius: 'var(--radius-md)', background: '#FFFBEB', border: '1px solid #FDE68A' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px', color: '#92400E' }}>
+                                <strong>{note.author} ({note.designation})</strong>
+                                <span>{note.timestamp}</span>
+                              </div>
+                              <p style={{ fontSize: '12px', color: '#78350F', margin: 0 }}>{note.note}</p>
+                            </div>
+                          ))
+                        )}
+                      </div>
+
+                      {/* Add Note Form */}
+                      <form onSubmit={handleAddNote} style={{ display: 'flex', gap: '8px' }}>
+                        <input
+                          type="text"
+                          value={internalNoteInput}
+                          onChange={(e) => setInternalNoteInput(e.target.value)}
+                          placeholder="Add confidential officer note (e.g. Traffic police clearance obtained)..."
+                          style={{
+                            flex: 1,
+                            height: '38px',
+                            borderRadius: 'var(--radius-sm)',
+                            border: '1px solid var(--color-border-medium)',
+                            padding: '0 10px',
+                            fontSize: '12px',
+                            background: '#FFFFFF'
+                          }}
+                        />
+                        <button type="submit" className="btn-primary btn-sm">
+                          Save Note
+                        </button>
+                      </form>
+                    </div>
+                  )}
+
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 6. CIVIC MAP TAB: SECTION 17 & 21 CIVIC INTELLIGENCE MAP */}
+        {activeAuthorityTab === 'map' && (
+          <div className="card" style={{ padding: '24px', marginBottom: '32px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+              <div>
+                <span className="category-pill" style={{ marginBottom: '6px' }}>
+                  CIVIC INTELLIGENCE MAP
+                </span>
+                <h3 style={{ fontSize: '20px', color: 'var(--color-text-primary)', margin: 0 }}>
+                  Active Ward Boundaries & Emerging Hotspots
+                </h3>
+                <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '4px 0 0 0' }}>
+                  Where are problems happening? Real-time spatial clustering with automated anomaly flags.
+                </p>
+              </div>
+
+              <Link to="/admin" className="btn-primary btn-sm">
+                Launch Full Municipal GIS Console →
+              </Link>
+            </div>
+
+            {/* Map Canvas */}
+            <div style={{
+              height: '400px',
+              borderRadius: 'var(--radius-md)',
+              background: '#0B1914',
+              position: 'relative',
+              overflow: 'hidden',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid rgba(255,255,255,0.1)'
+            }}>
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                backgroundImage: 'radial-gradient(rgba(16, 185, 129, 0.25) 1px, transparent 1px)',
+                backgroundSize: '24px 24px'
+              }} />
+
+              {/* Simulated Hotspots */}
+              {[
+                { ward: 'Ward 14 (Rohini)', top: '28%', left: '32%', cases: 18, critical: true, cat: 'Water Supply' },
+                { ward: 'Ward 18 (Shalimar Bagh)', top: '38%', left: '42%', cases: 12, critical: false, cat: 'Road Damage' },
+                { ward: 'Ward 8 (Lajpat Nagar)', top: '65%', left: '60%', cases: 22, critical: false, cat: 'Electricity' },
+                { ward: 'Ward 19 (Karol Bagh)', top: '48%', left: '48%', cases: 14, critical: false, cat: 'Sanitation' },
+                { ward: 'Ward 5 (Kalkaji)', top: '78%', left: '45%', cases: 9, critical: true, cat: 'Water Supply' }
+              ].map((spot, i) => (
+                <div
+                  key={i}
+                  onClick={() => openInspectionForCase(activeItem?.id || 'GRV-2025-001')}
+                  style={{
+                    position: 'absolute',
+                    top: spot.top,
+                    left: spot.left,
+                    transform: 'translate(-50%, -50%)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '4px',
+                    zIndex: 10
+                  }}
+                >
                   <div style={{
-                    padding: '12px 16px',
-                    borderRadius: 'var(--radius-md)',
-                    background: '#EFF6FF',
-                    border: '1px solid #BFDBFE',
-                    fontSize: '12px',
-                    color: '#1E40AF',
-                    marginBottom: '16px',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    background: spot.critical ? '#EF4444' : '#10B981',
+                    border: '3px solid #FFFFFF',
+                    boxShadow: spot.critical ? '0 0 20px rgba(239, 68, 68, 0.7)' : '0 0 16px rgba(16, 185, 129, 0.5)',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px'
+                    justifyContent: 'center',
+                    color: '#FFFFFF',
+                    fontWeight: 800,
+                    fontSize: '11px'
                   }}>
-                    <ShieldCheck style={{ width: '18px', height: '18px', flexShrink: 0 }} />
-                    <span>
-                      <strong>Human Authorization Mandate: </strong>
-                      JanSahayk AI categorizes candidates by semantic distance but will NEVER automatically delete or merge citizen tickets without officer signoff.
-                    </span>
+                    {spot.cases}
                   </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {liveAnalysis.duplicateCandidates?.map((candidate) => (
-                      <div
-                        key={candidate.id}
-                        style={{
-                          padding: '16px',
-                          borderRadius: 'var(--radius-md)',
-                          background: '#FFFFFF',
-                          border: `1px solid ${candidate.matchClassification === 'LIKELY_DUPLICATE' ? '#FECACA' : '#E2E8F0'}`,
-                          boxShadow: 'var(--shadow-xs)'
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px', flexWrap: 'wrap', gap: '8px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <strong className="font-mono-numbers" style={{ fontSize: '13px' }}>{candidate.id}</strong>
-                            <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>by {candidate.citizenName}</span>
-                            <span style={{
-                              fontSize: '10px',
-                              fontWeight: 800,
-                              padding: '2px 8px',
-                              borderRadius: '9999px',
-                              background: candidate.matchClassification === 'LIKELY_DUPLICATE' ? '#FEF2F2' : (candidate.matchClassification === 'RELATED_COMPLAINT' ? '#FFFBEB' : '#EFF6FF'),
-                              color: candidate.badgeColor
-                            }}>
-                              {candidate.matchBadge}
-                            </span>
-                          </div>
-
-                          <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                            Distance: {candidate.distanceMeters}m away
-                          </span>
-                        </div>
-
-                        <p style={{ fontSize: '13px', color: 'var(--color-text-primary)', marginBottom: '6px' }}>
-                          "{candidate.title}"
-                        </p>
-                        <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '12px', fontStyle: 'italic' }}>
-                          <strong>Reasoning: </strong>{candidate.reason}
-                        </p>
-
-                        {/* Officer Actions on Candidate */}
-                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                          <button
-                            type="button"
-                            onClick={() => handleDuplicateAction(activeItem.id, candidate.id, 'MERGE_AS_DUPLICATE', 'Confirmed identical pipeline fracture')}
-                            className="btn-primary btn-sm"
-                            style={{ fontSize: '11px', height: '30px' }}
-                          >
-                            ✓ Confirm Duplicate & Merge Cluster
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDuplicateAction(activeItem.id, candidate.id, 'LINK_AS_RELATED', 'Confirmed related downstream effect')}
-                            className="btn-secondary btn-sm"
-                            style={{ fontSize: '11px', height: '30px' }}
-                          >
-                            🔗 Link as Related Incident
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDuplicateAction(activeItem.id, candidate.id, 'MARK_INDEPENDENT', 'Confirmed separate issue')}
-                            className="btn-secondary btn-sm"
-                            style={{ fontSize: '11px', height: '30px', color: 'var(--color-text-muted)' }}
-                          >
-                            Keep Independent
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    color: '#FFFFFF',
+                    background: 'rgba(11, 25, 20, 0.9)',
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    border: '1px solid rgba(255,255,255,0.15)'
+                  }}>
+                    {spot.ward} • {spot.cat}
+                  </span>
                 </div>
-              )}
+              ))}
 
-              {/* TAB 4: Historical Precedents (RAG) */}
-              {activeTab === 'history' && (
-                <div>
-                  <h4 style={{ fontSize: '14px', marginBottom: '8px' }}>Previously Resolved Cases in this Infrastructure Sector</h4>
-                  <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '14px' }}>
-                    JanSahayk vector matching retrieved these past municipal work orders for reference.
-                  </p>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {liveAnalysis.historicalCases?.map((hist) => (
-                      <div key={hist.caseId} style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#F8F9FA', border: '1px solid var(--color-border-subtle)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '12px' }}>
-                          <strong>{hist.title} ({hist.caseId})</strong>
-                          <span style={{ color: 'var(--color-text-muted)' }}>Resolved on {hist.dateResolved}</span>
-                        </div>
-                        <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
-                          <strong>SOP Used: </strong>{hist.sopUsed}
-                        </p>
-                        <p style={{ fontSize: '12px', color: 'var(--color-text-primary)', marginBottom: '6px' }}>
-                          <strong>Action Taken: </strong>{hist.resolutionSummary}
-                        </p>
-                        <div style={{ display: 'flex', gap: '16px', fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                          <span>Fix Duration: <strong>{hist.fixDurationHours}</strong></span>
-                          <span>Water Quality Verification: <strong>{hist.chlorineResidualTest}</strong></span>
-                          <span>Signoff Officer: <strong>{hist.officer}</strong></span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 5: Resolution Workflow History */}
-              {activeTab === 'workflow' && (
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                    <h4 style={{ fontSize: '14px' }}>Recorded Workflow State Transitions</h4>
-                    <button
-                      type="button"
-                      onClick={() => setShowTransitionModal(true)}
-                      className="btn-primary btn-sm"
-                      style={{ fontSize: '11px' }}
-                    >
-                      + Record New Transition
-                    </button>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {(!activeItem.statusHistory || activeItem.statusHistory.length === 0) ? (
-                      <div style={{ padding: '14px', background: '#F8F9FA', borderRadius: 'var(--radius-md)', fontSize: '12px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-                          <strong>Initial Intake (SUBMITTED → AI_ANALYSED)</strong>
-                          <span className="font-mono-numbers" style={{ color: 'var(--color-text-muted)' }}>Sep 16, 09:30 AM</span>
-                        </div>
-                        <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>
-                          Actor: JanSahayk AI Autonomous Engine • Reason: Ingestion and Grievance DNA™ generated
-                        </p>
-                      </div>
-                    ) : (
-                      activeItem.statusHistory.map((hist) => (
-                        <div key={hist.transitionId} style={{ padding: '14px', borderRadius: 'var(--radius-md)', background: '#F8F9FA', border: '1px solid var(--color-border-subtle)' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-                            <strong style={{ color: 'var(--color-primary)' }}>
-                              {hist.previousStatus} → {hist.newStatus}
-                            </strong>
-                            <span className="font-mono-numbers" style={{ color: 'var(--color-text-muted)' }}>{hist.timestamp}</span>
-                          </div>
-                          <p style={{ fontSize: '12px', color: 'var(--color-text-primary)', margin: '0 0 4px 0' }}>
-                            "{hist.reason}"
-                          </p>
-                          <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                            Authorized by: <strong>{hist.actor}</strong> ({hist.role})
-                          </span>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 6: Internal Personnel Notes */}
-              {activeTab === 'notes' && (
-                <div>
-                  <h4 style={{ fontSize: '14px', marginBottom: '12px' }}>Personnel-Only Internal Case Log</h4>
-                  
-                  {/* Notes Feed */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
-                    {(!activeItem.internalNotes || activeItem.internalNotes.length === 0) ? (
-                      <div style={{ padding: '16px', background: '#F8F9FA', borderRadius: 'var(--radius-md)', fontSize: '12px', color: 'var(--color-text-muted)', textAlign: 'center' }}>
-                        No internal notes recorded yet. Add an update below for the field crew.
-                      </div>
-                    ) : (
-                      activeItem.internalNotes.map((note) => (
-                        <div key={note.id} style={{ padding: '12px 14px', borderRadius: 'var(--radius-md)', background: '#FFFBEB', border: '1px solid #FDE68A' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px', color: '#92400E' }}>
-                            <strong>{note.author} ({note.designation})</strong>
-                            <span>{note.timestamp}</span>
-                          </div>
-                          <p style={{ fontSize: '12px', color: '#78350F', margin: 0 }}>{note.note}</p>
-                        </div>
-                      ))
-                    )}
-                  </div>
-
-                  {/* Add Note Form */}
-                  <form onSubmit={handleAddNote} style={{ display: 'flex', gap: '8px' }}>
-                    <input
-                      type="text"
-                      value={internalNoteInput}
-                      onChange={(e) => setInternalNoteInput(e.target.value)}
-                      placeholder="Add confidential officer note (e.g. Traffic police clearance obtained)..."
-                      style={{
-                        flex: 1,
-                        height: '38px',
-                        borderRadius: 'var(--radius-sm)',
-                        border: '1px solid var(--color-border-medium)',
-                        padding: '0 10px',
-                        fontSize: '12px',
-                        background: '#FFFFFF'
-                      }}
-                    />
-                    <button type="submit" className="btn-primary btn-sm">
-                      Save Note
-                    </button>
-                  </form>
-                </div>
-              )}
-
+              <div style={{
+                position: 'absolute',
+                bottom: '12px',
+                left: '12px',
+                background: 'rgba(11, 25, 20, 0.9)',
+                padding: '8px 14px',
+                borderRadius: '6px',
+                border: '1px solid rgba(255,255,255,0.1)',
+                fontSize: '11px',
+                color: '#F8FAFC',
+                display: 'flex',
+                gap: '14px'
+              }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#EF4444' }} />
+                  Emerging Cluster
+                </span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981' }} />
+                  Stabilized Ward
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* MODAL: WORKFLOW STATUS TRANSITION */}
         {showTransitionModal && (
@@ -1071,7 +1501,7 @@ export default function OfficerWorkspace() {
             <form onSubmit={handleTransitionSubmit} className="card" style={{ maxWidth: '480px', width: '100%', padding: '28px' }}>
               <h3 style={{ fontSize: '18px', marginBottom: '8px' }}>Record Workflow Status Transition</h3>
               <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
-                Every transition is cryptographically logged with your username and timestamp.
+                Every transition is logged with your username, role, and ISO timestamp.
               </p>
 
               <div style={{ marginBottom: '12px' }}>
