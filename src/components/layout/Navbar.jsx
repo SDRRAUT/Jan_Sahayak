@@ -15,13 +15,9 @@ import {
   Search,
   CheckCircle2,
   ChevronDown,
-  Sparkles,
-  Globe,
-  Radio
+  Sparkles
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import CommandPalette from '../common/CommandPalette';
-import CivicSignalModal from '../intelligence/CivicSignalModal';
 
 export default function Navbar() {
   const location = useLocation();
@@ -45,14 +41,9 @@ export default function Navbar() {
   const [showTrackModal, setShowTrackModal] = useState(false);
   const [trackTicketId, setTrackTicketId] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showCommandPalette, setShowCommandPalette] = useState(false);
-  const [showSignalModal, setShowSignalModal] = useState(false);
-  const [currentLang, setCurrentLang] = useState('EN');
-  const [showLangDropdown, setShowLangDropdown] = useState(false);
 
   const notificationRef = useRef(null);
   const userMenuRef = useRef(null);
-  const langMenuRef = useRef(null);
 
   // Close notifications and user menu on click outside
   useEffect(() => {
@@ -62,9 +53,6 @@ export default function Navbar() {
       }
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
         setShowUserMenu(false);
-      }
-      if (langMenuRef.current && !langMenuRef.current.contains(e.target)) {
-        setShowLangDropdown(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -108,41 +96,77 @@ export default function Navbar() {
     setMobileMenuOpen(false);
   };
 
+  // Clean name formatting so "Er. Sanjay Sharma" displays as "Er. Sanjay" instead of just "Er."
+  const getCleanDisplayName = (u) => {
+    if (!u || !u.name) return 'Account';
+    const name = u.name.trim();
+    if (name.startsWith('Er. ')) {
+      const rest = name.replace(/^Er\.\s+/, '');
+      return `Er. ${rest.split(' ')[0]}`;
+    }
+    if (name.startsWith('Dr. ')) {
+      const rest = name.replace(/^Dr\.\s+/, '');
+      return `Dr. ${rest.split(' ')[0]}`;
+    }
+    return name.split(' ')[0];
+  };
+
+  const getUserInitials = (u) => {
+    if (!u || !u.name) return 'U';
+    const clean = u.name.replace(/^(Er\.|Dr\.|Mr\.|Mrs\.|Ms\.)\s+/i, '').trim();
+    const parts = clean.split(' ').filter(Boolean);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return clean.slice(0, 2).toUpperCase();
+  };
+
+  const getRoleDisplayLabel = (r) => {
+    switch (r) {
+      case 'citizen': return 'Citizen';
+      case 'officer': return 'Field Officer';
+      case 'dept_admin': return 'Dept Admin';
+      case 'super_admin': return 'Super Admin';
+      default: return 'User';
+    }
+  };
+
   return (
     <>
       {/* Full-width docked Civic Header */}
       <header className={`site-header ${isScrolled ? 'scrolled' : ''}`}>
         <div className="container site-header-inner">
           {/* Brand Logo: JanSahayak */}
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', flexShrink: 0 }}>
             <div style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '10px',
+              width: '40px',
+              height: '40px',
+              borderRadius: '11px',
               background: 'linear-gradient(135deg, #0E5E3A 0%, #083D25 100%)',
               color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 3px 8px rgba(14, 94, 58, 0.28)',
+              boxShadow: '0 3px 10px rgba(14, 94, 58, 0.28)',
               flexShrink: 0
             }}>
-              <ShieldCheck style={{ width: '22px', height: '22px', strokeWidth: 2.2 }} />
+              <ShieldCheck style={{ width: '23px', height: '23px', strokeWidth: 2.3 }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontWeight: 800, fontSize: '18px', letterSpacing: '-0.025em', color: 'var(--color-text-primary)' }}>
+                <span style={{ fontWeight: 800, fontSize: '18px', letterSpacing: '-0.03em', color: 'var(--color-text-primary)' }}>
                   JanSahayak
                 </span>
                 <span style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '4px',
-                  padding: '1px 6px',
+                  padding: '1.5px 7px',
                   background: '#ECFDF5',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
                   color: '#065F46',
                   borderRadius: '9999px',
-                  fontSize: '9px',
+                  fontSize: '9.5px',
                   fontWeight: 700,
                   letterSpacing: '0.04em'
                 }}>
@@ -150,7 +174,7 @@ export default function Navbar() {
                   LIVE
                 </span>
               </div>
-              <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--color-primary)' }}>
+              <span style={{ fontSize: '9.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-primary)' }}>
                 Civic Intelligence Platform
               </span>
             </div>
@@ -170,11 +194,12 @@ export default function Navbar() {
               className={`site-nav-link ${location.pathname.startsWith('/intelligence') ? 'active' : ''}`}
               style={{
                 position: 'relative',
-                color: location.pathname.startsWith('/intelligence') ? 'var(--color-ai-text)' : undefined,
-                background: location.pathname.startsWith('/intelligence') ? 'var(--color-ai-tint)' : undefined
+                color: location.pathname.startsWith('/intelligence') ? '#4338CA' : undefined,
+                background: location.pathname.startsWith('/intelligence') ? '#EEF2FF' : undefined,
+                fontWeight: location.pathname.startsWith('/intelligence') ? 700 : 500
               }}
             >
-              <Sparkles style={{ width: '13px', height: '13px', color: '#4F46E5' }} />
+              <Sparkles style={{ width: '13px', height: '13px', color: '#4F46E5', flexShrink: 0 }} />
               <span>Civic Intelligence</span>
               <span style={{
                 fontSize: '9px',
@@ -184,7 +209,8 @@ export default function Navbar() {
                 color: '#FFFFFF',
                 fontWeight: 700,
                 letterSpacing: '0.04em',
-                marginLeft: '2px'
+                marginLeft: '2px',
+                lineHeight: 1.2
               }}>
                 NEW
               </span>
@@ -221,131 +247,51 @@ export default function Navbar() {
           </nav>
 
           {/* Right Action Cluster */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {/* Action 1: Command Palette Trigger (Cmd+K) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+            {/* Action 1: Track Grievance Button */}
             <button
               type="button"
-              onClick={() => setShowCommandPalette(true)}
+              onClick={() => setShowTrackModal(true)}
               style={{
-                fontSize: '12px',
-                fontWeight: 500,
+                fontSize: '12.5px',
+                fontWeight: 600,
                 color: 'var(--color-text-secondary)',
-                padding: '6px 12px',
-                borderRadius: 'var(--radius-md)',
+                padding: '7px 13px',
+                borderRadius: 'var(--radius-full)',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '6px',
                 background: '#F8FAFC',
-                border: '1px solid var(--color-border-subtle)',
-                transition: 'all 150ms ease',
-                cursor: 'pointer'
+                border: '1px solid rgba(15, 23, 42, 0.10)',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'all 150ms ease'
               }}
               className="hidden-mobile"
-              title="Search complaints, wards, actions (⌘K / Ctrl+K)"
+              title="Track ticket status"
             >
-              <Search style={{ width: '13px', height: '13px', color: 'var(--color-primary)' }} />
-              <span>Search...</span>
-              <kbd style={{
-                fontSize: '10px',
-                background: '#E5E7EB',
-                padding: '1px 5px',
-                borderRadius: '4px',
-                color: '#4B5563',
-                fontWeight: 700,
-                fontFamily: 'var(--font-mono)'
-              }}>
-                ⌘K
-              </kbd>
+              <Search style={{ width: '13px', height: '13px', color: 'var(--color-text-muted)' }} />
+              <span>Track Ticket</span>
             </button>
 
-            {/* Action 2: Language Switcher Dropdown */}
-            <div ref={langMenuRef} style={{ position: 'relative' }} className="hidden-mobile">
-              <button
-                type="button"
-                onClick={() => setShowLangDropdown(!showLangDropdown)}
-                style={{
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  color: 'var(--color-text-secondary)',
-                  padding: '6px 10px',
-                  borderRadius: 'var(--radius-md)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  background: '#F8FAFC',
-                  border: '1px solid var(--color-border-subtle)',
-                  cursor: 'pointer',
-                  transition: 'all 120ms ease'
-                }}
-              >
-                <Globe style={{ width: '13px', height: '13px', color: 'var(--color-primary)' }} />
-                <span>{currentLang}</span>
-                <ChevronDown style={{ width: '11px', height: '11px', color: 'var(--color-text-muted)' }} />
-              </button>
-
-              {showLangDropdown && (
-                <div style={{
-                  position: 'absolute',
-                  top: '100%',
-                  right: 0,
-                  marginTop: '6px',
-                  width: '160px',
-                  background: '#FFFFFF',
-                  borderRadius: 'var(--radius-md)',
-                  boxShadow: 'var(--shadow-lg)',
-                  border: '1px solid var(--color-border-subtle)',
-                  padding: '4px',
-                  zIndex: 200
-                }}>
-                  {[
-                    { code: 'EN', name: 'English' },
-                    { code: 'HI', name: 'हिन्दी (Hindi)' },
-                    { code: 'MR', name: 'मराठी (Marathi)' },
-                    { code: 'TA', name: 'தமிழ் (Tamil)' }
-                  ].map((lang) => (
-                    <button
-                      key={lang.code}
-                      type="button"
-                      onClick={() => {
-                        setCurrentLang(lang.code);
-                        setShowLangDropdown(false);
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '7px 10px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        borderRadius: '6px',
-                        background: currentLang === lang.code ? '#F0F5FF' : 'transparent',
-                        color: currentLang === lang.code ? '#0F52BA' : '#111827',
-                        fontSize: '12.5px',
-                        fontWeight: currentLang === lang.code ? 600 : 400,
-                        border: 'none',
-                        cursor: 'pointer',
-                        textAlign: 'left'
-                      }}
-                    >
-                      <span>{lang.name}</span>
-                      {currentLang === lang.code && <CheckCircle2 style={{ width: '13px', height: '13px', color: '#0F52BA' }} />}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Action 3: Report a Problem (Warm Orange Accent CTA) */}
+            {/* Action 2: Report a Problem (Primary CTA) */}
             <Link
               to="/citizen/submit"
-              className="btn-accent"
               style={{
-                height: '36px',
+                height: '38px',
                 fontSize: '13px',
-                padding: '0 15px',
-                borderRadius: 'var(--radius-md)',
+                fontWeight: 600,
+                padding: '0 16px',
+                borderRadius: 'var(--radius-full)',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '6px'
+                gap: '6px',
+                background: 'linear-gradient(135deg, #0E5E3A 0%, #0A472C 100%)',
+                color: '#FFFFFF',
+                boxShadow: '0 2px 8px rgba(14, 94, 58, 0.28)',
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+                transition: 'all 150ms ease'
               }}
             >
               <span>Report Issue</span>
@@ -362,12 +308,14 @@ export default function Navbar() {
                   height: '38px',
                   borderRadius: '50%',
                   background: showNotifications ? '#F1F5F9' : '#F8FAFC',
-                  border: '1px solid var(--color-border-subtle)',
+                  border: showNotifications ? '1px solid rgba(15, 23, 42, 0.16)' : '1px solid rgba(15, 23, 42, 0.10)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'var(--color-text-secondary)',
+                  color: showNotifications ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
                   position: 'relative',
+                  cursor: 'pointer',
+                  flexShrink: 0,
                   transition: 'all 150ms ease'
                 }}
                 title="Notifications"
@@ -376,8 +324,8 @@ export default function Navbar() {
                 {unreadNotificationCount > 0 && (
                   <span style={{
                     position: 'absolute',
-                    top: '5px',
-                    right: '5px',
+                    top: '6px',
+                    right: '6px',
                     width: '8px',
                     height: '8px',
                     borderRadius: '50%',
@@ -428,27 +376,28 @@ export default function Navbar() {
                       {notifications.slice(0, 5).map((n) => (
                         <div
                           key={n.id}
+                          style={{
+                            padding: '10px 12px',
+                            borderRadius: 'var(--radius-md)',
+                            background: n.read ? '#FFFFFF' : '#F0FDF4',
+                            border: `1px solid ${n.read ? 'var(--color-border-subtle)' : '#BBF7D0'}`,
+                            fontSize: '12px',
+                            cursor: 'pointer'
+                          }}
                           onClick={() => {
                             markNotificationAsRead(n.id);
                             if (n.link) navigate(n.link);
-                            setShowNotifications(false);
-                          }}
-                          style={{
-                            padding: '10px',
-                            borderRadius: 'var(--radius-md)',
-                            background: n.read ? '#FFFFFF' : '#F0FDF4',
-                            border: '1px solid var(--color-border-subtle)',
-                            cursor: 'pointer',
-                            transition: 'background 150ms ease'
                           }}
                         >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
-                            <strong style={{ fontSize: '12px', color: 'var(--color-text-primary)' }}>{n.title}</strong>
-                            <span style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>{n.createdAt}</span>
+                          <div style={{ fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '2px' }}>
+                            {n.title}
                           </div>
-                          <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', lineHeight: 1.3 }}>
+                          <div style={{ color: 'var(--color-text-secondary)', fontSize: '11.5px', lineHeight: 1.4 }}>
                             {n.message}
-                          </p>
+                          </div>
+                          <div style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                            {n.timestamp || 'Just now'}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -466,38 +415,46 @@ export default function Navbar() {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px',
-                    padding: '4px 10px 4px 4px',
+                    gap: '9px',
+                    padding: '4px 12px 4px 5px',
                     borderRadius: 'var(--radius-full)',
-                    background: '#F8FAFC',
-                    border: '1px solid var(--color-border-subtle)',
+                    background: showUserMenu ? '#F1F5F9' : '#F8FAFC',
+                    border: showUserMenu ? '1px solid #CBD5E1' : '1px solid rgba(15, 23, 42, 0.12)',
+                    cursor: 'pointer',
+                    boxShadow: showUserMenu ? '0 0 0 2px rgba(14, 94, 58, 0.12)' : 'none',
                     transition: 'all 150ms ease'
                   }}
                   title="Switch Persona / Account"
                 >
                   <div style={{
-                    width: '30px',
-                    height: '30px',
+                    width: '32px',
+                    height: '32px',
                     borderRadius: '50%',
-                    background: 'var(--color-primary)',
+                    background: role === 'super_admin' ? 'linear-gradient(135deg, #4338CA 0%, #312E81 100%)' :
+                                role === 'dept_admin' ? 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)' :
+                                role === 'officer' ? 'linear-gradient(135deg, #059669 0%, #047857 100%)' :
+                                'linear-gradient(135deg, #0E5E3A 0%, #083D25 100%)',
                     color: '#FFFFFF',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: '11px',
-                    fontWeight: 700
+                    fontWeight: 800,
+                    letterSpacing: '0.03em',
+                    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.12)',
+                    flexShrink: 0
                   }}>
-                    {user.name ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2) : 'U'}
+                    {getUserInitials(user)}
                   </div>
-                  <div style={{ textAlign: 'left', lineHeight: 1.1 }} className="hidden-mobile">
-                    <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-primary)', display: 'block' }}>
-                      {user.name ? user.name.split(' ')[0] : 'Account'}
+                  <div style={{ textAlign: 'left', lineHeight: 1.15 }} className="hidden-mobile">
+                    <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--color-text-primary)', display: 'block', whiteSpace: 'nowrap' }}>
+                      {getCleanDisplayName(user)}
                     </span>
-                    <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', textTransform: 'capitalize' }}>
-                      {role?.replace('_', ' ')}
+                    <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', fontWeight: 600, display: 'block', whiteSpace: 'nowrap' }}>
+                      {getRoleDisplayLabel(role)}
                     </span>
                   </div>
-                  <ChevronDown style={{ width: '12px', height: '12px', color: 'var(--color-text-muted)' }} />
+                  <ChevronDown style={{ width: '13px', height: '13px', color: 'var(--color-text-muted)', marginLeft: '1px' }} />
                 </button>
 
                 {showUserMenu && (
@@ -1039,19 +996,6 @@ export default function Navbar() {
           </div>
         </div>
       )}
-
-      {/* Global Command Palette (Cmd+K / Ctrl+K) */}
-      <CommandPalette
-        isOpen={showCommandPalette}
-        onClose={() => setShowCommandPalette(false)}
-        onOpenSignalModal={() => setShowSignalModal(true)}
-      />
-
-      {/* Ambient Civic Signal Modal */}
-      <CivicSignalModal
-        isOpen={showSignalModal}
-        onClose={() => setShowSignalModal(false)}
-      />
     </>
   );
 }
