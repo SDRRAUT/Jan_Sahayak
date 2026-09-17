@@ -282,6 +282,12 @@ export default function Navbar() {
             {user && role === 'citizen' && (
               <>
                 <Link
+                  to="/"
+                  className={`site-nav-link ${location.pathname === '/' ? 'active' : ''}`}
+                >
+                  Home
+                </Link>
+                <Link
                   to="/citizen"
                   className={`site-nav-link ${location.pathname === '/citizen' ? 'active' : ''}`}
                 >
@@ -293,13 +299,6 @@ export default function Navbar() {
                 >
                   File Grievance
                 </Link>
-                <button
-                  type="button"
-                  onClick={() => scrollToSection('how-it-works')}
-                  className="site-nav-link nav-link-secondary"
-                >
-                  How it Works
-                </button>
               </>
             )}
 
@@ -484,6 +483,34 @@ export default function Navbar() {
                 </Link>
               </>
             )}
+
+            {/* Quick AI Assistant Trigger in Navbar */}
+            <button
+              type="button"
+              onClick={() => {
+                const launcher = document.getElementById('jansahayak-ai-launcher');
+                if (launcher) launcher.click();
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '7px 13px',
+                borderRadius: '999px',
+                background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+                color: '#10B981',
+                border: '1px solid rgba(16, 185, 129, 0.35)',
+                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.15)',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              title="Open JanSahayak Gemini AI Assistant"
+            >
+              <Sparkles style={{ width: '13px', height: '13px', color: '#10B981' }} />
+              <span style={{ color: '#FFFFFF' }}>AI Sahayak</span>
+            </button>
 
             {/* Notifications Bell */}
             {user && (
@@ -979,6 +1006,20 @@ export default function Navbar() {
               {user && role === 'citizen' && (
                 <>
                   <Link
+                    to="/"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname === '/' ? 'var(--color-primary)' : 'var(--color-text-primary)',
+                      background: location.pathname === '/' ? '#F0FDF4' : '#F8FAFC'
+                    }}
+                  >
+                    🏠 Home
+                  </Link>
+                  <Link
                     to="/citizen"
                     onClick={() => setMobileMenuOpen(false)}
                     style={{
@@ -1006,21 +1047,6 @@ export default function Navbar() {
                   >
                     ✍️ File Grievance
                   </Link>
-                  <button
-                    type="button"
-                    onClick={() => { scrollToSection('how-it-works'); setMobileMenuOpen(false); }}
-                    style={{
-                      padding: '10px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '14px',
-                      fontWeight: 500,
-                      color: 'var(--color-text-secondary)',
-                      background: 'transparent',
-                      textAlign: 'left'
-                    }}
-                  >
-                    How it Works
-                  </button>
                 </>
               )}
 
