@@ -28,8 +28,7 @@ function RoleHome() {
     return <Home />;
   }
   if (user.role === 'citizen') return <Navigate to="/citizen" replace />;
-  if (user.role === 'officer') return <Navigate to="/officer" replace />;
-  if (user.role === 'dept_admin') return <Navigate to="/admin/department" replace />;
+  if (user.role === 'civic_officer' || user.role === 'officer' || user.role === 'dept_admin') return <Navigate to="/officer" replace />;
   if (user.role === 'super_admin') return <Navigate to="/admin/super" replace />;
   return <Home />;
 }
@@ -53,7 +52,7 @@ export default function App() {
           <Route 
             path="/intelligence" 
             element={
-              <ProtectedRoute allowedRoles={['officer', 'dept_admin', 'super_admin']}>
+              <ProtectedRoute allowedRoles={['civic_officer', 'officer', 'dept_admin', 'super_admin']}>
                 <CivicIntelligenceDashboard />
               </ProtectedRoute>
             } 
@@ -61,7 +60,7 @@ export default function App() {
           <Route 
             path="/intelligence/incidents/:id" 
             element={
-              <ProtectedRoute allowedRoles={['officer', 'dept_admin', 'super_admin']}>
+              <ProtectedRoute allowedRoles={['civic_officer', 'officer', 'dept_admin', 'super_admin']}>
                 <CivicIncidentDetail />
               </ProtectedRoute>
             } 
@@ -98,11 +97,19 @@ export default function App() {
             } 
           />
 
-          {/* Government Officer Routes (Role: officer, dept_admin, super_admin) */}
+          {/* Civic Officer Unified Workspace Routes (Role: civic_officer, officer, dept_admin, super_admin) */}
           <Route 
             path="/officer" 
             element={
-              <ProtectedRoute allowedRoles={['officer', 'dept_admin', 'super_admin']}>
+              <ProtectedRoute allowedRoles={['civic_officer', 'officer', 'dept_admin', 'super_admin']}>
+                <OfficerWorkspace />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/civic-officer" 
+            element={
+              <ProtectedRoute allowedRoles={['civic_officer', 'officer', 'dept_admin', 'super_admin']}>
                 <OfficerWorkspace />
               </ProtectedRoute>
             } 
@@ -110,28 +117,28 @@ export default function App() {
           <Route 
             path="/officer/complaints/:id" 
             element={
-              <ProtectedRoute allowedRoles={['officer', 'dept_admin', 'super_admin']}>
+              <ProtectedRoute allowedRoles={['civic_officer', 'officer', 'dept_admin', 'super_admin']}>
                 <OfficerWorkspace />
               </ProtectedRoute>
             } 
           />
 
-          {/* Geospatial Heatmap (Role: officer, dept_admin, super_admin) */}
+          {/* Geospatial Heatmap (Role: civic_officer, officer, dept_admin, super_admin) */}
           <Route 
             path="/admin" 
             element={
-              <ProtectedRoute allowedRoles={['officer', 'dept_admin', 'super_admin']}>
+              <ProtectedRoute allowedRoles={['civic_officer', 'officer', 'dept_admin', 'super_admin']}>
                 <AdminHeatmap />
               </ProtectedRoute>
             } 
           />
 
-          {/* Department Admin Console (Role: dept_admin, super_admin) */}
+          {/* Department Admin Console (Role: civic_officer, dept_admin, super_admin) */}
           <Route 
             path="/admin/department" 
             element={
-              <ProtectedRoute allowedRoles={['dept_admin', 'super_admin']}>
-                <DeptAdmin />
+              <ProtectedRoute allowedRoles={['civic_officer', 'dept_admin', 'super_admin']}>
+                <OfficerWorkspace defaultSection="operations" />
               </ProtectedRoute>
             } 
           />

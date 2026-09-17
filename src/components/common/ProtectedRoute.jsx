@@ -12,8 +12,18 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
     return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
   }
 
-  // 2. Unauthorized Role -> Render Official 403 Forbidden Screen
-  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+  // 2. Role Authorization (Civic Officer inherits both officer and dept_admin permissions)
+  const userRole = user?.role?.toLowerCase() || '';
+  const effectiveRoles = [userRole];
+  if (userRole === 'civic_officer') {
+    effectiveRoles.push('officer', 'dept_admin');
+  } else if (userRole === 'officer' || userRole === 'dept_admin') {
+    effectiveRoles.push('civic_officer');
+  }
+
+  const isAuthorized = allowedRoles.length === 0 || allowedRoles.some(r => effectiveRoles.includes(r.toLowerCase()));
+
+  if (!isAuthorized) {
     return (
       <div className="section-spacing" style={{ paddingTop: '64px' }}>
         <div className="container" style={{ maxWidth: '640px' }}>
@@ -61,19 +71,11 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => switchDemoRole('officer')}
+                  onClick={() => switchDemoRole('civic_officer')}
                   className="btn-secondary btn-sm"
                   style={{ fontSize: '11.5px' }}
                 >
-                  🛠 Officer
-                </button>
-                <button
-                  type="button"
-                  onClick={() => switchDemoRole('dept_admin')}
-                  className="btn-secondary btn-sm"
-                  style={{ fontSize: '11.5px' }}
-                >
-                  🏛 Dept Admin
+                  🏛️ Civic Officer
                 </button>
                 <button
                   type="button"
@@ -81,7 +83,7 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
                   className="btn-secondary btn-sm"
                   style={{ fontSize: '11.5px' }}
                 >
-                  🛡 Super Admin
+                  🛡️ Super Admin
                 </button>
               </div>
             </div>

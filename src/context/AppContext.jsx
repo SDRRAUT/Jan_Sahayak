@@ -3,15 +3,18 @@ import { INITIAL_GRIEVANCES, MOCK_CLUSTERS, SYSTEM_METRICS, INITIAL_NOTIFICATION
 import { CIVIC_INCIDENTS, CIVIC_SIGNALS, CIVIC_INTELLIGENCE_METRICS } from '../data/civicIntelligenceData';
 import { analyzeGrievanceInput } from '../services/aiEngine';
 import { ComplaintDNAService, IncidentClusteringService, ActionSimulationService } from '../services/civicIntelligenceService';
+import { hasPermission, getRoleLabel, PERMISSIONS, ROLES } from '../utils/permissions';
 
 const AppContext = createContext();
 
-// Pre-seeded demo credentials for instant 1-click persona switching
+// Pre-seeded demo credentials for instant 1-click persona switching (3 Primary Roles)
 export const DEMO_CREDENTIALS = {
   citizen: { email: 'aditya@citizen.in', password: 'citizen123', label: 'Citizen (Aditya Verma)' },
-  officer: { email: 'sanjay.sharma@djb.gov.in', password: 'officer123', label: 'Govt Officer (Er. Sanjay Sharma - DJB)' },
-  dept_admin: { email: 'admin.djb@delhi.gov.in', password: 'deptadmin123', label: 'Dept Admin (Er. Rajiv Malhotra - DJB)' },
-  super_admin: { email: 'superadmin@delhi.gov.in', password: 'superadmin123', label: 'Super Admin (Dr. Meenakshi Sundaram, IAS)' }
+  civic_officer: { email: 'officer.djb@delhi.gov.in', password: 'officer123', label: 'Civic Officer (Er. Sanjay Sharma - Executive Engineer & Dept Admin)' },
+  super_admin: { email: 'superadmin@delhi.gov.in', password: 'superadmin123', label: 'Super Admin (Dr. Meenakshi Sundaram, IAS)' },
+  // Backward-compatible aliases for legacy credentials
+  officer: { email: 'sanjay.sharma@djb.gov.in', password: 'officer123', label: 'Civic Officer (Field Engineering Lead)' },
+  dept_admin: { email: 'admin.djb@delhi.gov.in', password: 'deptadmin123', label: 'Civic Officer (Department Operations Lead)' }
 };
 
 // Full profile objects for offline and instant demo switching
@@ -26,13 +29,23 @@ export const DEMO_USERS = {
     pincode: '110085',
     verified: true
   },
+  civic_officer: {
+    id: 'USR-CIVICOFFICER-01',
+    name: 'Er. Sanjay Sharma',
+    email: 'officer.djb@delhi.gov.in',
+    role: 'civic_officer',
+    department: 'Delhi Jal Board (DJB)',
+    designation: 'Civic Officer & Assistant Executive Engineer',
+    zone: 'Zone North-West (Rohini)',
+    phone: '+91 98111-90021'
+  },
   officer: {
     id: 'USR-OFFICER-01',
     name: 'Er. Sanjay Sharma',
     email: 'sanjay.sharma@djb.gov.in',
-    role: 'officer',
+    role: 'civic_officer',
     department: 'Delhi Jal Board (DJB)',
-    designation: 'Assistant Executive Engineer',
+    designation: 'Civic Officer & Assistant Executive Engineer',
     zone: 'Zone North-West (Rohini)',
     phone: '+91 98111-90021'
   },
@@ -40,9 +53,9 @@ export const DEMO_USERS = {
     id: 'USR-DEPTADMIN-01',
     name: 'Er. Rajiv Malhotra',
     email: 'admin.djb@delhi.gov.in',
-    role: 'dept_admin',
+    role: 'civic_officer',
     department: 'Delhi Jal Board (DJB)',
-    designation: 'Chief Engineer & Department Administrator',
+    designation: 'Civic Officer & Chief Engineer',
     phone: '+91 99100-11223'
   },
   super_admin: {
@@ -1176,7 +1189,11 @@ export function AppProvider({ children }) {
         handleDuplicateAction,
         updateUserSettings,
         upvoteGrievance,
-        metrics: SYSTEM_METRICS
+        metrics: SYSTEM_METRICS,
+        can: (perm) => hasPermission(user, perm),
+        hasPermission: (perm) => hasPermission(user, perm),
+        getRoleLabel: () => getRoleLabel(user?.role),
+        PERMISSIONS
       }}
     >
       {children}
