@@ -165,10 +165,7 @@ export default function OnboardingFlow({ onComplete }) {
       height: '100vh',
       maxHeight: '100vh',
       overflow: 'hidden',
-      backgroundImage: `url(${onboardingBg})`,
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: 'cover',
+      backgroundColor: '#0F172A',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -176,14 +173,17 @@ export default function OnboardingFlow({ onComplete }) {
       padding: '16px',
       boxSizing: 'border-box'
     }}>
-      {/* Translucent glass overlay to elevate the central card and keep background visible */}
+      {/* Crisp, clear background image with 50% opacity (NO blur) */}
       <div 
         aria-hidden="true"
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'rgba(15, 23, 42, 0.40)',
-          backdropFilter: 'blur(2px)',
+          backgroundImage: `url(${onboardingBg})`,
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          opacity: 0.50,
           zIndex: 1,
           pointerEvents: 'none'
         }} 
@@ -363,8 +363,7 @@ export default function OnboardingFlow({ onComplete }) {
                 position: 'absolute',
                 top: '10px',
                 left: '12px',
-                background: 'rgba(15, 23, 42, 0.85)',
-                backdropFilter: 'blur(4px)',
+                background: 'rgba(15, 23, 42, 0.90)',
                 padding: '3px 10px',
                 borderRadius: '6px',
                 fontSize: '11px',
