@@ -153,6 +153,12 @@ export default function OnboardingFlow({ onComplete }) {
     navigate('/');
   };
 
+  const handleSkip = () => {
+    if (enterApp) enterApp();
+    if (onComplete) onComplete();
+    navigate('/');
+  };
+
   return (
     <div style={{
       width: '100vw',

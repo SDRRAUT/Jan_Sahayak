@@ -1,205 +1,229 @@
 <div align="center">
 
 # 🏛️ JanSahayk (जनसहायक)
-### AI-Powered Public Grievance Resolution Platform for Smart Cities & Municipalities
+### Autonomous AI-Powered Civic Intelligence & Public Grievance Resolution Platform
 
 [![JanSahayk CI](https://github.com/SDRRAUT/Jan_Sahayak/actions/workflows/ci.yml/badge.svg)](https://github.com/SDRRAUT/Jan_Sahayak/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-0E5E3A.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/badge/Node.js-%3E%3D18.0.0-339933.svg?logo=node.js&logoColor=white)](https://nodejs.org)
+[![Node.js Version](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-339933.svg?logo=node.js&logoColor=white)](https://nodejs.org)
 [![React Version](https://img.shields.io/badge/React-19.0.0-61DAFB.svg?logo=react&logoColor=black)](https://react.dev)
 [![Vite Version](https://img.shields.io/badge/Vite-6.2.0-646CFF.svg?logo=vite&logoColor=white)](https://vitejs.dev)
 [![Express API](https://img.shields.io/badge/Express-5.2.1-000000.svg?logo=express&logoColor=white)](https://expressjs.com)
-[![Status: Production Ready](https://img.shields.io/badge/Status-Production%20Ready-10B981.svg)](#-how-to-run-locally)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Database: Supabase PostgreSQL](https://img.shields.io/badge/Database-Supabase%20PostgreSQL-3ECF8E.svg?logo=supabase&logoColor=white)](https://supabase.com)
+[![GIS: PostGIS](https://img.shields.io/badge/GIS-PostGIS-336791.svg?logo=postgresql&logoColor=white)](https://postgis.net)
+[![Vector: pgvector](https://img.shields.io/badge/Vector-pgvector%20768d-4169E1.svg)](https://github.com/pgvector/pgvector)
+[![LLM: Google Gemini](https://img.shields.io/badge/AI-Google%20Gemini%20Flash-8E75B2.svg?logo=google&logoColor=white)](https://ai.google.dev/)
+[![Status: Production Ready](https://img.shields.io/badge/Status-Production%20Ready-10B981.svg)](#-how-to-run-locally-quickstart)
 
 <p align="center">
-  <b>JanSahayk makes it effortless for everyday citizens to report problems in their own voice or language, and gives government officers intelligent tools to solve them quickly without drowning in paperwork.</b>
+  <b>One Single Source of Truth for Municipal Governance.</b><br/>
+  JanSahayk unifies <b>Citizens</b>, <b>Civic Officers</b>, and <b>Super Admins</b> into one interconnected, real-time civic ecosystem powered by an 8-Agent AI mesh, PostGIS geospatial intelligence, and pgvector semantic retrieval.
 </p>
 
-[The Problem](#-1-what-is-the-actual-problem) • [How We Solve It (USPs)](#-2-how-jansahayk-solves-it-our-core-ai-features--usps) • [Complaint Journey](#-3-the-step-by-step-complaint-journey) • [Try the Demo](#-4-try-it-in-2-minutes-pre-seeded-demo-logins) • [Under the Hood (AI)](#-5-how-the-ai-works-under-the-hood) • [Quickstart](#-6-how-to-run-locally-quickstart) • [Docker](#-7-run-with-docker) • [API Guide](#-8-api-endpoints-summary)
+[Core Architecture](#-1-core-architecture--one-source-of-truth) • [8-Agent AI Mesh](#-2-multi-agent-ai-pipeline-under-the-hood) • [Canonical Status & Events](#-3-canonical-state--real-time-event-model) • [Key Features](#-4-features-by-role) • [Tech Stack](#-5-complete-technology-stack) • [Quickstart](#-6-how-to-run-locally-quickstart) • [Validation & Tests](#-7-validation--automated-testing) • [API Guide](#-8-api-endpoints-reference)
 
 ---
 
 </div>
 
-## 💡 Quick Summary (TL;DR)
+## 💡 What Makes JanSahayk Revolutionary?
 
-Traditional government grievance portals are confusing, slow, and feel like black holes. Citizens don't know which department handles their problem, complaints get lost, and officers are overwhelmed by hundreds of duplicate tickets.
+Traditional civic complaint systems treat citizen reports as isolated, text-only tickets dumped into departmental silos. Citizens face a "black hole", officers drown in hundreds of duplicates for the same burst pipe, and leadership lacks root-cause visibility.
 
-**JanSahayk solves this with intelligent AI:**
-1. **Citizens speak or type in everyday language (Hindi, English, or Hinglish).**
-2. **AI figures out what is wrong, which department handles it, and how urgent it is.**
-3. **AI automatically detects duplicate complaints** and groups them together so officers only have to solve one big issue instead of 50 separate tickets.
-4. **AI suggests exact past solutions (SOPs, required tools, and estimated repair times)** to help officers get the job done quickly.
-5. **Live countdown timers & photo proof** ensure real accountability for every neighborhood.
-
----
-
-## 🛑 1. What is the Actual Problem?
-
-Every year, millions of citizens across Indian cities deal with broken roads, leaking water pipes, sewage overflows, and power outages. But when they try to complain, the system fails them in four major ways:
-
-### 1. The Citizen's "Black Hole"
-When you lodge a complaint on existing portals, you usually get an SMS with a reference number like `GRV-98214` and then... **total silence**. You don't know who is handling it, whether someone visited the spot, or when it will be fixed. Eventually, the ticket gets marked "Closed" without any explanation or proof.
-
-### 2. The Language & Tech Barrier
-Most portals force people to fill complex English forms with technical dropdown menus. Citizens are asked: *"Is this issue under PWD, MCD, or DJB?"* Most people don't know and shouldn't have to know! When people describe issues naturally in Hinglish (*"Bhai hamare gali mein pipeline phat gayi hai aur ganda paani supply mein aa raha hai"*), traditional systems fail to understand.
-
-### 3. Officer Triage Overload (Drowning in Duplicates)
-When a water pipeline bursts at a busy road junction, 60 different residents file complaints about the same spot. The field engineer receives 60 separate tickets, spends half the day reading and answering the same thing, and gets delayed in actually sending a repair team.
-
-### 4. Temporary Fixes Instead of Permanent Solutions
-A rusty water pipe in Sector 14 breaks 10 times in 3 months. Each time, workers put a quick rubber patch and close the ticket. Because the complaints are treated as isolated events, top officials never realize that the entire 35-year-old pipeline is decaying and needs complete replacement.
+**JanSahayk solves this end-to-end:**
+1. **Multimodal Citizen Intake**: Voice input in natural Indic languages (Hindi, Hinglish, English), photo upload, and instant GPS geolocation.
+2. **Autonomous Multi-Agent AI Pipeline**: 8 cooperative agents extract Complaint DNA, compute 768-dim embeddings, cluster reports spatially and semantically, synthesize high-level **Civic Incidents**, diagnose root causes, and prescribe Standard Operating Procedures (SOPs).
+3. **One Authoritative Truth**: The database is the single source of truth (`public.grievances`, `public.civic_incidents`, `public.field_actions`, `public.verification_records`). Zero fake state, zero role-specific duplicates.
+4. **Real-Time Cross-Role Sync**: When an officer uploads field remediation evidence, the citizen's verification modal and the Super Admin's city dashboard update in real time via WebSockets and Server-Sent Events (SSE).
+5. **Closed-Loop Verification**: A complaint is never closed until the citizen verifies the repair with photo proof, rating, or disputes it back into the investigation queue.
 
 ---
 
-## ✨ 2. How JanSahayk Solves It (Our Core AI Features & USPs)
+## 🏗️ 1. Core Architecture & One Source of Truth
 
-JanSahayk fixes every single one of these problems using practical, human-centered AI:
-
-### 🎯 USP 1: File by Voice or Plain Hinglish (Speak Naturally)
-Citizens don't need to learn government terminology. You can:
-- Speak via **Voice Note** (AI transcribes in real time).
-- Type in **Hindi, English, or mixed Hinglish**.
-- Upload a photo and let GPS pinpoint the exact spot.
-
-### 🎯 USP 2: Saral Mode (सरल मोड — For Non-Tech Users)
-Built specifically for senior citizens and people who struggle with smartphones:
-- Extra-large buttons and high-contrast visuals.
-- Spoken audio instructions in simple Hindi/English.
-- 1-click photo and voice submission without tedious typing.
-
-### 🎯 USP 3: "We Understood You As..." (Instant AI Verification)
-Before the complaint is submitted, the AI translates the text and clearly summarizes what it understood:
-> *"We understood your issue as: Contaminated tap water mixed with sewage near Mother Dairy in Rohini Sector 14, affecting approximately 450 households. Is this correct?"*
-
-This gives the citizen complete confidence that their voice was truly heard.
-
-### 🎯 USP 4: Automatic Department Routing & Urgency Scoring
-Our AI reads the description and automatically:
-- Identifies the right department (e.g., Delhi Jal Board vs. PWD).
-- Evaluates health and safety hazards (e.g., biological water contamination is automatically scored as **Critical Urgency**).
-- Assigns the correct SLA deadline (e.g., 24-hour target for critical water hazards).
-
-### 🎯 USP 5: Smart Duplicate Detection & Grouping
-When multiple people report the same problem:
-- AI detects that they are talking about the **same issue at the same location**.
-- It groups them into a **Single Civic Incident Cluster**.
-- **Human-in-the-Loop Safeguard**: The AI highlights duplicates, but an authorized government officer clicks to approve the merge.
-- When the officer fixes the problem, **all 60 citizens receive resolution updates at the same moment**!
-
-### 🎯 USP 6: Past Solution Recommendations (Municipal RAG)
-When an engineer opens a ticket, they don't have to guess how to fix it. The AI checks historical records and suggests:
-- *"Similar pipeline fracture happened 200m away last month."*
-- **Recommended Equipment**: 200mm Cast-Iron Repair Clamp, Excavation Shovel, Water Pump.
-- **Estimated Repair Time**: 4 hours.
-- **Standard Operating Procedure (SOP)** step-by-step checklist.
-
-### 🎯 USP 7: Live Ticking Countdown (SLA Clock) & Auto-Escalations
-Every ticket has a public **live countdown timer** (e.g., *"16 hours remaining"*). If an issue is ignored, it turns red and automatically escalates to senior officers (Superintending Engineer or District Magistrate).
-
-### 🎯 USP 8: Mandatory Photo Proof & 5-Star Citizen Rating
-An officer cannot just click "Resolved" and walk away.
-- The officer **must upload a photo of the completed repair**.
-- The citizen receives an instant alert, views the photo, and gives a **1 to 5 star rating**.
-- If the work was poor, the citizen can click **"Reopen Dispute"** with one tap.
-
-### 🎯 USP 9: Civic Memory & Chronic Problem Detection
-Our system connects the dots over time:
-- It notices if a specific ward has had 18 pipe bursts in 6 months.
-- It flags this as a **Chronic Infrastructure Hazard** on the Super Admin GIS map.
-- Instead of paying for 50 temporary repairs, the city can allocate budget to replace the entire pipeline once and for all.
-
----
-
-## 🔄 3. The Step-by-Step Complaint Journey
-
-Here is how a complaint travels from a citizen's phone to a permanent fix:
+Every citizen report is tracked under the same primary entities throughout its entire lifecycle:
+`complaint_id` ⟷ `incident_id` ⟷ `evidence_id` ⟷ `action_id` ⟷ `verification_id`.
 
 ```
-[ Citizen Files Complaint ]
-(Speaks in Hinglish / takes photo / shares GPS)
-               ↓
-[ AI Understanding & Translation ]
-(Detects language, extracts landmark, and verifies meaning with citizen)
-               ↓
-[ Smart Triage & Duplicate Check ]
-(Routes to right department, scores urgency, and checks if neighbors reported it)
-               ↓
-[ Field Officer Receives Ticket ]
-(Sees AI suggestions: past fixes, required tools, and SOP checklist)
-               ↓
-[ Work in Progress & Photo Proof ]
-(Team fixes the issue and uploads photo of the completed repair)
-               ↓
-[ Citizen Confirmation & 5-Star Feedback ]
-(Citizen inspects the photo, rates the work, or appeals if unsatisfied)
-               ↓
-[ Long-Term Civic Memory ]
-(If issues keep happening in the same ward, city leadership is alerted)
+                       ┌──────────────────────────────────────┐
+                       │          Citizen Submission          │
+                       │    (Voice / Text / Photo / GPS)      │
+                       └──────────────────┬───────────────────┘
+                                          │
+                                          ▼
+                       ┌──────────────────────────────────────┐
+                       │     Autonomous Multi-Agent Mesh      │
+                       │   (8 Cooperative Agents in Node)     │
+                       └──────────────────┬───────────────────┘
+                                          │
+                                          ▼
+                       ┌──────────────────────────────────────┐
+                       │       Supabase PostgreSQL DB         │
+                       │  - PostGIS Spatial Proximity         │
+                       │  - pgvector HNSW 768-dim Embeddings  │
+                       │  - Immutable Audit & Status History  │
+                       └──────────┬────────────────┬──────────┘
+                                  │                │
+             PostgreSQL Changes   │                │ Server-Sent Events
+             (Supabase Realtime)  ▼                ▼ (23 Canonical Types)
+             ┌─────────────────────────────────────────────────────────┐
+             │            Authoritative Reactive Event Bus             │
+             └────────────┬────────────────┬─────────────────┬──────────┘
+                          │                │                 │
+                          ▼                ▼                 ▼
+                 ┌─────────────────┐ ┌───────────┐ ┌─────────────────┐
+                 │ 👤 Citizen View │ │ 🏛️ Officer│ │ 🛡️ Super Admin  │
+                 │ - Live Timeline │ │ - Dispatch│ │ - City Heatmaps │
+                 │ - Photo Audit   │ │ - SOPs    │ │ - Audit Trail   │
+                 │ - Verification  │ │ - Actions │ │ - SLA Analytics │
+                 └─────────────────┘ └───────────┘ └─────────────────┘
 ```
 
 ---
 
-## 👥 4. Try It in 2 Minutes (Pre-Seeded Demo Logins)
+## 🧠 2. Multi-Agent AI Pipeline Under the Hood
 
-JanSahayk comes with pre-configured demo personas. You can switch between them with **1 click** in the top navigation bar or log in using these credentials:
+The backend orchestrates **8 specialized AI agents** (`server/agents/`) executing sequentially with automatic fallback handling:
 
-| Persona | Name & Title | Email | Password | What You Can Do in This Role |
-| :--- | :--- | :--- | :--- | :--- |
-| 👤 **Citizen** | Aditya Verma | `aditya@citizen.in` | `citizen123` | File complaints by voice/Hinglish, use Saral Mode, track live resolution timeline, and submit ratings. |
-| 🛠 **Field Officer** | Er. Sanjay Sharma *(AEE, Delhi Jal Board)* | `sanjay.sharma@djb.gov.in` | `officer123` | Review tickets, accept/modify AI past solutions, merge duplicate tickets, and upload photo proof. |
-| 🏛 **Department Admin** | Er. Rajiv Malhotra *(Chief Engineer)* | `admin.djb@delhi.gov.in` | `deptadmin123` | Monitor overall department queue, check 94.8% SLA compliance, manage officers, and export reports (PDF/CSV). |
-| 🛡 **Super Admin** | Dr. Meenakshi Sundaram, IAS *(Principal Secretary)* | `superadmin@delhi.gov.in` | `superadmin123` | View Delhi-wide GIS heatmaps, audit tamper-proof system logs, and inspect chronic infrastructure hotspots. |
+```
+                  [ Citizen Complaint Input ]
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────┐
+│ 1. Complaint Analyzer Agent (Multilingual NLP & Category) │
+└─────────────────────────────┬─────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────┐
+│ 2. Complaint DNA Agent (Problem, Asset, Cause Extraction) │
+└─────────────────────────────┬─────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────┐
+│ 3. Similarity & Cluster Agent (pgvector + PostGIS 300m)   │
+└─────────────────────────────┬─────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────┐
+│ 4. Civic Incident Agent (Cluster Synthesis & Title)       │
+└─────────────────────────────┬─────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────┐
+│ 5. Root Cause Agent (Underground Infrastructure Diagnosis)│
+└─────────────────────────────┬─────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────┐
+│ 6. Resolution Agent (Past SOPs, Tool List, Repair Hours)  │
+└─────────────────────────────┬─────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────┐
+│ 7. Authority Routing Agent (Jurisdiction Allocation)      │
+└─────────────────────────────┬─────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────┐
+│ 8. Civic Memory Agent (RAG Search on Historical Fixes)    │
+└───────────────────────────────────────────────────────────┘
+```
+
+| Agent | Responsibility | Underlying Technology |
+|---|---|---|
+| **ComplaintAnalyzerAgent** | Translates Hinglish/Hindi, scores urgency, and maps category | Google Gemini 3.5 Flash |
+| **ComplaintDNAAgent** | Deconstructs complaint into standardized structured DNA | Structured JSON Output Schema |
+| **SimilarityClusterAgent** | Finds duplicate/related reports using spatial and semantic similarity | PostGIS `ST_DWithin` + `pgvector` |
+| **CivicIncidentAgent** | Merges multiple citizen complaints into 1 unified master incident | Graph Aggregation |
+| **RootCauseAgent** | Identifies chronic failures (e.g. 35-year decaying cast iron mains) | Causal Chain Inference |
+| **ResolutionAgent** | Prescribes required tools, crew size, SOP checklist, and repair ETA | Municipal Knowledge Base |
+| **AuthorityRoutingAgent** | Matches incident to correct department (DJB, PWD, MCD, Tata Power) | Jurisdictional Decision Rules |
+| **CivicMemoryAgent** | Queries and stores resolved incidents for long-term municipal learning | `pgvector` Cosine Similarity |
 
 ---
 
-## 🧠 5. How the AI Works Under the Hood
+## 🔄 3. Canonical State & Real-Time Event Model
 
-The intelligence backend uses **5 cooperating AI agents** (found in `server/agents/`):
+### 11-Stage Canonical Status Graph (`server/constants/statuses.js`)
+All database records conform to one canonical status, translated dynamically into role-tailored perspectives:
 
-```
-       [ Citizen Input ]
-              │
-              ▼
-┌───────────────────────────────┐
-│ 1. ComplaintAnalyzerAgent     │ ── Translates Hinglish/Hindi, extracts landmarks & urgency
-└──────────────┬────────────────┘
-               │
-               ▼
-┌───────────────────────────────┐
-│ 2. SimilarityClusterAgent     │ ── Checks spatial radius (300m) & flags duplicate tickets
-└──────────────┬────────────────┘
-               │
-               ▼
-┌───────────────────────────────┐
-│ 3. HistoricalPrecedentRAG     │ ── Finds past similar fixes, SOPs, and required tools
-└──────────────┬────────────────┘
-               │
-               ▼
-┌───────────────────────────────┐
-│ 4. CivicIncidentAgent         │ ── Groups multiple complaints into 1 unified incident
-└──────────────┬────────────────┘
-               │
-               ▼
-┌───────────────────────────────┐
-│ 5. CivicMemoryAgent           │ ── Identifies chronic neighborhood decay & aging assets
-└───────────────────────────────┘
+```text
+REPORTED ──► ANALYZING ──► CONNECTED ──► INCIDENT_CREATED ──► AUTHORITY_ASSIGNED
+                                                                      │
+                                                                      ▼
+RESOLVED (CONFIRMED) ◄── VERIFICATION_PENDING ◄── ACTION_COMPLETED ◄── INVESTIGATION ──► ACTION_IN_PROGRESS
+        ▲                                                                                       │
+        └────────────────────────────── REOPENED (DISPUTED) ◄───────────────────────────────────┘
 ```
 
-### Simple Overview of Each Agent:
-1. **The Reader & Translator (`ComplaintAnalyzerAgent`)**: Understands everyday spoken Hindi/English, finds key facts (like *"Mother Dairy"* or *"450 homes affected"*), and calculates urgency.
-2. **The Duplicate Finder (`SimilarityClusterAgent`)**: Checks if another complaint was filed nearby within the last 72 hours so officers don't do double work.
-3. **The Municipal Expert (`HistoricalPrecedentRAG`)**: An AI assistant that remembers previous city repairs and tells the engineer what equipment to pack.
-4. **The Incident Grouper (`CivicIncidentAgent`)**: Combines 50 individual reports into one master incident for the field squad.
-5. **The Memory Keeper (`CivicMemoryAgent`)**: Keeps long-term institutional memory so repeated breakdowns trigger permanent upgrades instead of temporary band-aids.
+| Canonical Status | 👤 Citizen Sees | 🏛️ Civic Officer Sees | 🛡️ Super Admin Sees |
+|---|---|---|---|
+| `REPORTED` | Report Submitted | New Ingestion | Pending Classification |
+| `ANALYZING` | AI Processing | AI Engine Active | Ingest Pipeline Running |
+| `CONNECTED` | Related Reports Linked | Clustered Incident | Cluster Synthesized |
+| `INCIDENT_CREATED` | Civic Incident Created | Incident Queue | Incident Recorded |
+| `AUTHORITY_ASSIGNED` | Department Assigned | Assigned to Queue | Department Allocated |
+| `INVESTIGATION` | Field Inspection Started | Investigation Active | Active Investigation |
+| `ACTION_IN_PROGRESS` | Work in Progress | Remediation Underway | Remediation in Progress |
+| `ACTION_COMPLETED` | Remediation Completed | Work Completed | Remediation Signed Off |
+| `VERIFICATION_PENDING` | Verification Required | Pending Citizen Audit | Awaiting Citizen Audit |
+| `RESOLVED` | Issue Resolved & Confirmed | Resolved & Signed Off | Resolved (Historical) |
+| `REOPENED` | Dispute Reopened | Reopened by Citizen | SLA Escalated Dispute |
+
+### 23 Canonical Real-Time Events (`server/constants/events.js`)
+Emitted across Server-Sent Events (`/api/events`) and Supabase Realtime channels:
+- `complaint_created`, `complaint_updated`, `complaint_analyzed`, `dna_generated`, `embedding_generated`
+- `similar_complaints_found`, `incident_created`, `incident_updated`, `incident_escalated`
+- `root_cause_ready`, `recommendation_ready`, `authority_assigned`, `officer_assigned`
+- `investigation_started`, `field_action_started`, `field_action_updated`, `field_action_completed`, `evidence_uploaded`
+- `verification_requested`, `verification_submitted`, `incident_resolved`, `incident_reopened`, `notification_created`
 
 ---
 
-## 💻 6. How to Run Locally (Quickstart)
+## 👥 4. Features by Role
+
+### 👤 Citizen
+- **Voice-to-Text Input**: Built-in speech recognition for Hindi, Hinglish, and English via the Web Speech API.
+- **GPS Pinpoint**: Automatically attaches coordinates and ward details via HTML5 Geolocation.
+- **"We Understood You As"**: Immediate verification of AI comprehension before final submission.
+- **Authoritative Shared Timeline**: Live chronological audit of every inspection, dispatch, and repair step.
+- **Closed-Loop Verification**: Review officer completion photos, provide 1–5 star ratings, or reopen disputes with 1 tap.
+
+### 🏛️ Civic Officer
+- **Incident Dispatch Queue**: View clustered incidents rather than 50 duplicate tickets.
+- **AI Operational Briefing**: Instant display of required tools, estimated repair hours, and SOP checklists.
+- **Field Action Sign-Off**: Upload completion evidence photos and log field actions directly into the database.
+- **Cross-Department Coordination**: Coordinate joint work between water (DJB) and road (PWD) departments on shared incidents.
+
+### 🛡️ Super Admin
+- **City-Wide Heatmaps**: Interactive PostGIS density map of emerging and chronic municipal hotspots.
+- **Tamper-Proof Audit Trail**: Real-time queryable audit logs (`public.audit_logs`) tracking every system mutation and officer action.
+- **Civic Memory Intelligence**: Persistent institutional knowledge tracking recurring failures and contractor warranties.
+
+---
+
+## 💻 5. Complete Technology Stack
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| **Frontend** | **React 19**, **Vite 6**, **React Router v7** | Ultra-responsive modern SPA architecture |
+| **Icons & Design** | **Lucide React**, Custom CSS Design System | Glassmorphism, accessible dark/light themes, micro-animations |
+| **Native APIs** | **Web Speech API**, **Geolocation API**, **Canvas Confetti** | Indic voice input, GPS positioning, celebratory feedback |
+| **Backend** | **Node.js (ESM)**, **Express.js v5** | Lightweight, high-throughput REST API server |
+| **Database** | **Supabase PostgreSQL** | Authoritative Single Source of Truth |
+| **GIS & Spatial** | **PostGIS** (`ST_MakePoint`, `ST_DWithin`, `ST_Distance`) | Geographic radius clustering and spatial queries |
+| **Vector Engine** | **`pgvector`** (768-dimension HNSW indexing) | Semantic complaint matching & Civic Memory RAG |
+| **AI / Foundation** | **Google Gemini (2.5/3.5 Flash)** | Low-latency multimodal reasoning & structured outputs |
+| **Real-Time Bus** | **Supabase Realtime (WebSockets)** + **Server-Sent Events** | Zero-latency event propagation & multi-tab cache sync |
+| **Media Storage** | **Supabase Storage** | Cloud storage for complaint media and completion proof |
+| **Testing** | **Node.js Native Test Runner** (`node --test`) | Zero-dependency unit and cross-role integration testing |
+
+---
+
+## ⚡ 6. How to Run Locally (Quickstart)
 
 ### Prerequisites
-- **Node.js**: `v18.0.0` or higher
+- **Node.js**: `v20.0.0` or higher
 - **npm**: `v9.0.0` or higher
 - **Git**
 
@@ -209,107 +233,98 @@ git clone https://github.com/SDRRAUT/Jan_Sahayak.git
 cd Jan_Sahayak
 ```
 
-### Step 2: Install Dependencies
+### Step 2: Configure Environment Variables
+Create a `.env` file in the root directory:
+```env
+PORT=3001
+VITE_PORT=3737
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+SUPABASE_DATABASE_URL=postgresql://user:password@host:5432/postgres
+GEMINI_API_KEY=your-gemini-api-key
+```
+
+### Step 3: Install Dependencies
 ```bash
 npm install
 ```
-*(Runs 100% locally out of the box with embedded AI heuristics — zero setup or external API keys needed!)*
 
-### Step 3: Start the Application
-Run our 1-step integrated startup script:
+### Step 4: Start the Full Platform
 ```bash
 npm start
 ```
 This automatically starts:
-- 📡 **Backend API Server**: running on `http://localhost:3001`
-- ⚡ **Frontend Web Application**: running on `http://localhost:3737` (or `http://localhost:3000`)
+- 📡 **Backend API Server**: `http://localhost:3001`
+- ⚡ **Frontend Client**: `http://localhost:3737` (or `http://localhost:3000`)
 
-### Step 4: Verify the Build
+### Step 5: Build for Production
 ```bash
 npm run build
 ```
-Creates a clean, production-ready static bundle in `dist/`.
 
 ---
 
-## 🐳 7. Run with Docker
+## 🧪 7. Validation & Automated Testing
 
-You can run the entire platform with a single command using Docker:
+Jan_Sahayak includes a comprehensive, multi-layer validation suite:
 
+### 1. Cross-Role End-to-End Test Suite (`scripts/test_cross_role_sync.js`)
+Validates the entire lifecycle across Citizen, Officer, and Super Admin roles:
 ```bash
-# Build and start container in the background
-docker compose up -d --build
-
-# Check status
-docker compose ps
+node scripts/test_cross_role_sync.js
 ```
-Open **`http://localhost:3001`** in your browser to view the live platform!
+**Results: 24 PASSED, 0 FAILED**
+- ✅ Database & System Health Check
+- ✅ Citizen Submission & Multi-Agent Pipeline Execution
+- ✅ Officer Incident Visibility & Status Transition (`INVESTIGATION`)
+- ✅ Officer Resolution & Photo Evidence Persistence
+- ✅ Citizen Dispute (`DISPUTE_REOPENED`) ➔ Resolution ➔ Confirmation (`RESOLVED_CONFIRMED`)
+- ✅ Authoritative Shared Timeline Retrieval
+- ✅ Super Admin Audit Trail & Live Analytics
 
----
-
-## 📡 8. API Endpoints Summary
-
-| Type | Method & URL | Access | Purpose |
-| :--- | :--- | :--- | :--- |
-| **Health** | `GET /api/health` | Public | Check if the system is running and healthy. |
-| **Auth** | `POST /api/auth/login` | Public | Log in with email and password to receive a session token. |
-| **Auth** | `GET /api/auth/me` | Logged In | Get profile info for the currently logged-in user. |
-| **Grievances** | `GET /api/grievances` | Role-filtered | View all complaints (citizens see their ward, officers see their dept). |
-| **Grievances** | `POST /api/grievances` | Citizen | Submit a new complaint to be triaged by the AI mesh. |
-| **Grievances** | `PATCH /api/grievances/:id/status` | Officer / Admin | Move status (e.g. from *Triaged* to *In Progress* to *Resolved*). |
-| **Grievances** | `POST /api/grievances/:id/duplicate-action` | Officer | Approve or dismiss a suggested duplicate candidate. |
-| **Grievances** | `POST /api/grievances/:id/feedback` | Citizen | Submit 1 to 5 star rating and feedback after repair. |
-| **Intelligence**| `GET /api/intelligence/clusters` | Officer / Admin | View active geographic clusters of related complaints. |
-| **Intelligence**| `GET /api/intelligence/memory` | Officer / Admin | View chronic infrastructure hotspot memory for wards. |
-| **Security** | `GET /api/admin/audit-logs` | Super Admin | View tamper-proof logs of every action taken in the system. |
-
----
-
-## 📁 9. Project Files & Folders
-
-```text
-Jan_Sahayak/
-├── server/
-│   ├── agents/            # The 5 AI agents (Analyzer, Clusterer, RAG, Incidents, Memory)
-│   ├── data/              # Pre-seeded municipal data & historical records
-│   ├── db/                # In-memory database with persistent backup
-│   └── index.js           # Express API server + static file hosting
-├── src/
-│   ├── components/        # Reusable UI components (Cards, Modals, Navbar, Footer)
-│   ├── context/           # App state & 1-click persona logins
-│   ├── pages/             # All platform screens (Citizen, Officer, Admin, Intelligence)
-│   ├── services/          # Client-side AI helpers
-│   ├── App.jsx            # Main route manager
-│   └── index.css          # Design tokens, typography & styling
-├── public/                # Logo, favicon, and citizen banners
-├── .github/workflows/     # Automated testing & build pipeline (CI)
-├── Dockerfile             # Container configuration
-├── docker-compose.yml     # 1-command container launcher
-├── CONTRIBUTING.md        # How to contribute to this project
-├── SECURITY.md            # Security & data privacy policies
-└── package.json           # Dependencies and run scripts
+### 2. Unit Test Suite (`npm test`)
+```bash
+npm test
 ```
+**Results: 5 PASSED, 0 FAILED**
+- ✔ `Canonical Events - Completeness`
+- ✔ `Canonical Statuses - Normalization`
+- ✔ `Canonical Statuses - Valid Transitions`
+- ✔ `Canonical Statuses - Role-Specific Labels`
+- ✔ `Orchestrator - Ingests and processes complaint into Incident entity`
 
 ---
 
-## 🛡️ 10. Security & Privacy Highlights
+## 📡 8. API Endpoints Reference
 
-- **Privacy First (PII Masking)**: Citizen phone numbers and private addresses are automatically masked so field staff only see what is needed for repair.
-- **Strict Role Permissions**: Citizens cannot view other citizens' private data, and officers can only manage issues inside their assigned jurisdiction.
-- **Tamper-Proof Audit Trail**: Every status change, ticket merge, or SLA adjustment is recorded in an immutable log with timestamps and actor names.
+| Category | Method & Path | Access | Description |
+|---|---|---|---|
+| **Health** | `GET /api/health` | Public | System status and PostgreSQL connection health |
+| **Auth** | `POST /api/auth/login` | Public | Role-based authentication (Citizen, Officer, Admin) |
+| **Grievances** | `GET /api/grievances` | Authenticated | Fetch authoritative grievances (role-scoped) |
+| **Grievances** | `POST /api/grievances` | Citizen | Ingest complaint through the 8-Agent AI mesh |
+| **Grievances** | `GET /api/grievances/:id/timeline` | Authenticated | Fetch unified chronological timeline from DB |
+| **Grievances** | `PATCH /api/grievances/:id/transition-status` | Officer / Admin | Transition canonical status with event broadcast |
+| **Grievances** | `POST /api/grievances/:id/resolve` | Officer | Mark action completed with required photo evidence |
+| **Grievances** | `POST /api/grievances/:id/verify` | Citizen | Citizen closed-loop satisfaction verification / dispute |
+| **Incidents** | `GET /api/incidents` | Officer / Admin | Fetch synthesized civic incidents with linked tickets |
+| **Incidents** | `GET /api/incidents/:id` | Officer / Admin | Fetch full incident detail with graph nodes & SOPs |
+| **Admin** | `GET /api/admin/audit-logs` | Super Admin | Query immutable PostgreSQL audit logs |
+| **Admin** | `GET /api/admin/analytics` | Super Admin | Query live aggregation metrics across all wards |
+| **Realtime** | `GET /api/events` | Public / App | Server-Sent Events stream for 23 canonical event types |
 
 ---
 
-## 🤝 11. Contributing & Community
+## 👥 Demo Personas (1-Click Switch in UI)
 
-We welcome contributions from civic technologists, students, and open-source developers!
-- Review our [Contributing Guidelines](CONTRIBUTING.md) to get started.
-- Check our [Code of Conduct](CODE_OF_CONDUCT.md).
-- Report security issues following our [Security Policy](SECURITY.md).
+| Persona | Name & Role | Credentials | Focus Area |
+|---|---|---|---|
+| 👤 **Citizen** | Aditya Verma | `aditya@citizen.in` / `citizen123` | File voice/photo report, track live timeline, verify fix |
+| 🏛️ **Civic Officer** | Er. Sanjay Sharma *(AEE, DJB)* | `sanjay.sharma@djb.gov.in` / `officer123` | Triage incidents, execute field action, upload photo proof |
+| 🛡️ **Super Admin** | Dr. Meenakshi Sundaram, IAS | `superadmin@delhi.gov.in` / `superadmin123` | City heatmaps, SLA compliance, chronic hotspot memory |
 
 ---
 
-## 📄 12. License
-
+## 📄 License
 JanSahayk is distributed under the **[MIT License](LICENSE)**.  
-*Built with pride for Indian Municipalities, Public Utility Boards, and Citizen Empowerment.*
+*Engineered for municipal empowerment, transparency, and resilient public infrastructure.*
