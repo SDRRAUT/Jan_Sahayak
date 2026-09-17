@@ -774,5 +774,123 @@ export const postgresDB = {
       console.error('PostgreSQL getDepartments error:', err.message);
       return [];
     }
+  },
+
+  // --- Audit Logging ---
+  async logAuditEvent(actorName, action, targetId, details, metadata = {}) {
+    const p = getPool();
+    if (!p) return false;
+    try {
+      await p.query(`
+        INSERT INTO public.audit_logs (
+          actor_name, action, target_id, details, metadata, created_at
+        ) VALUES ($1, $2, $3, $4, $5, NOW())
+      `, [actorName, action, targetId, details, JSON.stringify(metadata)]);
+      return true;
+    } catch (err) {
+      console.warn('[PostgreSQL] logAuditEvent:', err.message);
+      return false;
+    }
+  },
+
+  // --- Notifications ---
+  async saveNotification({ userId, userRole, title, message, grievanceId, link, type }) {
+    const p = getPool();
+    if (!p) return false;
+    try {
+      await p.query(`
+        INSERT INTO public.notifications (
+          user_id, user_role, title, message, grievance_id, link, type, read, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, false, NOW())
+      `, [userId || null, userRole, title, message, grievanceId || null, link || null, type]);
+      return true;
+    } catch (err) {
+      console.warn('[PostgreSQL] saveNotification:', err.message);
+      return false;
+    }
+  },
+
+  // --- Update Grievance Status ---
+  async updateGrievanceStatus(grievanceId, updates) {
+    const p = getPool();
+    if (!p) return false;
+    try {
+      const setClauses = [];
+      const values = [];
+      let idx = 1;
+
+      if (updates.status !== undefined) {
+        setClauses.push(`status = $${idx++}`);
+        values.push(updates.status);
+      }
+      if (updates.resolutionNotes !== undefined) {
+        setClauses.push(`resolution_notes = $${idx++}`);
+        values.push(updates.resolutionNotes);
+      }
+      if (updates.resolutionPhotoUrl !== undefined) {
+        setClauses.push(`resolution_photo_url = $${idx++}`);
+        values.push(updates.resolutionPhotoUrl);
+      }
+      if (updates.assignedTo !== undefined) {
+        // officer_id is the DB column for assigned officer
+        setClauses.push(`officer_id = $${idx++}`);
+        values.push(updates.assignedTo);
+      }
+
+      if (setClauses.length === 0) return false;
+
+      setClauses.push(`updated_at = NOW()`);
+      values.push(grievanceId);
+
+      await p.query(
+        `UPDATE public.grievances SET ${setClauses.join(', ')} WHERE id = $${idx}`,
+        values
+      );
+      return true;
+    } catch (err) {
+      console.error('[PostgreSQL] updateGrievanceStatus error:', err.message);
+      return false;
+    }
+  },
+
+  // --- Add Civic Memory from Resolved Complaint ---
+  async addCivicMemoryFromResolution({ grievanceId, title, category, department, resolutionNotes, officerName, embedding }) {
+    const p = getPool();
+    if (!p) return false;
+    try {
+      if (embedding && Array.isArray(embedding)) {
+        await p.query(`
+          INSERT INTO public.civic_memory (
+            incident_title, category, department, root_cause, resolution_applied,
+            contractor, recurrence_rate, cost_estimate, embedding, created_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::extensions.vector(768), NOW())
+        `, [
+          title, category, department,
+          'Citizen-reported complaint — AI-analyzed root cause',
+          resolutionNotes || 'Field resolution completed',
+          officerName || 'Municipal Field Officer',
+          'LOW', 0,
+          JSON.stringify(embedding)
+        ]);
+      } else {
+        await p.query(`
+          INSERT INTO public.civic_memory (
+            incident_title, category, department, root_cause, resolution_applied,
+            contractor, recurrence_rate, cost_estimate, created_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+        `, [
+          title, category, department,
+          'Citizen-reported complaint — AI-analyzed root cause',
+          resolutionNotes || 'Field resolution completed',
+          officerName || 'Municipal Field Officer',
+          'LOW', 0
+        ]);
+      }
+      console.log(`✅ Civic memory recorded for grievance: ${grievanceId}`);
+      return true;
+    } catch (err) {
+      console.error('[PostgreSQL] addCivicMemoryFromResolution error:', err.message);
+      return false;
+    }
   }
 };

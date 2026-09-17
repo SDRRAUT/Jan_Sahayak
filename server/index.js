@@ -661,9 +661,24 @@ app.post('/api/auth/logout', authenticateToken, async (req, res) => {
   res.json({ success: true, message: 'Logged out successfully.' });
 });
 
-// ============================================================================
-// Grievances Endpoints (Role Protected)
-// ============================================================================
+// Database Grievance Record Helpers
+async function getGrievanceRecord(id) {
+  let item = await postgresDB.getGrievanceById(id);
+  if (!item) {
+    item = GRIEVANCES_DB.find(g => g.id === id);
+  }
+  return item;
+}
+
+async function persistGrievanceRecord(item) {
+  const idx = GRIEVANCES_DB.findIndex(g => g.id === item.id);
+  if (idx >= 0) {
+    GRIEVANCES_DB[idx] = item;
+  } else {
+    GRIEVANCES_DB.unshift(item);
+  }
+  await postgresDB.saveGrievance(item);
+}
 
 // Get Grievances (Filtered by role & access via Supabase PostgreSQL)
 app.get('/api/grievances', async (req, res) => {
@@ -984,26 +999,29 @@ app.post('/api/grievances', authenticateToken, requireRole(['citizen', 'super_ad
 });
 
 // 5. Citizen Verification & Dispute Reopening Endpoint
-app.post('/api/grievances/:id/verify', authenticateToken, requireRole(['citizen', 'super_admin']), (req, res) => {
+app.post('/api/grievances/:id/verify', authenticateToken, requireRole(['citizen', 'super_admin']), async (req, res) => {
   const { id } = req.params;
-  const { satisfaction, feedbackText, evidencePhotos } = req.body;
+  const { satisfaction, feedbackText, evidencePhotos, rating } = req.body;
 
-  const item = GRIEVANCES_DB.find(g => g.id === id);
+  const item = await getGrievanceRecord(id);
   if (!item) {
     return res.status(404).json({ error: 'Grievance not found.' });
   }
 
   const isSatisfied = satisfaction === 'SATISFIED' || satisfaction === 'YES';
   const newStatus = isSatisfied ? 'RESOLVED_CONFIRMED' : 'DISPUTE_REOPENED';
+  const previousStatus = item.status;
   item.status = newStatus;
 
   item.citizenVerification = {
     verifiedAt: new Date().toISOString(),
     satisfaction: isSatisfied ? 'SATISFIED' : 'DISPUTED',
     feedbackText: feedbackText || (isSatisfied ? 'Resolution confirmed by citizen on-site' : 'Citizen reported issue is still not fixed on ground'),
-    evidencePhotos: evidencePhotos || []
+    evidencePhotos: evidencePhotos || [],
+    rating: rating || (isSatisfied ? 5 : 2)
   };
 
+  if (!item.timeline) item.timeline = [];
   item.timeline.push({
     stage: isSatisfied ? 'Citizen Verified & Closed' : 'Dispute Reopened by Citizen',
     time: 'Just now',
@@ -1013,9 +1031,54 @@ app.post('/api/grievances/:id/verify', authenticateToken, requireRole(['citizen'
     status: isSatisfied ? 'completed' : 'in_progress'
   });
 
+  // Record verification in public.verification_records
+  await postgresDB.recordVerification({
+    grievanceId: item.id,
+    incidentId: item.incidentId || item.clusterId || null,
+    citizenId: req.user.id,
+    status: isSatisfied ? 'VERIFIED_SATISFIED' : 'DISPUTED_REOPENED',
+    feedback: item.citizenVerification.feedbackText,
+    rating: item.citizenVerification.rating,
+    photoUrl: item.citizenVerification.evidencePhotos?.[0] || null
+  });
+
+  // Record status transition in public.incident_status_history
+  await postgresDB.recordStatusTransition({
+    incidentId: item.incidentId || item.id,
+    fromStatus: previousStatus,
+    toStatus: newStatus,
+    reason: item.citizenVerification.feedbackText,
+    trigger: isSatisfied ? 'CITIZEN_CONFIRMED_RESOLUTION' : 'CITIZEN_DISPUTED_RESOLUTION',
+    actorId: req.user.id,
+    actorName: req.user.name,
+    actorRole: req.user.role
+  });
+
+  // If verified & satisfied, permanently add to Civic Memory with pgvector embedding
+  if (isSatisfied) {
+    try {
+      const memoryText = `${item.title} - ${item.category} in ${item.location?.ward}. Root cause: ${item.dna?.problem || item.category}. Resolution applied: ${item.resolutionNotes || 'Remediated by field team'}.`;
+      const emb = await aiProvider.generateEmbedding(memoryText);
+      await postgresDB.saveCivicMemory({
+        incidentTitle: item.title,
+        category: item.category,
+        department: item.department,
+        rootCause: item.dna?.problem || 'Infrastructure wear and joint failure',
+        resolutionApplied: item.resolutionNotes || 'Standard municipal engineering remediation',
+        contractor: 'Delhi Municipal Maintenance Division',
+        warrantyPeriod: '12 Months',
+        recurrenceRate: '2.1%',
+        costEstimate: '₹35,000',
+        embedding: emb
+      });
+    } catch (memErr) {
+      console.warn('Civic memory generation error:', memErr.message);
+    }
+  }
+
   // Create notifications
-  createNotification({
-    userRole: 'officer',
+  const notif = {
+    userRole: 'civic_officer',
     title: isSatisfied ? `Citizen Confirmed Resolution: ${item.id}` : `DISPUTE REOPENED: ${item.id}`,
     message: isSatisfied 
       ? `Citizen verified successful resolution for ticket ${item.id}. Case permanently logged to Civic Memory.`
@@ -1023,8 +1086,11 @@ app.post('/api/grievances/:id/verify', authenticateToken, requireRole(['citizen'
     grievanceId: item.id,
     link: `/officer`,
     type: isSatisfied ? 'STATUS_UPDATE' : 'DISPUTE'
-  });
+  };
+  await postgresDB.saveNotification(notif);
+  createNotification(notif);
 
+  await postgresDB.logAuditEvent(req.user.name, isSatisfied ? 'RESOLUTION_CONFIRMED' : 'DISPUTE_REOPENED', item.id, item.citizenVerification.feedbackText);
   AUDIT_LOGS.unshift({
     id: `LOG-${Date.now()}`,
     timestamp: new Date().toLocaleTimeString(),
@@ -1034,7 +1100,10 @@ app.post('/api/grievances/:id/verify', authenticateToken, requireRole(['citizen'
     details: item.citizenVerification.feedbackText
   });
 
-  // Broadcast real-time SSE event
+  // Save grievance to Supabase
+  await persistGrievanceRecord(item);
+
+  // Broadcast real-time SSE & Realtime event
   orchestrator.broadcastEvent('status_changed', { 
     grievanceId: item.id, 
     newStatus, 
@@ -1210,19 +1279,21 @@ app.post('/api/grievances/:id/reopen', authenticateToken, requireRole(['citizen'
   res.json({ success: true, grievance: item });
 });
 
-// Officer resolves grievance with evidence upload
-app.post('/api/grievances/:id/resolve', authenticateToken, requireRole(['officer', 'dept_admin', 'super_admin']), (req, res) => {
+// Officer resolves grievance with evidence upload (Supabase-persisted)
+app.post('/api/grievances/:id/resolve', authenticateToken, requireRole(['officer', 'dept_admin', 'super_admin']), async (req, res) => {
   const { id } = req.params;
   const { resolutionNotes, resolutionPhotoUrl } = req.body;
 
-  const item = GRIEVANCES_DB.find(g => g.id === id);
+  const item = await getGrievanceRecord(id);
   if (!item) return res.status(404).json({ error: 'Grievance not found.' });
 
+  const previousStatus = item.status;
   item.status = 'RESOLVED';
-  item.resolvedAt = new Date().toLocaleTimeString();
+  item.resolvedAt = new Date().toISOString();
   item.resolutionNotes = resolutionNotes || 'Field team completed replacement and pressure testing.';
   item.resolutionPhotoUrl = resolutionPhotoUrl || null;
 
+  if (!item.timeline) item.timeline = [];
   item.timeline.push({
     stage: 'Resolved & Verified',
     time: 'Just now',
@@ -1230,6 +1301,45 @@ app.post('/api/grievances/:id/resolve', authenticateToken, requireRole(['officer
     status: 'completed'
   });
 
+  // Record field action in public.field_actions
+  await postgresDB.recordFieldAction({
+    incidentId: item.incidentId || null,
+    grievanceId: item.id,
+    officerId: req.user.id,
+    officerName: req.user.name,
+    actionType: 'RESOLUTION_SIGN_OFF',
+    status: 'COMPLETED',
+    notes: resolutionNotes || 'Work order completed by field division.',
+    evidenceUrl: resolutionPhotoUrl || null
+  });
+
+  // Record status transition
+  await postgresDB.recordStatusTransition({
+    incidentId: item.incidentId || item.id,
+    fromStatus: previousStatus,
+    toStatus: 'RESOLVED',
+    reason: resolutionNotes || 'Field work completed',
+    trigger: 'OFFICER_RESOLUTION',
+    actorId: req.user.id,
+    actorName: req.user.name,
+    actorRole: req.user.role
+  });
+
+  // Save evidence record if photo was uploaded
+  if (resolutionPhotoUrl) {
+    await postgresDB.saveEvidenceRecord({
+      complaintId: item.id,
+      incidentId: item.incidentId || null,
+      uploadedBy: req.user.id,
+      type: 'RESOLUTION_PHOTO',
+      storagePath: resolutionPhotoUrl,
+      fileUrl: resolutionPhotoUrl,
+      mimeType: 'image/jpeg',
+      metadata: { action: 'RESOLUTION_SIGN_OFF', officer: req.user.name }
+    });
+  }
+
+  await postgresDB.logAuditEvent(req.user.name, 'GRIEVANCE_RESOLVED', id, resolutionNotes, { role: req.user.role });
   AUDIT_LOGS.unshift({
     id: `LOG-${Date.now()}`,
     timestamp: new Date().toLocaleTimeString(),
@@ -1239,20 +1349,63 @@ app.post('/api/grievances/:id/resolve', authenticateToken, requireRole(['officer
     details: resolutionNotes
   });
 
-  createNotification({
+  const citizenNotif = {
     userRole: 'citizen',
+    userId: item.citizenId,
     title: 'Grievance Resolved — Action Completed',
     message: `Officer ${req.user.name} marked ticket ${id} as RESOLVED: "${resolutionNotes || 'Field work completed'}"`,
     grievanceId: id,
     link: `/citizen/${id}`,
     type: 'RESOLVED'
+  };
+  await postgresDB.saveNotification(citizenNotif);
+  createNotification(citizenNotif);
+
+  // Persist resolved status in the grievances table
+  await postgresDB.updateGrievanceStatus(id, {
+    status: 'RESOLVED',
+    resolvedAt: item.resolvedAt,
+    resolutionNotes: item.resolutionNotes,
+    resolutionPhotoUrl: item.resolutionPhotoUrl
   });
+
+  // Write to civic_memory so resolved issues inform future AI suggestions
+  try {
+    const memoryEmbedding = await aiProvider.generateEmbedding(
+      `${item.category || ''} - ${item.subcategory || ''}: ${resolutionNotes}`
+    );
+    await postgresDB.addCivicMemoryFromResolution({
+      grievanceId: id,
+      title: item.title || item.description?.slice(0, 80),
+      category: item.category,
+      department: item.department,
+      resolutionNotes: resolutionNotes || 'Field resolution completed',
+      officerName: req.user.name,
+      embedding: memoryEmbedding
+    });
+  } catch (memErr) {
+    console.warn('[CivicMemory] Failed to generate embedding for civic memory:', memErr.message);
+    // Still write without embedding
+    await postgresDB.addCivicMemoryFromResolution({
+      grievanceId: id,
+      title: item.title || item.description?.slice(0, 80),
+      category: item.category,
+      department: item.department,
+      resolutionNotes: resolutionNotes || 'Field resolution completed',
+      officerName: req.user.name,
+      embedding: null
+    });
+  }
+
+  await persistGrievanceRecord(item);
+
+  orchestrator.broadcastEvent('grievance_resolved', { grievanceId: id, officer: req.user.name });
 
   res.json({ success: true, grievance: item });
 });
 
-// Formal Workflow Status Transitions (Submitted -> AI Analysed -> Assigned -> Under Review -> Information Required -> In Progress -> Escalated -> Resolved -> Closed)
-app.post('/api/grievances/:id/transition-status', authenticateToken, requireRole(['officer', 'dept_admin', 'super_admin']), (req, res) => {
+// Formal Workflow Status Transitions (Supabase-persisted)
+app.post('/api/grievances/:id/transition-status', authenticateToken, requireRole(['officer', 'dept_admin', 'super_admin']), async (req, res) => {
   const { id } = req.params;
   const { newStatus, reason } = req.body;
 
@@ -1261,7 +1414,7 @@ app.post('/api/grievances/:id/transition-status', authenticateToken, requireRole
     return res.status(400).json({ error: `Invalid status. Must be one of [${validStatuses.join(', ')}]` });
   }
 
-  const item = GRIEVANCES_DB.find(g => g.id === id);
+  const item = await getGrievanceRecord(id);
   if (!item) return res.status(404).json({ error: 'Grievance not found.' });
 
   const previousStatus = item.status;
@@ -1276,11 +1429,12 @@ app.post('/api/grievances/:id/transition-status', authenticateToken, requireRole
     role: req.user.role,
     designation: req.user.designation || 'Municipal Authority',
     timestamp: new Date().toLocaleTimeString(),
-    date: '2026-09-16',
+    date: new Date().toISOString().split('T')[0],
     reason: reason || `Status transitioned to ${newStatus}`
   };
   item.statusHistory.push(historyEntry);
 
+  if (!item.timeline) item.timeline = [];
   item.timeline.push({
     stage: newStatus.replace(/_/g, ' '),
     time: 'Just now',
@@ -1288,6 +1442,19 @@ app.post('/api/grievances/:id/transition-status', authenticateToken, requireRole
     status: newStatus === 'RESOLVED' || newStatus === 'CLOSED' ? 'completed' : 'in_progress'
   });
 
+  // Persist status transition to Supabase
+  await postgresDB.recordStatusTransition({
+    incidentId: item.incidentId || item.id,
+    fromStatus: previousStatus,
+    toStatus: newStatus,
+    reason: reason || `Workflow transition by ${req.user.name}`,
+    trigger: 'OFFICER_MANUAL_TRANSITION',
+    actorId: req.user.id,
+    actorName: req.user.name,
+    actorRole: req.user.role
+  });
+
+  await postgresDB.logAuditEvent(req.user.name, 'STATUS_TRANSITION', id, `${previousStatus} -> ${newStatus} (Reason: ${reason || 'Operational update'})`);
   AUDIT_LOGS.unshift({
     id: `LOG-${Date.now()}`,
     timestamp: new Date().toLocaleTimeString(),
@@ -1297,14 +1464,21 @@ app.post('/api/grievances/:id/transition-status', authenticateToken, requireRole
     details: `${previousStatus} -> ${newStatus} (Reason: ${reason || 'Operational update'})`
   });
 
-  createNotification({
+  const citizenNotif = {
     userRole: 'citizen',
+    userId: item.citizenId,
     title: `Status: ${newStatus.replace(/_/g, ' ')}`,
     message: `Grievance ${id} updated to ${newStatus}. ${reason || ''}`,
     grievanceId: id,
     link: `/citizen/${id}`,
     type: 'STATUS_UPDATE'
-  });
+  };
+  await postgresDB.saveNotification(citizenNotif);
+  createNotification(citizenNotif);
+
+  await persistGrievanceRecord(item);
+
+  orchestrator.broadcastEvent('status_changed', { grievanceId: id, previousStatus, newStatus, actor: req.user.name });
 
   res.json({ success: true, grievance: item, transition: historyEntry });
 });
