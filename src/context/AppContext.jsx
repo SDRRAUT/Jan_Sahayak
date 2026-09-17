@@ -10,11 +10,11 @@ const AppContext = createContext();
 // Pre-seeded demo credentials for instant 1-click persona switching (3 Primary Roles)
 export const DEMO_CREDENTIALS = {
   citizen: { email: 'aditya@citizen.in', password: 'citizen123', label: 'Citizen (Aditya Verma)' },
-  civic_officer: { email: 'officer.djb@delhi.gov.in', password: 'officer123', label: 'Civic Officer (Er. Sanjay Sharma - Executive Engineer & Dept Admin)' },
-  super_admin: { email: 'superadmin@delhi.gov.in', password: 'superadmin123', label: 'Super Admin (Dr. Meenakshi Sundaram, IAS)' },
+  civic_officer: { email: 'officer.djb@delhi.gov.in', password: 'officer123', label: 'Government Officer (Er. Sanjay Sharma - Field Engineer & Dept Lead)' },
+  super_admin: { email: 'superadmin@delhi.gov.in', password: 'superadmin123', label: 'Administrator / Admin (Dr. Meenakshi Sundaram, IAS)' },
   // Backward-compatible aliases for legacy credentials
-  officer: { email: 'sanjay.sharma@djb.gov.in', password: 'officer123', label: 'Civic Officer (Field Engineering Lead)' },
-  dept_admin: { email: 'admin.djb@delhi.gov.in', password: 'deptadmin123', label: 'Civic Officer (Department Operations Lead)' }
+  officer: { email: 'sanjay.sharma@djb.gov.in', password: 'officer123', label: 'Government Officer (Field Engineering Lead)' },
+  dept_admin: { email: 'admin.djb@delhi.gov.in', password: 'deptadmin123', label: 'Government Officer (Department Operations Lead)' }
 };
 
 // Full profile objects for offline and instant demo switching
@@ -35,7 +35,7 @@ export const DEMO_USERS = {
     email: 'officer.djb@delhi.gov.in',
     role: 'civic_officer',
     department: 'Delhi Jal Board (DJB)',
-    designation: 'Civic Officer & Assistant Executive Engineer',
+    designation: 'Government Officer & Assistant Executive Engineer',
     zone: 'Zone North-West (Rohini)',
     phone: '+91 98111-90021'
   },
@@ -283,6 +283,52 @@ export function AppProvider({ children }) {
     setNotifications(prev => [newN, ...prev]);
   };
 
+  // Real-Time EventSource connection to backend SSE
+  useEffect(() => {
+    let es = null;
+    try {
+      es = new EventSource('/api/events');
+      
+      es.addEventListener('complaint_created', () => {
+        fetchGrievances();
+        fetchNotifications();
+        fetchCivicIntelligence();
+      });
+
+      es.addEventListener('status_changed', (evt) => {
+        try {
+          const parsed = JSON.parse(evt.data);
+          const payload = parsed.payload || parsed;
+          if (payload?.grievanceId) {
+            setGrievances(prev => prev.map(g => g.id === payload.grievanceId ? { ...g, status: payload.newStatus } : g));
+          }
+        } catch (err) {}
+        fetchGrievances();
+        fetchNotifications();
+      });
+
+      es.addEventListener('incident_created', () => {
+        fetchCivicIntelligence();
+      });
+
+      es.addEventListener('complaint_analyzed', () => {
+        fetchGrievances();
+      });
+
+      es.onerror = () => {
+        // Browser automatically retries SSE connection
+      };
+    } catch (e) {
+      console.warn('[SSE] EventSource init note:', e.message);
+    }
+
+    return () => {
+      if (es) {
+        es.close();
+      }
+    };
+  }, [token]);
+
   // Real Login with Offline Demo Fallback
   const login = async (email, password) => {
     setIsLoadingAuth(true);
@@ -475,8 +521,9 @@ export function AppProvider({ children }) {
       }
     } catch (e) {}
 
-    // Fallback in-memory
-    const fallbackId = `DL-2026-W${Math.floor(10 + Math.random() * 89)}-${Math.floor(1000 + Math.random() * 9000)}`;
+    // Fallback in-memory with JS- prefix
+    const wardNum = (formData.ward || user?.ward || 'Ward 14').match(/\d+/)?.[0] || '14';
+    const fallbackId = `JS-2026-W${wardNum}-${String(Date.now()).slice(-4)}`;
     const fallbackItem = {
       ...newGrievance,
       id: fallbackId,
@@ -707,6 +754,49 @@ export function AppProvider({ children }) {
             time: 'Just now',
             detail: `Citizen rated ${rating}/5 stars: "${comment}"`,
             status: 'completed'
+          }]
+        };
+      }
+      return g;
+    }));
+  };
+
+  // Real Citizen Resolution Verification
+  const verifyResolution = async (grievanceId, satisfaction, feedbackText, evidencePhotos = []) => {
+    try {
+      const res = await fetch(`/api/grievances/${grievanceId}/verify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ satisfaction, feedbackText, evidencePhotos })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setGrievances(prev => prev.map(g => g.id === grievanceId ? { ...g, ...data.grievance } : g));
+        return data.grievance;
+      }
+    } catch (e) {}
+
+    // Fallback in-memory
+    const isSatisfied = satisfaction === 'SATISFIED' || satisfaction === 'YES';
+    const newStatus = isSatisfied ? 'RESOLVED_CONFIRMED' : 'DISPUTE_REOPENED';
+    setGrievances(prev => prev.map(g => {
+      if (g.id === grievanceId) {
+        return {
+          ...g,
+          status: newStatus,
+          citizenVerification: {
+            verifiedAt: new Date().toISOString(),
+            satisfaction: isSatisfied ? 'SATISFIED' : 'DISPUTED',
+            feedbackText: feedbackText || (isSatisfied ? 'Resolution confirmed by citizen' : 'Citizen reported issue persists on ground')
+          },
+          timeline: [...(g.timeline || []), {
+            stage: isSatisfied ? 'Citizen Verified & Closed' : 'Dispute Reopened by Citizen',
+            time: 'Just now',
+            detail: feedbackText || (isSatisfied ? 'Problem confirmed resolved by citizen' : 'Citizen reported issue persists on ground'),
+            status: isSatisfied ? 'completed' : 'in_progress'
           }]
         };
       }
@@ -1202,6 +1292,7 @@ export function AppProvider({ children }) {
         requestInfo,
         respondInfo,
         resolveGrievance,
+        verifyResolution,
         reopenDispute,
         submitFeedback,
         addInternalNote,

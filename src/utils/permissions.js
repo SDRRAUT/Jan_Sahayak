@@ -154,9 +154,9 @@ export function getRoleLabel(role) {
     case 'civic_officer':
     case 'officer':
     case 'dept_admin':
-      return 'Civic Officer';
+      return 'Government Officer';
     case 'super_admin':
-      return 'Super Admin';
+      return 'Administrator / Admin';
     default:
       return 'Guest';
   }

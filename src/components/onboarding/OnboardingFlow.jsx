@@ -46,9 +46,9 @@ export default function OnboardingFlow({ onComplete }) {
     },
     {
       key: 'civic_officer',
-      label: 'Civic Officer',
+      label: 'Govt Officer',
       name: 'Er. Sanjay Sharma',
-      badge: 'DJB Lead Engineer',
+      badge: 'Field Engineer (DJB)',
       email: DEMO_CREDENTIALS.civic_officer.email,
       password: DEMO_CREDENTIALS.civic_officer.password,
       icon: Briefcase,
@@ -58,9 +58,9 @@ export default function OnboardingFlow({ onComplete }) {
     },
     {
       key: 'super_admin',
-      label: 'Super Admin',
+      label: 'Administrator / Admin',
       name: 'Dr. Meenakshi, IAS',
-      badge: 'Principal Secretary',
+      badge: 'Municipal Head / Boss',
       email: DEMO_CREDENTIALS.super_admin.email,
       password: DEMO_CREDENTIALS.super_admin.password,
       icon: ShieldCheck,
@@ -326,7 +326,7 @@ export default function OnboardingFlow({ onComplete }) {
             </span>
 
             <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}>
-              Authenticating {selectedRole.replace('_', ' ').toUpperCase()}...
+              Authenticating {currentRoleData.label.toUpperCase()}...
             </h3>
 
             <p style={{ fontSize: '13px', color: '#64748B', maxWidth: '400px', minHeight: '34px', lineHeight: 1.4, marginBottom: '16px' }}>

@@ -5,10 +5,32 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { db } from './db/database.js';
 import { orchestrator } from './agents/orchestrator.js';
+import { aiProvider } from './agents/aiProvider.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const distPath = path.resolve(__dirname, '..', 'dist');
+
+// Automatically load .env configuration if present
+const envFilePath = path.resolve(__dirname, '..', '.env');
+if (fs.existsSync(envFilePath)) {
+  try {
+    const rawEnv = fs.readFileSync(envFilePath, 'utf8');
+    for (const line of rawEnv.split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
+        const eqIdx = trimmed.indexOf('=');
+        const envKey = trimmed.substring(0, eqIdx).trim();
+        const envVal = trimmed.substring(eqIdx + 1).trim();
+        if (!process.env[envKey]) {
+          process.env[envKey] = envVal;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Could not parse local .env file:', err.message);
+  }
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -379,6 +401,89 @@ app.get('/api/health', (req, res) => {
 });
 
 // ============================================================================
+// Real-Time Server-Sent Events (SSE) Stream
+// ============================================================================
+app.get('/api/events', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders();
+
+  // Send initial handshake
+  res.write(`event: connected\ndata: ${JSON.stringify({ status: 'connected', time: new Date().toISOString() })}\n\n`);
+
+  orchestrator.addSSEClient(res);
+
+  // Keep-alive heartbeat every 20 seconds
+  const heartbeat = setInterval(() => {
+    try {
+      res.write(': heartbeat\n\n');
+    } catch (e) {
+      clearInterval(heartbeat);
+    }
+  }, 20000);
+
+  req.on('close', () => {
+    clearInterval(heartbeat);
+    orchestrator.removeSSEClient(res);
+  });
+});
+
+// ============================================================================
+// Geolocation & Reverse Geocoding
+// ============================================================================
+app.post('/api/location/reverse-geocode', async (req, res) => {
+  const { lat, lng } = req.body;
+  if (!lat || !lng) {
+    return res.status(400).json({ error: 'Latitude and Longitude required.' });
+  }
+
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+    const geoRes = await fetch(url, {
+      headers: {
+        'User-Agent': 'JanSahayak-Civic-Platform/1.0 (delhi.civic@gov.in)'
+      }
+    });
+
+    if (geoRes.ok) {
+      const data = await geoRes.json();
+      const addr = data.address || {};
+      const road = addr.road || addr.neighbourhood || addr.suburb || 'Local Area';
+      const city = addr.city || addr.state_district || 'New Delhi';
+      const pincode = addr.postcode || '110085';
+      const ward = `Ward ${Math.floor(10 + (Math.abs(Number(lat) * 100) % 80))} (${road})`;
+
+      return res.json({
+        success: true,
+        formattedAddress: data.display_name?.split(',').slice(0, 3).join(', ') || `${road}, ${city}`,
+        area: road,
+        ward,
+        pincode,
+        city,
+        lat: Number(lat),
+        lng: Number(lng)
+      });
+    }
+  } catch (err) {
+    console.warn('[ReverseGeocode] Network lookup fallback:', err.message);
+  }
+
+  // Resilient fallback with coordinate context
+  res.json({
+    success: true,
+    formattedAddress: `Sector 14 Corridor (GPS: ${Number(lat).toFixed(4)}°N, ${Number(lng).toFixed(4)}°E)`,
+    area: 'Sector 14 Corridor',
+    ward: 'Ward 14 (Rohini Sector 14)',
+    pincode: '110085',
+    city: 'New Delhi',
+    lat: Number(lat),
+    lng: Number(lng)
+  });
+});
+
+// ============================================================================
 // Auth Endpoints
 // ============================================================================
 
@@ -495,7 +600,115 @@ app.get('/api/grievances', (req, res) => {
   }
 });
 
-// Create Grievance (Citizen or Admin)
+// ============================================================================
+// Citizen Real-Time AI Understanding & Multimodal Endpoints
+// ============================================================================
+
+// 1. Live AI Understanding (Pre-Submission Review via Gemini)
+app.post('/api/complaints/ai-understand', async (req, res) => {
+  const { text, description, ward, area } = req.body;
+  const content = text || description;
+  if (!content || content.trim().length < 5) {
+    return res.status(400).json({ error: 'Sufficient complaint description is required for AI understanding.' });
+  }
+
+  try {
+    const prompt = `You are the JanSahayak Municipal Grievance Intelligence Engine.
+Analyze this raw citizen complaint from Delhi:
+"${content}"
+Ward context: ${ward || 'Ward 14 (Rohini Sector 14)'}, Area: ${area || 'Local Area'}
+
+Respond ONLY with valid JSON with this exact schema:
+{
+  "problem_type": string (concise 3-6 word title e.g. "Main Water Supply Contamination" or "Deep Asphalt Road Crater"),
+  "category": string ("Water Supply & Contamination" | "Roads & Infrastructure" | "Sanitation & Solid Waste" | "Electricity & Power Grid"),
+  "department": string ("Delhi Jal Board (DJB)" | "Public Works Department (PWD)" | "Municipal Corporation of Delhi (MCD)" | "BSES Rajdhani Power Limited"),
+  "severity": "CRITICAL" | "HIGH" | "MEDIUM" | "LOW",
+  "urgency": number (integer between 1 and 10),
+  "summary": string (1-sentence concise summary in clear English),
+  "root_cause_hypothesis": string (likely underlying infrastructure failure),
+  "recommended_action": string (official municipal Standard Operating Procedure),
+  "estimated_sla_hours": number (recommended resolution time limit in hours)
+}`;
+
+    const understanding = await aiProvider.generateStructuredJSON(prompt, '', {
+      problem_type: 'Civic Infrastructure Concern',
+      category: 'General Civic Infrastructure',
+      department: 'Municipal Corporation of Delhi (MCD)',
+      severity: 'HIGH',
+      urgency: 7,
+      summary: content.slice(0, 100),
+      root_cause_hypothesis: 'Infrastructure deterioration requiring field inspection',
+      recommended_action: 'Deploy emergency inspection crew to assess location',
+      estimated_sla_hours: 24
+    });
+
+    res.json({ success: true, understanding });
+  } catch (err) {
+    res.status(500).json({ error: 'AI Understanding error: ' + err.message });
+  }
+});
+
+// 2. Multimodal Computer Vision Analysis via Gemini
+app.post('/api/complaints/vision-analyze', async (req, res) => {
+  const { imageBase64, mimeType, contextPrompt } = req.body;
+  if (!imageBase64) {
+    return res.status(400).json({ error: 'Image base64 data required for vision analysis.' });
+  }
+
+  try {
+    const vision = await aiProvider.analyzeImageEvidence(
+      imageBase64,
+      mimeType || 'image/jpeg',
+      contextPrompt || 'Civic infrastructure complaint'
+    );
+    res.json({ success: true, vision });
+  } catch (err) {
+    res.status(500).json({ error: 'Vision analysis error: ' + err.message });
+  }
+});
+
+// 3. Citizen Dashboard Data API
+app.get('/api/citizen/dashboard', authenticateToken, requireRole(['citizen', 'super_admin']), (req, res) => {
+  const citizenId = req.user.id;
+  const citizenWard = req.user.ward || 'Ward 14 (Rohini Sector 14)';
+
+  // Real user reports from database
+  const myReports = GRIEVANCES_DB.filter(g => 
+    g.citizenId === citizenId || 
+    (g.citizenName && g.citizenName.toLowerCase() === req.user.name.toLowerCase())
+  );
+
+  // Real ward-level incidents
+  const allIncidents = db.getIncidents ? db.getIncidents() : [];
+  const wardIncidents = allIncidents.filter(inc => !inc.location?.ward || inc.location.ward === citizenWard);
+
+  // Real notifications for citizen
+  const userNotifs = NOTIFICATIONS_DB.filter(n => n.userId === citizenId || n.userRole === 'citizen');
+
+  res.json({
+    success: true,
+    citizen: {
+      id: req.user.id,
+      name: req.user.name,
+      email: req.user.email,
+      phone: req.user.phone,
+      ward: req.user.ward,
+      pincode: req.user.pincode
+    },
+    metrics: {
+      totalReports: myReports.length,
+      activeReports: myReports.filter(r => r.status !== 'RESOLVED' && r.status !== 'RESOLVED_CONFIRMED').length,
+      resolvedReports: myReports.filter(r => r.status === 'RESOLVED' || r.status === 'RESOLVED_CONFIRMED').length,
+      pendingVerification: myReports.filter(r => r.status === 'RESOLVED').length
+    },
+    myReports,
+    wardIncidents,
+    notifications: userNotifs
+  });
+});
+
+// 4. Create Grievance (Citizen or Admin)
 app.post('/api/grievances', authenticateToken, requireRole(['citizen', 'super_admin']), async (req, res) => {
   const { title, description, category, department, location, urgency, urgencyScore, evidence } = req.body;
   
@@ -503,7 +716,9 @@ app.post('/api/grievances', authenticateToken, requireRole(['citizen', 'super_ad
     return res.status(400).json({ error: 'Grievance description is required.' });
   }
 
-  const newId = `DL-2026-W${Math.floor(10 + Math.random() * 89)}-${Math.floor(1000 + Math.random() * 9000)}`;
+  const wardNum = (location?.ward || req.user.ward || 'Ward 14').match(/\d+/)?.[0] || '14';
+  const newId = `JS-2026-W${wardNum}-${String(Date.now()).slice(-4)}`;
+
   const newGrievance = {
     id: newId,
     title: title || `${category || 'Civic'} Issue in ${location?.ward || req.user.ward}`,
@@ -515,8 +730,8 @@ app.post('/api/grievances', authenticateToken, requireRole(['citizen', 'super_ad
     location: location || { ward: req.user.ward, area: 'Local Area', city: 'New Delhi', pincode: req.user.pincode, lat: 28.7185, lng: 77.1250 },
     urgency: urgency || 'HIGH',
     urgencyScore: urgencyScore || 85,
-    status: 'TRIAGED',
-    createdAt: 'Just now',
+    status: 'INGESTED',
+    createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     timestamp: new Date().toISOString(),
     slaDeadline: '24 Hours from now',
     slaHoursLeft: 24,
@@ -534,8 +749,26 @@ app.post('/api/grievances', authenticateToken, requireRole(['citizen', 'super_ad
     ]
   };
 
-  // Run through multi-agent orchestrator pipeline
+  // Run through connected multi-agent orchestrator pipeline
   const orchestration = await orchestrator.processComplaint(newGrievance);
+
+  // Sync enriched fields from orchestration
+  if (orchestration.complaint) {
+    newGrievance.analysis = orchestration.complaint.analysis;
+    newGrievance.dna = orchestration.complaint.dna;
+    newGrievance.category = orchestration.complaint.category || newGrievance.category;
+    newGrievance.department = orchestration.complaint.department || newGrievance.department;
+    newGrievance.urgency = orchestration.complaint.urgency || newGrievance.urgency;
+    newGrievance.urgencyScore = orchestration.complaint.urgencyScore || newGrievance.urgencyScore;
+  }
+  if (orchestration.cluster) {
+    newGrievance.clusterId = orchestration.cluster.id;
+    newGrievance.clusterCount = orchestration.cluster.complaintIds?.length || 1;
+    newGrievance.clusterTitle = orchestration.cluster.title;
+  }
+  if (orchestration.incident) {
+    newGrievance.incidentId = orchestration.incident.id;
+  }
 
   GRIEVANCES_DB.unshift(newGrievance);
   db.saveComplaint(newGrievance);
@@ -568,7 +801,81 @@ app.post('/api/grievances', authenticateToken, requireRole(['citizen', 'super_ad
     type: 'ASSIGNMENT'
   });
 
-  res.status(201).json({ success: true, grievance: newGrievance, incident: orchestration.incident, cluster: orchestration.cluster });
+  // Real-time broadcast
+  orchestrator.broadcastEvent('complaint_created', { 
+    complaintId: newId, 
+    title: newGrievance.title,
+    department: newGrievance.department,
+    urgency: newGrievance.urgency
+  });
+
+  res.status(201).json({ 
+    success: true, 
+    grievance: newGrievance, 
+    incident: orchestration.incident, 
+    cluster: orchestration.cluster 
+  });
+});
+
+// 5. Citizen Verification & Dispute Reopening Endpoint
+app.post('/api/grievances/:id/verify', authenticateToken, requireRole(['citizen', 'super_admin']), (req, res) => {
+  const { id } = req.params;
+  const { satisfaction, feedbackText, evidencePhotos } = req.body;
+
+  const item = GRIEVANCES_DB.find(g => g.id === id);
+  if (!item) {
+    return res.status(404).json({ error: 'Grievance not found.' });
+  }
+
+  const isSatisfied = satisfaction === 'SATISFIED' || satisfaction === 'YES';
+  const newStatus = isSatisfied ? 'RESOLVED_CONFIRMED' : 'DISPUTE_REOPENED';
+  item.status = newStatus;
+
+  item.citizenVerification = {
+    verifiedAt: new Date().toISOString(),
+    satisfaction: isSatisfied ? 'SATISFIED' : 'DISPUTED',
+    feedbackText: feedbackText || (isSatisfied ? 'Resolution confirmed by citizen on-site' : 'Citizen reported issue is still not fixed on ground'),
+    evidencePhotos: evidencePhotos || []
+  };
+
+  item.timeline.push({
+    stage: isSatisfied ? 'Citizen Verified & Closed' : 'Dispute Reopened by Citizen',
+    time: 'Just now',
+    detail: isSatisfied 
+      ? 'Citizen completed real verification: Problem confirmed completely resolved.'
+      : `Citizen disputed resolution: "${feedbackText || 'Problem persists on ground'}"`,
+    status: isSatisfied ? 'completed' : 'in_progress'
+  });
+
+  // Create notifications
+  createNotification({
+    userRole: 'officer',
+    title: isSatisfied ? `Citizen Confirmed Resolution: ${item.id}` : `DISPUTE REOPENED: ${item.id}`,
+    message: isSatisfied 
+      ? `Citizen verified successful resolution for ticket ${item.id}. Case permanently logged to Civic Memory.`
+      : `Citizen disputed resolution for ticket ${item.id}: "${feedbackText || 'Work incomplete'}". Immediate inspection required.`,
+    grievanceId: item.id,
+    link: `/officer`,
+    type: isSatisfied ? 'STATUS_UPDATE' : 'DISPUTE'
+  });
+
+  AUDIT_LOGS.unshift({
+    id: `LOG-${Date.now()}`,
+    timestamp: new Date().toLocaleTimeString(),
+    actor: req.user.name,
+    action: isSatisfied ? 'RESOLUTION_CONFIRMED' : 'DISPUTE_REOPENED',
+    targetId: item.id,
+    details: item.citizenVerification.feedbackText
+  });
+
+  // Broadcast real-time SSE event
+  orchestrator.broadcastEvent('status_changed', { 
+    grievanceId: item.id, 
+    newStatus, 
+    actor: req.user.name 
+  });
+
+  res.json({ success: true, grievance: item });
 });
 
 // Direct Public Complaints API (Used for test suite and external reporting)
@@ -577,7 +884,8 @@ app.post('/api/complaints', async (req, res) => {
   const content = text || description;
   if (!content) return res.status(400).json({ error: 'Complaint text or description is required.' });
 
-  const newId = `DL-2026-W${Math.floor(10 + Math.random() * 89)}-${Math.floor(1000 + Math.random() * 9000)}`;
+  const wardNum = (ward || location?.ward || 'Ward 14').match(/\d+/)?.[0] || '14';
+  const newId = `JS-2026-W${wardNum}-${String(Date.now()).slice(-4)}`;
   const loc = location || {
     ward: ward || 'Ward 14 (Rohini Sector 14)',
     lat: Number(lat) || 28.7185,
