@@ -467,58 +467,6 @@ export default function Navbar() {
               </>
             )}
 
-            {user && (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') && (
-              <Link
-                to="/officer"
-                className="header-report-btn"
-                style={{
-                  height: '38px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  padding: '0 16px',
-                  borderRadius: 'var(--radius-full)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                  color: '#FFFFFF',
-                  boxShadow: '0 2px 8px rgba(5, 150, 105, 0.28)',
-                  textDecoration: 'none',
-                  whiteSpace: 'nowrap',
-                  transition: 'all 150ms ease'
-                }}
-              >
-                <Briefcase style={{ width: '14px', height: '14px' }} />
-                <span>Civic Console</span>
-              </Link>
-            )}
-
-            {user && role === 'super_admin' && (
-              <Link
-                to="/admin/super"
-                className="header-report-btn"
-                style={{
-                  height: '38px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  padding: '0 16px',
-                  borderRadius: 'var(--radius-full)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  background: 'linear-gradient(135deg, #4338CA 0%, #312E81 100%)',
-                  color: '#FFFFFF',
-                  boxShadow: '0 2px 8px rgba(67, 56, 202, 0.28)',
-                  textDecoration: 'none',
-                  whiteSpace: 'nowrap',
-                  transition: 'all 150ms ease'
-                }}
-              >
-                <ShieldCheck style={{ width: '14px', height: '14px' }} />
-                <span>Admin Console</span>
-              </Link>
-            )}
-
             {/* Notifications Bell */}
             {user && (
               <div ref={notificationRef} style={{ position: 'relative' }}>
