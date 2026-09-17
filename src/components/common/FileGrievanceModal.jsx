@@ -88,8 +88,11 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
     { label: '💡 Streetlight not working', text: 'Gali ki 3 streetlight kharab hain, raat ko andhera rehta hai.', cat: 'Electricity & Power Grid' }
   ];
 
+  const prevIsOpenRef = useRef(false);
+
   useEffect(() => {
-    if (isOpen) {
+    // Only initialize form fields when the modal is newly opened
+    if (isOpen && !prevIsOpenRef.current) {
       setCurrentStep(1);
       setCreatedTicket(null);
       setAiDetectedCategory(null);
@@ -100,6 +103,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
       if (user?.ward) setWard(user.ward);
       if (user?.pincode) setPincode(user.pincode);
     }
+    prevIsOpenRef.current = isOpen;
   }, [isOpen, defaultCategory, user]);
 
   // ─── AI Category Detection ───────────────────────────────────────────────────
