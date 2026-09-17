@@ -20,10 +20,12 @@ import {
   X
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import EditorialComplaintCard, { ComplaintDetailModal } from '../components/common/EditorialComplaintCard';
 
 export default function DeptAdmin() {
   const { user, grievances, clusters } = useApp();
-  const [selectedTab, setSelectedTab] = useState('overview'); // 'overview' | 'trends' | 'feedback' | 'disputes' | 'users'
+  const [selectedTab, setSelectedTab] = useState('overview'); // 'overview' | 'grievances' | 'trends' | 'feedback' | 'disputes'
+  const [selectedModalGrievance, setSelectedModalGrievance] = useState(null);
   const [reportExported, setReportExported] = useState(false);
   const [showAddOfficerModal, setShowAddOfficerModal] = useState(false);
 
@@ -209,6 +211,7 @@ export default function DeptAdmin() {
         <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', borderBottom: '1px solid var(--color-divider)', paddingBottom: '12px', flexWrap: 'wrap' }}>
           {[
             { id: 'overview', label: 'Officer Workload & Roster' },
+            { id: 'grievances', label: `Department Grievances (${deptGrievances.length})` },
             { id: 'trends', label: 'Category & Geographic Trends' },
             { id: 'feedback', label: 'Citizen Feedback & Quality' },
             { id: 'disputes', label: `Disputes & Reopened Audit (${disputes.length})` }
@@ -310,6 +313,29 @@ export default function DeptAdmin() {
           </div>
         )}
 
+        {/* TAB: Department Grievances (Editorial Reference-2 Cards) */}
+        {selectedTab === 'grievances' && (
+          <div style={{ marginBottom: '32px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+              {deptGrievances.map((g) => (
+                <EditorialComplaintCard
+                  key={g.id}
+                  item={g}
+                  role="dept_admin"
+                  currentUser={user}
+                  onOpen={(item) => setSelectedModalGrievance(item)}
+                  onInspect={(caseId) => setSelectedModalGrievance(g)}
+                />
+              ))}
+            </div>
+            {deptGrievances.length === 0 && (
+              <div style={{ padding: '48px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                No active grievances logged for this department.
+              </div>
+            )}
+          </div>
+        )}
+
         {/* TAB 2: Category & Geographic Trends */}
         {selectedTab === 'trends' && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
@@ -398,27 +424,38 @@ export default function DeptAdmin() {
         {/* TAB 4: Reopened Citizen Disputes */}
         {selectedTab === 'disputes' && (
           <div className="card" style={{ padding: '28px' }}>
-            <h3 style={{ fontSize: '18px', marginBottom: '16px' }}>
-              Citizen Disputed Closures Requiring Supervisory Adjudication
-            </h3>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '8px' }}>
+              <div>
+                <h3 style={{ fontSize: '18px', margin: 0 }}>
+                  Citizen Disputed Closures Requiring Supervisory Adjudication
+                </h3>
+                <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '4px 0 0 0' }}>
+                  Resolutions marked completed by officers but contested by citizens with on-ground counter-evidence.
+                </p>
+              </div>
+              <span style={{ fontSize: '12px', fontWeight: 700, padding: '4px 12px', borderRadius: '999px', background: '#FFFBEB', color: '#B45309', border: '1px solid #FDE68A' }}>
+                ⚠️ {disputes.length} Active Disputes
+              </span>
+            </div>
+
             {disputes.length === 0 ? (
               <div style={{ padding: '32px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
                 Zero active disputes in this department. All verified resolutions accepted by citizens.
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
                 {disputes.map(d => (
-                  <div key={d.id} style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#FFFBEB', border: '1px solid #FDE68A' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                      <strong style={{ fontSize: '14px', color: '#92400E' }}>Case #{d.id}: {d.title}</strong>
-                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#B45309' }}>SUPERVISORY ESCALATION</span>
+                  <div key={d.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ padding: '8px 14px', borderRadius: '12px', background: '#FEF2F2', border: '1px solid #FECACA', fontSize: '11.5px', color: '#991B1B', fontWeight: 600 }}>
+                      ⚠️ Dispute Reason: "{d.reopenedDispute?.citizenReason || 'Resolved status contested by resident.'}"
                     </div>
-                    <p style={{ fontSize: '13px', color: '#78350F', marginBottom: '8px' }}>
-                      <strong>Citizen Dispute Reason: </strong> "{d.reopenedDispute?.citizenReason || 'Resolved status contested.'}"
-                    </p>
-                    <div style={{ fontSize: '12px', color: '#92400E' }}>
-                      Assigned Officer: <strong>{d.officerName}</strong> • Ward: {d.location.ward}
-                    </div>
+                    <EditorialComplaintCard
+                      item={d}
+                      role="dept_admin"
+                      currentUser={user}
+                      onOpen={(item) => setSelectedModalGrievance(item)}
+                      onInspect={(caseId) => setSelectedModalGrievance(d)}
+                    />
                   </div>
                 ))}
               </div>
@@ -481,6 +518,16 @@ export default function DeptAdmin() {
               </div>
             </form>
           </div>
+        )}
+
+        {/* Full Editorial Complaint Detail Popup */}
+        {selectedModalGrievance && (
+          <ComplaintDetailModal
+            item={selectedModalGrievance}
+            onClose={() => setSelectedModalGrievance(null)}
+            role="dept_admin"
+            currentUser={user}
+          />
         )}
 
       </div>

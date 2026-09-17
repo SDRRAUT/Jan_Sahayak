@@ -5,6 +5,7 @@ import {
   Sparkles, Bell, FileText, X, Radio
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { normalizeStatus, getRoleStatusLabel, getStatusConfig } from '../utils/statuses';
 import WhyExplainer from '../components/common/WhyExplainer';
 import CivicSignalModal from '../components/intelligence/CivicSignalModal';
 import FileGrievanceModal from '../components/common/FileGrievanceModal';
@@ -28,19 +29,23 @@ const CATEGORY_IMAGES = {
 };
 
 const STATUS_STEPS = [
-  { key:'SUBMITTED',          label:'Submitted',   icon:'📋', desc:'Your complaint is received & logged' },
-  { key:'ASSIGNED',           label:'Assigned',    icon:'👮', desc:'Officer assigned to your case' },
-  { key:'IN_PROGRESS',        label:'In Progress', icon:'🔧', desc:'Field crew is working on it' },
-  { key:'RESOLVED',           label:'Resolved',    icon:'✅', desc:'Work completed by the team' },
-  { key:'RESOLVED_CONFIRMED', label:'Verified',    icon:'🎉', desc:'You confirmed the fix on ground' },
+  { key:'REPORTED',           label:'Submitted',       icon:'📋', desc:'Your complaint is logged in system' },
+  { key:'ANALYZING',          label:'AI Analyzing',    icon:'✨', desc:'AI extracts DNA & correlates signals' },
+  { key:'AUTHORITY_ASSIGNED', label:'Assigned',        icon:'👮', desc:'Assigned to field division' },
+  { key:'INVESTIGATION',      label:'Investigation',   icon:'🔍', desc:'Field inspection started' },
+  { key:'ACTION_IN_PROGRESS', label:'Work In Progress',icon:'🔧', desc:'Remediation crew active on site' },
+  { key:'ACTION_COMPLETED',   label:'Action Completed',icon:'📸', desc:'Repairs completed with evidence' },
+  { key:'RESOLVED',           label:'Verified & Closed',icon:'🎉', desc:'Problem fixed & closed' },
 ];
 
 function getStepIndex(status) {
-  const s = (status||'').toUpperCase();
-  if (s==='RESOLVED_CONFIRMED') return 4;
-  if (s==='RESOLVED')           return 3;
-  if (s==='IN_PROGRESS')        return 2;
-  if (s==='ASSIGNED')           return 1;
+  const s = normalizeStatus(status);
+  if (s === 'RESOLVED') return 6;
+  if (s === 'VERIFICATION_PENDING' || s === 'ACTION_COMPLETED') return 5;
+  if (s === 'ACTION_IN_PROGRESS') return 4;
+  if (s === 'INVESTIGATION') return 3;
+  if (s === 'AUTHORITY_ASSIGNED' || s === 'INCIDENT_CREATED') return 2;
+  if (s === 'CONNECTED' || s === 'ANALYZING') return 1;
   return 0;
 }
 
