@@ -298,23 +298,13 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setShowFileGrievanceModal(true)}
+                  className={`site-nav-link ${location.pathname === '/citizen/submit' ? 'active' : ''}`}
                   style={{
-                    height: '34px',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    padding: '0 16px',
-                    borderRadius: '9999px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    background: 'linear-gradient(135deg, #0E5E3A 0%, #0A472C 100%)',
-                    color: '#FFFFFF',
+                    background: 'transparent',
                     border: 'none',
-                    boxShadow: '0 2px 8px rgba(14, 94, 58, 0.28)',
                     cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                    transition: 'all 150ms ease',
-                    marginLeft: '4px'
+                    fontFamily: 'inherit',
+                    fontSize: '13px'
                   }}
                 >
                   <Plus style={{ width: '14px', height: '14px' }} />
@@ -1036,14 +1026,15 @@ export default function Navbar() {
                       borderRadius: 'var(--radius-md)',
                       fontSize: '14px',
                       fontWeight: 600,
-                      color: '#FFFFFF',
-                      background: 'linear-gradient(135deg, #0E5E3A 0%, #0A472C 100%)',
+                      color: location.pathname === '/citizen/submit' ? 'var(--color-primary)' : 'var(--color-text-primary)',
+                      background: location.pathname === '/citizen/submit' ? '#EFF6FF' : '#F8FAFC',
                       border: 'none',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '8px',
                       cursor: 'pointer',
-                      textAlign: 'left'
+                      textAlign: 'left',
+                      width: '100%'
                     }}
                   >
                     <Plus style={{ width: '15px', height: '15px' }} />

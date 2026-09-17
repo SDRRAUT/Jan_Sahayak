@@ -609,8 +609,16 @@ export function AppProvider({ children }) {
     let activeUser = user;
     let activeToken = token;
     if (!activeUser || !activeToken) {
-      activeUser = await switchDemoRole('citizen');
-      activeToken = localStorage.getItem('jansahayk_token') || 'demo-token-citizen';
+      activeUser = DEMO_USERS.citizen;
+      activeToken = 'demo_token_citizen';
+      setUser(activeUser);
+      setToken(activeToken);
+      localStorage.setItem('jansahayk_token', activeToken);
+      localStorage.setItem('jansahayk_user', JSON.stringify(activeUser));
+      localStorage.setItem('jansahayk_entered_app', 'true');
+      setHasEnteredApp(true);
+      // Fire background sync login if backend available
+      switchDemoRole('citizen').catch(() => {});
     }
 
     const analysis = analyzeGrievanceInput(formData.description, { ward: formData.ward || activeUser?.ward });
@@ -639,6 +647,9 @@ export function AppProvider({ children }) {
       },
       urgency: analysis.urgency,
       urgencyScore: analysis.urgencyScore,
+      citizenId: activeUser?.id || 'USR-CITIZEN-01',
+      citizenName: formData.citizenName || activeUser?.name || 'Aditya Verma',
+      citizenPhone: formData.citizenPhone || activeUser?.phone || '+91 98712-88210',
       evidence: formData.evidence || {
         hasPhoto: !!formData.photoTag,
         photoTag: formData.photoTag || null,
@@ -650,14 +661,18 @@ export function AppProvider({ children }) {
     };
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1500);
       const res = await fetch('/api/grievances', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${activeToken}`
         },
-        body: JSON.stringify(newGrievance)
+        body: JSON.stringify(newGrievance),
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
         const created = data.grievance;

@@ -409,6 +409,8 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
         pincode,
         category,
         urgency,
+        citizenName: citizenName || user?.name || 'Aditya Verma',
+        citizenPhone: citizenPhone || user?.phone || '+91 98712-88210',
         location: {
           ward,
           area: landmark ? `${landmark}, ${area}` : area,
