@@ -4,6 +4,11 @@ import { INITIAL_GRIEVANCES, MOCK_CLUSTERS, SYSTEM_METRICS, INITIAL_NOTIFICATION
 import { CIVIC_INCIDENTS, CIVIC_SIGNALS, CIVIC_INTELLIGENCE_METRICS } from '../data/civicIntelligenceData';
 import { analyzeGrievanceInput } from '../services/aiEngine';
 import { ComplaintDNAService, IncidentClusteringService, ActionSimulationService } from '../services/civicIntelligenceService';
+import { ComplaintService } from '../services/ComplaintService';
+import { IncidentService } from '../services/IncidentService';
+import { NotificationService } from '../services/NotificationService';
+import { CANONICAL_STATUSES, normalizeStatus } from '../utils/statuses';
+import { CANONICAL_EVENTS } from '../utils/events';
 import { hasPermission, getRoleLabel, PERMISSIONS, ROLES } from '../utils/permissions';
 
 const AppContext = createContext();
@@ -157,6 +162,43 @@ export function AppProvider({ children }) {
     localStorage.setItem('jansahayk_notifications', JSON.stringify(notifications));
   }, [notifications]);
 
+  // Auth state listener: Keep Supabase Auth session synchronized
+  useEffect(() => {
+    let authSub = null;
+    try {
+      const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (session?.access_token) {
+          setToken(session.access_token);
+          localStorage.setItem('jansahayk_token', session.access_token);
+          try {
+            const meRes = await fetch('/api/auth/me', {
+              headers: { Authorization: `Bearer ${session.access_token}` }
+            });
+            if (meRes.ok) {
+              const meData = await meRes.json();
+              if (meData?.user) {
+                setUser(meData.user);
+                localStorage.setItem('jansahayk_user', JSON.stringify(meData.user));
+              }
+            }
+          } catch (e) {}
+        } else if (event === 'SIGNED_OUT') {
+          setToken(null);
+          setUser(null);
+          localStorage.removeItem('jansahayk_token');
+          localStorage.removeItem('jansahayk_user');
+        }
+      });
+      authSub = data?.subscription;
+    } catch (e) {
+      console.warn('onAuthStateChange listener note:', e.message);
+    }
+
+    return () => {
+      if (authSub) authSub.unsubscribe();
+    };
+  }, []);
+
   // Real backend synchronization and real-time Supabase Realtime / SSE stream
   useEffect(() => {
     fetchGrievances();
@@ -188,12 +230,20 @@ export function AppProvider({ children }) {
           console.log('[Supabase Realtime] Notification event:', payload.eventType);
           fetchNotifications();
         })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'field_actions' }, () => {
+          fetchGrievances();
+          fetchCivicIntelligence();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'verification_records' }, () => {
+          fetchGrievances();
+          fetchCivicIntelligence();
+        })
         .subscribe();
     } catch (e) {
       console.warn('Supabase Realtime channel init failed:', e.message);
     }
 
-    // 2. Fallback / supplementary SSE listener
+    // 2. Fallback / supplementary SSE listener for all canonical events
     let eventSource = null;
     try {
       eventSource = new EventSource('/api/events');
@@ -203,12 +253,28 @@ export function AppProvider({ children }) {
         fetchNotifications();
       };
 
-      eventSource.addEventListener('complaint_created', handleServerEvent);
-      eventSource.addEventListener('complaint_analyzed', handleServerEvent);
-      eventSource.addEventListener('cluster_updated', handleServerEvent);
-      eventSource.addEventListener('incident_updated', handleServerEvent);
-      eventSource.addEventListener('status_changed', handleServerEvent);
-      eventSource.addEventListener('verification_submitted', handleServerEvent);
+      const eventsToListen = [
+        'complaint_created',
+        'complaint_updated',
+        'complaint_analyzed',
+        'dna_generated',
+        'cluster_updated',
+        'incident_created',
+        'incident_updated',
+        'status_changed',
+        'investigation_started',
+        'field_action_started',
+        'field_action_completed',
+        'verification_requested',
+        'verification_submitted',
+        'incident_resolved',
+        'incident_reopened',
+        'notification_created'
+      ];
+
+      eventsToListen.forEach(evt => {
+        eventSource.addEventListener(evt, handleServerEvent);
+      });
 
       eventSource.onerror = () => {
         if (eventSource && eventSource.readyState === EventSource.CONNECTING) {
@@ -228,43 +294,32 @@ export function AppProvider({ children }) {
 
   const fetchCivicIntelligence = async () => {
     try {
-      const res = await fetch('/api/intelligence/incidents');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.incidents && data.incidents.length > 0) {
-          setCivicIncidents(data.incidents);
-        }
+      const incidents = await IncidentService.getIncidents(token);
+      if (Array.isArray(incidents)) {
+        setCivicIncidents(incidents);
       }
     } catch (e) {}
   };
 
   const fetchGrievances = async () => {
     try {
-      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-      const res = await fetch('/api/grievances', { headers });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.grievances && data.grievances.length > 0) {
-          setGrievances(data.grievances);
-        }
+      const complaints = await ComplaintService.getComplaints(token);
+      if (Array.isArray(complaints)) {
+        setGrievances(complaints);
       }
     } catch (e) {
-      // Fallback gracefully
+      // Network failure
     }
   };
 
   const fetchNotifications = async () => {
     try {
-      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-      const res = await fetch('/api/notifications', { headers });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.notifications && data.notifications.length > 0) {
-          setNotifications(data.notifications);
-        }
+      const notifs = await NotificationService.getNotifications(token);
+      if (Array.isArray(notifs)) {
+        setNotifications(notifs);
       }
     } catch (e) {
-      // Fallback gracefully
+      // Network failure
     }
   };
 
@@ -462,8 +517,9 @@ export function AppProvider({ children }) {
     setUser(null);
     localStorage.removeItem('jansahayk_token');
     localStorage.removeItem('jansahayk_user');
-    localStorage.removeItem('jansahayk_entered_app');
-    setHasEnteredApp(false);
+    // Ensure hasEnteredApp remains true so logging out goes directly to Home, NOT onboarding
+    localStorage.setItem('jansahayk_entered_app', 'true');
+    setHasEnteredApp(true);
   };
 
   // 1-Click Quick Demo Switcher (Instant & Offline Resilient)
@@ -700,6 +756,8 @@ export function AppProvider({ children }) {
       if (res.ok) {
         const data = await res.json();
         setGrievances(prev => prev.map(g => g.id === grievanceId ? { ...g, ...data.grievance } : g));
+        fetchNotifications();
+        fetchCivicIntelligence();
         return data.grievance;
       }
     } catch (e) {}
@@ -816,6 +874,8 @@ export function AppProvider({ children }) {
       if (res.ok) {
         const data = await res.json();
         setGrievances(prev => prev.map(g => g.id === grievanceId ? { ...g, ...data.grievance } : g));
+        fetchNotifications();
+        fetchCivicIntelligence();
         return data.grievance;
       }
     } catch (e) {}
@@ -1000,7 +1060,7 @@ export function AppProvider({ children }) {
   };
 
   // Formal Workflow Status Transition (Submitted -> AI Analysed -> Assigned -> Under Review -> Information Required -> In Progress -> Escalated -> Resolved -> Closed)
-  const transitionStatus = async (grievanceId, newStatus, reason) => {
+  const transitionStatus = async (grievanceId, newStatus, reason, actionType, notes, evidenceUrl) => {
     try {
       const res = await fetch(`/api/grievances/${grievanceId}/transition-status`, {
         method: 'POST',
@@ -1008,11 +1068,13 @@ export function AppProvider({ children }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ newStatus, reason })
+        body: JSON.stringify({ newStatus, reason, actionType, notes, evidenceUrl })
       });
       if (res.ok) {
         const data = await res.json();
         setGrievances(prev => prev.map(g => g.id === grievanceId ? { ...g, ...data.grievance } : g));
+        fetchNotifications();
+        fetchCivicIntelligence();
         return data.grievance;
       }
     } catch (e) {}

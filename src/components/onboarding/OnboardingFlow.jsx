@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useApp, DEMO_CREDENTIALS, DEMO_USERS } from '../../context/AppContext';
 import citizenBg from '../../assets/citizen-bg.jpg';
+import onboardingBg from '../../assets/onboarding-bg.jpg';
 
 export default function OnboardingFlow({ onComplete }) {
   const navigate = useNavigate();
@@ -98,19 +99,22 @@ export default function OnboardingFlow({ onComplete }) {
       setVerifyStageMessage('Access Granted! Redirecting...');
 
       try {
-        if (enterApp) enterApp();
-        const logged = await switchDemoRole(roleKey);
-        const target = logged?.role || roleKey;
-        
-        setTimeout(() => {
-          if (onComplete) onComplete();
-          if (target === 'citizen') navigate('/citizen');
-          else if (target === 'civic_officer' || target === 'officer' || target === 'dept_admin') navigate('/officer');
-          else if (target === 'super_admin') navigate('/admin/super');
-          else navigate('/');
-        }, 300);
+        await switchDemoRole(roleKey);
       } catch (err) {
-        setIsVerifying(false);
+        console.warn('Auto auth sequence fallback:', err);
+      }
+
+      if (enterApp) enterApp();
+      if (onComplete) onComplete();
+
+      if (roleKey === 'citizen') {
+        navigate('/citizen');
+      } else if (roleKey === 'civic_officer' || roleKey === 'officer' || roleKey === 'dept_admin') {
+        navigate('/officer');
+      } else if (roleKey === 'super_admin') {
+        navigate('/admin/super');
+      } else {
+        navigate('/');
       }
     }, 3000);
 
@@ -121,14 +125,26 @@ export default function OnboardingFlow({ onComplete }) {
     };
   };
 
-  const handleSkip = () => {
+  const handleNext = () => {
     if (currentStep < 4) {
-      setCurrentStep(4);
+      setCurrentStep(prev => prev + 1);
     } else {
-      if (enterApp) enterApp();
-      if (onComplete) onComplete();
-      navigate('/');
+      trigger3SecondAuth(selectedRole);
     }
+  };
+
+  const handlePrev = () => {
+    if (currentStep > 1) {
+      setCurrentStep(prev => prev - 1);
+    }
+  };
+
+  const handleRoleCardClick = (roleKey) => {
+    setSelectedRole(roleKey);
+  };
+
+  const handleLoginClick = () => {
+    trigger3SecondAuth(selectedRole);
   };
 
   const handleDirectEnter = () => {
@@ -143,7 +159,10 @@ export default function OnboardingFlow({ onComplete }) {
       height: '100vh',
       maxHeight: '100vh',
       overflow: 'hidden',
-      background: 'linear-gradient(145deg, #374cc9 0%, #3B52D4 50%, #2f42b5 100%)',
+      backgroundImage: `url(${onboardingBg})`,
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: 'cover',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -151,66 +170,15 @@ export default function OnboardingFlow({ onComplete }) {
       padding: '16px',
       boxSizing: 'border-box'
     }}>
-      {/* Decorative Accents matching the reference design image */}
-      {/* Top Right White Pill */}
+      {/* Translucent glass overlay to elevate the central card and keep background visible */}
       <div 
-        aria-hidden="true" 
+        aria-hidden="true"
         style={{
           position: 'absolute',
-          top: '11%',
-          right: 0,
-          width: '84px',
-          height: '30px',
-          background: '#FFFFFF',
-          borderTopLeftRadius: '15px',
-          borderBottomLeftRadius: '15px',
-          pointerEvents: 'none',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
-        }} 
-      />
-      {/* Top Right White Dot */}
-      <div 
-        aria-hidden="true" 
-        style={{
-          position: 'absolute',
-          top: '13.5%',
-          right: '98px',
-          width: '10px',
-          height: '10px',
-          borderRadius: '50%',
-          background: '#FFFFFF',
-          pointerEvents: 'none'
-        }} 
-      />
-
-      {/* Bottom Left White Pill 1 */}
-      <div 
-        aria-hidden="true" 
-        style={{
-          position: 'absolute',
-          bottom: '22%',
-          left: 0,
-          width: '95px',
-          height: '30px',
-          background: '#FFFFFF',
-          borderTopRightRadius: '15px',
-          borderBottomRightRadius: '15px',
-          pointerEvents: 'none',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
-        }} 
-      />
-      {/* Bottom Left White Pill 2 */}
-      <div 
-        aria-hidden="true" 
-        style={{
-          position: 'absolute',
-          bottom: '15%',
-          left: 0,
-          width: '60px',
-          height: '26px',
-          background: '#FFFFFF',
-          borderTopRightRadius: '13px',
-          borderBottomRightRadius: '13px',
+          inset: 0,
+          background: 'rgba(15, 23, 42, 0.40)',
+          backdropFilter: 'blur(2px)',
+          zIndex: 1,
           pointerEvents: 'none'
         }} 
       />
@@ -221,12 +189,13 @@ export default function OnboardingFlow({ onComplete }) {
         borderRadius: '24px',
         maxWidth: '560px',
         width: '100%',
-        boxShadow: '0 25px 60px -10px rgba(15, 23, 42, 0.35)',
+        boxShadow: '0 25px 60px -10px rgba(15, 23, 42, 0.45)',
         padding: '18px 24px 16px 24px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         position: 'relative',
+        zIndex: 2,
         overflow: 'hidden',
         boxSizing: 'border-box'
       }}>
