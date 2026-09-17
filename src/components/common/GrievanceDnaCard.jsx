@@ -1,220 +1,453 @@
 import React, { useState } from 'react';
 import { 
-  Building2, 
-  MapPin, 
-  Clock, 
-  Users, 
-  AlertTriangle, 
-  Layers, 
-  Wrench, 
+  Dna,
+  Sparkles, 
   ChevronDown, 
   ChevronUp, 
-  Sparkles, 
-  ShieldCheck, 
-  Check 
+  Check, 
+  Edit3, 
+  X, 
+  AlertTriangle, 
+  Users, 
+  CheckCircle2, 
+  Wrench,
+  Clock,
+  Layers
 } from 'lucide-react';
 import WhyExplainer from './WhyExplainer';
 
 /**
- * Grievance DNA Component (Refactored)
- * Follows the core principle: "DON'T SHOW THE AI. SHOW WHAT THE AI UNDERSTANDS."
- * Features progressive disclosure for technical metadata.
+ * Modern AI Analysis Panel (Signature Screen — Grievance DNA™)
+ * Matches the specification in MODERN_UI_UX_GUIDE.md:
+ * - Confidence bar & score (96%)
+ * - Category / Department / Location 3-box grid
+ * - Urgency score bar (87/100 CRITICAL)
+ * - Collapsible AI reasoning checklist
+ * - Duplicate cluster with indicators
+ * - AI recommendation with Accept / Modify / Reject actions
  */
-export default function GrievanceDnaCard({ dna, isDark = false, compact = false }) {
-  const [showTechnical, setShowTechnical] = useState(false);
+export default function GrievanceDnaCard({ dna, isDark = false, compact = false, onAccept, onModify, onReject }) {
+  const [showReasoning, setShowReasoning] = useState(true);
+  const [actionState, setActionState] = useState(null); // 'ACCEPTED' | 'MODIFIED' | 'REJECTED' | null
+  const [activeAvatarIndex, setActiveAvatarIndex] = useState(null);
 
   if (!dna) return null;
 
-  // Extract human values
   const category = dna.category || 'Water Supply & Contamination';
+  const department = dna.department || 'Delhi Jal Board (DJB)';
   const ward = dna.ward || 'Ward 14 (Rohini Sector 14)';
-  const duration = dna.duration || '3 days';
-  const estimatedImpact = dna.impactHouseholds || '~450 households';
-  const priority = dna.urgency || 'HIGH';
-  const relatedCount = dna.clusterCount || dna.duplicateCount || 17;
-  const nearbyLocations = dna.nearbyCount || 4;
-  const recommendedAction = dna.recommendedAction || 'Inspect local supply infrastructure & 100mm junction clamp';
+  const urgencyScore = dna.urgencyScore || 87;
+  const confidence = dna.confidence || 96;
+  const duplicateCount = dna.clusterCount || dna.duplicateCount || 12;
+  const recommendation = dna.recommendedAction || 'Full 100mm pipeline sleeve replacement recommended';
+  const estTime = dna.estTime || '3-5 days';
+  const historicalSuccess = dna.historicalSuccess || '89%';
 
-  const priorityReasons = [
-    'Biohazard risk: Contaminated water mixed with sewage line',
-    '3 days continuous citizen reports without municipal closure',
-    `${relatedCount} identical complaints logged in the same 400m perimeter`,
-    'Nearby public school & Mother Dairy booth impacted',
-    'Historical precedent: Similar incident escalated in Oct 2025'
+  const reasons = dna.reasons || [
+    '200+ households affected across contiguous 400m utility corridor',
+    'Issue recurred 3 times in 60 days — surface clamp repairs proved ineffective',
+    'Active primary school & community milk booth located within 150m radius',
+    'SCADA sensor confirms feeder line pressure deficit of 2.4 bar'
   ];
+
+  const handleAction = (type) => {
+    setActionState(type);
+    if (type === 'ACCEPTED' && onAccept) onAccept();
+    if (type === 'MODIFIED' && onModify) onModify();
+    if (type === 'REJECTED' && onReject) onReject();
+  };
 
   return (
     <div
       style={{
         background: isDark ? 'var(--color-surface-inset-card)' : '#FFFFFF',
-        color: isDark ? 'var(--color-text-inverse)' : 'var(--color-text-primary)',
-        borderRadius: 'var(--radius-lg)',
-        border: isDark ? '1px solid var(--color-border-dark)' : '1px solid var(--color-border-subtle)',
-        boxShadow: 'var(--shadow-card)',
-        padding: '20px',
-        position: 'relative'
+        color: isDark ? 'var(--color-text-inverse)' : '#111827',
+        borderRadius: '12px',
+        border: isDark ? '1px solid #1F2937' : '1px solid #E5E7EB',
+        boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)',
+        overflow: 'hidden',
+        transition: 'all 200ms ease'
       }}
     >
-      {/* Top Header: Understands */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', paddingBottom: '10px', borderBottom: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(15,23,42,0.06)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: isDark ? 'rgba(79,70,229,0.2)' : 'var(--color-ai-tint)', color: isDark ? '#A5B4FC' : 'var(--color-ai-text)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Sparkles style={{ width: '14px', height: '14px' }} />
-          </div>
-          <span style={{ fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: isDark ? '#A5B4FC' : 'var(--color-ai-text)' }}>
-            JanSahayak Understands
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{
-            fontSize: '11px',
-            fontWeight: 700,
-            padding: '2px 8px',
-            borderRadius: 'var(--radius-full)',
-            background: priority === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB',
-            color: priority === 'CRITICAL' ? '#991B1B' : '#92400E',
-            display: 'inline-flex',
+      {/* Top Banner Header: Grievance DNA™ & Confidence */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '16px 20px',
+        background: isDark ? 'rgba(255,255,255,0.02)' : '#FAFBFC',
+        borderBottom: isDark ? '1px solid #1F2937' : '1px solid #E5E7EB'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg, #0F52BA 0%, #0A3D8F 100%)',
+            color: '#FFFFFF',
+            display: 'flex',
             alignItems: 'center',
-            gap: '4px'
+            justifyContent: 'center',
+            boxShadow: '0 2px 6px rgba(15, 82, 186, 0.3)'
           }}>
-            ● Priority: {priority}
+            <Sparkles style={{ width: '16px', height: '16px' }} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontWeight: 800, fontSize: '14px', letterSpacing: '-0.01em', color: isDark ? '#FFFFFF' : '#111827' }}>
+                GRIEVANCE DNA™
+              </span>
+              <span style={{ fontSize: '10px', color: '#6B7280', fontWeight: 600 }}>v3.2</span>
+            </div>
+            <span style={{ fontSize: '11px', color: '#6B7280' }}>
+              Multi-modal synthesis & pattern identification
+            </span>
+          </div>
+        </div>
+
+        {/* Confidence Ring / Pill */}
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          padding: '4px 12px',
+          borderRadius: '9999px',
+          background: '#EEF2FF',
+          border: '1px solid #C7D2FE',
+          color: '#0F52BA'
+        }}>
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#0F52BA' }} />
+          <span style={{ fontSize: '12px', fontWeight: 700 }}>
+            Confidence: {confidence}%
           </span>
-          <WhyExplainer
-            label="Why?"
-            title={`Why ${priority} Priority?`}
-            reasons={priorityReasons}
-            align="right"
-          />
         </div>
       </div>
 
-      {/* 01: Extracted Key Insights (Clean 2x2 Grid) */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '10px',
-        marginBottom: '16px'
-      }}>
-        <div style={{ padding: '10px 12px', borderRadius: 'var(--radius-md)', background: isDark ? 'rgba(255,255,255,0.04)' : '#F8F9FA', border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(15,23,42,0.04)' }}>
-          <span style={{ fontSize: '11px', color: isDark ? '#94A3B8' : 'var(--color-text-muted)', display: 'block', marginBottom: '2px' }}>
-            Category
-          </span>
-          <strong style={{ fontSize: '13px', color: isDark ? '#FFFFFF' : 'var(--color-text-primary)' }}>
-            {category}
-          </strong>
+      <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        {/* 1. Category / Department / Location 3-Box Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '10px'
+        }}>
+          <div style={{
+            padding: '12px 14px',
+            borderRadius: '8px',
+            background: isDark ? 'rgba(255,255,255,0.04)' : '#F8FAFC',
+            border: '1px solid #E5E7EB'
+          }}>
+            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '4px' }}>
+              Category
+            </span>
+            <strong style={{ fontSize: '13px', color: isDark ? '#FFFFFF' : '#111827', display: 'block', lineHeight: 1.3 }}>
+              {category}
+            </strong>
+          </div>
+
+          <div style={{
+            padding: '12px 14px',
+            borderRadius: '8px',
+            background: isDark ? 'rgba(255,255,255,0.04)' : '#F8FAFC',
+            border: '1px solid #E5E7EB'
+          }}>
+            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '4px' }}>
+              Department
+            </span>
+            <strong style={{ fontSize: '13px', color: isDark ? '#FFFFFF' : '#111827', display: 'block', lineHeight: 1.3 }}>
+              {department}
+            </strong>
+          </div>
+
+          <div style={{
+            padding: '12px 14px',
+            borderRadius: '8px',
+            background: isDark ? 'rgba(255,255,255,0.04)' : '#F8FAFC',
+            border: '1px solid #E5E7EB'
+          }}>
+            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '4px' }}>
+              Location
+            </span>
+            <strong style={{ fontSize: '13px', color: isDark ? '#FFFFFF' : '#111827', display: 'block', lineHeight: 1.3 }}>
+              {ward.split('(')[0].trim()}
+            </strong>
+          </div>
         </div>
 
-        <div style={{ padding: '10px 12px', borderRadius: 'var(--radius-md)', background: isDark ? 'rgba(255,255,255,0.04)' : '#F8F9FA', border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(15,23,42,0.04)' }}>
-          <span style={{ fontSize: '11px', color: isDark ? '#94A3B8' : 'var(--color-text-muted)', display: 'block', marginBottom: '2px' }}>
-            Location
-          </span>
-          <strong style={{ fontSize: '13px', color: isDark ? '#FFFFFF' : 'var(--color-text-primary)' }}>
-            {ward.split('(')[0]}
-          </strong>
+        {/* 2. Urgency Score Bar */}
+        <div style={{
+          padding: '14px 16px',
+          borderRadius: '8px',
+          background: isDark ? 'rgba(239, 68, 68, 0.08)' : '#FEF2F2',
+          border: '1px solid #FECACA'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: '#991B1B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              URGENCY SCORE
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '13px', fontWeight: 800, color: '#991B1B', fontFamily: 'var(--font-mono)' }}>
+                {urgencyScore}/100
+              </span>
+              <span style={{
+                fontSize: '10px',
+                fontWeight: 700,
+                padding: '2px 8px',
+                borderRadius: '9999px',
+                background: '#EF4444',
+                color: '#FFFFFF'
+              }}>
+                CRITICAL
+              </span>
+            </div>
+          </div>
+
+          <div style={{
+            width: '100%',
+            height: '8px',
+            background: '#FEE2E2',
+            borderRadius: '9999px',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              width: `${urgencyScore}%`,
+              height: '100%',
+              background: 'linear-gradient(90deg, #F59E0B 0%, #EF4444 100%)',
+              borderRadius: '9999px',
+              transition: 'width 600ms cubic-bezier(0.16, 1, 0.3, 1)'
+            }} />
+          </div>
         </div>
 
-        <div style={{ padding: '10px 12px', borderRadius: 'var(--radius-md)', background: isDark ? 'rgba(255,255,255,0.04)' : '#F8F9FA', border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(15,23,42,0.04)' }}>
-          <span style={{ fontSize: '11px', color: isDark ? '#94A3B8' : 'var(--color-text-muted)', display: 'block', marginBottom: '2px' }}>
-            Duration
-          </span>
-          <strong style={{ fontSize: '13px', color: isDark ? '#FFFFFF' : 'var(--color-text-primary)' }}>
-            {duration}
-          </strong>
-        </div>
-
-        <div style={{ padding: '10px 12px', borderRadius: 'var(--radius-md)', background: isDark ? 'rgba(255,255,255,0.04)' : '#F8F9FA', border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(15,23,42,0.04)' }}>
-          <span style={{ fontSize: '11px', color: isDark ? '#94A3B8' : 'var(--color-text-muted)', display: 'block', marginBottom: '2px' }}>
-            Est. Citizen Impact
-          </span>
-          <strong style={{ fontSize: '13px', color: isDark ? '#FFFFFF' : 'var(--color-text-primary)' }}>
-            {estimatedImpact}
-          </strong>
-        </div>
-      </div>
-
-      {/* 02: Pattern Detected */}
-      <div style={{
-        padding: '12px 14px',
-        borderRadius: 'var(--radius-md)',
-        background: isDark ? 'rgba(245, 158, 11, 0.12)' : '#FFFBEB',
-        border: '1px solid rgba(245, 158, 11, 0.25)',
-        marginBottom: '14px'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-          <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#92400E' }}>
-            Pattern Detected
-          </span>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: '#B45309' }}>
-            Possible Systemic Issue
-          </span>
-        </div>
-        <p style={{ fontSize: '12px', color: '#78350F', margin: 0, lineHeight: 1.4 }}>
-          <strong>{relatedCount} related complaints</strong> detected across <strong>{nearbyLocations} nearby locations</strong> in the last 72 hours.
-        </p>
-      </div>
-
-      {/* 03: Recommended Action */}
-      <div style={{
-        padding: '12px 14px',
-        borderRadius: 'var(--radius-md)',
-        background: isDark ? 'rgba(16, 185, 129, 0.12)' : '#ECFDF5',
-        border: '1px solid rgba(16, 185, 129, 0.25)',
-        marginBottom: '12px'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-          <Wrench style={{ width: '13px', height: '13px', color: '#065F46' }} />
-          <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#065F46' }}>
-            Recommended Action
-          </span>
-        </div>
-        <p style={{ fontSize: '12px', color: '#065F46', fontWeight: 600, margin: 0, lineHeight: 1.4 }}>
-          {recommendedAction}
-        </p>
-      </div>
-
-      {/* 04: Progressive Disclosure Button */}
-      {!compact && (
-        <div style={{ paddingTop: '8px', borderTop: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(15,23,42,0.06)' }}>
+        {/* 3. AI Reasoning (Collapsible Accordion) */}
+        <div style={{
+          borderRadius: '8px',
+          border: '1px solid #E5E7EB',
+          overflow: 'hidden'
+        }}>
           <button
             type="button"
-            onClick={() => setShowTechnical(!showTechnical)}
+            onClick={() => setShowReasoning(!showReasoning)}
             style={{
-              fontSize: '11px',
-              fontWeight: 600,
-              color: isDark ? '#A5B4FC' : 'var(--color-primary)',
-              display: 'inline-flex',
+              width: '100%',
+              padding: '12px 14px',
+              display: 'flex',
               alignItems: 'center',
-              gap: '4px',
-              padding: '4px 0'
+              justifyContent: 'space-between',
+              background: '#FAFBFC',
+              border: 'none',
+              cursor: 'pointer',
+              textAlign: 'left'
             }}
           >
-            <span>{showTechnical ? 'Hide Technical Metadata' : 'View AI Reasoning & Metadata →'}</span>
-            {showTechnical ? <ChevronUp style={{ width: '12px', height: '12px' }} /> : <ChevronDown style={{ width: '12px', height: '12px' }} />}
+            <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#111827', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span>AI Diagnostic Reasoning</span>
+              <span style={{ fontSize: '11px', color: '#6B7280', fontWeight: 400 }}>({reasons.length} verified factors)</span>
+            </span>
+            {showReasoning ? <ChevronUp style={{ width: '16px', height: '16px', color: '#6B7280' }} /> : <ChevronDown style={{ width: '16px', height: '16px', color: '#6B7280' }} />}
           </button>
 
-          {showTechnical && (
-            <div style={{ marginTop: '10px', padding: '10px', borderRadius: 'var(--radius-sm)', background: isDark ? 'rgba(0,0,0,0.2)' : '#F1F5F9', fontSize: '11px', color: isDark ? '#94A3B8' : 'var(--color-text-secondary)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>DNA Identifier:</span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}>{dna.dnaId || 'DNA-W14-892'}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Routing Confidence:</span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, color: 'var(--color-primary)' }}>{dna.departmentConfidence || 98.4}%</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Target SLA:</span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}>12 Hours</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Precedent Retrieval:</span>
-                <span>DJB SOP #14 (Clamp Replacement)</span>
-              </div>
+          {showReasoning && (
+            <div style={{ padding: '12px 16px', background: '#FFFFFF', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {reasons.map((r, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#374151', lineHeight: 1.4 }}>
+                  <span style={{ color: '#0F52BA', fontWeight: 700, marginTop: '1px' }}>•</span>
+                  <span>{r}</span>
+                </div>
+              ))}
             </div>
           )}
         </div>
-      )}
+
+        {/* 4. Duplicate Cluster & Similar Complaints */}
+        <div style={{
+          padding: '14px 16px',
+          borderRadius: '8px',
+          background: '#FFFBEB',
+          border: '1px solid #FDE68A',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
+              background: '#F59E0B',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Layers style={{ width: '16px', height: '16px' }} />
+            </div>
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: '#92400E' }}>
+                {duplicateCount} Similar Complaints Clustered
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
+                {Array.from({ length: Math.min(duplicateCount, 12) }).map((_, idx) => (
+                  <span
+                    key={idx}
+                    onMouseEnter={() => setActiveAvatarIndex(idx)}
+                    onMouseLeave={() => setActiveAvatarIndex(null)}
+                    style={{
+                      width: '8px',
+                      height: '8px',
+                      borderRadius: '50%',
+                      background: idx < 4 ? '#EF4444' : '#F59E0B',
+                      display: 'inline-block',
+                      cursor: 'pointer',
+                      transform: activeAvatarIndex === idx ? 'scale(1.4)' : 'scale(1)',
+                      transition: 'transform 100ms ease'
+                    }}
+                    title={`Signal #${idx + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <span style={{ fontSize: '12px', fontWeight: 700, color: '#B45309', cursor: 'pointer' }}>
+            View All Cluster Signals →
+          </span>
+        </div>
+
+        {/* 5. AI Recommendation Box with Accept / Modify / Reject */}
+        <div style={{
+          padding: '16px',
+          borderRadius: '8px',
+          background: '#F0FDF4',
+          border: '1px solid #BBF7D0'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <div style={{
+              width: '24px',
+              height: '24px',
+              borderRadius: '50%',
+              background: '#10B981',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Sparkles style={{ width: '13px', height: '13px' }} />
+            </div>
+            <span style={{ fontSize: '12px', fontWeight: 800, color: '#065F46', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Recommended Engineering Action
+            </span>
+          </div>
+
+          <div style={{ fontSize: '14px', fontWeight: 700, color: '#064E3B', marginBottom: '6px', lineHeight: 1.3 }}>
+            {recommendation}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '12px', color: '#047857', marginBottom: '14px' }}>
+            <span>Based on 3 historical precedents (<strong>{historicalSuccess} success rate</strong>)</span>
+            <span>•</span>
+            <span>Est. Remediation: <strong>{estTime}</strong></span>
+          </div>
+
+          {/* Action Feedback or Buttons */}
+          {actionState ? (
+            <div style={{
+              padding: '10px 14px',
+              borderRadius: '6px',
+              background: actionState === 'ACCEPTED' ? '#DCFCE7' : actionState === 'MODIFIED' ? '#FEF3C7' : '#FEE2E2',
+              color: actionState === 'ACCEPTED' ? '#166534' : actionState === 'MODIFIED' ? '#92400E' : '#991B1B',
+              fontSize: '12.5px',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <CheckCircle2 style={{ width: '16px', height: '16px' }} />
+                <span>
+                  {actionState === 'ACCEPTED' && 'Recommendation accepted. Work order dispatched to North-West DJB maintenance crew.'}
+                  {actionState === 'MODIFIED' && 'Action modified. Engineering notes sent for supervisory sign-off.'}
+                  {actionState === 'REJECTED' && 'Recommendation rejected. Re-routed for secondary manual inspection.'}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActionState(null)}
+                style={{ fontSize: '11px', textDecoration: 'underline', color: 'inherit' }}
+              >
+                Reset
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={() => handleAction('ACCEPTED')}
+                style={{
+                  height: '36px',
+                  padding: '0 16px',
+                  borderRadius: '6px',
+                  background: '#0F52BA',
+                  color: '#FFFFFF',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  border: 'none',
+                  transition: 'all 120ms ease'
+                }}
+              >
+                <Check style={{ width: '14px', height: '14px' }} />
+                <span>Accept Recommendation</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleAction('MODIFIED')}
+                style={{
+                  height: '36px',
+                  padding: '0 14px',
+                  borderRadius: '6px',
+                  background: '#FFFFFF',
+                  color: '#4B5563',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  border: '1px solid #D1D5DB',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: 'pointer'
+                }}
+              >
+                <Edit3 style={{ width: '13px', height: '13px' }} />
+                <span>Modify</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleAction('REJECTED')}
+                style={{
+                  height: '36px',
+                  padding: '0 12px',
+                  borderRadius: '6px',
+                  background: 'transparent',
+                  color: '#EF4444',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                <X style={{ width: '13px', height: '13px' }} />
+                <span>Reject</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

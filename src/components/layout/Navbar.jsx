@@ -15,9 +15,13 @@ import {
   Search,
   CheckCircle2,
   ChevronDown,
-  Sparkles
+  Sparkles,
+  Globe,
+  Radio
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import CommandPalette from '../common/CommandPalette';
+import CivicSignalModal from '../intelligence/CivicSignalModal';
 
 export default function Navbar() {
   const location = useLocation();
@@ -41,9 +45,14 @@ export default function Navbar() {
   const [showTrackModal, setShowTrackModal] = useState(false);
   const [trackTicketId, setTrackTicketId] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
+  const [showSignalModal, setShowSignalModal] = useState(false);
+  const [currentLang, setCurrentLang] = useState('EN');
+  const [showLangDropdown, setShowLangDropdown] = useState(false);
 
   const notificationRef = useRef(null);
   const userMenuRef = useRef(null);
+  const langMenuRef = useRef(null);
 
   // Close notifications and user menu on click outside
   useEffect(() => {
@@ -53,6 +62,9 @@ export default function Navbar() {
       }
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
         setShowUserMenu(false);
+      }
+      if (langMenuRef.current && !langMenuRef.current.contains(e.target)) {
+        setShowLangDropdown(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -209,40 +221,128 @@ export default function Navbar() {
           </nav>
 
           {/* Right Action Cluster */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {/* Action 1: Track Grievance Button */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {/* Action 1: Command Palette Trigger (Cmd+K) */}
             <button
               type="button"
-              onClick={() => setShowTrackModal(true)}
+              onClick={() => setShowCommandPalette(true)}
               style={{
-                fontSize: '12.5px',
-                fontWeight: 600,
+                fontSize: '12px',
+                fontWeight: 500,
                 color: 'var(--color-text-secondary)',
-                padding: '7px 12px',
-                borderRadius: 'var(--radius-full)',
+                padding: '6px 12px',
+                borderRadius: 'var(--radius-md)',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '6px',
+                gap: '8px',
                 background: '#F8FAFC',
                 border: '1px solid var(--color-border-subtle)',
-                transition: 'all 150ms ease'
+                transition: 'all 150ms ease',
+                cursor: 'pointer'
               }}
               className="hidden-mobile"
-              title="Track ticket status"
+              title="Search complaints, wards, actions (⌘K / Ctrl+K)"
             >
-              <Search style={{ width: '13px', height: '13px', color: 'var(--color-text-muted)' }} />
-              <span>Track Ticket</span>
+              <Search style={{ width: '13px', height: '13px', color: 'var(--color-primary)' }} />
+              <span>Search...</span>
+              <kbd style={{
+                fontSize: '10px',
+                background: '#E5E7EB',
+                padding: '1px 5px',
+                borderRadius: '4px',
+                color: '#4B5563',
+                fontWeight: 700,
+                fontFamily: 'var(--font-mono)'
+              }}>
+                ⌘K
+              </kbd>
             </button>
 
-            {/* Action 2: Report a Problem (Primary CTA) */}
+            {/* Action 2: Language Switcher Dropdown */}
+            <div ref={langMenuRef} style={{ position: 'relative' }} className="hidden-mobile">
+              <button
+                type="button"
+                onClick={() => setShowLangDropdown(!showLangDropdown)}
+                style={{
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: 'var(--color-text-secondary)',
+                  padding: '6px 10px',
+                  borderRadius: 'var(--radius-md)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  background: '#F8FAFC',
+                  border: '1px solid var(--color-border-subtle)',
+                  cursor: 'pointer',
+                  transition: 'all 120ms ease'
+                }}
+              >
+                <Globe style={{ width: '13px', height: '13px', color: 'var(--color-primary)' }} />
+                <span>{currentLang}</span>
+                <ChevronDown style={{ width: '11px', height: '11px', color: 'var(--color-text-muted)' }} />
+              </button>
+
+              {showLangDropdown && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '6px',
+                  width: '160px',
+                  background: '#FFFFFF',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: 'var(--shadow-lg)',
+                  border: '1px solid var(--color-border-subtle)',
+                  padding: '4px',
+                  zIndex: 200
+                }}>
+                  {[
+                    { code: 'EN', name: 'English' },
+                    { code: 'HI', name: 'हिन्दी (Hindi)' },
+                    { code: 'MR', name: 'मराठी (Marathi)' },
+                    { code: 'TA', name: 'தமிழ் (Tamil)' }
+                  ].map((lang) => (
+                    <button
+                      key={lang.code}
+                      type="button"
+                      onClick={() => {
+                        setCurrentLang(lang.code);
+                        setShowLangDropdown(false);
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '7px 10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        borderRadius: '6px',
+                        background: currentLang === lang.code ? '#F0F5FF' : 'transparent',
+                        color: currentLang === lang.code ? '#0F52BA' : '#111827',
+                        fontSize: '12.5px',
+                        fontWeight: currentLang === lang.code ? 600 : 400,
+                        border: 'none',
+                        cursor: 'pointer',
+                        textAlign: 'left'
+                      }}
+                    >
+                      <span>{lang.name}</span>
+                      {currentLang === lang.code && <CheckCircle2 style={{ width: '13px', height: '13px', color: '#0F52BA' }} />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Action 3: Report a Problem (Warm Orange Accent CTA) */}
             <Link
               to="/citizen/submit"
-              className="btn-primary"
+              className="btn-accent"
               style={{
-                height: '38px',
+                height: '36px',
                 fontSize: '13px',
-                padding: '0 16px',
-                borderRadius: 'var(--radius-full)',
+                padding: '0 15px',
+                borderRadius: 'var(--radius-md)',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px'
@@ -939,6 +1039,19 @@ export default function Navbar() {
           </div>
         </div>
       )}
+
+      {/* Global Command Palette (Cmd+K / Ctrl+K) */}
+      <CommandPalette
+        isOpen={showCommandPalette}
+        onClose={() => setShowCommandPalette(false)}
+        onOpenSignalModal={() => setShowSignalModal(true)}
+      />
+
+      {/* Ambient Civic Signal Modal */}
+      <CivicSignalModal
+        isOpen={showSignalModal}
+        onClose={() => setShowSignalModal(false)}
+      />
     </>
   );
 }

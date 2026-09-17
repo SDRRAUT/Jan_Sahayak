@@ -5,55 +5,64 @@
 
 :root {
   /* Canvas & Base Surfaces */
-  --color-bg-canvas:              #F8F9FA; /* Calming bone-white canvas; page background */
+  --color-bg-canvas:              #FAFBFC; /* Off-white softer canvas; page background */
   --color-surface-card:           #FFFFFF; /* Pure white; default card and component surface */
   --color-surface-elevated:       #FFFFFF; /* Elevated white; popovers, dropdowns, floating nav */
-  --color-surface-inset-dark:     #0B1914; /* Deep Obsidian Forest; dark section containers */
-  --color-surface-inset-card:     #132A22; /* Pine Card Surface; cards nested inside dark containers */
+  --color-surface-inset-dark:     #0A0E1A; /* Deep Charcoal; dark section containers */
+  --color-surface-inset-card:     #131826; /* Deep Card Surface; cards nested inside dark containers */
   
-  /* Brand Accents */
-  --color-primary:                #0E5E3A; /* Deep Forest Green; primary CTA, active anchors */
-  --color-primary-hover:          #0A472C; /* Darker Forest; hover state for primary button */
-  --color-secondary:              #132A22; /* Dark Pine; secondary interactive elements */
-  --color-accent:                 #10B981; /* High-Visibility Emerald; stats, badges, sparklines */
-  --color-accent-tint:            #E8F7F0; /* 10% soft emerald tint; badge background */
-  --color-accent-glow:            rgba(16, 185, 129, 0.15); /* Controlled micro-halo */
-  
-  /* Neutral Slate Typography Hierarchy */
-  --color-text-primary:           #0F172A; /* Deep Slate Charcoal; headings, card titles */
-  --color-text-secondary:         #475569; /* Balanced Slate; body paragraphs, subtitles */
-  --color-text-muted:             #64748B; /* Cool Muted Slate; metadata, timestamps */
-  --color-text-inverse:           #F8FAFC; /* Crisp Near-White; text on dark surfaces */
+  /* Brand Accents — Government Trust (#0F52BA Deep Indigo) */
+  --color-primary:                #0F52BA; /* Deep Indigo — professional trust */
+  --color-primary-light:          #E6EEFB; /* Soft blue tint */
+  --color-primary-dark:           #0A3D8F; /* Hover/pressed */
+  --color-primary-hover:          #0A3D8F;
+  --color-secondary:              #1E293B; /* Slate 800; secondary interactive elements */
+
+  /* Accent (Action) — Silicon Valley Polish (#F97316 Warm Orange) */
+  --color-accent:                 #F97316; /* Warm Orange — high-conversion CTAs */
+  --color-accent-hover:           #EA580C;
+  --color-accent-tint:            #FFF7ED; /* Soft warm orange tint */
+  --color-accent-glow:            rgba(249, 115, 22, 0.16);
+
+  /* Neutral Foundation */
+  --color-text-primary:           #111827; /* Almost black; headings, primary text */
+  --color-text-secondary:         #4B5563; /* Medium gray; body paragraphs, subtitles */
+  --color-text-muted:             #9CA3AF; /* Light gray; metadata, timestamps */
+  --color-text-inverse:           #F9FAFB; /* Crisp Near-White; text on dark surfaces */
   --color-text-inverse-muted:     #94A3B8; /* Muted Slate; secondary text on dark surfaces */
   
   /* Boundary Rules & Dividers */
-  --color-border-subtle:          rgba(15, 23, 42, 0.08);  /* 1px light mode boundary */
-  --color-border-medium:          rgba(15, 23, 42, 0.14);  /* 1px input and active border */
-  --color-border-dark:            rgba(255, 255, 255, 0.12); /* 1px boundary on dark surfaces */
-  --color-divider:                #E2E8F0;                  /* Horizontal section separator */
+  --color-border-subtle:          #E5E7EB; /* Subtle light dividers */
+  --color-border-medium:          #D1D5DB; /* Inputs, interactive borders */
+  --color-border-dark:            #1F2937; /* 1px boundary on dark surfaces */
+  --color-divider:                #E5E7EB; /* Horizontal section separator */
 
   /* Semantic Feedback States */
-  --color-success:                #10B981;
+  --color-success:                #10B981; /* Emerald — Resolved */
   --color-success-bg:             #ECFDF5;
   --color-success-text:           #065F46;
   
-  --color-warning:                #F59E0B;
+  --color-warning:                #F59E0B; /* Amber — SLA at Risk */
   --color-warning-bg:             #FFFBEB;
   --color-warning-text:           #92400E;
   
-  --color-error:                  #EF4444;
+  --color-error:                  #EF4444; /* Red — Critical / Overdue */
   --color-error-bg:               #FEF2F2;
   --color-error-text:             #991B1B;
+  --color-danger:                 #EF4444;
 
-  /* AI Intelligence Accent (Subtle, Not Dominant) */
+  --color-info:                   #3B82F6; /* Blue — In Progress */
+  --color-neutral:                #6B7280; /* Gray — Pending */
+
+  /* AI Intelligence Accent */
   --color-ai-accent:              #4F46E5;
   --color-ai-tint:                #EEF2FF;
   --color-ai-border:              rgba(79, 70, 229, 0.20);
   --color-ai-text:                #4338CA;
 
   /* Typography Families */
-  --font-display:                 'Fraunces', Georgia, serif;
-  --font-sans:                    'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display:                 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans:                    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono:                    'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 
   /* Spacing Scale (8pt grid) */
@@ -252,9 +261,9 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Buttons */
 .btn-primary {
-  height: 48px;
-  padding: 0 24px;
-  border-radius: var(--radius-full);
+  height: 44px;
+  padding: 0 20px;
+  border-radius: var(--radius-md);
   background: var(--color-primary);
   color: #FFFFFF;
   font: 600 14px var(--font-sans);
@@ -262,20 +271,22 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 2px rgba(15, 82, 186, 0.16);
   transition: all var(--duration-fast) var(--ease-spring);
   text-decoration: none;
+  cursor: pointer;
+  border: none;
 }
 
 .btn-primary:hover {
   background: var(--color-primary-hover);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(15, 82, 186, 0.25);
 }
 
 .btn-primary:active {
-  transform: translateY(0);
-  box-shadow: var(--shadow-xs);
+  transform: scale(0.98);
+  box-shadow: 0 1px 2px rgba(15, 82, 186, 0.12);
 }
 
 .btn-primary .btn-arrow {
@@ -286,33 +297,111 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateX(4px);
 }
 
-.btn-secondary {
-  height: 48px;
-  padding: 0 22px;
-  border-radius: var(--radius-full);
-  background: #FFFFFF;
-  color: var(--color-text-primary);
+.btn-accent {
+  height: 44px;
+  padding: 0 20px;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: #FFFFFF;
   font: 600 14px var(--font-sans);
-  border: 1px solid var(--color-border-medium);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: var(--shadow-xs);
+  box-shadow: 0 1px 3px rgba(249, 115, 22, 0.28);
   transition: all var(--duration-fast) var(--ease-spring);
   text-decoration: none;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-accent:hover {
+  background: var(--color-accent-hover);
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+}
+
+.btn-accent:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: var(--radius-md);
+  background: #FFFFFF;
+  color: var(--color-primary);
+  font: 600 14px var(--font-sans);
+  border: 1px solid var(--color-border-subtle);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all var(--duration-fast) var(--ease-spring);
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .btn-secondary:hover {
-  background: #F8F9FA;
-  border-color: var(--color-text-primary);
-  transform: translateY(-2px);
+  background: #F8FAFC;
+  border-color: var(--color-primary-light);
+  transform: translateY(-1.5px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+.btn-ghost {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: 600 13px var(--font-sans);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all var(--duration-fast) ease;
+}
+
+.btn-ghost:hover {
+  background: #F1F5F9;
+  color: var(--color-text-primary);
+}
+
+.btn-danger {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: var(--radius-md);
+  background: #EF4444;
+  color: #FFFFFF;
+  font: 600 14px var(--font-sans);
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.btn-danger:hover {
+  background: #DC2626;
+  transform: translateY(-1.5px);
 }
 
 .btn-sm {
-  height: 38px;
-  padding: 0 16px;
-  font-size: 13px;
+  height: 34px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.btn-pill {
+  border-radius: var(--radius-full);
 }
 
 /* Cards */
