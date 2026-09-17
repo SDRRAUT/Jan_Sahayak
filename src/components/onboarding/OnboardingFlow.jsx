@@ -14,7 +14,7 @@ import {
   Mail
 } from 'lucide-react';
 import { useApp, DEMO_CREDENTIALS, DEMO_USERS } from '../../context/AppContext';
-import groundRealityImg from '../../assets/ground-reality.jpg';
+import complaintKeyImg from '../../assets/complaint-key.jpg';
 import onboardingBg from '../../assets/onboarding-bg.jpg';
 
 export default function OnboardingFlow({ onComplete }) {
@@ -148,12 +148,6 @@ export default function OnboardingFlow({ onComplete }) {
   };
 
   const handleDirectEnter = () => {
-    if (enterApp) enterApp();
-    if (onComplete) onComplete();
-    navigate('/');
-  };
-
-  const handleSkip = () => {
     if (enterApp) enterApp();
     if (onComplete) onComplete();
     navigate('/');
@@ -350,8 +344,8 @@ export default function OnboardingFlow({ onComplete }) {
               marginBottom: '12px'
             }}>
               <img 
-                src={groundRealityImg} 
-                alt="Delhi Civic Ground Reality" 
+                src={complaintKeyImg} 
+                alt="Citizen Complaint" 
                 style={{
                   width: '100%',
                   height: '100%',
