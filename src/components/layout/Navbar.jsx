@@ -23,6 +23,7 @@ import {
   Lock
 } from 'lucide-react';
 import { useApp, DEMO_CREDENTIALS } from '../../context/AppContext';
+import UserProfileModal from '../common/UserProfileModal';
 
 export default function Navbar() {
   const location = useLocation();
@@ -46,6 +47,8 @@ export default function Navbar() {
   const [showTrackModal, setShowTrackModal] = useState(false);
   const [trackTicketId, setTrackTicketId] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [profileModalTab, setProfileModalTab] = useState('profile');
 
   // Login modal: role selection + 3-second auth simulation (matches onboarding Step 4)
   const [loginSelectedRole, setLoginSelectedRole] = useState('citizen');
@@ -432,56 +435,30 @@ export default function Navbar() {
           <div className="header-right-cluster">
             {/* Logged-in Citizen Quick Actions */}
             {user && role === 'citizen' && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => setShowTrackModal(true)}
-                  className="header-track-btn hidden-mobile"
-                  style={{
-                    fontSize: '12.5px',
-                    fontWeight: 600,
-                    color: 'var(--color-text-secondary)',
-                    padding: '7px 13px',
-                    borderRadius: 'var(--radius-full)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    background: '#F8FAFC',
-                    border: '1px solid rgba(15, 23, 42, 0.10)',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                    transition: 'all 150ms ease'
-                  }}
-                  title="Track ticket status"
-                >
-                  <Search style={{ width: '13px', height: '13px', color: 'var(--color-text-muted)' }} />
-                  <span>Track Ticket</span>
-                </button>
-
-                <Link
-                  to="/citizen/submit"
-                  className="header-report-btn"
-                  style={{
-                    height: '38px',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    padding: '0 16px',
-                    borderRadius: 'var(--radius-full)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    background: 'linear-gradient(135deg, #0E5E3A 0%, #0A472C 100%)',
-                    color: '#FFFFFF',
-                    boxShadow: '0 2px 8px rgba(14, 94, 58, 0.28)',
-                    textDecoration: 'none',
-                    whiteSpace: 'nowrap',
-                    transition: 'all 150ms ease'
-                  }}
-                >
-                  <Plus style={{ width: '14px', height: '14px' }} />
-                  <span>File Grievance</span>
-                </Link>
-              </>
+              <button
+                type="button"
+                onClick={() => setShowTrackModal(true)}
+                className="header-track-btn hidden-mobile"
+                style={{
+                  fontSize: '12.5px',
+                  fontWeight: 600,
+                  color: 'var(--color-text-secondary)',
+                  padding: '7px 13px',
+                  borderRadius: 'var(--radius-full)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: '#F8FAFC',
+                  border: '1px solid rgba(15, 23, 42, 0.10)',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 150ms ease'
+                }}
+                title="Track ticket status"
+              >
+                <Search style={{ width: '13px', height: '13px', color: 'var(--color-text-muted)' }} />
+                <span>Track Ticket</span>
+              </button>
             )}
 
             {/* Quick AI Assistant Trigger in Navbar */}
@@ -872,7 +849,11 @@ export default function Navbar() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                       <button
                         type="button"
-                        onClick={() => { setShowUserMenu(false); navigate(role === 'citizen' ? '/citizen' : role === 'super_admin' ? '/admin/super' : '/officer'); }}
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          setProfileModalTab('profile');
+                          setShowProfileModal(true);
+                        }}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -883,7 +864,8 @@ export default function Navbar() {
                           fontSize: '12px',
                           color: 'var(--color-text-secondary)',
                           background: 'transparent',
-                          textAlign: 'left'
+                          textAlign: 'left',
+                          cursor: 'pointer'
                         }}
                       >
                         <User style={{ width: '13px', height: '13px' }} />
@@ -891,7 +873,11 @@ export default function Navbar() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => { setShowUserMenu(false); navigate(role === 'citizen' ? '/citizen' : role === 'super_admin' ? '/admin/super' : '/officer'); }}
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          setProfileModalTab('settings');
+                          setShowProfileModal(true);
+                        }}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -902,7 +888,8 @@ export default function Navbar() {
                           fontSize: '12px',
                           color: 'var(--color-text-secondary)',
                           background: 'transparent',
-                          textAlign: 'left'
+                          textAlign: 'left',
+                          cursor: 'pointer'
                         }}
                       >
                         <Settings style={{ width: '13px', height: '13px' }} />
@@ -1318,7 +1305,62 @@ export default function Navbar() {
                   </div>
                 )}
 
-                <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--color-divider)' }}>
+                {/* Mobile Profile & Settings Quick Buttons */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--color-divider)' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setProfileModalTab('profile');
+                      setShowProfileModal(true);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      padding: '9px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '12.5px',
+                      fontWeight: 600,
+                      color: 'var(--color-text-primary)',
+                      background: '#F8FAFC',
+                      border: '1px solid #E2E8F0',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <User style={{ width: '13px', height: '13px', color: '#2563EB' }} />
+                    <span>My Profile</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setProfileModalTab('settings');
+                      setShowProfileModal(true);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      padding: '9px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '12.5px',
+                      fontWeight: 600,
+                      color: 'var(--color-text-primary)',
+                      background: '#F8FAFC',
+                      border: '1px solid #E2E8F0',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <Settings style={{ width: '13px', height: '13px', color: '#64748B' }} />
+                    <span>Settings</span>
+                  </button>
+                </div>
+
+                <div style={{ marginTop: '8px' }}>
                   <button
                     type="button"
                     onClick={() => { logout(); setMobileMenuOpen(false); navigate('/'); }}
@@ -1621,6 +1663,13 @@ export default function Navbar() {
           </div>
         </div>
       )}
+
+      {/* Universal User Profile & Account Settings Modal (Works across all roles) */}
+      <UserProfileModal 
+        isOpen={showProfileModal} 
+        onClose={() => setShowProfileModal(false)} 
+        initialTab={profileModalTab} 
+      />
     </>
   );
 }

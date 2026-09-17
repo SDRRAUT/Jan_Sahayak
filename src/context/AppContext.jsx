@@ -1203,12 +1203,18 @@ export function AppProvider({ children }) {
       });
       if (res.ok) {
         const data = await res.json();
-        setUser(data.user);
-        return data.user;
+        if (data.user) {
+          localStorage.setItem('jansahayk_user', JSON.stringify(data.user));
+          setUser(data.user);
+          return data.user;
+        }
       }
     } catch (e) {}
 
     const updatedUser = { ...user, ...settings };
+    try {
+      localStorage.setItem('jansahayk_user', JSON.stringify(updatedUser));
+    } catch (err) {}
     setUser(updatedUser);
     return updatedUser;
   };
