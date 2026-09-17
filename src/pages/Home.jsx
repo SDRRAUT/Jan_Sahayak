@@ -23,7 +23,8 @@ import {
   ChevronRight,
   Filter,
   Eye,
-  Sliders
+  Sliders,
+  History
 } from 'lucide-react';
 import WhyExplainer from '../components/common/WhyExplainer';
 import { INITIAL_GRIEVANCES, SYSTEM_METRICS } from '../data/mockGrievances';
