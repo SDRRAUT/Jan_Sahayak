@@ -18,6 +18,7 @@ import {
 import { useApp } from '../context/AppContext';
 import WhyExplainer from '../components/common/WhyExplainer';
 import CivicSignalModal from '../components/intelligence/CivicSignalModal';
+import citizenBg from '../assets/citizen-bg.jpg';
 
 export default function CitizenDashboard() {
   const { grievances = [], upvoteGrievance, user, currentCitizen: contextCitizen, civicIncidents = [] } = useApp();
@@ -49,8 +50,43 @@ export default function CitizenDashboard() {
   });
 
   return (
-    <div className="section-spacing" style={{ paddingTop: '32px' }}>
-      <div className="container">
+    <div style={{ position: 'relative', minHeight: 'calc(100vh - 72px)', background: 'var(--color-bg-base)' }}>
+      {/* Background civic problems montage with low opacity */}
+      <div 
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `url(${citizenBg})`,
+          backgroundPosition: 'center top',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          opacity: 0.14,
+          pointerEvents: 'none',
+          zIndex: 0,
+          filter: 'contrast(105%) saturate(110%)'
+        }}
+      />
+      {/* Soft gradient wash ensuring high legibility for cards and text */}
+      <div 
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'linear-gradient(180deg, rgba(248, 250, 252, 0.45) 0%, rgba(241, 245, 249, 0.65) 100%)',
+          pointerEvents: 'none',
+          zIndex: 0
+        }}
+      />
+
+      <div className="section-spacing" style={{ paddingTop: '32px', position: 'relative', zIndex: 1 }}>
+        <div className="container">
         {/* Profile and Action Top Bar */}
         <div style={{
           display: 'flex',
@@ -392,5 +428,6 @@ export default function CitizenDashboard() {
         </div>
       </div>
     </div>
+  </div>
   );
 }

@@ -30,8 +30,19 @@ export default function Register() {
     <div className="section-spacing" style={{ paddingTop: '32px' }}>
       <div className="container" style={{ maxWidth: '560px' }}>
         <div className="section-header center" style={{ marginBottom: '28px' }}>
+          <img 
+            src="/logo.png" 
+            alt="JanSahayak Official Logo" 
+            style={{ 
+              height: '72px', 
+              width: 'auto', 
+              margin: '0 auto 16px auto', 
+              display: 'block',
+              filter: 'drop-shadow(0 4px 14px rgba(14, 94, 58, 0.18))' 
+            }} 
+          />
           <div className="category-pill">CITIZEN ENROLLMENT</div>
-          <h2>Register for JanSahayk</h2>
+          <h2>Register for JanSahayak</h2>
           <p>Direct citizen grievance submission and transparent municipal tracking.</p>
         </div>
 

@@ -475,7 +475,10 @@ export default function CommandPalette({ isOpen, onClose, onOpenSignalModal }) {
             <span><kbd style={{ padding: '1px 4px', background: '#E5E7EB', borderRadius: '4px', fontSize: '10px' }}>Enter</kbd> to select</span>
             <span><kbd style={{ padding: '1px 4px', background: '#E5E7EB', borderRadius: '4px', fontSize: '10px' }}>Esc</kbd> to close</span>
           </div>
-          <span style={{ fontWeight: 600, color: '#0F52BA' }}>JanSahayak Quick Launcher</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <img src="/logo.png" alt="JanSahayak" style={{ height: '16px', width: 'auto', objectFit: 'contain' }} />
+            <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>JanSahayak Quick Launcher</span>
+          </div>
         </div>
       </div>
     </div>

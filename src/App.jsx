@@ -20,6 +20,7 @@ import OfficerWorkspace from './pages/OfficerWorkspace';
 import AdminHeatmap from './pages/AdminHeatmap';
 import DeptAdmin from './pages/DeptAdmin';
 import SuperAdmin from './pages/SuperAdmin';
+import Onboarding from './pages/Onboarding';
 
 function RoleHome() {
   const { user, token } = useApp();
@@ -66,7 +67,8 @@ export default function App() {
             } 
           />
           
-          {/* Authentication Gateway */}
+          {/* Authentication & Onboarding Gateway */}
+          <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 

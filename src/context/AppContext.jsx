@@ -14,20 +14,53 @@ export const DEMO_CREDENTIALS = {
   super_admin: { email: 'superadmin@delhi.gov.in', password: 'superadmin123', label: 'Super Admin (Dr. Meenakshi Sundaram, IAS)' }
 };
 
+// Full profile objects for offline and instant demo switching
+export const DEMO_USERS = {
+  citizen: {
+    id: 'USR-CITIZEN-01',
+    name: 'Aditya Verma',
+    email: 'aditya@citizen.in',
+    role: 'citizen',
+    phone: '+91 98712-88210',
+    ward: 'Ward 14 (Rohini Sector 14)',
+    pincode: '110085',
+    verified: true
+  },
+  officer: {
+    id: 'USR-OFFICER-01',
+    name: 'Er. Sanjay Sharma',
+    email: 'sanjay.sharma@djb.gov.in',
+    role: 'officer',
+    department: 'Delhi Jal Board (DJB)',
+    designation: 'Assistant Executive Engineer',
+    zone: 'Zone North-West (Rohini)',
+    phone: '+91 98111-90021'
+  },
+  dept_admin: {
+    id: 'USR-DEPTADMIN-01',
+    name: 'Er. Rajiv Malhotra',
+    email: 'admin.djb@delhi.gov.in',
+    role: 'dept_admin',
+    department: 'Delhi Jal Board (DJB)',
+    designation: 'Chief Engineer & Department Administrator',
+    phone: '+91 99100-11223'
+  },
+  super_admin: {
+    id: 'USR-SUPERADMIN-01',
+    name: 'Dr. Meenakshi Sundaram, IAS',
+    email: 'superadmin@delhi.gov.in',
+    role: 'super_admin',
+    designation: 'Principal Secretary (IT & Public Grievance)',
+    phone: '+91 11-2339-2000'
+  }
+};
+
 export function AppProvider({ children }) {
   // Session & User State
   const [token, setToken] = useState(() => localStorage.getItem('jansahayk_token') || 'demo_token_citizen');
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('jansahayk_user');
-    return saved ? JSON.parse(saved) : {
-      id: 'USR-CITIZEN-01',
-      name: 'Aditya Verma',
-      email: 'aditya@citizen.in',
-      role: 'citizen',
-      phone: '+91 98712-88210',
-      ward: 'Ward 14 (Rohini Sector 14)',
-      pincode: '110085'
-    };
+    return saved ? JSON.parse(saved) : DEMO_USERS.citizen;
   });
 
   const [grievances, setGrievances] = useState(() => {
@@ -207,26 +240,50 @@ export function AppProvider({ children }) {
     setNotifications(prev => [newN, ...prev]);
   };
 
-  // Real Login
+  // Real Login with Offline Demo Fallback
   const login = async (email, password) => {
     setIsLoadingAuth(true);
     setAuthError(null);
+
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const matchedKey = Object.keys(DEMO_CREDENTIALS).find(
+      k => DEMO_CREDENTIALS[k].email.toLowerCase() === cleanEmail && DEMO_CREDENTIALS[k].password === password
+    );
+
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
+
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
+
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || 'Authentication failed');
       }
       setToken(data.token);
       setUser(data.user);
+      localStorage.setItem('jansahayk_token', data.token);
+      localStorage.setItem('jansahayk_user', JSON.stringify(data.user));
       setIsLoadingAuth(false);
       return data.user;
     } catch (err) {
-      setAuthError(err.message);
+      if (matchedKey && DEMO_USERS[matchedKey]) {
+        const targetUser = DEMO_USERS[matchedKey];
+        const demoToken = `demo_token_${matchedKey}`;
+        setToken(demoToken);
+        setUser(targetUser);
+        localStorage.setItem('jansahayk_token', demoToken);
+        localStorage.setItem('jansahayk_user', JSON.stringify(targetUser));
+        setIsLoadingAuth(false);
+        return targetUser;
+      }
+      setAuthError(err.message || 'Authentication failed');
       setIsLoadingAuth(false);
       throw err;
     }
@@ -248,6 +305,8 @@ export function AppProvider({ children }) {
       }
       setToken(data.token);
       setUser(data.user);
+      localStorage.setItem('jansahayk_token', data.token);
+      localStorage.setItem('jansahayk_user', JSON.stringify(data.user));
       setIsLoadingAuth(false);
       return data.user;
     } catch (err) {
@@ -261,22 +320,62 @@ export function AppProvider({ children }) {
   const logout = async () => {
     try {
       if (token) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1000);
         await fetch('/api/auth/logout', {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { 'Authorization': `Bearer ${token}` },
+          signal: controller.signal
         });
+        clearTimeout(timeoutId);
       }
     } catch (e) {}
     setToken(null);
     setUser(null);
+    localStorage.removeItem('jansahayk_token');
+    localStorage.removeItem('jansahayk_user');
   };
 
-  // 1-Click Quick Demo Switcher
+  // 1-Click Quick Demo Switcher (Instant & Offline Resilient)
   const switchDemoRole = async (roleKey) => {
+    const targetUser = DEMO_USERS[roleKey] || DEMO_USERS.citizen;
+    const demoToken = `demo_token_${roleKey}`;
+
+    // 1. Immediately apply client state so clicking works without any delay or failure
+    setToken(demoToken);
+    setUser(targetUser);
+    localStorage.setItem('jansahayk_token', demoToken);
+    localStorage.setItem('jansahayk_user', JSON.stringify(targetUser));
+
+    // 2. Asynchronously notify backend session if API server is running
     const cred = DEMO_CREDENTIALS[roleKey];
     if (cred) {
-      return await login(cred.email, cred.password);
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1500);
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: cred.email, password: cred.password }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.token && data.user) {
+            setToken(data.token);
+            setUser(data.user);
+            localStorage.setItem('jansahayk_token', data.token);
+            localStorage.setItem('jansahayk_user', JSON.stringify(data.user));
+            return data.user;
+          }
+        }
+      } catch (err) {
+        // Backend offline or timeout: local state is already applied
+      }
     }
+
+    return targetUser;
   };
 
   // Submit Grievance

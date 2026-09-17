@@ -29,20 +29,17 @@ export default function Footer() {
         >
           {/* Brand Col */}
           <div style={{ gridColumn: 'span 2' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-              <div
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <img 
+                src="/logo.png" 
+                alt="JanSahayak Official Logo" 
                 style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '9999px',
-                  background: 'var(--color-primary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <Shield style={{ width: '20px', height: '20px', color: '#FFFFFF' }} />
-              </div>
+                  height: '48px',
+                  width: 'auto',
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 2px 10px rgba(0, 0, 0, 0.4))'
+                }} 
+              />
               <div>
                 <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#FFFFFF' }}>JanSahayak</h3>
                 <p style={{ fontSize: '12px', color: 'var(--color-accent)' }}>Aapki Awaaz, Ab Samjhi Jayegi</p>

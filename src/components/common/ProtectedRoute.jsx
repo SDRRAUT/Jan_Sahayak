@@ -4,7 +4,7 @@ import { ShieldAlert, ArrowLeft, Lock } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 export default function ProtectedRoute({ children, allowedRoles = [] }) {
-  const { user, token } = useApp();
+  const { user, token, switchDemoRole } = useApp();
   const location = useLocation();
 
   // 1. Unauthenticated -> Redirect to Login
@@ -40,23 +40,59 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
               Administrative Clearance Required
             </h2>
 
-            <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6, marginBottom: '24px' }}>
+            <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6, marginBottom: '20px' }}>
               Your current account (<strong>{user.name}</strong>, Role: <code style={{ background: '#F1F5F9', padding: '2px 6px', borderRadius: '4px' }}>{user.role}</code>) does not possess the requisite security clearance to access this module.
               <br />
               Required Role: <strong>{allowedRoles.join(' or ')}</strong>.
             </p>
 
-            <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: '#F8F9FA', fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '24px' }}>
-              Audit logged: Attempted access to <code>{location.pathname}</code> from IP ::1 at {new Date().toLocaleTimeString()}.
+            <div style={{ marginBottom: '24px', padding: '16px', background: '#F8FAFC', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-subtle)' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-muted)', display: 'block', marginBottom: '10px' }}>
+                Switch Persona to Enter:
+              </span>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => switchDemoRole('citizen')}
+                  className="btn-secondary btn-sm"
+                  style={{ fontSize: '11.5px' }}
+                >
+                  👤 Citizen
+                </button>
+                <button
+                  type="button"
+                  onClick={() => switchDemoRole('officer')}
+                  className="btn-secondary btn-sm"
+                  style={{ fontSize: '11.5px' }}
+                >
+                  🛠 Officer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => switchDemoRole('dept_admin')}
+                  className="btn-secondary btn-sm"
+                  style={{ fontSize: '11.5px' }}
+                >
+                  🏛 Dept Admin
+                </button>
+                <button
+                  type="button"
+                  onClick={() => switchDemoRole('super_admin')}
+                  className="btn-secondary btn-sm"
+                  style={{ fontSize: '11.5px' }}
+                >
+                  🛡 Super Admin
+                </button>
+              </div>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
               <Link to="/login" className="btn-primary btn-sm">
-                Switch to an Authorized Role
+                Login with Different Account
               </Link>
               <Link to="/" className="btn-secondary btn-sm">
                 <ArrowLeft style={{ width: '14px', height: '14px' }} />
-                <span>Return to Public Site</span>
+                <span>Return to My Dashboard</span>
               </Link>
             </div>
           </div>

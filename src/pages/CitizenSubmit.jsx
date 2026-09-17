@@ -218,9 +218,12 @@ export default function CitizenSubmit() {
           marginBottom: '28px'
         }}>
           <div>
-            <div className="category-pill" style={{ marginBottom: '10px' }}>
-              <Sparkles style={{ width: '13px', height: '13px' }} />
-              <span>CITIZEN ACCESS PORTAL</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+              <img src="/logo.png" alt="JanSahayak" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
+              <div className="category-pill">
+                <Sparkles style={{ width: '13px', height: '13px' }} />
+                <span>CITIZEN ACCESS PORTAL</span>
+              </div>
             </div>
             <h1 style={{ fontSize: '36px', marginBottom: '8px', color: 'var(--color-text-primary)' }}>
               What happened?

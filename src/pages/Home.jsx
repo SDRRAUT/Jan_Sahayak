@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import WhyExplainer from '../components/common/WhyExplainer';
 import { INITIAL_GRIEVANCES, SYSTEM_METRICS } from '../data/mockGrievances';
+import citizenBg from '../assets/citizen-bg.jpg';
 
 export default function Home() {
   // 20-Second End-to-End Civic Intelligence Lifecycle Demo
@@ -234,8 +235,48 @@ export default function Home() {
       {/* ==========================================================================
           02. HERO SECTION
           ========================================================================== */}
-      <section className="section-spacing" style={{ paddingTop: '40px', paddingBottom: '56px' }}>
-        <div className="container">
+      <section 
+        className="section-spacing" 
+        style={{ 
+          position: 'relative', 
+          paddingTop: '40px', 
+          paddingBottom: '56px',
+          overflow: 'hidden'
+        }}
+      >
+        {/* Low-opacity civic montage backdrop */}
+        <div 
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: `url(${citizenBg})`,
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+            opacity: 0.13,
+            pointerEvents: 'none',
+            zIndex: 0,
+            filter: 'contrast(105%) saturate(108%)'
+          }}
+        />
+        <div 
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(248, 250, 252, 0.75) 100%)',
+            pointerEvents: 'none',
+            zIndex: 0
+          }}
+        />
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(12, 1fr)',
@@ -245,7 +286,17 @@ export default function Home() {
             {/* Left Narrative (7 Cols) */}
             <div style={{ gridColumn: 'span 7' }} className="hero-left-col">
               {/* Category Overline: Professional Public Civic Intelligence */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
+                <img 
+                  src="/logo.png" 
+                  alt="JanSahayak Official Logo" 
+                  style={{ 
+                    height: '52px', 
+                    width: 'auto', 
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 4px 12px rgba(14, 94, 58, 0.22))' 
+                  }} 
+                />
                 <span className="category-pill" style={{ background: '#E8F7F0', color: '#0E5E3A', borderColor: 'rgba(14, 94, 58, 0.2)' }}>
                   <ShieldCheck style={{ width: '13px', height: '13px' }} />
                   <span>PUBLIC GRIEVANCE INTELLIGENCE</span>

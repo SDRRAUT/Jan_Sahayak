@@ -74,11 +74,23 @@ export default function Navbar() {
       const logged = await switchDemoRole(roleKey);
       setShowLoginModal(false);
       setShowUserMenu(false);
-      if (logged.role === 'citizen') navigate('/citizen');
-      else if (logged.role === 'officer') navigate('/officer');
-      else if (logged.role === 'dept_admin') navigate('/admin/department');
-      else if (logged.role === 'super_admin') navigate('/admin/super');
-    } catch (e) {}
+      setMobileMenuOpen(false);
+      const targetRole = logged?.role || roleKey;
+      if (targetRole === 'citizen') navigate('/citizen');
+      else if (targetRole === 'officer') navigate('/officer');
+      else if (targetRole === 'dept_admin') navigate('/admin/department');
+      else if (targetRole === 'super_admin') navigate('/admin/super');
+      else navigate('/');
+    } catch (e) {
+      setShowLoginModal(false);
+      setShowUserMenu(false);
+      setMobileMenuOpen(false);
+      if (roleKey === 'citizen') navigate('/citizen');
+      else if (roleKey === 'officer') navigate('/officer');
+      else if (roleKey === 'dept_admin') navigate('/admin/department');
+      else if (roleKey === 'super_admin') navigate('/admin/super');
+      else navigate('/');
+    }
   };
 
   const handleTrackSubmit = (e) => {
@@ -159,21 +171,18 @@ export default function Navbar() {
       <header className={`site-header ${isScrolled ? 'scrolled' : ''}`}>
         <div className="site-header-inner">
           {/* Brand Logo: JanSahayak */}
-          <Link to={getHomeLink()} style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', flexShrink: 0 }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '11px',
-              background: 'linear-gradient(135deg, #0E5E3A 0%, #083D25 100%)',
-              color: '#FFFFFF',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 3px 10px rgba(14, 94, 58, 0.28)',
-              flexShrink: 0
-            }}>
-              <ShieldCheck style={{ width: '23px', height: '23px', strokeWidth: 2.3 }} />
-            </div>
+          <Link to={getHomeLink()} style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', flexShrink: 0 }}>
+            <img 
+              src="/logo.png" 
+              alt="JanSahayak Logo" 
+              style={{
+                height: '44px',
+                width: 'auto',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 2px 8px rgba(14, 94, 58, 0.2))',
+                flexShrink: 0
+              }} 
+            />
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontWeight: 800, fontSize: '18px', letterSpacing: '-0.03em', color: 'var(--color-text-primary)' }}>
@@ -348,6 +357,14 @@ export default function Navbar() {
                 >
                   How it Works
                 </button>
+                <Link
+                  to="/onboarding"
+                  className={`site-nav-link ${location.pathname === '/onboarding' ? 'active' : ''}`}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--color-primary)', fontWeight: 600 }}
+                >
+                  <Sparkles style={{ width: '13px', height: '13px' }} />
+                  <span>3-Step Tour</span>
+                </Link>
                 <Link
                   to="/impact"
                   className={`site-nav-link nav-link-secondary ${location.pathname === '/impact' ? 'active' : ''}`}
@@ -1300,6 +1317,79 @@ export default function Navbar() {
               )}
             </div>
 
+            {/* Mobile Persona Switcher */}
+            <div style={{ marginTop: '8px', paddingTop: '10px', borderTop: '1px solid var(--color-divider)' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '8px' }}>
+                Switch Persona (1-Click):
+              </span>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => handleRoleLogin('citizen')}
+                  style={{
+                    padding: '8px 10px',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '12px',
+                    textAlign: 'left',
+                    background: role === 'citizen' ? '#F0FDF4' : '#F8FAFC',
+                    color: role === 'citizen' ? 'var(--color-primary)' : 'var(--color-text-primary)',
+                    border: `1px solid ${role === 'citizen' ? 'rgba(16, 185, 129, 0.3)' : 'var(--color-border-subtle)'}`,
+                    fontWeight: role === 'citizen' ? 700 : 500
+                  }}
+                >
+                  👤 Citizen
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleRoleLogin('officer')}
+                  style={{
+                    padding: '8px 10px',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '12px',
+                    textAlign: 'left',
+                    background: role === 'officer' ? '#ECFDF5' : '#F8FAFC',
+                    color: role === 'officer' ? '#059669' : 'var(--color-text-primary)',
+                    border: `1px solid ${role === 'officer' ? 'rgba(5, 150, 105, 0.3)' : 'var(--color-border-subtle)'}`,
+                    fontWeight: role === 'officer' ? 700 : 500
+                  }}
+                >
+                  🛠 Officer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleRoleLogin('dept_admin')}
+                  style={{
+                    padding: '8px 10px',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '12px',
+                    textAlign: 'left',
+                    background: role === 'dept_admin' ? '#F0F9FF' : '#F8FAFC',
+                    color: role === 'dept_admin' ? '#0284C7' : 'var(--color-text-primary)',
+                    border: `1px solid ${role === 'dept_admin' ? 'rgba(2, 132, 199, 0.3)' : 'var(--color-border-subtle)'}`,
+                    fontWeight: role === 'dept_admin' ? 700 : 500
+                  }}
+                >
+                  🏛 Dept Admin
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleRoleLogin('super_admin')}
+                  style={{
+                    padding: '8px 10px',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '12px',
+                    textAlign: 'left',
+                    background: role === 'super_admin' ? '#EEF2FF' : '#F8FAFC',
+                    color: role === 'super_admin' ? '#4338CA' : 'var(--color-text-primary)',
+                    border: `1px solid ${role === 'super_admin' ? 'rgba(67, 56, 202, 0.3)' : 'var(--color-border-subtle)'}`,
+                    fontWeight: role === 'super_admin' ? 700 : 500
+                  }}
+                >
+                  🛡 Super Admin
+                </button>
+              </div>
+            </div>
+
             <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
               <button
                 type="button"
@@ -1464,8 +1554,8 @@ export default function Navbar() {
             position: 'relative'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <LogIn style={{ width: '18px', height: '18px', color: 'var(--color-primary)' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <img src="/logo.png" alt="JanSahayak" style={{ height: '34px', width: 'auto', objectFit: 'contain' }} />
                 <h3 style={{ fontSize: '18px', color: 'var(--color-text-primary)' }}>Sign In to JanSahayak</h3>
               </div>
               <button type="button" onClick={() => setShowLoginModal(false)} style={{ color: 'var(--color-text-muted)' }}>
@@ -1581,6 +1671,26 @@ export default function Navbar() {
               >
                 Super Admin Access →
               </button>
+            </div>
+
+            {/* Guided Product Tour Link */}
+            <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--color-divider)', textAlign: 'center' }}>
+              <Link
+                to="/onboarding"
+                onClick={() => setShowLoginModal(false)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '12.5px',
+                  fontWeight: 600,
+                  color: 'var(--color-primary)',
+                  textDecoration: 'none'
+                }}
+              >
+                <Sparkles style={{ width: '14px', height: '14px' }} />
+                <span>Take the 3-Step Interactive Tour & Demo →</span>
+              </Link>
             </div>
           </div>
         </div>
