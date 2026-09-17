@@ -127,8 +127,14 @@ export default function OnboardingFlow({ onComplete }) {
     } else {
       if (enterApp) enterApp();
       if (onComplete) onComplete();
-      navigate('/overview');
+      navigate('/');
     }
+  };
+
+  const handleDirectEnter = () => {
+    if (enterApp) enterApp();
+    if (onComplete) onComplete();
+    navigate('/');
   };
 
   return (
@@ -212,11 +218,11 @@ export default function OnboardingFlow({ onComplete }) {
       {/* Central Single-Screen Non-Scrollable Card */}
       <div style={{
         background: '#FFFFFF',
-        borderRadius: '28px',
-        maxWidth: '580px',
+        borderRadius: '24px',
+        maxWidth: '560px',
         width: '100%',
         boxShadow: '0 25px 60px -10px rgba(15, 23, 42, 0.35)',
-        padding: '24px 28px 20px 28px',
+        padding: '18px 24px 16px 24px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -224,6 +230,54 @@ export default function OnboardingFlow({ onComplete }) {
         overflow: 'hidden',
         boxSizing: 'border-box'
       }}>
+
+        {/* Top Header: Website Logo + Brand + Direct App Entry */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingBottom: '10px',
+          marginBottom: '10px',
+          borderBottom: '1px solid #F1F5F9'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img 
+              src="/logo.png" 
+              alt="JanSahayak Logo" 
+              style={{ height: '32px', width: 'auto', objectFit: 'contain' }} 
+            />
+            <div>
+              <div style={{ fontWeight: 800, fontSize: '15px', color: '#1E2653', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+                JanSahayak
+              </div>
+              <div style={{ fontSize: '10px', color: '#64748B', fontWeight: 600 }}>
+                AI Civic Resolution Platform
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleDirectEnter}
+            style={{
+              background: '#F1F5F9',
+              border: '1px solid #E2E8F0',
+              borderRadius: '999px',
+              padding: '4px 12px',
+              fontSize: '11.5px',
+              fontWeight: 700,
+              color: '#3B52D4',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              transition: 'all 150ms ease'
+            }}
+            title="Enter platform directly as public guest"
+          >
+            <span>Enter App</span>
+            <ArrowRight style={{ width: '12px', height: '12px' }} />
+          </button>
+        </div>
 
         {/* 3-Second Security Clearance Simulation Overlay (Step 4) */}
         {isVerifying && (
@@ -312,13 +366,13 @@ export default function OnboardingFlow({ onComplete }) {
             {/* Top Visual: Framed Civic Collage Image */}
             <div style={{
               width: '100%',
-              height: '185px',
-              borderRadius: '16px',
+              height: '160px',
+              borderRadius: '14px',
               overflow: 'hidden',
               position: 'relative',
               boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08)',
               border: '1px solid #E2E8F0',
-              marginBottom: '14px'
+              marginBottom: '12px'
             }}>
               <img 
                 src={citizenBg} 
@@ -383,44 +437,44 @@ export default function OnboardingFlow({ onComplete }) {
             {/* Top Visual: Modern 3-Step AI Pipeline Banner */}
             <div style={{
               width: '100%',
-              height: '185px',
-              borderRadius: '16px',
+              height: '160px',
+              borderRadius: '14px',
               background: 'linear-gradient(135deg, #F0FDF4 0%, #EFF6FF 100%)',
               border: '1px solid #BFDBFE',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              padding: '14px 16px',
+              padding: '12px 14px',
               boxSizing: 'border-box',
-              marginBottom: '14px'
+              marginBottom: '12px'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
                 {/* Stage 1 */}
-                <div style={{ flex: 1, background: '#FFFFFF', padding: '10px 8px', borderRadius: '12px', border: '1px solid #BBF7D0', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
-                  <div style={{ fontSize: '20px', marginBottom: '2px' }}>🎙️</div>
-                  <strong style={{ fontSize: '11.5px', display: 'block', color: '#166534' }}>Voice & Photo</strong>
-                  <span style={{ fontSize: '10px', color: '#64748B' }}>No complex forms</span>
+                <div style={{ flex: 1, background: '#FFFFFF', padding: '8px 6px', borderRadius: '12px', border: '1px solid #BBF7D0', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
+                  <div style={{ fontSize: '18px', marginBottom: '2px' }}>🎙️</div>
+                  <strong style={{ fontSize: '11px', display: 'block', color: '#166534' }}>Voice & Photo</strong>
+                  <span style={{ fontSize: '9.5px', color: '#64748B' }}>No complex forms</span>
                 </div>
                 <div style={{ color: '#94A3B8', fontWeight: 700, fontSize: '13px' }}>➔</div>
 
                 {/* Stage 2 */}
-                <div style={{ flex: 1.1, background: '#FFFFFF', padding: '10px 8px', borderRadius: '12px', border: '1px solid #BFDBFE', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
-                  <div style={{ fontSize: '20px', marginBottom: '2px' }}>🧬</div>
-                  <strong style={{ fontSize: '11.5px', display: 'block', color: '#1D4ED8' }}>Complaint DNA</strong>
-                  <span style={{ fontSize: '10px', color: '#64748B' }}>Ward + Biohazard</span>
+                <div style={{ flex: 1.1, background: '#FFFFFF', padding: '8px 6px', borderRadius: '12px', border: '1px solid #BFDBFE', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
+                  <div style={{ fontSize: '18px', marginBottom: '2px' }}>🧬</div>
+                  <strong style={{ fontSize: '11px', display: 'block', color: '#1D4ED8' }}>Complaint DNA</strong>
+                  <span style={{ fontSize: '9.5px', color: '#64748B' }}>Ward + Biohazard</span>
                 </div>
                 <div style={{ color: '#94A3B8', fontWeight: 700, fontSize: '13px' }}>➔</div>
 
                 {/* Stage 3 */}
-                <div style={{ flex: 1.1, background: '#FFFFFF', padding: '10px 8px', borderRadius: '12px', border: '1px solid #E9D5FF', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
-                  <div style={{ fontSize: '20px', marginBottom: '2px' }}>🔗</div>
-                  <strong style={{ fontSize: '11.5px', display: 'block', color: '#7E22CE' }}>Smart Clustering</strong>
-                  <span style={{ fontSize: '10px', color: '#64748B' }}>15 calls = 1 incident</span>
+                <div style={{ flex: 1.1, background: '#FFFFFF', padding: '8px 6px', borderRadius: '12px', border: '1px solid #E9D5FF', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
+                  <div style={{ fontSize: '18px', marginBottom: '2px' }}>🔗</div>
+                  <strong style={{ fontSize: '11px', display: 'block', color: '#7E22CE' }}>Smart Clustering</strong>
+                  <span style={{ fontSize: '9.5px', color: '#64748B' }}>15 calls = 1 incident</span>
                 </div>
               </div>
 
-              <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#2563EB', background: '#DBEAFE', padding: '3px 10px', borderRadius: '999px' }}>
+              <div style={{ marginTop: '8px', textAlign: 'center' }}>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: '#2563EB', background: '#DBEAFE', padding: '2px 8px', borderRadius: '999px' }}>
                   ⚡ Zero Duplicate Backlog • Instant Ground Mapping
                 </span>
               </div>
@@ -447,45 +501,45 @@ export default function OnboardingFlow({ onComplete }) {
             {/* Top Visual: Authority Work Order Card */}
             <div style={{
               width: '100%',
-              height: '185px',
-              borderRadius: '16px',
+              height: '160px',
+              borderRadius: '14px',
               background: 'linear-gradient(135deg, #F8FAFC 0%, #ECFDF5 100%)',
               border: '1px solid #E2E8F0',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              padding: '14px 16px',
+              padding: '12px 14px',
               boxSizing: 'border-box',
-              marginBottom: '14px'
+              marginBottom: '12px'
             }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-                <div style={{ background: '#FFFFFF', padding: '10px 8px', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
-                  <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: '#EFF6FF', color: '#1D4ED8', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px auto' }}>
+                <div style={{ background: '#FFFFFF', padding: '8px 6px', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#EFF6FF', color: '#1D4ED8', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px auto' }}>
                     <Building2 style={{ width: '15px', height: '15px' }} />
                   </div>
-                  <strong style={{ fontSize: '11.5px', display: 'block', color: '#0F172A' }}>Auto-Routing</strong>
+                  <strong style={{ fontSize: '11px', display: 'block', color: '#0F172A' }}>Auto-Routing</strong>
                   <span style={{ fontSize: '9.5px', color: '#64748B' }}>Direct to DJB/PWD</span>
                 </div>
 
-                <div style={{ background: '#FFFFFF', padding: '10px 8px', borderRadius: '12px', border: '1px solid #BBF7D0', textAlign: 'center' }}>
-                  <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: '#ECFDF5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px auto' }}>
+                <div style={{ background: '#FFFFFF', padding: '8px 6px', borderRadius: '12px', border: '1px solid #BBF7D0', textAlign: 'center' }}>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#ECFDF5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px auto' }}>
                     <Zap style={{ width: '15px', height: '15px' }} />
                   </div>
-                  <strong style={{ fontSize: '11.5px', display: 'block', color: '#047857' }}>1-Click SOP</strong>
+                  <strong style={{ fontSize: '11px', display: 'block', color: '#047857' }}>1-Click SOP</strong>
                   <span style={{ fontSize: '9.5px', color: '#64748B' }}>Pre-computed fix</span>
                 </div>
 
-                <div style={{ background: '#FFFFFF', padding: '10px 8px', borderRadius: '12px', border: '1px solid #FED7AA', textAlign: 'center' }}>
-                  <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: '#FFF7ED', color: '#C2410C', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px auto' }}>
+                <div style={{ background: '#FFFFFF', padding: '8px 6px', borderRadius: '12px', border: '1px solid #FED7AA', textAlign: 'center' }}>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#FFF7ED', color: '#C2410C', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px auto' }}>
                     <CheckCircle2 style={{ width: '15px', height: '15px' }} />
                   </div>
-                  <strong style={{ fontSize: '11.5px', display: 'block', color: '#9A3412' }}>Citizen Verify</strong>
+                  <strong style={{ fontSize: '11px', display: 'block', color: '#9A3412' }}>Citizen Verify</strong>
                   <span style={{ fontSize: '9.5px', color: '#64748B' }}>Closed-loop closure</span>
                 </div>
               </div>
 
-              <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#047857', background: '#DCFCE7', padding: '3px 10px', borderRadius: '999px' }}>
+              <div style={{ marginTop: '8px', textAlign: 'center' }}>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: '#047857', background: '#DCFCE7', padding: '2px 8px', borderRadius: '999px' }}>
                   ⏱️ 12-Hour SLA Timer • On-Ground Photo Verification Mandatory
                 </span>
               </div>
