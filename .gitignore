@@ -1,8 +1,103 @@
 # ==============================================================================
-# JanSahayk (जनसहायक) — Production .gitignore
+# JanSahayk (जनसहायक) — Enterprise Production .gitignore
 # ==============================================================================
 
-# Dependencies
+# ------------------------------------------------------------------------------
+# 1. Environment Variables & Secrets (CRITICAL: Never commit to version control)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ------------------------------------------------------------------------------
+# 2. Cryptographic Keys, Certificates & Credentials
+# ------------------------------------------------------------------------------
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+*.pub
+id_rsa
+id_rsa*
+id_ed25519
+id_ed25519*
+*.keystore
+*.jks
+*.der
+*.csr
+*.p8
+
+# ------------------------------------------------------------------------------
+# 3. Cloud Provider & Service Account Credentials
+# ------------------------------------------------------------------------------
+*credentials*.json
+*service-account*.json
+*firebase*.json
+google-services.json
+GoogleService-Info.plist
+client_secret*.json
+*.credential
+.aws/
+.azure/
+.gcp/
+
+# ------------------------------------------------------------------------------
+# 4. Authentication Tokens & Package Manager Secrets
+# ------------------------------------------------------------------------------
+.npmrc
+.yarnrc
+.netrc
+*.token
+*.secret
+jwt.key
+token.json
+
+# ------------------------------------------------------------------------------
+# 5. Runtime Database, Storage & State Files
+# ------------------------------------------------------------------------------
+server/data/*.json
+server/data/*.tmp
+server/data/*.backup.json
+!server/data/.gitkeep
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.sql
+*.dump
+*.rdb
+
+# ------------------------------------------------------------------------------
+# 6. Scratch Files, SingleFile Web Dumps & Local Exports
+# ------------------------------------------------------------------------------
+Product discovery web.html
+*.singlefile.html
+*.saved.html
+scratch/
+*.scratch.*
+
+# ------------------------------------------------------------------------------
+# 7. AI Workspace Caches & Local Agent State
+# ------------------------------------------------------------------------------
+.gemini/
+.agents/
+.claude/
+.copilot/
+.cursor/
+.antigravity/
+
+# ------------------------------------------------------------------------------
+# 8. Dependencies & Package Managers
+# ------------------------------------------------------------------------------
 node_modules/
 .pnp
 .pnp.js
@@ -12,26 +107,20 @@ node_modules/
 .yarn/install-state.gz
 .pnp.*
 
-# Environment variables & Secrets (Strictly prevent credential leakage)
-.env
-.env.*
-!.env.example
-*.pem
-*.key
-*.cert
-*.crt
-*.pfx
-*.p12
-
-# Production build outputs
+# ------------------------------------------------------------------------------
+# 9. Production Build & Bundler Outputs
+# ------------------------------------------------------------------------------
 dist/
 dist-ssr/
 build/
 out/
 .parcel-cache/
 .turbo/
+.next/
 
-# Logs & Debug outputs
+# ------------------------------------------------------------------------------
+# 10. Logs, Telemetry & Debug Artifacts
+# ------------------------------------------------------------------------------
 logs/
 *.log
 npm-debug.log*
@@ -40,22 +129,16 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Testing & Coverage reports
+# ------------------------------------------------------------------------------
+# 11. Testing & Coverage
+# ------------------------------------------------------------------------------
 coverage/
 .nyc_output/
 *.lcov
 
-# Databases & Runtime state
-*.db
-*.db-journal
-*.db-wal
-*.db-shm
-*.sqlite
-*.sqlite3
-server/data/*.tmp
-server/data/*.backup.json
-
-# Operating System files
+# ------------------------------------------------------------------------------
+# 12. Operating System Files
+# ------------------------------------------------------------------------------
 .DS_Store
 .DS_Store?
 ._*
@@ -64,7 +147,9 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 
-# IDEs & Editor configurations
+# ------------------------------------------------------------------------------
+# 13. IDEs & Editor Configurations
+# ------------------------------------------------------------------------------
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
@@ -77,7 +162,9 @@ $RECYCLE.BIN/
 *.sublime-workspace
 *.sublime-project
 
-# Temporary, Cache & Backup files
+# ------------------------------------------------------------------------------
+# 14. Temporary, Cache & Backup Files
+# ------------------------------------------------------------------------------
 .cache/
 tmp/
 temp/
@@ -87,12 +174,7 @@ temp/
 *.swo
 *~
 
-# AI Workspaces & Local Agent Caches
-.gemini/
-.agents/
-.claude/
-.copilot/
-
-# Docker Local Overrides
+# ------------------------------------------------------------------------------
+# 15. Docker Local Overrides
+# ------------------------------------------------------------------------------
 docker-compose.override.yml
-
