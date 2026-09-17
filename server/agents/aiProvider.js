@@ -269,6 +269,54 @@ Respond ONLY with valid JSON with this exact structure:
   }
 
   /**
+   * Generates a semantic embedding vector for the given text.
+   * Uses Gemini text-embedding-004 (768 dims) when API key is available.
+   * Falls back to a deterministic sparse TF-IDF-inspired vector offline.
+   */
+  async generateEmbedding(text) {
+    const apiKey = this.getApiKey();
+    if (apiKey && text) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${apiKey}`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'models/text-embedding-004',
+            content: { parts: [{ text: text.slice(0, 2000) }] }
+          })
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const values = data?.embedding?.values;
+          if (Array.isArray(values) && values.length > 0) {
+            return values;
+          }
+        }
+      } catch (err) {
+        console.warn('[AIProvider] Gemini embedding failed, using fallback:', err.message);
+      }
+    }
+
+    // Deterministic 768-dim sparse vector fallback
+    const tokens = (text || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .filter((w) => w.length > 1);
+    const vec = new Array(768).fill(0);
+    tokens.forEach((token) => {
+      let h = 5381;
+      for (let i = 0; i < token.length; i++) {
+        h = ((h * 33) ^ token.charCodeAt(i)) >>> 0;
+      }
+      vec[h % 768] += 1;
+    });
+    const norm = Math.sqrt(vec.reduce((s, v) => s + v * v, 0)) || 1;
+    return vec.map((v) => v / norm);
+  }
+
+  /**
    * Calculates TF-IDF / Token Cosine Semantic Similarity between two texts
    */
   static calculateSemanticSimilarity(text1 = '', text2 = '') {
