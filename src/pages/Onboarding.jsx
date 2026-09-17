@@ -9,9 +9,9 @@ export default function Onboarding() {
       <div className="container">
         {/* Top return link & header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-          <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: 'var(--color-text-secondary)', fontWeight: 600, textDecoration: 'none' }}>
+          <Link to="/overview" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: 'var(--color-text-secondary)', fontWeight: 600, textDecoration: 'none' }}>
             <ArrowLeft style={{ width: '15px', height: '15px' }} />
-            <span>Back to Public Overview</span>
+            <span>View Public Platform Overview</span>
           </Link>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

@@ -61,6 +61,17 @@ const USERS = [
     role: 'super_admin',
     designation: 'Principal Secretary (IT & Public Grievance)',
     phone: '+91 11-2339-2000'
+  },
+  {
+    id: 'USR-CIVICOFFICER-01',
+    name: 'Er. Sanjay Sharma',
+    email: 'civic.officer@djb.gov.in',
+    password: 'civicofficer123',
+    role: 'civic_officer',
+    department: 'Delhi Jal Board (DJB)',
+    designation: 'Executive Engineer & Department Administrator',
+    zone: 'Zone North-West (Rohini)',
+    phone: '+91 98111-90021'
   }
 ];
 
@@ -69,6 +80,7 @@ let SESSIONS = {
   'demo_token_officer': USERS[1],
   'demo_token_dept_admin': USERS[2],
   'demo_token_super_admin': USERS[3],
+  'demo_token_civic_officer': USERS[4],
 }; // token -> user
 let AUDIT_LOGS = [
   { id: 'LOG-101', timestamp: '2026-09-16 09:31 AM', actor: 'System AI Engine', action: 'GRIEVANCE_TRIAGED', targetId: 'DL-2026-W14-0892', details: 'Autoclassified as Critical Biological Hazard, routed to DJB' },

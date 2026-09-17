@@ -77,8 +77,7 @@ export default function Navbar() {
       setMobileMenuOpen(false);
       const targetRole = logged?.role || roleKey;
       if (targetRole === 'citizen') navigate('/citizen');
-      else if (targetRole === 'officer') navigate('/officer');
-      else if (targetRole === 'dept_admin') navigate('/admin/department');
+      else if (targetRole === 'civic_officer' || targetRole === 'officer' || targetRole === 'dept_admin') navigate('/officer');
       else if (targetRole === 'super_admin') navigate('/admin/super');
       else navigate('/');
     } catch (e) {
@@ -86,8 +85,7 @@ export default function Navbar() {
       setShowUserMenu(false);
       setMobileMenuOpen(false);
       if (roleKey === 'citizen') navigate('/citizen');
-      else if (roleKey === 'officer') navigate('/officer');
-      else if (roleKey === 'dept_admin') navigate('/admin/department');
+      else if (roleKey === 'civic_officer' || roleKey === 'officer' || roleKey === 'dept_admin') navigate('/officer');
       else if (roleKey === 'super_admin') navigate('/admin/super');
       else navigate('/');
     }
@@ -138,8 +136,9 @@ export default function Navbar() {
   const getRoleDisplayLabel = (r) => {
     switch (r) {
       case 'citizen': return 'Citizen';
-      case 'officer': return 'Field Officer';
-      case 'dept_admin': return 'Dept Admin';
+      case 'civic_officer':
+      case 'officer':
+      case 'dept_admin': return 'Civic Officer';
       case 'super_admin': return 'Super Admin';
       default: return 'User';
     }
@@ -148,8 +147,7 @@ export default function Navbar() {
   const getHomeLink = () => {
     if (!user) return '/';
     if (role === 'citizen') return '/citizen';
-    if (role === 'officer') return '/officer';
-    if (role === 'dept_admin') return '/admin/department';
+    if (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') return '/officer';
     if (role === 'super_admin') return '/admin/super';
     return '/';
   };
@@ -239,13 +237,20 @@ export default function Navbar() {
             )}
 
             {/* Field Officer View */}
-            {role === 'officer' && (
+            {/* Civic Officer View (Unified Field + Dept Admin) */}
+            {(role === 'civic_officer' || role === 'officer' || role === 'dept_admin') && (
               <>
                 <Link
                   to="/officer"
-                  className={`site-nav-link ${location.pathname.startsWith('/officer') ? 'active' : ''}`}
+                  className={`site-nav-link ${location.pathname === '/officer' && !location.search.includes('operations') ? 'active' : ''}`}
                 >
-                  Triage Workspace
+                  Workspace
+                </Link>
+                <Link
+                  to="/officer?section=operations"
+                  className={`site-nav-link ${location.search.includes('operations') || location.pathname === '/admin/department' ? 'active' : ''}`}
+                >
+                  Operations & Roster
                 </Link>
                 <Link
                   to="/admin"
@@ -265,42 +270,6 @@ export default function Navbar() {
                 >
                   <Sparkles style={{ width: '13px', height: '13px', color: '#4F46E5', flexShrink: 0 }} />
                   <span>Civic Intelligence</span>
-                </Link>
-              </>
-            )}
-
-            {/* Dept Admin View */}
-            {role === 'dept_admin' && (
-              <>
-                <Link
-                  to="/admin/department"
-                  className={`site-nav-link ${location.pathname === '/admin/department' ? 'active' : ''}`}
-                >
-                  Department Console
-                </Link>
-                <Link
-                  to="/officer"
-                  className={`site-nav-link ${location.pathname.startsWith('/officer') ? 'active' : ''}`}
-                >
-                  Officer Queue
-                </Link>
-                <Link
-                  to="/admin"
-                  className={`site-nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
-                >
-                  Geospatial Heatmap
-                </Link>
-                <Link
-                  to="/intelligence"
-                  className={`site-nav-link ${location.pathname.startsWith('/intelligence') ? 'active' : ''}`}
-                  style={{
-                    color: location.pathname.startsWith('/intelligence') ? '#4338CA' : undefined,
-                    background: location.pathname.startsWith('/intelligence') ? '#EEF2FF' : undefined,
-                    fontWeight: location.pathname.startsWith('/intelligence') ? 700 : 500
-                  }}
-                >
-                  <Sparkles style={{ width: '13px', height: '13px', color: '#4F46E5', flexShrink: 0 }} />
-                  <span>Civic Hotspots</span>
                 </Link>
               </>
             )}
@@ -430,7 +399,7 @@ export default function Navbar() {
               </Link>
             )}
 
-            {role === 'officer' && (
+            {(role === 'civic_officer' || role === 'officer' || role === 'dept_admin') && (
               <Link
                 to="/officer"
                 className="header-report-btn"
@@ -452,33 +421,7 @@ export default function Navbar() {
                 }}
               >
                 <Briefcase style={{ width: '14px', height: '14px' }} />
-                <span>Triage Queue</span>
-              </Link>
-            )}
-
-            {role === 'dept_admin' && (
-              <Link
-                to="/admin/department"
-                className="header-report-btn"
-                style={{
-                  height: '38px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  padding: '0 16px',
-                  borderRadius: 'var(--radius-full)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  background: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
-                  color: '#FFFFFF',
-                  boxShadow: '0 2px 8px rgba(2, 132, 199, 0.28)',
-                  textDecoration: 'none',
-                  whiteSpace: 'nowrap',
-                  transition: 'all 150ms ease'
-                }}
-              >
-                <Building2 style={{ width: '14px', height: '14px' }} />
-                <span>Dept Console</span>
+                <span>Civic Console</span>
               </Link>
             )}
 
@@ -738,7 +681,7 @@ export default function Navbar() {
                         </>
                       )}
 
-                      {role === 'officer' && (
+                      {(role === 'civic_officer' || role === 'officer' || role === 'dept_admin') && (
                         <>
                           <Link
                             to="/officer"
@@ -759,7 +702,29 @@ export default function Navbar() {
                           >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <Briefcase style={{ width: '14px', height: '14px', color: '#059669' }} />
-                              <span>Officer Triage Workspace</span>
+                              <span>Civic Officer Workspace</span>
+                            </div>
+                            <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
+                          </Link>
+                          <Link
+                            to="/officer?section=operations"
+                            onClick={() => setShowUserMenu(false)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '7px 10px',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '12px',
+                              textDecoration: 'none',
+                              color: 'var(--color-text-primary)',
+                              background: '#F8FAFC',
+                              border: '1px solid rgba(15, 23, 42, 0.06)'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <Building2 style={{ width: '14px', height: '14px', color: '#059669' }} />
+                              <span>Dept Operations & Roster</span>
                             </div>
                             <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
                           </Link>
@@ -782,56 +747,6 @@ export default function Navbar() {
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <MapPin style={{ width: '14px', height: '14px', color: '#059669' }} />
                               <span>Ward Heatmap</span>
-                            </div>
-                            <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
-                          </Link>
-                        </>
-                      )}
-
-                      {role === 'dept_admin' && (
-                        <>
-                          <Link
-                            to="/admin/department"
-                            onClick={() => setShowUserMenu(false)}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              padding: '7px 10px',
-                              borderRadius: 'var(--radius-sm)',
-                              fontSize: '12px',
-                              textDecoration: 'none',
-                              color: '#0369A1',
-                              background: '#F0F9FF',
-                              border: '1px solid rgba(2, 132, 199, 0.2)',
-                              fontWeight: 600
-                            }}
-                          >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <Building2 style={{ width: '14px', height: '14px', color: '#0284C7' }} />
-                              <span>Department Console</span>
-                            </div>
-                            <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
-                          </Link>
-                          <Link
-                            to="/officer"
-                            onClick={() => setShowUserMenu(false)}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              padding: '7px 10px',
-                              borderRadius: 'var(--radius-sm)',
-                              fontSize: '12px',
-                              textDecoration: 'none',
-                              color: 'var(--color-text-primary)',
-                              background: '#F8FAFC',
-                              border: '1px solid rgba(15, 23, 42, 0.06)'
-                            }}
-                          >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <Briefcase style={{ width: '14px', height: '14px', color: '#0284C7' }} />
-                              <span>Officer Queue</span>
                             </div>
                             <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
                           </Link>
@@ -892,7 +807,7 @@ export default function Navbar() {
                     <div style={{ height: '1px', background: 'var(--color-divider)', margin: '8px 0' }} />
 
                     <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
-                      Switch Demo Persona:
+                      Switch Demo Persona (3 Roles):
                     </span>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '8px' }}>
                       <button
@@ -912,33 +827,18 @@ export default function Navbar() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleRoleLogin('officer')}
+                        onClick={() => handleRoleLogin('civic_officer')}
                         style={{
                           padding: '7px 8px',
                           borderRadius: 'var(--radius-sm)',
                           fontSize: '12px',
                           textAlign: 'left',
-                          background: role === 'officer' ? '#F0FDF4' : 'transparent',
-                          color: role === 'officer' ? 'var(--color-primary)' : 'var(--color-text-primary)',
-                          fontWeight: role === 'officer' ? 700 : 400
+                          background: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? '#ECFDF5' : 'transparent',
+                          color: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? '#047857' : 'var(--color-text-primary)',
+                          fontWeight: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? 700 : 400
                         }}
                       >
-                        🛠 Govt Officer (Er. Sanjay Sharma)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleRoleLogin('dept_admin')}
-                        style={{
-                          padding: '7px 8px',
-                          borderRadius: 'var(--radius-sm)',
-                          fontSize: '12px',
-                          textAlign: 'left',
-                          background: role === 'dept_admin' ? '#F0FDF4' : 'transparent',
-                          color: role === 'dept_admin' ? 'var(--color-primary)' : 'var(--color-text-primary)',
-                          fontWeight: role === 'dept_admin' ? 700 : 400
-                        }}
-                      >
-                        🏛 Dept Admin (Er. Rajiv Malhotra)
+                        🏛️ Civic Officer (Er. Sanjay Sharma)
                       </button>
                       <button
                         type="button"
@@ -948,12 +848,12 @@ export default function Navbar() {
                           borderRadius: 'var(--radius-sm)',
                           fontSize: '12px',
                           textAlign: 'left',
-                          background: role === 'super_admin' ? '#F0FDF4' : 'transparent',
-                          color: role === 'super_admin' ? 'var(--color-primary)' : 'var(--color-text-primary)',
+                          background: role === 'super_admin' ? '#EEF2FF' : 'transparent',
+                          color: role === 'super_admin' ? '#4338CA' : 'var(--color-text-primary)',
                           fontWeight: role === 'super_admin' ? 700 : 400
                         }}
                       >
-                        🛡 Super Admin (Principal Secretary)
+                        🛡️ Super Admin (Dr. Meenakshi Sundaram, IAS)
                       </button>
                     </div>
 
@@ -1087,8 +987,8 @@ export default function Navbar() {
                 </>
               )}
 
-              {/* Officer Mobile Links */}
-              {role === 'officer' && (
+              {/* Civic Officer Mobile Links */}
+              {(role === 'civic_officer' || role === 'officer' || role === 'dept_admin') && (
                 <>
                   <Link
                     to="/officer"
@@ -1098,11 +998,25 @@ export default function Navbar() {
                       borderRadius: 'var(--radius-md)',
                       fontSize: '14px',
                       fontWeight: 600,
-                      color: location.pathname.startsWith('/officer') ? '#059669' : 'var(--color-text-primary)',
-                      background: location.pathname.startsWith('/officer') ? '#ECFDF5' : '#F8FAFC'
+                      color: location.pathname === '/officer' && !location.search.includes('operations') ? '#059669' : 'var(--color-text-primary)',
+                      background: location.pathname === '/officer' && !location.search.includes('operations') ? '#ECFDF5' : '#F8FAFC'
                     }}
                   >
-                    📥 Triage Workspace
+                    🏛️ Civic Workspace
+                  </Link>
+                  <Link
+                    to="/officer?section=operations"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.search.includes('operations') ? '#059669' : 'var(--color-text-primary)',
+                      background: location.search.includes('operations') ? '#ECFDF5' : '#F8FAFC'
+                    }}
+                  >
+                    📋 Dept Operations & Roster
                   </Link>
                   <Link
                     to="/admin"
@@ -1116,7 +1030,7 @@ export default function Navbar() {
                       background: location.pathname === '/admin' ? '#ECFDF5' : '#F8FAFC'
                     }}
                   >
-                    🗺️ Ward Heatmap
+                    🗺️ Ward Heatmap & GIS
                   </Link>
                   <Link
                     to="/intelligence"
@@ -1135,72 +1049,6 @@ export default function Navbar() {
                   >
                     <Sparkles style={{ width: '16px', height: '16px', color: '#4F46E5' }} />
                     <span>Civic Intelligence</span>
-                  </Link>
-                </>
-              )}
-
-              {/* Dept Admin Mobile Links */}
-              {role === 'dept_admin' && (
-                <>
-                  <Link
-                    to="/admin/department"
-                    onClick={() => setMobileMenuOpen(false)}
-                    style={{
-                      padding: '10px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      color: location.pathname === '/admin/department' ? '#0284C7' : 'var(--color-text-primary)',
-                      background: location.pathname === '/admin/department' ? '#F0F9FF' : '#F8FAFC'
-                    }}
-                  >
-                    🏢 Department Console
-                  </Link>
-                  <Link
-                    to="/officer"
-                    onClick={() => setMobileMenuOpen(false)}
-                    style={{
-                      padding: '10px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      color: location.pathname.startsWith('/officer') ? '#0284C7' : 'var(--color-text-primary)',
-                      background: location.pathname.startsWith('/officer') ? '#F0F9FF' : '#F8FAFC'
-                    }}
-                  >
-                    👥 Officer Workload
-                  </Link>
-                  <Link
-                    to="/admin"
-                    onClick={() => setMobileMenuOpen(false)}
-                    style={{
-                      padding: '10px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      color: location.pathname === '/admin' ? '#0284C7' : 'var(--color-text-primary)',
-                      background: location.pathname === '/admin' ? '#F0F9FF' : '#F8FAFC'
-                    }}
-                  >
-                    🗺️ Geospatial Heatmap
-                  </Link>
-                  <Link
-                    to="/intelligence"
-                    onClick={() => setMobileMenuOpen(false)}
-                    style={{
-                      padding: '10px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '14px',
-                      fontWeight: 700,
-                      color: '#4338CA',
-                      background: '#EEF2FF',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}
-                  >
-                    <Sparkles style={{ width: '16px', height: '16px', color: '#4F46E5' }} />
-                    <span>Civic Hotspots</span>
                   </Link>
                 </>
               )}
@@ -1322,12 +1170,12 @@ export default function Navbar() {
               <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '8px' }}>
                 Switch Persona (1-Click):
               </span>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
                 <button
                   type="button"
                   onClick={() => handleRoleLogin('citizen')}
                   style={{
-                    padding: '8px 10px',
+                    padding: '8px 12px',
                     borderRadius: 'var(--radius-md)',
                     fontSize: '12px',
                     textAlign: 'left',
@@ -1337,45 +1185,29 @@ export default function Navbar() {
                     fontWeight: role === 'citizen' ? 700 : 500
                   }}
                 >
-                  👤 Citizen
+                  👤 Citizen (Aditya Verma)
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleRoleLogin('officer')}
+                  onClick={() => handleRoleLogin('civic_officer')}
                   style={{
-                    padding: '8px 10px',
+                    padding: '8px 12px',
                     borderRadius: 'var(--radius-md)',
                     fontSize: '12px',
                     textAlign: 'left',
-                    background: role === 'officer' ? '#ECFDF5' : '#F8FAFC',
-                    color: role === 'officer' ? '#059669' : 'var(--color-text-primary)',
-                    border: `1px solid ${role === 'officer' ? 'rgba(5, 150, 105, 0.3)' : 'var(--color-border-subtle)'}`,
-                    fontWeight: role === 'officer' ? 700 : 500
+                    background: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? '#ECFDF5' : '#F8FAFC',
+                    color: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? '#047857' : 'var(--color-text-primary)',
+                    border: `1px solid ${(role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? 'rgba(5, 150, 105, 0.3)' : 'var(--color-border-subtle)'}`,
+                    fontWeight: (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') ? 700 : 500
                   }}
                 >
-                  🛠 Officer
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleRoleLogin('dept_admin')}
-                  style={{
-                    padding: '8px 10px',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: '12px',
-                    textAlign: 'left',
-                    background: role === 'dept_admin' ? '#F0F9FF' : '#F8FAFC',
-                    color: role === 'dept_admin' ? '#0284C7' : 'var(--color-text-primary)',
-                    border: `1px solid ${role === 'dept_admin' ? 'rgba(2, 132, 199, 0.3)' : 'var(--color-border-subtle)'}`,
-                    fontWeight: role === 'dept_admin' ? 700 : 500
-                  }}
-                >
-                  🏛 Dept Admin
+                  🏛️ Civic Officer (Er. Sanjay Sharma)
                 </button>
                 <button
                   type="button"
                   onClick={() => handleRoleLogin('super_admin')}
                   style={{
-                    padding: '8px 10px',
+                    padding: '8px 12px',
                     borderRadius: 'var(--radius-md)',
                     fontSize: '12px',
                     textAlign: 'left',
@@ -1385,7 +1217,7 @@ export default function Navbar() {
                     fontWeight: role === 'super_admin' ? 700 : 500
                   }}
                 >
-                  🛡 Super Admin
+                  🛡️ Super Admin (Dr. Meenakshi Sundaram, IAS)
                 </button>
               </div>
             </div>
@@ -1598,10 +1430,10 @@ export default function Navbar() {
                 </div>
               </button>
 
-              {/* Persona 2: Government Officer */}
+              {/* Persona 2: Civic Officer */}
               <button
                 type="button"
-                onClick={() => handleRoleLogin('officer')}
+                onClick={() => handleRoleLogin('civic_officer')}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -1615,23 +1447,23 @@ export default function Navbar() {
                 }}
                 className="card-interactive"
               >
-                <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: '#EFF6FF', color: '#1D4ED8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: '#ECFDF5', color: '#065F46', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <Briefcase style={{ width: '18px', height: '18px' }} />
                 </div>
                 <div>
                   <strong style={{ fontSize: '14px', color: 'var(--color-text-primary)', display: 'block' }}>
-                    Government Officer
+                    🏛️ Civic Officer
                   </strong>
                   <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
-                    Er. Sanjay Sharma (AEE) • Case triage, duplicate verification & SOPs
+                    Er. Sanjay Sharma • Field triage, dept operations, SOP approvals & AI radar
                   </span>
                 </div>
               </button>
 
-              {/* Persona 3: Department Admin */}
+              {/* Persona 3: Super Admin */}
               <button
                 type="button"
-                onClick={() => handleRoleLogin('dept_admin')}
+                onClick={() => handleRoleLogin('super_admin')}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -1645,31 +1477,17 @@ export default function Navbar() {
                 }}
                 className="card-interactive"
               >
-                <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: '#F5F3FF', color: '#6D28D9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Building2 style={{ width: '18px', height: '18px' }} />
+                <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: '#EEF2FF', color: '#4338CA', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <ShieldCheck style={{ width: '18px', height: '18px' }} />
                 </div>
                 <div>
                   <strong style={{ fontSize: '14px', color: 'var(--color-text-primary)', display: 'block' }}>
-                    Department Administrator
+                    🛡️ Super Admin
                   </strong>
                   <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
-                    Er. Rajiv Malhotra • Department health, SLA compliance & hotspots
+                    Dr. Meenakshi Sundaram, IAS • State-level civic intelligence & systemic governance
                   </span>
                 </div>
-              </button>
-            </div>
-
-            {/* Subtle Super Admin access */}
-            <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--color-divider)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                Municipal Principal Secretary
-              </span>
-              <button
-                type="button"
-                onClick={() => handleRoleLogin('super_admin')}
-                style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-secondary)' }}
-              >
-                Super Admin Access →
               </button>
             </div>
 

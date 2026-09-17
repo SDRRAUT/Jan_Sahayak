@@ -43,8 +43,7 @@ export default function Login() {
       return;
     }
     if (role === 'citizen') navigate('/citizen');
-    else if (role === 'officer') navigate('/officer');
-    else if (role === 'dept_admin') navigate('/admin/department');
+    else if (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') navigate('/officer');
     else if (role === 'super_admin') navigate('/admin/super');
     else navigate('/');
   };
@@ -101,8 +100,7 @@ export default function Login() {
     setLocalError('');
     // Infer role from email or default to citizen
     let inferredRole = 'citizen';
-    if (email.includes('djb') || email.includes('officer')) inferredRole = 'officer';
-    if (email.includes('admin.djb') || email.includes('dept')) inferredRole = 'dept_admin';
+    if (email.includes('djb') || email.includes('officer') || email.includes('civic') || email.includes('admin.djb') || email.includes('dept')) inferredRole = 'civic_officer';
     if (email.includes('superadmin') || email.includes('ias')) inferredRole = 'super_admin';
 
     execute3SecondLogin(inferredRole, email, password);
@@ -295,10 +293,10 @@ export default function Login() {
               </p>
             </button>
 
-            {/* Role 2: Officer */}
+            {/* Role 2: Civic Officer */}
             <button
               type="button"
-              onClick={() => handleQuickDemoLogin('officer')}
+              onClick={() => handleQuickDemoLogin('civic_officer')}
               className="card card-interactive"
               style={{
                 padding: '18px',
@@ -312,57 +310,39 @@ export default function Login() {
                   <Briefcase style={{ width: '16px', height: '16px', color: '#065F46' }} />
                 </div>
                 <div>
-                  <strong style={{ fontSize: '14px', color: '#065F46', display: 'block' }}>Government Officer</strong>
-                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Field Triage & Work Orders</span>
+                  <strong style={{ fontSize: '14px', color: '#065F46', display: 'block' }}>🏛️ Civic Officer</strong>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Field Execution + Dept Operations</span>
                 </div>
               </div>
               <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.4 }}>
-                Er. Sanjay Sharma (AEE DJB) • Review AI brief, authorize SOPs & dispatch crews.
+                Er. Sanjay Sharma (AEE & Dept Admin) • Field triage, team roster, SOP approvals & AI radar.
               </p>
             </button>
 
-            {/* Role 3: Dept Admin */}
+            {/* Role 3: Super Admin */}
             <button
               type="button"
-              onClick={() => handleQuickDemoLogin('dept_admin')}
+              onClick={() => handleQuickDemoLogin('super_admin')}
               className="card card-interactive"
               style={{
                 padding: '18px',
                 textAlign: 'left',
-                border: '1px solid rgba(14, 94, 58, 0.2)',
+                border: '1px solid rgba(67, 56, 202, 0.2)',
                 background: '#FFFFFF'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                <div className="icon-squircle" style={{ width: '32px', height: '32px', background: '#EFF6FF' }}>
-                  <Building2 style={{ width: '16px', height: '16px', color: '#1E40AF' }} />
+                <div className="icon-squircle" style={{ width: '32px', height: '32px', background: '#EEF2FF' }}>
+                  <ShieldCheck style={{ width: '16px', height: '16px', color: '#4338CA' }} />
                 </div>
                 <div>
-                  <strong style={{ fontSize: '14px', color: '#1E40AF', display: 'block' }}>Department Admin</strong>
-                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>SLA Health & Macro Hotspots</span>
+                  <strong style={{ fontSize: '14px', color: '#4338CA', display: 'block' }}>🛡️ Super Admin</strong>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>State-Wide Governance</span>
                 </div>
               </div>
               <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.4 }}>
-                Chief Engineer • Monitor ward SLA compliance, recurring defects & allocation.
+                Dr. Meenakshi Sundaram, IAS • Cross-department audit, budget approval & systemic escalation.
               </p>
-            </button>
-          </div>
-
-          {/* Deemphasized Super Admin link */}
-          <div style={{ textAlign: 'center', marginTop: '14px' }}>
-            <button
-              type="button"
-              onClick={() => handleQuickDemoLogin('super_admin')}
-              style={{
-                fontSize: '11px',
-                color: 'var(--color-text-muted)',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                textDecoration: 'underline'
-              }}
-            >
-              Municipal System Administrator (State Level IAS Console) →
             </button>
           </div>
         </div>

@@ -69,11 +69,11 @@ export const DEMO_USERS = {
 };
 
 export function AppProvider({ children }) {
-  // Session & User State
-  const [token, setToken] = useState(() => localStorage.getItem('jansahayk_token') || 'demo_token_citizen');
+  // Session & User State (Clean start for first-time visitors)
+  const [token, setToken] = useState(() => localStorage.getItem('jansahayk_token') || null);
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('jansahayk_user');
-    return saved ? JSON.parse(saved) : DEMO_USERS.citizen;
+    return saved ? JSON.parse(saved) : null;
   });
 
   const [grievances, setGrievances] = useState(() => {

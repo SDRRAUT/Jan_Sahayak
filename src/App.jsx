@@ -25,12 +25,12 @@ import Onboarding from './pages/Onboarding';
 function RoleHome() {
   const { user, token } = useApp();
   if (!token || !user) {
-    return <Home />;
+    return <Onboarding />;
   }
   if (user.role === 'citizen') return <Navigate to="/citizen" replace />;
   if (user.role === 'civic_officer' || user.role === 'officer' || user.role === 'dept_admin') return <Navigate to="/officer" replace />;
   if (user.role === 'super_admin') return <Navigate to="/admin/super" replace />;
-  return <Home />;
+  return <Onboarding />;
 }
 
 export default function App() {

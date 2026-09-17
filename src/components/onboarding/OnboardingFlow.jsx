@@ -78,8 +78,7 @@ export default function OnboardingFlow({ onComplete }) {
         setTimeout(() => {
           if (onComplete) onComplete();
           if (target === 'citizen') navigate('/citizen');
-          else if (target === 'officer') navigate('/officer');
-          else if (target === 'dept_admin') navigate('/admin/department');
+          else if (target === 'civic_officer' || target === 'officer' || target === 'dept_admin') navigate('/officer');
           else if (target === 'super_admin') navigate('/admin/super');
           else navigate('/');
         }, 400);
@@ -618,38 +617,38 @@ export default function OnboardingFlow({ onComplete }) {
               </button>
             </div>
 
-            {/* Role 2: Government Officer */}
+            {/* Role 2: Civic Officer */}
             <div
-              onClick={() => handleSelectRole('officer')}
+              onClick={() => handleSelectRole('civic_officer')}
               style={{
                 padding: '18px',
                 borderRadius: 'var(--radius-lg)',
-                border: selectedRole === 'officer' ? '2px solid #059669' : '1px solid var(--color-border-subtle)',
-                background: selectedRole === 'officer' ? '#ECFDF5' : '#FFFFFF',
+                border: (selectedRole === 'civic_officer' || selectedRole === 'officer' || selectedRole === 'dept_admin') ? '2px solid #059669' : '1px solid var(--color-border-subtle)',
+                background: (selectedRole === 'civic_officer' || selectedRole === 'officer' || selectedRole === 'dept_admin') ? '#ECFDF5' : '#FFFFFF',
                 cursor: 'pointer',
                 transition: 'all 150ms ease',
-                boxShadow: selectedRole === 'officer' ? '0 4px 12px rgba(5, 150, 105, 0.12)' : 'none'
+                boxShadow: (selectedRole === 'civic_officer' || selectedRole === 'officer' || selectedRole === 'dept_admin') ? '0 4px 12px rgba(5, 150, 105, 0.12)' : 'none'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#DCFCE7', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Briefcase style={{ width: '18px', height: '18px' }} />
                 </div>
-                {selectedRole === 'officer' && (
+                {(selectedRole === 'civic_officer' || selectedRole === 'officer' || selectedRole === 'dept_admin') && (
                   <span style={{ fontSize: '10.5px', background: '#059669', color: '#FFFFFF', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>
                     SELECTED
                   </span>
                 )}
               </div>
               <strong style={{ fontSize: '14.5px', display: 'block', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
-                Government Officer
+                🏛️ Civic Officer
               </strong>
               <span style={{ fontSize: '11.5px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '8px' }}>
-                Er. Sanjay Sharma (AEE DJB)
+                Er. Sanjay Sharma (AEE & Dept Admin)
               </span>
               <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); handleSelectRole('officer'); trigger3SecondAuth('officer'); }}
+                onClick={(e) => { e.stopPropagation(); handleSelectRole('civic_officer'); trigger3SecondAuth('civic_officer'); }}
                 className="btn-secondary btn-sm"
                 style={{ width: '100%', fontSize: '11px', marginTop: '6px' }}
               >
@@ -657,46 +656,7 @@ export default function OnboardingFlow({ onComplete }) {
               </button>
             </div>
 
-            {/* Role 3: Dept Admin */}
-            <div
-              onClick={() => handleSelectRole('dept_admin')}
-              style={{
-                padding: '18px',
-                borderRadius: 'var(--radius-lg)',
-                border: selectedRole === 'dept_admin' ? '2px solid #0284C7' : '1px solid var(--color-border-subtle)',
-                background: selectedRole === 'dept_admin' ? '#F0F9FF' : '#FFFFFF',
-                cursor: 'pointer',
-                transition: 'all 150ms ease',
-                boxShadow: selectedRole === 'dept_admin' ? '0 4px 12px rgba(2, 132, 199, 0.12)' : 'none'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#E0F2FE', color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Building2 style={{ width: '18px', height: '18px' }} />
-                </div>
-                {selectedRole === 'dept_admin' && (
-                  <span style={{ fontSize: '10.5px', background: '#0284C7', color: '#FFFFFF', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>
-                    SELECTED
-                  </span>
-                )}
-              </div>
-              <strong style={{ fontSize: '14.5px', display: 'block', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
-                Department Admin
-              </strong>
-              <span style={{ fontSize: '11.5px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '8px' }}>
-                Er. Rajiv Malhotra (Chief Eng.)
-              </span>
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); handleSelectRole('dept_admin'); trigger3SecondAuth('dept_admin'); }}
-                className="btn-secondary btn-sm"
-                style={{ width: '100%', fontSize: '11px', marginTop: '6px' }}
-              >
-                ⚡ 1-Click Demo Login
-              </button>
-            </div>
-
-            {/* Role 4: Super Admin */}
+            {/* Role 3: Super Admin */}
             <div
               onClick={() => handleSelectRole('super_admin')}
               style={{
@@ -720,10 +680,10 @@ export default function OnboardingFlow({ onComplete }) {
                 )}
               </div>
               <strong style={{ fontSize: '14.5px', display: 'block', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
-                Super Admin
+                🛡️ Super Admin
               </strong>
               <span style={{ fontSize: '11.5px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '8px' }}>
-                Principal Secretary (IAS)
+                Dr. Meenakshi Sundaram (IAS)
               </span>
               <button
                 type="button"
