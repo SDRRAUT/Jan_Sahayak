@@ -592,6 +592,122 @@ export const postgresDB = {
     }
   },
 
+  // --- Field Actions ---
+  async recordFieldAction({ incidentId, grievanceId, officerId, officerName, actionType, status, notes, evidenceUrl }) {
+    const p = getPool();
+    if (!p) return false;
+    try {
+      const validOfficerId = (officerId && officerId.length === 36) ? officerId : 'b0000000-0000-0000-0000-000000000001';
+      await p.query(`
+        INSERT INTO public.field_actions (
+          incident_id, grievance_id, officer_id, officer_name, action_type, status, notes, evidence_url, started_at, completed_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW() - INTERVAL '2 hours', NOW())
+      `, [incidentId || null, grievanceId || null, validOfficerId, officerName || 'Field Officer', actionType || 'REPAIR', status || 'COMPLETED', notes || '', evidenceUrl || null]);
+      return true;
+    } catch (err) {
+      console.error('PostgreSQL recordFieldAction error:', err.message);
+      return false;
+    }
+  },
+
+  // --- Status Transitions ---
+  async recordStatusTransition({ incidentId, fromStatus, toStatus, reason, trigger, actorId, actorName, actorRole }) {
+    const p = getPool();
+    if (!p) return false;
+    try {
+      await p.query(`
+        INSERT INTO public.incident_status_history (
+          incident_id, from_status, to_status, reason, trigger, actor_id, actor_name, actor_role, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+      `, [incidentId, fromStatus, toStatus, reason || `Transitioned to ${toStatus}`, trigger || 'OPERATIONAL_ACTION', actorId || null, actorName || 'Authority', actorRole || 'OFFICER']);
+      return true;
+    } catch (err) {
+      console.error('PostgreSQL recordStatusTransition error:', err.message);
+      return false;
+    }
+  },
+
+  // --- Verification Records ---
+  async recordVerification({ grievanceId, incidentId, citizenId, status, feedback, rating, photoUrl }) {
+    const p = getPool();
+    if (!p) return false;
+    try {
+      const validCitizenId = (citizenId && citizenId.length === 36) ? citizenId : 'a0000000-0000-0000-0000-000000000001';
+      await p.query(`
+        INSERT INTO public.verification_records (
+          grievance_id, incident_id, citizen_id, status, feedback, rating, photo_url, verified_at, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+      `, [grievanceId || null, incidentId || null, validCitizenId, status || 'VERIFIED', feedback || '', rating || 5, photoUrl || null]);
+      return true;
+    } catch (err) {
+      console.error('PostgreSQL recordVerification error:', err.message);
+      return false;
+    }
+  },
+
+  // --- Evidence Records ---
+  async saveEvidenceRecord({ complaintId, incidentId, uploadedBy, type, storagePath, fileUrl, mimeType, metadata }) {
+    const p = getPool();
+    if (!p) return false;
+    try {
+      const validUserId = (uploadedBy && uploadedBy.length === 36) ? uploadedBy : 'a0000000-0000-0000-0000-000000000001';
+      await p.query(`
+        INSERT INTO public.evidence_records (
+          complaint_id, incident_id, uploaded_by, type, storage_path, file_url, mime_type, metadata, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+      `, [complaintId || null, incidentId || null, validUserId, type || 'IMAGE', storagePath || '', fileUrl || '', mimeType || 'image/jpeg', JSON.stringify(metadata || {})]);
+      return true;
+    } catch (err) {
+      console.error('PostgreSQL saveEvidenceRecord error:', err.message);
+      return false;
+    }
+  },
+
+  // --- Authority Assignments ---
+  async recordAuthorityAssignment({ incidentId, departmentId, officerId, reason, status, assignedBy }) {
+    const p = getPool();
+    if (!p) return false;
+    try {
+      const validOfficerId = (officerId && officerId.length === 36) ? officerId : 'b0000000-0000-0000-0000-000000000001';
+      await p.query(`
+        INSERT INTO public.authority_assignments (
+          incident_id, department_id, officer_id, reason, status, assigned_at, assigned_by
+        ) VALUES ($1, $2, $3, $4, $5, NOW(), $6)
+      `, [incidentId || null, departmentId, validOfficerId, reason || 'Department allocation', status || 'ASSIGNED', assignedBy || 'System AI Engine']);
+      return true;
+    } catch (err) {
+      console.error('PostgreSQL recordAuthorityAssignment error:', err.message);
+      return false;
+    }
+  },
+
+  // --- Civic Memory ---
+  async saveCivicMemory({ incidentTitle, category, department, rootCause, resolutionApplied, contractor, warrantyPeriod, recurrenceRate, costEstimate, embedding }) {
+    const p = getPool();
+    if (!p) return false;
+    try {
+      if (embedding && Array.isArray(embedding)) {
+        await p.query(`
+          INSERT INTO public.civic_memory (
+            incident_title, category, department, root_cause, resolution_applied,
+            contractor, warranty_period, recurrence_rate, cost_estimate, embedding, created_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::extensions.vector(768), NOW())
+        `, [incidentTitle, category, department, rootCause, resolutionApplied, contractor, warrantyPeriod, recurrenceRate, costEstimate, JSON.stringify(embedding)]);
+      } else {
+        await p.query(`
+          INSERT INTO public.civic_memory (
+            incident_title, category, department, root_cause, resolution_applied,
+            contractor, warranty_period, recurrence_rate, cost_estimate, created_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+        `, [incidentTitle, category, department, rootCause, resolutionApplied, contractor, warrantyPeriod, recurrenceRate, costEstimate]);
+      }
+      return true;
+    } catch (err) {
+      console.error('PostgreSQL saveCivicMemory error:', err.message);
+      return false;
+    }
+  },
+
   // --- Spatial & Vector Queries ---
   async searchNearbyGrievances(lat, lng, radiusMeters = 1500) {
     const p = getPool();
