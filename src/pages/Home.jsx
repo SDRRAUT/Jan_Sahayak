@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { INITIAL_GRIEVANCES, SYSTEM_METRICS } from '../data/mockGrievances';
 import citizenBg from '../assets/citizen-bg.jpg';
+import WhyExplainer from '../components/common/WhyExplainer';
 
 export default function Home() {
   const [mapCategory, setMapCategory] = useState('ALL');
