@@ -14,7 +14,7 @@ import {
   Mail
 } from 'lucide-react';
 import { useApp, DEMO_CREDENTIALS, DEMO_USERS } from '../../context/AppContext';
-import citizenBg from '../../assets/citizen-bg.jpg';
+import groundRealityImg from '../../assets/ground-reality.jpg';
 import onboardingBg from '../../assets/onboarding-bg.jpg';
 
 export default function OnboardingFlow({ onComplete }) {
@@ -350,8 +350,8 @@ export default function OnboardingFlow({ onComplete }) {
               marginBottom: '12px'
             }}>
               <img 
-                src={citizenBg} 
-                alt="Delhi Civic Ground Truth" 
+                src={groundRealityImg} 
+                alt="Delhi Civic Ground Reality" 
                 style={{
                   width: '100%',
                   height: '100%',

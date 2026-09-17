@@ -83,13 +83,29 @@ export function AppProvider({ children }) {
   });
 
   const [grievances, setGrievances] = useState(() => {
-    const saved = localStorage.getItem('jansahayk_grievances');
-    return saved ? JSON.parse(saved) : INITIAL_GRIEVANCES;
+    const saved = localStorage.getItem('jansahayk_grievances_v3');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length >= INITIAL_GRIEVANCES.length) {
+          return parsed;
+        }
+      } catch (e) {}
+    }
+    localStorage.setItem('jansahayk_grievances_v3', JSON.stringify(INITIAL_GRIEVANCES));
+    return INITIAL_GRIEVANCES;
   });
 
   const [clusters, setClusters] = useState(() => {
-    const saved = localStorage.getItem('jansahayk_clusters');
-    return saved ? JSON.parse(saved) : MOCK_CLUSTERS;
+    const saved = localStorage.getItem('jansahayk_clusters_v3');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length >= MOCK_CLUSTERS.length) return parsed;
+      } catch (e) {}
+    }
+    localStorage.setItem('jansahayk_clusters_v3', JSON.stringify(MOCK_CLUSTERS));
+    return MOCK_CLUSTERS;
   });
 
   const [civicIncidents, setCivicIncidents] = useState(() => {
@@ -147,8 +163,14 @@ export function AppProvider({ children }) {
   }, [user]);
 
   useEffect(() => {
+    localStorage.setItem('jansahayk_grievances_v3', JSON.stringify(grievances));
     localStorage.setItem('jansahayk_grievances', JSON.stringify(grievances));
   }, [grievances]);
+
+  useEffect(() => {
+    localStorage.setItem('jansahayk_clusters_v3', JSON.stringify(clusters));
+    localStorage.setItem('jansahayk_clusters', JSON.stringify(clusters));
+  }, [clusters]);
 
   useEffect(() => {
     localStorage.setItem('jansahayk_incidents', JSON.stringify(civicIncidents));
