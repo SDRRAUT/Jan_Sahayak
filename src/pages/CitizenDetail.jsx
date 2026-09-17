@@ -25,10 +25,9 @@ import ResolutionIntelligenceCard from '../components/common/ResolutionIntellige
 
 export default function CitizenDetail() {
   const { id } = useParams();
-  const { grievances, upvoteGrievance, respondInfo, reopenDispute, submitFeedback, user } = useApp();
+  const { grievances, upvoteGrievance, respondInfo, reopenDispute, submitFeedback, verifyResolution, user } = useApp();
   const [citizenReply, setCitizenReply] = useState('');
   const [actionMessage, setActionMessage] = useState('');
-  const [showSimulateResolution, setShowSimulateResolution] = useState(false);
 
   const item = grievances.find(g => g.id === id) || grievances[0];
 
@@ -91,7 +90,7 @@ export default function CitizenDetail() {
         {/* 6-Stage Visual Journey Stepper (Section 19) */}
         <div style={{ marginBottom: '24px' }}>
           <VisualJourneyTimeline
-            status={showSimulateResolution ? 'RESOLVED' : item.status}
+            status={item.status}
             createdAt={item.createdAt}
             officerName={item.officerName}
             department={item.department}
@@ -108,19 +107,22 @@ export default function CitizenDetail() {
           {/* Left Column (7 Cols): Grievance Detail & Actions */}
           <div style={{ gridColumn: 'span 7' }} className="hero-left-col">
             
-            {/* Closed Loop Resolution Verification (Section 20) */}
-            {(item.status === 'RESOLVED' || showSimulateResolution) && (
+            {/* Closed Loop Resolution Verification (Section 20 & 26) */}
+            {(item.status === 'RESOLVED' || item.status === 'RESOLVED_CONFIRMED' || item.status === 'DISPUTE_REOPENED') && (
               <div style={{ marginBottom: '24px' }}>
                 <ResolutionVerificationCard
                   grievance={item}
-                  onVerifyFixed={() => setActionMessage('✓ Resolution confirmed by citizen. Case closed.')}
-                  onReopenDispute={(id, reason) => {
-                    reopenDispute(id, reason);
-                    setActionMessage('Case disputed and escalated to Superintending Engineer.');
+                  onVerifyFixed={async (id, feedbackText, evidencePhotos) => {
+                    await verifyResolution(id, 'SATISFIED', feedbackText, evidencePhotos);
+                    setActionMessage('✓ Resolution confirmed by citizen. Case closed and logged to Civic Memory.');
                   }}
-                  onSubmitFeedback={(id, rating, comm) => {
-                    submitFeedback(id, rating, comm);
-                    setActionMessage('Thank you! Your 5-star rating has been registered in the municipal audit register.');
+                  onReopenDispute={async (id, reason, evidencePhotos) => {
+                    await verifyResolution(id, 'DISPUTED', reason, evidencePhotos);
+                    setActionMessage('Case disputed and re-escalated to Department Superintending Engineer.');
+                  }}
+                  onSubmitFeedback={async (id, rating, comm) => {
+                    await submitFeedback(id, rating, comm);
+                    setActionMessage('Thank you! Your citizen rating has been registered in the municipal audit register.');
                   }}
                 />
               </div>
@@ -137,8 +139,8 @@ export default function CitizenDetail() {
                     borderRadius: 'var(--radius-full)',
                     fontSize: '11px',
                     fontWeight: 700,
-                    background: item.status === 'RESOLVED' ? '#ECFDF5' : (item.urgency === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB'),
-                    color: item.status === 'RESOLVED' ? '#065F46' : (item.urgency === 'CRITICAL' ? '#991B1B' : '#92400E')
+                    background: item.status === 'RESOLVED' || item.status === 'RESOLVED_CONFIRMED' ? '#ECFDF5' : (item.urgency === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB'),
+                    color: item.status === 'RESOLVED' || item.status === 'RESOLVED_CONFIRMED' ? '#065F46' : (item.urgency === 'CRITICAL' ? '#991B1B' : '#92400E')
                   }}>
                     ● {item.urgency || 'HIGH'} Priority
                   </span>
@@ -168,7 +170,7 @@ export default function CitizenDetail() {
                 marginBottom: '20px'
               }}>
                 <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
-                  Citizen Report ({item.languageDetected}):
+                  Citizen Report ({item.languageDetected || 'Multilingual'}):
                 </span>
                 <p style={{ fontSize: '14px', lineHeight: 1.6, color: 'var(--color-text-primary)' }}>
                   "{item.descriptionRaw}"
@@ -176,25 +178,41 @@ export default function CitizenDetail() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '12px', fontSize: '12px', color: 'var(--color-text-secondary)', flexWrap: 'wrap' }}>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                     <MapPin style={{ width: '13px', height: '13px', color: 'var(--color-primary)' }} />
-                    {item.location.area}, {item.location.ward}
+                    {item.location?.area || 'Local Area'}, {item.location?.ward || 'Ward Area'}
                   </span>
-                  <span>PIN: {item.location.pincode}</span>
+                  <span>PIN: {item.location?.pincode || '110085'}</span>
+                  {item.location?.lat && (
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px' }}>
+                      📍 {Number(item.location.lat).toFixed(4)}, {Number(item.location.lng).toFixed(4)}
+                    </span>
+                  )}
                 </div>
               </div>
 
-              {/* Simulation Helper Button if not resolved */}
-              {item.status !== 'RESOLVED' && (
-                <div style={{ padding: '10px 14px', borderRadius: 'var(--radius-md)', background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
-                  <span style={{ color: 'var(--color-text-muted)' }}>
-                    Test resolution verification flow:
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setShowSimulateResolution(!showSimulateResolution)}
-                    style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-primary)' }}
-                  >
-                    {showSimulateResolution ? 'Reset to Active View' : 'Simulate Field Repair Verification →'}
-                  </button>
+              {/* Real Evidence Section (Citizen Photo + Field Completion Photo) */}
+              {(item.evidence?.photoUrl || item.resolutionPhotoUrl) && (
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: item.evidence?.photoUrl && item.resolutionPhotoUrl ? '1fr 1fr' : '1fr',
+                  gap: '16px',
+                  marginBottom: '16px'
+                }}>
+                  {item.evidence?.photoUrl && (
+                    <div style={{ border: '1px solid var(--color-border-subtle)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+                      <span style={{ display: 'block', padding: '6px 10px', background: '#F1F5F9', fontSize: '11px', fontWeight: 700, color: 'var(--color-text-secondary)' }}>
+                        Original Problem Evidence
+                      </span>
+                      <img src={item.evidence.photoUrl} alt="Reported problem" style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
+                    </div>
+                  )}
+                  {item.resolutionPhotoUrl && (
+                    <div style={{ border: '1px solid #BBF7D0', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+                      <span style={{ display: 'block', padding: '6px 10px', background: '#F0FDF4', fontSize: '11px', fontWeight: 700, color: '#166534' }}>
+                        Officer Field Completion Photo
+                      </span>
+                      <img src={item.resolutionPhotoUrl} alt="Resolution work" style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
+                    </div>
+                  )}
                 </div>
               )}
             </div>

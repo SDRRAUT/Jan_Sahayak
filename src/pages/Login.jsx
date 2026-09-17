@@ -293,7 +293,7 @@ export default function Login() {
               </p>
             </button>
 
-            {/* Role 2: Civic Officer */}
+            {/* Role 2: Government Officer */}
             <button
               type="button"
               onClick={() => handleQuickDemoLogin('civic_officer')}
@@ -310,16 +310,16 @@ export default function Login() {
                   <Briefcase style={{ width: '16px', height: '16px', color: '#065F46' }} />
                 </div>
                 <div>
-                  <strong style={{ fontSize: '14px', color: '#065F46', display: 'block' }}>🏛️ Civic Officer</strong>
-                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Field Execution + Dept Operations</span>
+                  <strong style={{ fontSize: '14px', color: '#065F46', display: 'block' }}>👷 Government Officer</strong>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Field Work & Issue Solving</span>
                 </div>
               </div>
               <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.4 }}>
-                Er. Sanjay Sharma (AEE & Dept Admin) • Field triage, team roster, SOP approvals & AI radar.
+                Er. Sanjay Sharma (Field Engineer) • Ground visits, repair works, SOP approvals & resolving complaints.
               </p>
             </button>
 
-            {/* Role 3: Super Admin */}
+            {/* Role 3: Administrator / Admin */}
             <button
               type="button"
               onClick={() => handleQuickDemoLogin('super_admin')}
@@ -336,12 +336,12 @@ export default function Login() {
                   <ShieldCheck style={{ width: '16px', height: '16px', color: '#4338CA' }} />
                 </div>
                 <div>
-                  <strong style={{ fontSize: '14px', color: '#4338CA', display: 'block' }}>🛡️ Super Admin</strong>
-                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>State-Wide Governance</span>
+                  <strong style={{ fontSize: '14px', color: '#4338CA', display: 'block' }}>🛡️ Administrator / Admin</strong>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Municipal Boss & Citywide Head</span>
                 </div>
               </div>
               <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.4 }}>
-                Dr. Meenakshi Sundaram, IAS • Cross-department audit, budget approval & systemic escalation.
+                Dr. Meenakshi Sundaram, IAS • Department audits, citywide performance monitoring & overall governance.
               </p>
             </button>
           </div>

@@ -76,12 +76,11 @@ When visiting `http://localhost:3737/` without an existing session, the website 
   - **12-Hour SLA Timer & Closed-Loop Citizen Sign-Off**: Resolution requires an actual on-site photo; tickets cannot be closed without citizen verification.
 
 ### **Step 4: Role Selection & 3-Second Credential Authentication**
-- **Objective**: Let evaluators, officers, or citizens select their role and witness a realistic security clearance check.
+- **Objective**: Let anyone select their role and witness a realistic security clearance check.
 - **Role Options**:
   - 👤 **Citizen**: Aditya Verma (Ward 14, Rohini)
-  - 🛠️ **Government Field Officer**: Er. Sanjay Sharma (AEE DJB)
-  - 🏛️ **Department Admin**: Er. Rajiv Malhotra (Chief Engineer, DJB)
-  - 🛡️ **Super Admin**: Dr. Meenakshi Sundaram, IAS (Principal Secretary)
+  - 👷 **Government Officer**: Er. Sanjay Sharma (Field Engineer & Dept Lead, DJB)
+  - 🛡️ **Administrator / Admin**: Dr. Meenakshi Sundaram, IAS (Municipal Boss & State Head)
 - **⚡ 3-Second Verification Simulation**:
   - **0.0s – 1.0s**: Spinner + *"Checking credentials with Delhi Municipal Directory..."* (Progress 15% ➔ 50%)
   - **1.0s – 2.0s**: *"Validating jurisdictional authorization & security clearance for [Role]..."* (Progress 50% ➔ 85%)
@@ -95,9 +94,8 @@ When visiting `http://localhost:3737/` without an existing session, the website 
 | Persona | Primary URL | Header Navigation | Top-Right Action CTA | Core Views & Responsibilities |
 | :--- | :--- | :--- | :--- | :--- |
 | 👤 **Citizen** | `/citizen` | My Grievances, File Grievance, How it Works | `+ File Grievance` | View personal tickets, submit voice/text grievance, live track repair squads, rate resolution. |
-| 🛠️ **Field Officer** | `/officer` | Triage Workspace, Ward Heatmap, Civic Intelligence | `Triage Queue` | Review AI brief, approve/modify pre-computed SOPs, dispatch field squads, upload completion photos. |
-| 🏛️ **Dept Admin** | `/admin/department` | Department Console, Officer Queue, Heatmap, Hotspots | `Dept Console` | Monitor ward SLA compliance, reassign overloaded officers, inspect recurring hotspot clusters. |
-| 🛡️ **Super Admin** | `/admin/super` | Super Admin, Departments, Officers, Heatmap, Intelligence | `Admin Console` | All-Delhi municipal oversight, adjust AI scoring weights, configure SLA rules, inspect cryptographic audit trails. |
+| 👷 **Government Officer** | `/officer` | Triage Workspace, Ward Heatmap, Civic Intelligence | `Triage Queue` | Review AI brief, approve/modify pre-computed SOPs, dispatch field squads, upload completion photos. |
+| 🛡️ **Administrator / Admin** | `/admin/super` | Admin Console, Departments, Officers, Heatmap, Intelligence | `Admin Console` | All-Delhi municipal oversight, adjust AI scoring weights, configure SLA rules, inspect cryptographic audit trails. |
 | 🌐 **Public / Guest** | `/overview` | Overview, 3-Step Tour, Impact | `Track Ticket`, `Login` | 20-second lifecycle demo, public impact counters, transparency statistics. |
 
 ---
