@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   MapPin, 
   Layers, 
@@ -10,24 +11,40 @@ import {
   Radio, 
   Send,
   Eye,
-  Shield
+  Shield,
+  Filter,
+  Flame,
+  ArrowRight
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
+import WhyExplainer from '../components/common/WhyExplainer';
 
 export default function AdminHeatmap() {
   const { grievances, clusters, metrics } = useApp();
   const [selectedWard, setSelectedWard] = useState('Ward 14 (Rohini Sector 14)');
   const [selectedCluster, setSelectedCluster] = useState(clusters[0]);
+  const [categoryFilter, setCategoryFilter] = useState('ALL');
   const [broadcastSent, setBroadcastSent] = useState(false);
 
   const wardStats = [
-    { ward: 'Ward 14 (Rohini)', active: 18, critical: 1, resolved: 14, status: 'HIGH_ALERT' },
-    { ward: 'Ward 8 (Lajpat Nagar)', active: 7, critical: 0, resolved: 22, status: 'NORMAL' },
-    { ward: 'Ward 22 (Mayur Vihar)', active: 11, critical: 0, resolved: 31, status: 'NORMAL' },
-    { ward: 'Ward 5 (Kalkaji)', active: 9, critical: 1, resolved: 19, status: 'HIGH_ALERT' },
-    { ward: 'Ward 19 (Karol Bagh)', active: 4, critical: 0, resolved: 28, status: 'RESOLVED' }
+    { ward: 'Ward 14 (Rohini)', category: 'Water Supply', active: 18, critical: 1, resolved: 14, status: 'HIGH_ALERT', trend: '+48% this week' },
+    { ward: 'Ward 8 (Lajpat Nagar)', category: 'Electricity', active: 7, critical: 0, resolved: 22, status: 'NORMAL', trend: '+12% this week' },
+    { ward: 'Ward 22 (Mayur Vihar)', category: 'Roads', active: 11, critical: 0, resolved: 31, status: 'NORMAL', trend: '-8% this week' },
+    { ward: 'Ward 5 (Kalkaji)', category: 'Water Supply', active: 9, critical: 1, resolved: 19, status: 'HIGH_ALERT', trend: '+22% this week' },
+    { ward: 'Ward 19 (Karol Bagh)', category: 'Sanitation', active: 4, critical: 0, resolved: 28, status: 'RESOLVED', trend: '-40% this week' }
   ];
+
+  const categories = ['ALL', 'Water', 'Roads', 'Sanitation', 'Electricity', 'Other'];
+
+  const filteredWards = wardStats.filter(w => {
+    if (categoryFilter === 'ALL') return true;
+    if (categoryFilter === 'Water') return w.category === 'Water Supply';
+    if (categoryFilter === 'Roads') return w.category === 'Roads';
+    if (categoryFilter === 'Sanitation') return w.category === 'Sanitation';
+    if (categoryFilter === 'Electricity') return w.category === 'Electricity';
+    return true;
+  });
 
   const handleBroadcast = () => {
     setBroadcastSent(true);
@@ -47,7 +64,7 @@ export default function AdminHeatmap() {
           justifyContent: 'space-between',
           flexWrap: 'wrap',
           gap: '16px',
-          marginBottom: '28px',
+          marginBottom: '24px',
           paddingBottom: '20px',
           borderBottom: '1px solid var(--color-divider)'
         }}>
@@ -56,19 +73,73 @@ export default function AdminHeatmap() {
               MUNICIPAL COMMAND CENTER • GEOSPATIAL INTELLIGENCE
             </div>
             <h1 style={{ fontSize: '32px', color: 'var(--color-text-primary)' }}>
-              Delhi NCR Public Grievance Heatmap & Root-Cause Matrix
+              Civic Intelligence Map & Hotspot Matrix
             </h1>
             <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
-              Real-time clustering across 272 municipal wards with automated root-cause detection.
+              Answering <strong>WHERE</strong> public problems are emerging with real-time ward clustering & root-cause detection.
             </p>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '9999px', background: '#ECFDF5', border: '1px solid #A7F3D0', color: '#065F46', fontSize: '12px', fontWeight: 700 }}>
               <span className="status-dot active"></span>
-              <span>SCADA & GIS Feed Online</span>
+              <span>SCADA & Municipal GIS Feed Online</span>
+            </div>
+            <Link to="/officer" className="btn-secondary btn-sm">
+              Open Officer Triage Queue →
+            </Link>
+          </div>
+        </div>
+
+        {/* SECTION 17: EMERGING THIS WEEK CALLOUT BANNER */}
+        <div style={{
+          padding: '16px 20px',
+          borderRadius: 'var(--radius-lg)',
+          background: 'linear-gradient(90deg, #FEF2F2 0%, #FFFBEB 100%)',
+          border: '1px solid #FECACA',
+          marginBottom: '28px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '14px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              background: '#DC2626',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <Flame style={{ width: '18px', height: '18px' }} />
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <strong style={{ fontSize: '13px', color: '#991B1B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  EMERGING THIS WEEK: WARD 14 PIPELINE PRESSURE DROP
+                </strong>
+                <span style={{ fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', background: '#DC2626', color: '#FFFFFF' }}>
+                  +48% SPIKE
+                </span>
+              </div>
+              <p style={{ fontSize: '12px', color: '#7F1D1D', margin: '2px 0 0 0' }}>
+                18 separate citizen submissions in Rohini Sector 14 correlate with 40m crack near Mother Dairy booster valve.
+              </p>
             </div>
           </div>
+
+          <Link
+            to="/officer/complaints/GRV-2025-001"
+            className="btn-primary btn-sm"
+            style={{ background: '#DC2626', borderColor: '#DC2626' }}
+          >
+            <span>Inspect Hotspot Grievances →</span>
+          </Link>
         </div>
 
         {/* 4 Summary Stat Cards */}
@@ -76,7 +147,7 @@ export default function AdminHeatmap() {
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
           gap: '16px',
-          marginBottom: '32px'
+          marginBottom: '28px'
         }}>
           <div className="card" style={{ padding: '20px' }}>
             <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
@@ -90,7 +161,7 @@ export default function AdminHeatmap() {
 
           <div className="card" style={{ padding: '20px' }}>
             <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-              Cluster Deduplication Rate
+              Deduplication Rate
             </span>
             <div style={{ fontSize: '32px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#059669', marginTop: '4px' }}>
               64.2%
@@ -115,7 +186,7 @@ export default function AdminHeatmap() {
             <div style={{ fontSize: '32px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-text-primary)', marginTop: '4px' }}>
               91.6%
             </div>
-            <span style={{ fontSize: '11px', color: 'var(--color-primary)' }}>Based on 4,200 Verified Reviews</span>
+            <span style={{ fontSize: '11px', color: 'var(--color-primary)' }}>Based on Verified Case Audits</span>
           </div>
         </div>
 
@@ -130,18 +201,39 @@ export default function AdminHeatmap() {
           {/* Map Surface (7 Cols) */}
           <div style={{ gridColumn: 'span 7' }} className="hero-left-col">
             <div className="card" style={{ padding: '24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              
+              {/* Category Filter Pills (Section 17) */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
                 <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                  Interactive Geospatial Grid (Delhi NCR Zone Map)
+                  Filter Map by Civic Domain:
                 </span>
-                <span style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: 600 }}>
-                  Click Ward Pin to Filter Clusters
-                </span>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  {categories.map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setCategoryFilter(cat)}
+                      style={{
+                        padding: '4px 12px',
+                        borderRadius: '9999px',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        border: categoryFilter === cat ? 'none' : '1px solid var(--color-border-medium)',
+                        background: categoryFilter === cat ? 'var(--color-primary)' : '#FFFFFF',
+                        color: categoryFilter === cat ? '#FFFFFF' : 'var(--color-text-secondary)',
+                        cursor: 'pointer',
+                        transition: 'all 150ms ease'
+                      }}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Graphical Ward Map Simulator */}
               <div style={{
-                height: '360px',
+                height: '380px',
                 borderRadius: 'var(--radius-md)',
                 background: '#0B1914',
                 position: 'relative',
@@ -185,17 +277,19 @@ export default function AdminHeatmap() {
                         alignItems: 'center',
                         gap: '4px',
                         cursor: 'pointer',
-                        zIndex: 10
+                        zIndex: 10,
+                        background: 'transparent',
+                        border: 'none'
                       }}
                     >
                       {/* Pulse circle pin */}
                       <div style={{
-                        width: isSelected ? '28px' : '22px',
-                        height: isSelected ? '28px' : '22px',
+                        width: isSelected ? '30px' : '24px',
+                        height: isSelected ? '30px' : '24px',
                         borderRadius: '50%',
                         background: w.critical > 0 ? '#EF4444' : (w.active > 10 ? '#F59E0B' : '#10B981'),
                         border: '3px solid #FFFFFF',
-                        boxShadow: '0 0 16px rgba(16, 185, 129, 0.5)',
+                        boxShadow: w.critical > 0 ? '0 0 20px rgba(239, 68, 68, 0.8)' : '0 0 16px rgba(16, 185, 129, 0.5)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -236,10 +330,10 @@ export default function AdminHeatmap() {
                   gap: '12px'
                 }}>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#EF4444' }} /> Critical Hazard
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#EF4444' }} /> Critical Cluster
                   </span>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#F59E0B' }} /> Elevated Cluster
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#F59E0B' }} /> Elevated Anomaly
                   </span>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                     <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981' }} /> Normal Resolution
@@ -248,8 +342,8 @@ export default function AdminHeatmap() {
               </div>
 
               {/* Ward breakdown list */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px', marginTop: '16px' }}>
-                {wardStats.map((w) => (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '8px', marginTop: '16px' }}>
+                {filteredWards.map((w) => (
                   <button
                     key={w.ward}
                     onClick={() => setSelectedWard(w.ward)}
@@ -259,15 +353,21 @@ export default function AdminHeatmap() {
                       background: selectedWard.includes(w.ward.split(' ')[1]) ? 'var(--color-accent-tint)' : '#F8F9FA',
                       border: selectedWard.includes(w.ward.split(' ')[1]) ? '1px solid var(--color-primary)' : '1px solid var(--color-border-subtle)',
                       textAlign: 'left',
-                      transition: 'all 150ms ease'
+                      transition: 'all 150ms ease',
+                      cursor: 'pointer'
                     }}
                   >
                     <span style={{ fontSize: '11px', fontWeight: 700, display: 'block', color: 'var(--color-text-primary)' }}>
                       {w.ward}
                     </span>
-                    <span style={{ fontSize: '12px', color: w.critical > 0 ? '#EF4444' : 'var(--color-text-secondary)' }}>
-                      {w.active} Active Cases
-                    </span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
+                      <span style={{ fontSize: '12px', color: w.critical > 0 ? '#EF4444' : 'var(--color-text-secondary)', fontWeight: 600 }}>
+                        {w.active} Cases
+                      </span>
+                      <span style={{ fontSize: '10px', color: w.trend.includes('+') ? '#DC2626' : '#059669' }}>
+                        {w.trend}
+                      </span>
+                    </div>
                   </button>
                 ))}
               </div>
@@ -307,10 +407,22 @@ export default function AdminHeatmap() {
                 border: '1px solid var(--color-border-subtle)',
                 marginBottom: '16px'
               }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-primary)', display: 'block', marginBottom: '4px' }}>
-                  Identified Root Cause:
-                </span>
-                <p style={{ fontSize: '13px', color: 'var(--color-text-primary)', lineHeight: 1.5 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-primary)' }}>
+                    Identified Root Cause:
+                  </span>
+                  <WhyExplainer
+                    label="Why this root cause?"
+                    title="Spatial Telemetry Corroboration"
+                    reasons={[
+                      'Pressure drop recorded across 3 adjacent junctions',
+                      'Contamination complaints report identical odor & timing',
+                      '18 corroborating citizen GPS reports within 400m radius'
+                    ]}
+                    align="right"
+                  />
+                </div>
+                <p style={{ fontSize: '13px', color: 'var(--color-text-primary)', lineHeight: 1.5, margin: 0 }}>
                   "{selectedCluster.rootCause}"
                 </p>
                 <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '8px' }}>
@@ -346,18 +458,26 @@ export default function AdminHeatmap() {
               </div>
 
               {broadcastSent && (
-                <div style={{ padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: '#ECFDF5', color: '#065F46', fontSize: '12px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{ padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: '#ECFDF5', color: '#065F46', fontSize: '12px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px' }}>
                   <CheckCircle2 style={{ width: '14px', height: '14px' }} />
-                  <span>Broadcast successfully transmitted to 18 phone numbers via JanSahayk Gateway.</span>
+                  <span>Broadcast transmitted to 18 phone numbers via JanSahayak Gateway.</span>
                 </div>
               )}
+
+              <Link
+                to="/officer/complaints/GRV-2025-001"
+                className="btn-secondary btn-sm"
+                style={{ width: '100%', justifyContent: 'center' }}
+              >
+                Inspect Associated Grievances →
+              </Link>
             </div>
 
             {/* Stage 14: Systemic Root Cause & Proactive Capital Insight */}
             <div className="card" style={{ padding: '24px', background: '#FFFFFF', border: '1px solid #E2E8F0', marginTop: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                 <span className="category-pill" style={{ background: '#FEF3C7', color: '#92400E', borderColor: '#FDE68A' }}>
-                  SYSTEMIC POLICY INSIGHT (STAGE 14)
+                  SYSTEMIC POLICY INSIGHT
                 </span>
               </div>
               <h4 style={{ fontSize: '16px', color: 'var(--color-text-primary)', marginBottom: '8px' }}>
