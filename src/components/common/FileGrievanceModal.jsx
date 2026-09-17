@@ -68,8 +68,14 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
     { key: 'Sanitation & Solid Waste', label: 'Garbage & Waste', icon: '🗑️' },
     { key: 'Electricity & Power Grid', label: 'Streetlight & Power', icon: '💡' },
     { key: 'Drainage & Waterlogging', label: 'Sewage & Drainage', icon: '🕳️' },
-    { key: 'Other Civic Issue', label: 'Other Problem', icon: '🌐' }
   ];
+
+  // AI category detection state
+  const [isAiDetecting, setIsAiDetecting] = useState(false);
+  const [aiDetectedCategory, setAiDetectedCategory] = useState(null); // null = not detected yet
+  const aiDebounceRef = useRef(null);
+
+
 
   const presets = [
     { label: '💧 Dirty tap water', text: 'Pichle 2 din se nal mein ganda badbudar paani aa raha hai.', cat: 'Water Supply & Contamination' },
@@ -82,6 +88,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
     if (isOpen) {
       setCurrentStep(1);
       setCreatedTicket(null);
+      setAiDetectedCategory(null);
       if (defaultCategory) setCategory(defaultCategory);
       if (user?.name) setCitizenName(user.name);
       if (user?.phone) setCitizenPhone(user.phone);
@@ -89,6 +96,69 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
       if (user?.pincode) setPincode(user.pincode);
     }
   }, [isOpen, defaultCategory, user]);
+
+  // ─── AI Category Detection ───────────────────────────────────────────────────
+  // Client-side instant keyword matching (works offline, zero latency)
+  const detectCategoryFromText = (text) => {
+    const t = text.toLowerCase();
+    if (/paani|water|nal|pipe|contamina|boring|tank|supply|leak|water.?log/i.test(t))
+      return 'Water Supply & Contamination';
+    if (/road|pothole|gaddha|sadak|crack|break|pit|sinkhole|speed.?breaker|footpath|pavem/i.test(t))
+      return 'Roads & Infrastructure';
+    if (/garbage|kooda|kachra|waste|trash|dustbin|sweeping|sweeper|sanitation|clean|smell|badbu/i.test(t))
+      return 'Sanitation & Solid Waste';
+    if (/light|streetlight|lamp|bijli|electricity|power|current|dark|andhera|transformer|wire/i.test(t))
+      return 'Electricity & Power Grid';
+    if (/drain|nali|sewer|naala|waterlog|flood|overflow|blockage|clog|gutter/i.test(t))
+      return 'Drainage & Waterlogging';
+    return null; // not enough info yet
+  };
+
+  // Auto-detect category as user types/speaks (debounced 600ms)
+  useEffect(() => {
+    if (aiDebounceRef.current) clearTimeout(aiDebounceRef.current);
+    if (description.length < 8) {
+      setAiDetectedCategory(null);
+      setIsAiDetecting(false);
+      return;
+    }
+
+    setIsAiDetecting(true);
+    aiDebounceRef.current = setTimeout(async () => {
+      // 1. Try instant client-side detection first
+      const clientResult = detectCategoryFromText(description + ' ' + title);
+      if (clientResult) {
+        setAiDetectedCategory(clientResult);
+        setCategory(clientResult);
+        setIsAiDetecting(false);
+        return;
+      }
+
+      // 2. Fallback: call backend Gemini AI for ambiguous text
+      try {
+        const res = await fetch('/api/complaints/classify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: description, title })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.category) {
+            setAiDetectedCategory(data.category);
+            setCategory(data.category);
+          }
+        }
+      } catch (_) {
+        // backend unavailable — silently skip, user can pick manually
+      } finally {
+        setIsAiDetecting(false);
+      }
+    }, 600);
+
+    return () => clearTimeout(aiDebounceRef.current);
+  }, [description, title]); // eslint-disable-line
+
+
 
   // ─── Real-time Speech-to-Text ───────────────────────────────────────────────
   const handleToggleVoice = () => {
@@ -594,35 +664,110 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
               {/* STEP 1 */}
               {currentStep === 1 && (
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '8px' }}>
-                    1. Select Problem Category:
-                  </label>
-                  
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '14px' }}>
-                    {categories.map((cat) => {
-                      const isSelected = category === cat.key;
-                      return (
-                        <button
-                          key={cat.key}
-                          type="button"
-                          onClick={() => setCategory(cat.key)}
-                          style={{
-                            padding: '9px 6px',
-                            borderRadius: '10px',
-                            border: isSelected ? '2px solid #2563EB' : '1px solid #E2E8F0',
-                            background: isSelected ? '#EFF6FF' : '#F8FAFC',
-                            textAlign: 'center',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          <div style={{ fontSize: '18px', marginBottom: '2px' }}>{cat.icon}</div>
-                          <strong style={{ fontSize: '11px', display: 'block', color: isSelected ? '#1E40AF' : '#0F172A', lineHeight: 1.2 }}>
-                            {cat.label}
-                          </strong>
-                        </button>
-                      );
-                    })}
+                  <div style={{ marginBottom: '14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <label style={{ fontSize: '12px', fontWeight: 700, color: '#334155' }}>
+                        1. Problem Category:
+                      </label>
+                      {/* AI detection badge */}
+                      <span style={{
+                        fontSize: '10px',
+                        fontWeight: 700,
+                        color: aiDetectedCategory ? '#065F46' : '#6366F1',
+                        background: aiDetectedCategory ? '#ECFDF5' : '#EEF2FF',
+                        border: `1px solid ${aiDetectedCategory ? '#A7F3D0' : '#C7D2FE'}`,
+                        borderRadius: '999px',
+                        padding: '2px 8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
+                        {isAiDetecting
+                          ? <><Loader2 style={{ width: '10px', height: '10px', animation: 'spin 1s linear infinite' }} /> AI detecting...</>
+                          : aiDetectedCategory
+                            ? <>✅ AI detected</>
+                            : <>🤖 AI will auto-detect</>
+                        }
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                      {categories.map((cat) => {
+                        const isSelected = category === cat.key;
+                        const isAiPick = aiDetectedCategory === cat.key;
+                        return (
+                          <button
+                            key={cat.key}
+                            type="button"
+                            onClick={() => { setCategory(cat.key); setAiDetectedCategory(null); }}
+                            style={{
+                              padding: '9px 6px',
+                              borderRadius: '10px',
+                              border: isSelected ? '2px solid #2563EB' : isAiPick ? '2px solid #059669' : '1px solid #E2E8F0',
+                              background: isSelected ? '#EFF6FF' : isAiPick ? '#ECFDF5' : '#F8FAFC',
+                              textAlign: 'center',
+                              cursor: 'pointer',
+                              position: 'relative',
+                              transition: 'all 0.2s'
+                            }}
+                          >
+                            <div style={{ fontSize: '18px', marginBottom: '2px' }}>{cat.icon}</div>
+                            <strong style={{ fontSize: '11px', display: 'block', color: isSelected ? '#1E40AF' : isAiPick ? '#065F46' : '#0F172A', lineHeight: 1.2 }}>
+                              {cat.label}
+                            </strong>
+                            {isAiPick && (
+                              <span style={{
+                                position: 'absolute',
+                                top: '-6px',
+                                right: '-6px',
+                                background: '#059669',
+                                color: '#fff',
+                                fontSize: '9px',
+                                fontWeight: 800,
+                                borderRadius: '999px',
+                                padding: '1px 5px',
+                                lineHeight: 1.4
+                              }}>AI ✓</span>
+                            )}
+                          </button>
+                        );
+                      })}
+
+                      {/* 6th slot: AI Detection tile */}
+                      <div style={{
+                        padding: '9px 6px',
+                        borderRadius: '10px',
+                        border: '1px dashed #A5B4FC',
+                        background: '#F5F3FF',
+                        textAlign: 'center',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        {isAiDetecting ? (
+                          <>
+                            <Loader2 style={{ width: '18px', height: '18px', color: '#6366F1', animation: 'spin 1s linear infinite', marginBottom: '2px' }} />
+                            <strong style={{ fontSize: '10px', color: '#6366F1', lineHeight: 1.2 }}>Detecting...</strong>
+                          </>
+                        ) : aiDetectedCategory ? (
+                          <>
+                            <div style={{ fontSize: '16px', marginBottom: '2px' }}>✅</div>
+                            <strong style={{ fontSize: '10px', color: '#059669', lineHeight: 1.2 }}>AI detected!</strong>
+                          </>
+                        ) : (
+                          <>
+                            <div style={{ fontSize: '16px', marginBottom: '2px' }}>🤖</div>
+                            <strong style={{ fontSize: '10px', color: '#6366F1', lineHeight: 1.2 }}>Type to detect</strong>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                   </div>
+
+
 
                   <div style={{ marginBottom: '12px' }}>
                     <label style={{ fontSize: '12px', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '4px' }}>
