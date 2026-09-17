@@ -20,7 +20,7 @@
   JanSahayk unifies <b>Citizens</b>, <b>Civic Officers</b>, and <b>Super Admins</b> into one interconnected, real-time civic ecosystem powered by an 8-Agent AI mesh, PostGIS geospatial intelligence, and pgvector semantic retrieval.
 </p>
 
-[Core Architecture](#-1-core-architecture--one-source-of-truth) • [8-Agent AI Mesh](#-2-multi-agent-ai-pipeline-under-the-hood) • [Canonical Status & Events](#-3-canonical-state--real-time-event-model) • [Key Features](#-4-features-by-role) • [Tech Stack](#-5-complete-technology-stack) • [Quickstart](#-6-how-to-run-locally-quickstart) • [Validation & Tests](#-7-validation--automated-testing) • [API Guide](#-8-api-endpoints-reference)
+[10 Unique Points](#-10-unique-special-points--what-makes-jansahayk-different) • [Core Architecture](#-1-core-architecture--one-source-of-truth) • [8-Agent AI Mesh](#-2-multi-agent-ai-pipeline-under-the-hood) • [Canonical Status & Events](#-3-canonical-state--real-time-event-model) • [Key Features](#-4-features-by-role) • [Tech Stack](#-5-complete-technology-stack) • [Quickstart](#-6-how-to-run-locally-quickstart) • [Validation & Tests](#-7-validation--automated-testing) • [API Guide](#-8-api-endpoints-reference)
 
 ---
 
@@ -36,6 +36,68 @@ Traditional civic complaint systems treat citizen reports as isolated, text-only
 3. **One Authoritative Truth**: The database is the single source of truth (`public.grievances`, `public.civic_incidents`, `public.field_actions`, `public.verification_records`). Zero fake state, zero role-specific duplicates.
 4. **Real-Time Cross-Role Sync**: When an officer uploads field remediation evidence, the citizen's verification modal and the Super Admin's city dashboard update in real time via WebSockets and Server-Sent Events (SSE).
 5. **Closed-Loop Verification**: A complaint is never closed until the citizen verifies the repair with photo proof, rating, or disputes it back into the investigation queue.
+
+---
+
+## 🌟 10 Unique Special Points — What Makes JanSahayk Different?
+
+### 1. 🧬 **Grievance DNA™ — Complete Intelligence Fingerprint**
+Har complaint ka ek structured profile: category, department, location, urgency, affected people, history, duplicates, recommendation — sab ek jagah.
+> **Why unique:** CPGRAMS aur traditional state portals complaint ko sirf raw text ki tarah store karte hain. Hum use ek complete **"intelligence document"** banate hain.
+
+---
+
+### 2. 🔄 **Duplicate Fusion Engine — 50 Complaints = 1 Action**
+Semantic similarity (`pgvector`) + GPS proximity (`PostGIS`) + time window se same issue ki multiple complaints ko ek cohesive **Civic Incident** mein merge karta hai, aur automatically priority badha deta hai.
+> **Why unique:** Existing portals mein duplicate detection nahi hai — officer ek hi pothole ya water leak ki 50 complaints alag-alag padh ke confuse hota hai.
+
+---
+
+### 3. 💡 **Resolution Recommendation (RAG-based) — Sirf Forward Nahi, Solve Karne Mein Madad**
+AI past similar resolved cases dhundhta hai aur officer ko batata hai: *"Pichli baar aisa case pipe replacement se 5 din mein solve hua, required tools: 200mm clamp, citizen rating 4.5★."*
+> **Why unique:** Koi bhi Indian grievance portal officer ko "kya karna chahiye" nahi batata. Yeh hamara core differentiator hai.
+
+---
+
+### 4. 🎤 **Voice-First for Bharat — Bolo, Complaint Ho Gayi**
+Illiterate ya semi-literate citizen apni bhasha mein bol de → Speech-to-Text → AI structured complaint bana de → voice mein confirmation bhi sune.
+> **Why unique:** Existing portals complex text-form-centric hain — jahan 40%+ population effectively form fill nahi kar sakti.
+
+---
+
+### 5. 🌐 **Cross-Language Bridge — Citizen Tamil/Hindi Mein, Officer English/Hindi Mein**
+Citizen kisi bhi Indian language mein complaint kare, officer ko apni language mein structured brief mile, aur citizen ko status updates wapas uski apni language mein jaayein.
+> **Why unique:** Language barrier poori tarah eliminate — kisi manual translation team ki zaroorat nahi.
+
+---
+
+### 6. ⚡ **Smart Priority Scoring — FIFO Nahi, Urgency First**
+Multi-factor scoring: safety risk, affected population, duration, school/hospital proximity, recurrence, photo evidence — se priority score (0–100) banta hai. Open live electrical wire pothole se pehle triage hoga.
+> **Why unique:** Existing systems mein complaints "first-come-first-served" (FIFO) queue mein hoti hain — emergency issues bhi line mein intezar karte hain.
+
+---
+
+### 7. 🔍 **Explainable AI — "Yeh HIGH Priority KYUN Hai?"**
+Har AI decision ke saath 3-line clear reasoning: *"200 households affected, 14 days pending, 3rd recurrence in 12 months near School boundary."*
+> **Why unique:** Government mein black-box AI accept nahi hota. Transparency = Trust = Real Adoption.
+
+---
+
+### 8. 🗺️ **Proactive Systemic Alerts — Root Cause Detection**
+Location + category + time pattern mining se administration ko proactive alert: *"Ward 14 mein water complaints 300% badhi hain — possible main pipeline fracture. Patching band karo, pipeline replacement sanction karo."*
+> **Why unique:** Existing analytics sirf static historical pie charts dikhate hain. Hum reactive governance ko proactive predictive governance banate hain.
+
+---
+
+### 9. 📋 **AI Officer Brief — 30 Second Mein Poori Picture**
+Officer ko 10 page lambi complaint nahi padhni — ek concise one-page operational brief: kya hua, kahan hua, kitna urgent hai, kaun affected hai, pehle kya hua tha, aur ab kya karna chahiye.
+> **Why unique:** Field engineers aur officers ka ghanton ka paperwork bachta hai, leading to faster ground action.
+
+---
+
+### 10. 🛡️ **Human-in-the-Loop by Design — AI Recommend Karega, Decide Nahi**
+AI kabhi complaint unilaterally reject ya close nahi karta, aur budget sanction decide nahi karta. Har recommendation ko authorized officer accept, modify, ya reject karta hai — aur har human action tamper-proof audit log mein record hota hai.
+> **Why unique:** Yeh sirf ek marketing disclaimer nahi, platform ke software architecture ka hissa hai. Government-ready, transparent, aur accountable.
 
 ---
 
