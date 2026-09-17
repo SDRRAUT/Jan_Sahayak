@@ -42,7 +42,7 @@ export default function Footer() {
                 <Shield style={{ width: '20px', height: '20px', color: '#FFFFFF' }} />
               </div>
               <div>
-                <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#FFFFFF' }}>JanSahayk (जनसहायक)</h3>
+                <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#FFFFFF' }}>JanSahayak (जनसहायक)</h3>
                 <p style={{ fontSize: '12px', color: 'var(--color-accent)' }}>Aapki Awaaz, Ab Samjhi Jayegi</p>
               </div>
             </div>
@@ -55,12 +55,11 @@ export default function Footer() {
                 marginBottom: '20px'
               }}
             >
-              India’s first AI-powered public grievance analysis & resolution recommendation platform.
-              Bridging citizens and governance with Grievance DNA™ architecture.
+              India’s public grievance intelligence platform. Translating unstructured citizen voice and text into structured insights, connected evidence, and actionable resolution recommendations.
             </p>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 12px', borderRadius: '9999px', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
               <span className="status-dot active"></span>
-              <span style={{ fontSize: '12px', fontWeight: 600, color: '#10B981' }}>22 Indian Languages Active</span>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: '#10B981' }}>Multilingual Citizen Access (22 Languages)</span>
             </div>
           </div>
 
@@ -135,12 +134,10 @@ export default function Footer() {
           }}
         >
           <div>
-            © 2026 JanSahayk Platform. All rights reserved. Problem Track AI-04.
+            © 2026 JanSahayak (जनसहायक). Public Grievance Intelligence Platform.
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <span>Built with Luminary Architectural Design System</span>
-            <span>•</span>
-            <span style={{ color: '#10B981', fontWeight: 600 }}>Zero Cyberpunk AI Clichés</span>
+            <span style={{ color: '#10B981', fontWeight: 600 }}>Closed-Loop Civic Governance</span>
           </div>
         </div>
       </div>

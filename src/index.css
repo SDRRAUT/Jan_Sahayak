@@ -45,6 +45,12 @@
   --color-error-bg:               #FEF2F2;
   --color-error-text:             #991B1B;
 
+  /* AI Intelligence Accent (Subtle, Not Dominant) */
+  --color-ai-accent:              #4F46E5;
+  --color-ai-tint:                #EEF2FF;
+  --color-ai-border:              rgba(79, 70, 229, 0.20);
+  --color-ai-text:                #4338CA;
+
   /* Typography Families */
   --font-display:                 'Fraunces', Georgia, serif;
   --font-sans:                    'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -412,6 +418,83 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ==========================================================================
+   Intelligent Civic UX & Explainability Utilities
+   ========================================================================== */
+
+/* Signature "Why?" Explainable AI Pattern */
+.why-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-ai-text);
+  background: var(--color-ai-tint);
+  border: 1px solid var(--color-ai-border);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.why-trigger:hover {
+  background: #E0E7FF;
+  border-color: #818CF8;
+  transform: translateY(-1px);
+}
+
+.why-panel {
+  background: #FFFFFF;
+  border: 1px solid var(--color-ai-border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: var(--shadow-card-hover);
+  margin-top: 10px;
+  animation: fadeIn 200ms ease-out;
+}
+
+/* Prototype / Pilot Honesty Tag */
+.pilot-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: #F1F5F9;
+  color: #475569;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+/* Evidence Card Pill */
+.evidence-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: #F8F9FA;
+  border: 1px solid var(--color-border-subtle);
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) ease;
+}
+
+.evidence-pill:hover {
+  background: #FFFFFF;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ==========================================================================
    Responsive Breakpoint Architecture (Section 14 of website-ui-ux.md)
    ========================================================================== */
 
@@ -454,6 +537,10 @@ h1, h2, h3, h4, h5, h6 {
 @media (max-width: 767px) {
   .hidden-mobile {
     display: none !important;
+  }
+
+  .mobile-hamburger {
+    display: block !important;
   }
 
   /* Full touch targets (44px minimum for WCAG AA compliance) */

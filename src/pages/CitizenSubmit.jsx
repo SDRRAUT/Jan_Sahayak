@@ -26,6 +26,7 @@ import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
 import { analyzeGrievanceInput } from '../services/aiEngine';
 import GrievanceDnaCard from '../components/common/GrievanceDnaCard';
+import WhyExplainer from '../components/common/WhyExplainer';
 
 export default function CitizenSubmit() {
   const navigate = useNavigate();
@@ -51,6 +52,7 @@ export default function CitizenSubmit() {
   const [severityLevel, setSeverityLevel] = useState('HIGH');
   const [affectedCount, setAffectedCount] = useState('50+ Families');
   const [gpsDetected, setGpsDetected] = useState(false);
+  const [showLocationDetails, setShowLocationDetails] = useState(false);
 
   // Multimodal Inputs State
   const [isRecording, setIsRecording] = useState(false);
@@ -218,13 +220,13 @@ export default function CitizenSubmit() {
           <div>
             <div className="category-pill" style={{ marginBottom: '10px' }}>
               <Sparkles style={{ width: '13px', height: '13px' }} />
-              <span>AI-ASSISTED CITIZEN INTAKE • जनसहायक पोर्टल</span>
+              <span>CITIZEN ACCESS • जनसहायक</span>
             </div>
-            <h1 style={{ fontSize: '34px', marginBottom: '8px' }}>
-              File a Public Grievance
+            <h1 style={{ fontSize: '36px', marginBottom: '8px', color: 'var(--color-text-primary)' }}>
+              What happened?
             </h1>
-            <p style={{ color: 'var(--color-text-secondary)', fontSize: '15px' }}>
-              Write or speak in your natural language (Hindi, Hinglish, or English). JanSahayk AI structures your report, identifies the correct department, and alerts responsible officers.
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: '15px', maxWidth: '640px' }}>
+              Tell us about your problem in your own words. JanSahayak will automatically extract category, location, severity, and the responsible authority.
             </p>
           </div>
 
@@ -437,105 +439,15 @@ export default function CitizenSubmit() {
           gap: '32px',
           alignItems: 'start'
         }}>
-          {/* Left Column: Comprehensive Submission Form (7 Cols) */}
+          {/* Left Column: Simple Citizen Intake Form (7 Cols) */}
           <div style={{ gridColumn: 'span 7' }} className="hero-left-col">
             <form onSubmit={handleProceedToReview} className="card" style={{ padding: '32px' }}>
               
-              {/* Location Selectors with GPS detection */}
-              <div style={{ marginBottom: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <label style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-text-muted)' }}>
-                    Location & Jurisdiction
-                  </label>
-                  <button
-                    type="button"
-                    onClick={handleGpsDetect}
-                    style={{
-                      border: 'none',
-                      background: 'none',
-                      fontSize: '11px',
-                      fontWeight: 600,
-                      color: gpsDetected ? '#059669' : 'var(--color-primary)',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <Navigation style={{ width: '12px', height: '12px' }} />
-                    <span>{gpsDetected ? 'GPS Coordinates Locked ✓' : 'Auto-Detect Current GPS'}</span>
-                  </button>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 0.8fr', gap: '12px' }}>
-                  <div>
-                    <select
-                      value={ward}
-                      onChange={(e) => setWard(e.target.value)}
-                      style={{
-                        width: '100%',
-                        height: '42px',
-                        borderRadius: 'var(--radius-md)',
-                        border: '1px solid var(--color-border-medium)',
-                        padding: '0 10px',
-                        background: '#FFFFFF',
-                        fontSize: '13px',
-                        color: 'var(--color-text-primary)'
-                      }}
-                    >
-                      <option value="Ward 14 (Rohini Sector 14)">Ward 14 (Rohini Sector 14)</option>
-                      <option value="Ward 8 (Lajpat Nagar / Moolchand)">Ward 8 (Lajpat Nagar / Moolchand)</option>
-                      <option value="Ward 22 (Mayur Vihar Ph-1)">Ward 22 (Mayur Vihar Ph-1)</option>
-                      <option value="Ward 5 (Kalkaji / South)">Ward 5 (Kalkaji / South)</option>
-                      <option value="Ward 19 (Karol Bagh)">Ward 19 (Karol Bagh)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <input
-                      type="text"
-                      value={area}
-                      onChange={(e) => setArea(e.target.value)}
-                      placeholder="Local Area / Landmark"
-                      style={{
-                        width: '100%',
-                        height: '42px',
-                        borderRadius: 'var(--radius-md)',
-                        border: '1px solid var(--color-border-medium)',
-                        padding: '0 10px',
-                        background: '#FFFFFF',
-                        fontSize: '13px',
-                        color: 'var(--color-text-primary)'
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <input
-                      type="text"
-                      value={pincode}
-                      onChange={(e) => setPincode(e.target.value)}
-                      placeholder="Pincode"
-                      style={{
-                        width: '100%',
-                        height: '42px',
-                        borderRadius: 'var(--radius-md)',
-                        border: '1px solid var(--color-border-medium)',
-                        padding: '0 10px',
-                        background: '#FFFFFF',
-                        fontSize: '13px',
-                        color: 'var(--color-text-primary)'
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Main Description Input with Voice and Media Toolbar */}
-              <div style={{ marginBottom: '20px' }}>
+              {/* Primary Prompt & Textarea */}
+              <div style={{ marginBottom: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <label style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                    Describe the Issue (Voice or Text)
+                  <label style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                    Describe your problem
                   </label>
                   <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
                     Hindi • Hinglish • English accepted
@@ -546,7 +458,7 @@ export default function CitizenSubmit() {
                   rows={5}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Apni pareshani yahan likhein ya mic daba kar bolein... (Jaise: Gali No. 4 mein 3 din se pipeline tooti hai aur ganda paani aa raha hai)"
+                  placeholder="Tell us what happened in your own words... (e.g. Sector 14 mein 3 din se ganda paani aa raha hai near Mother Dairy booth)"
                   style={{
                     width: '100%',
                     borderRadius: 'var(--radius-md)',
@@ -561,7 +473,7 @@ export default function CitizenSubmit() {
                   required
                 />
 
-                {/* Multimodal Input Toolbar: Voice, Photo, Video, Document */}
+                {/* 4 Quick Action Toolbar: Speak, Type, Add Photo, Add Location */}
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -575,7 +487,7 @@ export default function CitizenSubmit() {
                   border: '1px solid var(--color-border-subtle)'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                    {/* Voice Button */}
+                    {/* Speak */}
                     <button
                       type="button"
                       onClick={isRecording ? () => setIsRecording(false) : handleStartVoice}
@@ -601,12 +513,12 @@ export default function CitizenSubmit() {
                       ) : (
                         <>
                           <Mic style={{ width: '13px', height: '13px', color: 'var(--color-primary)' }} />
-                          <span>Speak (Hindi / English)</span>
+                          <span>Speak</span>
                         </>
                       )}
                     </button>
 
-                    {/* Camera Button */}
+                    {/* Add Photo */}
                     <button
                       type="button"
                       onClick={handleSimulatePhoto}
@@ -628,16 +540,16 @@ export default function CitizenSubmit() {
                       <span>{hasPhoto ? 'Photo Added ✓' : 'Add Photo'}</span>
                     </button>
 
-                    {/* Video Button */}
+                    {/* Add Location Toggle */}
                     <button
                       type="button"
-                      onClick={handleSimulateVideo}
+                      onClick={() => setShowLocationDetails(!showLocationDetails)}
                       style={{
                         padding: '6px 12px',
                         borderRadius: '9999px',
-                        background: hasVideo ? '#EFF6FF' : '#FFFFFF',
-                        border: hasVideo ? '1px solid #93C5FD' : '1px solid var(--color-border-medium)',
-                        color: hasVideo ? '#1D4ED8' : 'var(--color-text-primary)',
+                        background: showLocationDetails || gpsDetected ? '#ECFDF5' : '#FFFFFF',
+                        border: showLocationDetails || gpsDetected ? '1px solid #10B981' : '1px solid var(--color-border-medium)',
+                        color: showLocationDetails || gpsDetected ? '#065F46' : 'var(--color-text-primary)',
                         fontSize: '12px',
                         fontWeight: 600,
                         display: 'inline-flex',
@@ -646,35 +558,13 @@ export default function CitizenSubmit() {
                         cursor: 'pointer'
                       }}
                     >
-                      <Video style={{ width: '13px', height: '13px' }} />
-                      <span>{hasVideo ? 'Video Clip Added ✓' : 'Add Video'}</span>
-                    </button>
-
-                    {/* Document Button */}
-                    <button
-                      type="button"
-                      onClick={handleSimulateDocument}
-                      style={{
-                        padding: '6px 12px',
-                        borderRadius: '9999px',
-                        background: hasDocument ? '#FAF5FF' : '#FFFFFF',
-                        border: hasDocument ? '1px solid #D8B4FE' : '1px solid var(--color-border-medium)',
-                        color: hasDocument ? '#7E22CE' : 'var(--color-text-primary)',
-                        fontSize: '12px',
-                        fontWeight: 600,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <FileText style={{ width: '13px', height: '13px' }} />
-                      <span>{hasDocument ? 'PDF Bill Added ✓' : 'Add Document'}</span>
+                      <MapPin style={{ width: '13px', height: '13px' }} />
+                      <span>{gpsDetected ? 'GPS Locked ✓' : (showLocationDetails ? 'Location Open' : 'Add Location')}</span>
                     </button>
                   </div>
 
                   <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                    AI parses all evidence in real time
+                    Auto-inferred by JanSahayak
                   </span>
                 </div>
 
@@ -686,83 +576,182 @@ export default function CitizenSubmit() {
                       <button type="button" onClick={() => setHasPhoto(false)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#065F46' }}>×</button>
                     </div>
                   )}
-                  {hasVideo && (
-                    <div style={{ padding: '6px 12px', borderRadius: 'var(--radius-sm)', background: '#EFF6FF', border: '1px solid #BFDBFE', fontSize: '12px', color: '#1E40AF', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span>🎥 {videoTag}</span>
-                      <button type="button" onClick={() => setHasVideo(false)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#1E40AF' }}>×</button>
-                    </div>
-                  )}
-                  {hasDocument && (
-                    <div style={{ padding: '6px 12px', borderRadius: 'var(--radius-sm)', background: '#FAF5FF', border: '1px solid #E9D5FF', fontSize: '12px', color: '#6B21A8', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span>📄 {documentTag}</span>
-                      <button type="button" onClick={() => setHasDocument(false)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#6B21A8' }}>×</button>
-                    </div>
-                  )}
                 </div>
               </div>
 
-              {/* Metadata & Severity Selectors */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '16px',
-                padding: '16px',
-                borderRadius: 'var(--radius-md)',
-                background: '#F8F9FA',
-                marginBottom: '20px'
-              }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '6px' }}>
-                    Severity / Urgency Level
-                  </label>
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    {['NORMAL', 'HIGH', 'CRITICAL'].map((lvl) => (
-                      <button
-                        key={lvl}
-                        type="button"
-                        onClick={() => setSeverityLevel(lvl)}
-                        style={{
-                          flex: 1,
-                          height: '34px',
-                          borderRadius: 'var(--radius-sm)',
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          border: severityLevel === lvl ? 'none' : '1px solid var(--color-border-medium)',
-                          background: severityLevel === lvl ? (lvl === 'CRITICAL' ? '#EF4444' : (lvl === 'HIGH' ? '#F59E0B' : 'var(--color-primary)')) : '#FFFFFF',
-                          color: severityLevel === lvl ? '#FFFFFF' : 'var(--color-text-secondary)',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {lvl}
-                      </button>
-                    ))}
+              {/* Collapsible Location & Additional Details */}
+              {showLocationDetails && (
+                <div style={{
+                  padding: '16px',
+                  borderRadius: 'var(--radius-md)',
+                  background: '#F8F9FA',
+                  border: '1px solid var(--color-border-subtle)',
+                  marginBottom: '20px',
+                  animation: 'fadeIn 200ms ease-out'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
+                      Location Details (Optional)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleGpsDetect}
+                      style={{
+                        border: 'none',
+                        background: 'none',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        color: gpsDetected ? '#059669' : 'var(--color-primary)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Navigation style={{ width: '12px', height: '12px' }} />
+                      <span>{gpsDetected ? 'GPS Coordinates Locked ✓' : 'Detect GPS'}</span>
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 0.8fr', gap: '10px' }}>
+                    <select
+                      value={ward}
+                      onChange={(e) => setWard(e.target.value)}
+                      style={{
+                        width: '100%',
+                        height: '38px',
+                        borderRadius: 'var(--radius-sm)',
+                        border: '1px solid var(--color-border-medium)',
+                        padding: '0 8px',
+                        background: '#FFFFFF',
+                        fontSize: '12px'
+                      }}
+                    >
+                      <option value="Ward 14 (Rohini Sector 14)">Ward 14 (Rohini Sector 14)</option>
+                      <option value="Ward 8 (Lajpat Nagar / Moolchand)">Ward 8 (Lajpat Nagar / Moolchand)</option>
+                      <option value="Ward 22 (Mayur Vihar Ph-1)">Ward 22 (Mayur Vihar Ph-1)</option>
+                      <option value="Ward 5 (Kalkaji / South)">Ward 5 (Kalkaji / South)</option>
+                      <option value="Ward 19 (Karol Bagh)">Ward 19 (Karol Bagh)</option>
+                    </select>
+
+                    <input
+                      type="text"
+                      value={area}
+                      onChange={(e) => setArea(e.target.value)}
+                      placeholder="Local Area / Landmark"
+                      style={{
+                        width: '100%',
+                        height: '38px',
+                        borderRadius: 'var(--radius-sm)',
+                        border: '1px solid var(--color-border-medium)',
+                        padding: '0 8px',
+                        background: '#FFFFFF',
+                        fontSize: '12px'
+                      }}
+                    />
+
+                    <input
+                      type="text"
+                      value={pincode}
+                      onChange={(e) => setPincode(e.target.value)}
+                      placeholder="Pincode"
+                      style={{
+                        width: '100%',
+                        height: '38px',
+                        borderRadius: 'var(--radius-sm)',
+                        border: '1px solid var(--color-border-medium)',
+                        padding: '0 8px',
+                        background: '#FFFFFF',
+                        fontSize: '12px'
+                      }}
+                    />
                   </div>
                 </div>
+              )}
 
-                <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '6px' }}>
-                    Estimated Affected Citizens
-                  </label>
-                  <select
-                    value={affectedCount}
-                    onChange={(e) => setAffectedCount(e.target.value)}
-                    style={{
-                      width: '100%',
-                      height: '34px',
-                      borderRadius: 'var(--radius-sm)',
-                      border: '1px solid var(--color-border-medium)',
-                      padding: '0 8px',
-                      fontSize: '12px',
-                      background: '#FFFFFF'
-                    }}
-                  >
-                    <option value="1-5 Households">1-5 Households (Local)</option>
-                    <option value="10-25 Households">10-25 Households (Street)</option>
-                    <option value="50+ Families">50+ Families (Sub-locality)</option>
-                    <option value="Entire Colony / 500+">Entire Colony / 500+ (Widespread)</option>
-                  </select>
+              {/* "Here's what we understood." Inferred Summary Card (Section 18) */}
+              {liveDna && description.trim().length > 10 && (
+                <div style={{
+                  padding: '20px',
+                  borderRadius: 'var(--radius-lg)',
+                  background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FDF9 100%)',
+                  border: '1px solid #10B981',
+                  marginBottom: '20px',
+                  boxShadow: 'var(--shadow-sm)',
+                  animation: 'fadeIn 200ms ease-out'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <CheckCircle2 style={{ width: '18px', height: '18px', color: '#10B981' }} />
+                      <strong style={{ fontSize: '15px', color: 'var(--color-text-primary)' }}>
+                        Here's what we understood
+                      </strong>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: 'var(--radius-full)', background: severityLevel === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB', color: severityLevel === 'CRITICAL' ? '#991B1B' : '#92400E' }}>
+                        ● Priority: {severityLevel}
+                      </span>
+                      <WhyExplainer
+                        label="Why?"
+                        title="Why this Priority?"
+                        reasons={[
+                          'Biohazard & contaminant keywords identified',
+                          'Ward 14 historic response compliance rule active',
+                          'Residential population density in area'
+                        ]}
+                        align="right"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Summary Grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: '16px' }}>
+                    <div style={{ padding: '8px 10px', borderRadius: 'var(--radius-sm)', background: '#FFFFFF', border: '1px solid rgba(16,185,129,0.2)' }}>
+                      <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'block' }}>Category</span>
+                      <strong style={{ fontSize: '12px', color: 'var(--color-text-primary)' }}>{liveDna.category}</strong>
+                    </div>
+
+                    <div style={{ padding: '8px 10px', borderRadius: 'var(--radius-sm)', background: '#FFFFFF', border: '1px solid rgba(16,185,129,0.2)' }}>
+                      <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'block' }}>Responsible Dept</span>
+                      <strong style={{ fontSize: '12px', color: 'var(--color-primary)' }}>{liveDna.department?.split('(')[0]}</strong>
+                    </div>
+
+                    <div style={{ padding: '8px 10px', borderRadius: 'var(--radius-sm)', background: '#FFFFFF', border: '1px solid rgba(16,185,129,0.2)' }}>
+                      <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'block' }}>Location</span>
+                      <strong style={{ fontSize: '12px', color: 'var(--color-text-primary)' }}>{ward.split('(')[0]}</strong>
+                    </div>
+
+                    <div style={{ padding: '8px 10px', borderRadius: 'var(--radius-sm)', background: '#FFFFFF', border: '1px solid rgba(16,185,129,0.2)' }}>
+                      <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'block' }}>Est. Impact</span>
+                      <strong style={{ fontSize: '12px', color: 'var(--color-text-primary)' }}>Area-wide (~450 families)</strong>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', paddingTop: '10px', borderTop: '1px solid rgba(16,185,129,0.2)' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#065F46' }}>
+                      Is this correct?
+                    </span>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setShowAiReviewModal(true)}
+                        className="btn-secondary btn-sm"
+                      >
+                        Adjust Details
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleConfirmSubmission}
+                        disabled={isSubmitting}
+                        className="btn-primary btn-sm"
+                        style={{ background: '#10B981', color: '#FFFFFF', padding: '0 16px' }}
+                      >
+                        <span>{isSubmitting ? 'Submitting...' : 'YES, CONTINUE →'}</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Citizen Contact Strip */}
               <div style={{
@@ -772,7 +761,7 @@ export default function CitizenSubmit() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: '24px',
+                marginBottom: '20px',
                 fontSize: '12px'
               }}>
                 <div>
@@ -780,20 +769,22 @@ export default function CitizenSubmit() {
                   <strong>{citizenInfo.name}</strong> ({citizenInfo.phone})
                 </div>
                 <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
-                  ✓ Instant SMS & WhatsApp Dispatch
+                  ✓ Instant SMS Dispatch
                 </span>
               </div>
 
-              {/* Next Step CTA */}
-              <button
-                type="submit"
-                disabled={!description.trim() || isSubmitting}
-                className="btn-primary"
-                style={{ width: '100%', height: '52px', fontSize: '15px' }}
-              >
-                <span>Review AI Structure & Submit Grievance</span>
-                <ArrowRight className="btn-arrow" style={{ width: '18px', height: '18px' }} />
-              </button>
+              {/* Proceed Button */}
+              {(!liveDna || description.trim().length <= 10) && (
+                <button
+                  type="submit"
+                  disabled={!description.trim() || isSubmitting}
+                  className="btn-primary"
+                  style={{ width: '100%', height: '50px', fontSize: '15px' }}
+                >
+                  <span>Review & Continue</span>
+                  <ArrowRight className="btn-arrow" style={{ width: '18px', height: '18px' }} />
+                </button>
+              )}
             </form>
           </div>
 
