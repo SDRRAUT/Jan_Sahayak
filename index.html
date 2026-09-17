@@ -28,26 +28,61 @@
     <meta property="og:image" content="/logo.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="/logo.png" />
+    <!-- Automatic Cache Purge & Service Worker Unregistration to prevent blank screen 404s -->
+    <script>
+      (function() {
+        // 1. Unregister all service workers and purge caches immediately
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            var hadWorker = registrations.length > 0;
+            for (var i = 0; i < registrations.length; i++) {
+              registrations[i].unregister();
+            }
+            // If the page was controlled by an old service worker, auto-reload once to bypass its cache
+            if ((hadWorker || navigator.serviceWorker.controller) && !sessionStorage.getItem('sw_purged_v3')) {
+              sessionStorage.setItem('sw_purged_v3', '1');
+              window.location.reload();
+            }
+          }).catch(function() {});
+        }
+
+        // 2. Clear stale CacheStorage immediately
+        if (typeof window !== 'undefined' && 'caches' in window) {
+          caches.keys().then(function(keys) {
+            for (var i = 0; i < keys.length; i++) {
+              caches.delete(keys[i]);
+            }
+          }).catch(function() {});
+        }
+
+        // 3. Auto-recover from Vite dynamic chunk loading errors (new deployment chunk mismatch)
+        window.addEventListener('vite:preloadError', function(event) {
+          event.preventDefault();
+          if (!sessionStorage.getItem('vite_chunk_reloaded')) {
+            sessionStorage.setItem('vite_chunk_reloaded', '1');
+            window.location.reload();
+          }
+        });
+
+        // 4. Global error listener for failed module script imports
+        window.addEventListener('error', function(event) {
+          var msg = event && event.message ? String(event.message) : '';
+          if (
+            msg.indexOf('Failed to fetch dynamically imported module') !== -1 ||
+            msg.indexOf('error loading dynamically imported module') !== -1 ||
+            msg.indexOf('Loading chunk') !== -1
+          ) {
+            if (!sessionStorage.getItem('vite_chunk_reloaded')) {
+              sessionStorage.setItem('vite_chunk_reloaded', '1');
+              window.location.reload();
+            }
+          }
+        });
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    <script>
-      // Clear legacy service worker registrations and caches to prevent blank screen 404s
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then((registrations) => {
-          for (const registration of registrations) {
-            registration.unregister();
-          }
-        }).catch(() => {});
-      }
-      if (typeof window !== 'undefined' && 'caches' in window) {
-        caches.keys().then((keys) => {
-          for (const key of keys) {
-            caches.delete(key);
-          }
-        }).catch(() => {});
-      }
-    </script>
   </body>
 </html>

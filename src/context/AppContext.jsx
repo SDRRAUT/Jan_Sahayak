@@ -78,8 +78,13 @@ export function AppProvider({ children }) {
   // Session & User State (Clean start for first-time visitors)
   const [token, setToken] = useState(() => localStorage.getItem('jansahayk_token') || null);
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('jansahayk_user');
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem('jansahayk_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      localStorage.removeItem('jansahayk_user');
+      return null;
+    }
   });
 
   const [grievances, setGrievances] = useState(() => {
@@ -109,18 +114,30 @@ export function AppProvider({ children }) {
   });
 
   const [civicIncidents, setCivicIncidents] = useState(() => {
-    const saved = localStorage.getItem('jansahayk_incidents');
-    return saved ? JSON.parse(saved) : CIVIC_INCIDENTS;
+    try {
+      const saved = localStorage.getItem('jansahayk_incidents');
+      return saved ? JSON.parse(saved) : CIVIC_INCIDENTS;
+    } catch (e) {
+      return CIVIC_INCIDENTS;
+    }
   });
 
   const [civicSignals, setCivicSignals] = useState(() => {
-    const saved = localStorage.getItem('jansahayk_signals');
-    return saved ? JSON.parse(saved) : CIVIC_SIGNALS;
+    try {
+      const saved = localStorage.getItem('jansahayk_signals');
+      return saved ? JSON.parse(saved) : CIVIC_SIGNALS;
+    } catch (e) {
+      return CIVIC_SIGNALS;
+    }
   });
 
   const [notifications, setNotifications] = useState(() => {
-    const saved = localStorage.getItem('jansahayk_notifications');
-    return saved ? JSON.parse(saved) : INITIAL_NOTIFICATIONS;
+    try {
+      const saved = localStorage.getItem('jansahayk_notifications');
+      return saved ? JSON.parse(saved) : INITIAL_NOTIFICATIONS;
+    } catch (e) {
+      return INITIAL_NOTIFICATIONS;
+    }
   });
 
   const [auditLogs, setAuditLogs] = useState([]);
