@@ -24,62 +24,84 @@ import {
   Filter,
   Eye,
   Sliders,
-  History
+  History,
+  Radio
 } from 'lucide-react';
 import WhyExplainer from '../components/common/WhyExplainer';
 import { INITIAL_GRIEVANCES, SYSTEM_METRICS } from '../data/mockGrievances';
 
 export default function Home() {
-  // 10-Second Demo Active Step: 0 (Voice), 1 (Understands), 2 (Pattern), 3 (Action)
-  const [demoStep, setDemoStep] = useState(1);
-  const [demoAutoPlay, setDemoAutoPlay] = useState(false);
+  // 20-Second End-to-End Civic Intelligence Lifecycle Demo
+  const [demoStep, setDemoStep] = useState(0);
+  const [demoAutoPlay, setDemoAutoPlay] = useState(true);
+  const [demoSeconds, setDemoSeconds] = useState(0);
+  const [citizenVerified, setCitizenVerified] = useState(false);
 
-  // Real Civic Examples Tab
-  const [activeExampleIndex, setActiveExampleIndex] = useState(0);
-
-  // Civic Map Filter & Active Ward
-  const [mapCategory, setMapCategory] = useState('ALL');
-  const [activeWardIndex, setActiveWardIndex] = useState(0);
-
-  // Track Grievance Quick Input
-  const [quickTrackId, setQuickTrackId] = useState('');
-
-  // 10-Second Demo Data
+  // 5-Stage Complete Flow from Citizen Voice to Civic Intelligence to Verified Resolution
   const demoPhases = [
     {
       id: 0,
-      phase: 'CITIZEN VOICE',
+      shortName: '01 REGISTER',
+      phase: 'CITIZEN INTAKE',
       title: 'Everyday Citizen Voice / Text',
-      pill: 'Input Received'
+      pill: 'Voice Note Ingested',
+      timeRange: '0s - 4s'
     },
     {
       id: 1,
-      phase: 'JAN_SAHAYAK UNDERSTANDS',
-      title: 'Extracted Infrastructure Meaning',
-      pill: 'AI Understanding'
+      shortName: '02 UNDERSTAND',
+      phase: 'DNA EXTRACTION',
+      title: 'Multimodal AI & Complaint DNA',
+      pill: 'DNA-W14-892',
+      timeRange: '4s - 8s'
     },
     {
       id: 2,
-      phase: 'PATTERN DETECTED',
-      title: 'Correlated Ward Intelligence',
-      pill: 'Pattern Alert'
+      shortName: '03 INTELLIGENCE',
+      phase: 'CIVIC LINKAGE',
+      title: 'Civic Linkage & Clustering',
+      pill: '17 Reports → 1 Incident',
+      timeRange: '8s - 12s'
     },
     {
       id: 3,
-      phase: 'RECOMMENDED ACTION',
-      title: 'Evidence-Backed Action for Officer',
-      pill: 'Decision Support'
+      shortName: '04 DISPATCH',
+      phase: 'DECISION & DISPATCH',
+      title: 'Action Simulation & SLA',
+      pill: 'Field Crew Dispatched',
+      timeRange: '12s - 16s'
+    },
+    {
+      id: 4,
+      shortName: '05 VERIFY',
+      phase: 'CITIZEN VERIFY',
+      title: 'Closed-Loop Citizen Sign-Off',
+      pill: 'Verified Resolution',
+      timeRange: '16s - 20s'
     }
   ];
 
-  // Auto-advance 10-second demo if enabled
+  // Auto-advance 20-second demo timer (4s per stage = 20s full loop)
   useEffect(() => {
     if (!demoAutoPlay) return;
     const timer = setInterval(() => {
-      setDemoStep((prev) => (prev + 1) % 4);
-    }, 3500);
+      setDemoSeconds((prev) => {
+        const nextSec = (prev + 1) % 20;
+        const currentStep = Math.floor(nextSec / 4);
+        setDemoStep(currentStep);
+        if (currentStep === 4) setCitizenVerified(true);
+        if (currentStep === 0) setCitizenVerified(false);
+        return nextSec;
+      });
+    }, 1000);
     return () => clearInterval(timer);
   }, [demoAutoPlay]);
+
+  const handleStepJump = (stepId) => {
+    setDemoStep(stepId);
+    setDemoSeconds(stepId * 4);
+    if (stepId === 4) setCitizenVerified(true);
+  };
 
   // Civic Examples Data (Section 15)
   const civicExamples = [
@@ -279,107 +301,181 @@ export default function Home() {
             </div>
 
             {/* ==========================================================================
-                03. 10-SECOND PRODUCT DEMONSTRATION (Hero Right Visual)
+                03. 20-SECOND PRODUCT DEMONSTRATION (Hero Right Visual)
                 ========================================================================== */}
             <div style={{ gridColumn: 'span 5' }} className="hero-right-col">
               <div
                 className="card"
                 style={{
-                  padding: '24px',
+                  padding: '22px',
                   background: '#FFFFFF',
                   borderRadius: 'var(--radius-xl)',
                   boxShadow: 'var(--shadow-card-hover)',
-                  border: '1px solid rgba(15, 23, 42, 0.1)'
+                  border: '1px solid rgba(15, 23, 42, 0.1)',
+                  position: 'relative'
                 }}
               >
-                {/* Visual Flow Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                {/* Visual Flow Header & 20s Timer Controls */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                   <div>
-                    <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-primary)' }}>
-                      10-Second Demonstration
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span className="status-dot active" style={{ width: '6px', height: '6px' }} />
+                      <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-primary)' }}>
+                        20-Second Live Demonstration
+                      </span>
+                    </div>
                     <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: '2px' }}>
-                      How JanSahayak Works
+                      Citizen-to-Resolution Lifecycle
                     </h3>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setDemoAutoPlay(!demoAutoPlay)}
-                    style={{
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{
+                      fontFamily: 'var(--font-mono)',
                       fontSize: '11px',
-                      fontWeight: 600,
-                      padding: '4px 10px',
-                      borderRadius: 'var(--radius-full)',
-                      background: demoAutoPlay ? '#ECFDF5' : '#F1F5F9',
-                      color: demoAutoPlay ? '#065F46' : 'var(--color-text-secondary)'
-                    }}
-                  >
-                    {demoAutoPlay ? '● Autoplay Active' : '▶ Play Steps'}
-                  </button>
+                      fontWeight: 700,
+                      color: 'var(--color-text-primary)',
+                      background: '#F1F5F9',
+                      padding: '3px 7px',
+                      borderRadius: '4px'
+                    }}>
+                      00:{String(demoSeconds).padStart(2, '0')} / 00:20s
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() => setDemoAutoPlay(!demoAutoPlay)}
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        padding: '4px 9px',
+                        borderRadius: 'var(--radius-full)',
+                        background: demoAutoPlay ? '#ECFDF5' : '#F1F5F9',
+                        color: demoAutoPlay ? '#065F46' : 'var(--color-text-secondary)',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
+                      title={demoAutoPlay ? 'Pause 20s autoplay' : 'Play 20s autoplay'}
+                    >
+                      {demoAutoPlay ? '⏸ Pause' : '▶ Play 20s'}
+                    </button>
+                  </div>
                 </div>
 
-                {/* 4-Stage Stepper Buttons */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px', marginBottom: '16px', background: '#F1F5F9', padding: '3px', borderRadius: 'var(--radius-md)' }}>
+                {/* 20-Second Animated Progress Bar */}
+                <div style={{
+                  width: '100%',
+                  height: '4px',
+                  background: '#E2E8F0',
+                  borderRadius: '9999px',
+                  marginBottom: '14px',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${(demoSeconds / 20) * 100}%`,
+                    background: 'linear-gradient(90deg, #10B981 0%, #4F46E5 100%)',
+                    borderRadius: '9999px',
+                    transition: 'width 980ms linear'
+                  }} />
+                </div>
+
+                {/* 5-Stage Stepper Navigation Buttons */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(5, 1fr)',
+                  gap: '3px',
+                  marginBottom: '14px',
+                  background: '#F1F5F9',
+                  padding: '3px',
+                  borderRadius: 'var(--radius-md)'
+                }}>
                   {demoPhases.map((p) => (
                     <button
                       key={p.id}
                       type="button"
-                      onClick={() => setDemoStep(p.id)}
+                      onClick={() => handleStepJump(p.id)}
                       style={{
-                        padding: '6px 4px',
+                        padding: '6px 2px',
                         borderRadius: 'var(--radius-sm)',
-                        fontSize: '10px',
+                        fontSize: '9.5px',
                         fontWeight: demoStep === p.id ? 700 : 500,
                         background: demoStep === p.id ? '#FFFFFF' : 'transparent',
                         color: demoStep === p.id ? 'var(--color-primary)' : 'var(--color-text-secondary)',
                         boxShadow: demoStep === p.id ? '0 1px 2px rgba(15,23,42,0.06)' : 'none',
                         textAlign: 'center',
-                        transition: 'all 150ms ease'
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'all 120ms ease',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
                       }}
+                      title={p.title}
                     >
-                      {p.phase.split(' ')[0]}
+                      {p.shortName}
                     </button>
                   ))}
                 </div>
 
-                {/* Stage 0: Citizen Voice */}
+                {/* ================================================================
+                    STAGE 0: Citizen Voice & Complaint Registration (0s - 4s)
+                    ================================================================ */}
                 {demoStep === 0 && (
                   <div style={{ animation: 'fadeIn 200ms ease-out' }}>
-                    <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#F8F9FA', border: '1px solid var(--color-border-subtle)', marginBottom: '14px' }}>
+                    <div style={{ padding: '14px', borderRadius: 'var(--radius-md)', background: '#F8FAFC', border: '1px solid var(--color-border-subtle)', marginBottom: '12px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                        <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>
-                          Incoming Citizen Voice (Hindi/Hinglish)
+                        <span style={{ fontSize: '10.5px', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                          <Radio style={{ width: '12px', height: '12px', color: '#10B981' }} />
+                          Citizen Voice Intake
                         </span>
-                        <span style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: 600 }}>
+                        <span style={{ fontSize: '10px', color: '#065F46', background: '#ECFDF5', padding: '1.5px 6px', borderRadius: '9999px', fontWeight: 700 }}>
                           Ward 14 Resident
                         </span>
                       </div>
-                      <p style={{ fontSize: '14px', fontStyle: 'italic', color: 'var(--color-text-primary)', lineHeight: 1.5 }}>
-                        "Hamare area mein 3 din se naali ka ganda paani supply mein mix hoke aa raha hai near Mother Dairy booth. Bacche bimaar pad rahe hain..."
+
+                      {/* Animated Audio Waveform */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '3px', height: '22px', marginBottom: '8px', padding: '0 8px', background: '#FFFFFF', borderRadius: '6px', border: '1px solid #E2E8F0' }}>
+                        <span style={{ fontSize: '9.5px', color: 'var(--color-text-muted)', fontWeight: 600, marginRight: '6px' }}>0:14s</span>
+                        {[10, 16, 20, 12, 18, 22, 14, 20, 16, 8, 14, 20, 18, 12, 18, 14, 10, 16, 20, 14].map((h, i) => (
+                          <span key={i} style={{ width: '2.5px', height: `${h}px`, background: '#10B981', borderRadius: '2px' }} />
+                        ))}
+                      </div>
+
+                      <p style={{ fontSize: '13px', fontStyle: 'italic', color: 'var(--color-text-primary)', lineHeight: 1.45, margin: 0, background: '#FFFFFF', padding: '9px 11px', borderRadius: '6px', border: '1px solid #E2E8F0' }}>
+                        "Hamare Sector 14, Pocket 2 mein 3 din se naali ka ganda badbudaar paani drinking supply mein mix hoke aa raha hai near Mother Dairy booth... Bacche bimaar pad rahe hain please jaldi theek karwao!"
                       </p>
                     </div>
+
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
-                        Citizens speak in their natural colloquial language.
+                      <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                        Ingested & geo-tagged in 1.2s • No technical forms
                       </span>
-                      <button type="button" onClick={() => setDemoStep(1)} className="btn-primary btn-sm">
-                        <span>See Understanding</span>
-                        <ChevronRight style={{ width: '13px', height: '13px' }} />
+                      <button type="button" onClick={() => handleStepJump(1)} className="btn-primary btn-sm">
+                        <span>See DNA Extraction →</span>
                       </button>
                     </div>
                   </div>
                 )}
 
-                {/* Stage 1: JanSahayak Understands */}
+                {/* ================================================================
+                    STAGE 1: AI Understanding & Complaint DNA (4s - 8s)
+                    ================================================================ */}
                 {demoStep === 1 && (
                   <div style={{ animation: 'fadeIn 200ms ease-out' }}>
-                    <div style={{ padding: '14px', borderRadius: 'var(--radius-md)', background: '#EEF2FF', border: '1px solid rgba(79, 70, 229, 0.2)', marginBottom: '14px' }}>
+                    <div style={{ padding: '13px', borderRadius: 'var(--radius-md)', background: '#EEF2FF', border: '1px solid rgba(79, 70, 229, 0.2)', marginBottom: '12px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                        <span style={{ fontSize: '11px', fontWeight: 800, color: '#4338CA', textTransform: 'uppercase' }}>
-                          JanSahayak Extracts
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Sparkles style={{ width: '13px', height: '13px', color: '#4F46E5' }} />
+                          <span style={{ fontSize: '10.5px', fontWeight: 800, color: '#4338CA', textTransform: 'uppercase' }}>
+                            Complaint DNA Fingerprint
+                          </span>
+                          <span style={{ fontSize: '9.5px', fontFamily: 'var(--font-mono)', background: '#FFFFFF', padding: '1px 5px', borderRadius: '4px', color: '#4F46E5', fontWeight: 600 }}>
+                            DNA-W14-892
+                          </span>
+                        </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <span style={{ fontSize: '11px', fontWeight: 700, color: '#991B1B', background: '#FEF2F2', padding: '2px 6px', borderRadius: 'var(--radius-full)' }}>
+                          <span style={{ fontSize: '10px', fontWeight: 700, color: '#991B1B', background: '#FEF2F2', padding: '2px 6px', borderRadius: '9999px' }}>
                             High Priority
                           </span>
                           <WhyExplainer
@@ -387,103 +483,217 @@ export default function Home() {
                             title="Why High Priority?"
                             reasons={[
                               'Sewage cross-contamination (biological hazard)',
-                              '3 consecutive days of ongoing exposure',
-                              'Public school & dairy booth within 150m'
+                              '3 consecutive days of active exposure',
+                              'Primary school & Mother Dairy booth within 150m'
                             ]}
                             align="right"
                           />
                         </div>
                       </div>
 
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginTop: '10px' }}>
-                        <div style={{ background: '#FFFFFF', padding: '8px 10px', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(79, 70, 229, 0.1)' }}>
-                          <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'block' }}>Category</span>
-                          <strong style={{ fontSize: '12px', color: 'var(--color-text-primary)' }}>💧 Water Supply</strong>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px' }}>
+                        <div style={{ background: '#FFFFFF', padding: '7px 9px', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(79, 70, 229, 0.1)' }}>
+                          <span style={{ fontSize: '9px', color: 'var(--color-text-muted)', display: 'block' }}>Category</span>
+                          <strong style={{ fontSize: '11.5px', color: 'var(--color-text-primary)' }}>💧 Water Contamination</strong>
                         </div>
-                        <div style={{ background: '#FFFFFF', padding: '8px 10px', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(79, 70, 229, 0.1)' }}>
-                          <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'block' }}>Location</span>
-                          <strong style={{ fontSize: '12px', color: 'var(--color-text-primary)' }}>📍 Ward 14 (Rohini)</strong>
+                        <div style={{ background: '#FFFFFF', padding: '7px 9px', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(79, 70, 229, 0.1)' }}>
+                          <span style={{ fontSize: '9px', color: 'var(--color-text-muted)', display: 'block' }}>Location</span>
+                          <strong style={{ fontSize: '11.5px', color: 'var(--color-text-primary)' }}>📍 Rohini Sector 14</strong>
                         </div>
-                        <div style={{ background: '#FFFFFF', padding: '8px 10px', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(79, 70, 229, 0.1)' }}>
-                          <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'block' }}>Duration</span>
-                          <strong style={{ fontSize: '12px', color: 'var(--color-text-primary)' }}>⏱ 3 Days</strong>
+                        <div style={{ background: '#FFFFFF', padding: '7px 9px', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(79, 70, 229, 0.1)' }}>
+                          <span style={{ fontSize: '9px', color: 'var(--color-text-muted)', display: 'block' }}>Duration</span>
+                          <strong style={{ fontSize: '11.5px', color: 'var(--color-text-primary)' }}>⏱ 3 Days Ongoing</strong>
                         </div>
-                        <div style={{ background: '#FFFFFF', padding: '8px 10px', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(79, 70, 229, 0.1)' }}>
-                          <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'block' }}>Estimated Impact</span>
-                          <strong style={{ fontSize: '12px', color: 'var(--color-text-primary)' }}>👥 ~450 Families</strong>
+                        <div style={{ background: '#FFFFFF', padding: '7px 9px', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(79, 70, 229, 0.1)' }}>
+                          <span style={{ fontSize: '9px', color: 'var(--color-text-muted)', display: 'block' }}>Estimated Impact</span>
+                          <strong style={{ fontSize: '11.5px', color: 'var(--color-text-primary)' }}>👥 ~450 Families</strong>
                         </div>
                       </div>
                     </div>
+
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
-                        No dropdown forms required.
+                      <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                        Extracted with 98.4% multi-modal confidence
                       </span>
-                      <button type="button" onClick={() => setDemoStep(2)} className="btn-primary btn-sm">
-                        <span>Check Pattern</span>
-                        <ChevronRight style={{ width: '13px', height: '13px' }} />
+                      <button type="button" onClick={() => handleStepJump(2)} className="btn-primary btn-sm">
+                        <span>Check Intelligence →</span>
                       </button>
                     </div>
                   </div>
                 )}
 
-                {/* Stage 2: Pattern Detected */}
+                {/* ================================================================
+                    STAGE 2: In-Between Civic Intelligence & Linkage (8s - 12s)
+                    ================================================================ */}
                 {demoStep === 2 && (
                   <div style={{ animation: 'fadeIn 200ms ease-out' }}>
-                    <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#FFFBEB', border: '1px solid #FCD34D', marginBottom: '14px' }}>
+                    <div style={{ padding: '13px', borderRadius: 'var(--radius-md)', background: '#FFFBEB', border: '1px solid #FCD34D', marginBottom: '12px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                        <span style={{ fontSize: '11px', fontWeight: 800, color: '#92400E', textTransform: 'uppercase' }}>
-                          Cluster Alert
-                        </span>
-                        <span style={{ fontSize: '11px', fontWeight: 700, color: '#B45309' }}>
-                          POSSIBLE SYSTEMIC ISSUE
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Activity style={{ width: '13px', height: '13px', color: '#D97706' }} />
+                          <span style={{ fontSize: '10.5px', fontWeight: 800, color: '#92400E', textTransform: 'uppercase' }}>
+                            Civic Intelligence Linkage
+                          </span>
+                        </div>
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: '#B45309', background: '#FEF3C7', padding: '1.5px 6px', borderRadius: '4px' }}>
+                          INC-2026-DEL-01
                         </span>
                       </div>
-                      <p style={{ fontSize: '13px', color: '#78350F', lineHeight: 1.5, marginBottom: '10px' }}>
-                        <strong>17 similar complaints</strong> registered across <strong>4 nearby streets</strong> in Sector 14 within 72 hours.
-                      </p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#92400E' }}>
-                        <AlertTriangle style={{ width: '14px', height: '14px', color: '#D97706' }} />
-                        <span>Root Cause: Main feeder valve crack rather than individual house connection</span>
+
+                      <div style={{ background: '#FFFFFF', padding: '9px 11px', borderRadius: '6px', border: '1px solid #FDE68A', marginBottom: '8px' }}>
+                        <div style={{ fontSize: '12px', fontWeight: 700, color: '#92400E', marginBottom: '3px' }}>
+                          17 Complaints Linked Across 400m Corridor
+                        </div>
+                        <p style={{ fontSize: '11px', color: '#78350F', lineHeight: 1.4, margin: 0 }}>
+                          AI clusters 17 isolated reports: Subsurface joint leak in 1988 cast-iron line is softening road subgrade.
+                        </p>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10.5px', color: '#92400E' }}>
+                        <span style={{ fontWeight: 700, color: '#0284C7', background: '#E0F2FE', padding: '1.5px 5px', borderRadius: '4px' }}>DJB Pipe Leak</span>
+                        <span>+</span>
+                        <span style={{ fontWeight: 700, color: '#0E5E3A', background: '#E8F7F0', padding: '1.5px 5px', borderRadius: '4px' }}>PWD Road Sinking</span>
+                        <span>=</span>
+                        <span style={{ fontWeight: 700, color: '#991B1B' }}>Cross-Dept Alert</span>
                       </div>
                     </div>
+
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
-                        Prevents repetitive, isolated work orders.
+                      <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                        100 complaints reduced to 1 systemic problem
                       </span>
-                      <button type="button" onClick={() => setDemoStep(3)} className="btn-primary btn-sm">
-                        <span>Recommended Action</span>
-                        <ChevronRight style={{ width: '13px', height: '13px' }} />
+                      <button type="button" onClick={() => handleStepJump(3)} className="btn-primary btn-sm">
+                        <span>See Field Dispatch →</span>
                       </button>
                     </div>
                   </div>
                 )}
 
-                {/* Stage 3: Recommended Action */}
+                {/* ================================================================
+                    STAGE 3: Action Simulation & Department Dispatch (12s - 16s)
+                    ================================================================ */}
                 {demoStep === 3 && (
                   <div style={{ animation: 'fadeIn 200ms ease-out' }}>
-                    <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#ECFDF5', border: '1px solid #A7F3D0', marginBottom: '14px' }}>
+                    <div style={{ padding: '13px', borderRadius: 'var(--radius-md)', background: '#F0FDF4', border: '1px solid #BBF7D0', marginBottom: '12px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                        <span style={{ fontSize: '11px', fontWeight: 800, color: '#065F46', textTransform: 'uppercase' }}>
-                          Decision Support for Officer
+                        <span style={{ fontSize: '10.5px', fontWeight: 800, color: '#065F46', textTransform: 'uppercase' }}>
+                          Decision Sandbox & Dispatch
                         </span>
-                        <span style={{ fontSize: '11px', color: '#065F46', fontWeight: 600 }}>
-                          Precedent Match (98%)
+                        <span style={{ fontSize: '10px', color: '#047857', background: '#DCFCE7', padding: '1.5px 6px', borderRadius: '9999px', fontWeight: 700 }}>
+                          12h Target SLA
                         </span>
                       </div>
-                      <strong style={{ fontSize: '13px', color: '#065F46', display: 'block', marginBottom: '4px' }}>
-                        Inspect local supply infrastructure & dispatch 100mm repair clamp
-                      </strong>
-                      <p style={{ fontSize: '12px', color: '#047857', lineHeight: 1.4, margin: 0 }}>
-                        DJB Emergency SOP #14 applied. Required equipment: Heavy excavation backhoe + 100mm C.I. repair sleeve.
-                      </p>
+
+                      <div style={{ background: '#FFFFFF', padding: '9px 11px', borderRadius: '6px', border: '1px solid #A7F3D0', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '9.5px', color: 'var(--color-text-muted)', display: 'block', textTransform: 'uppercase', fontWeight: 700 }}>
+                          Simulated Engineering Remedy:
+                        </span>
+                        <strong style={{ fontSize: '12px', color: '#065F46', display: 'block', margin: '2px 0 3px 0' }}>
+                          Ultrasonic Feeder Sleeve & Valve Seal (SOP #14)
+                        </strong>
+                        <span style={{ fontSize: '10.5px', color: '#047857' }}>
+                          Historical Precedent Match: <strong>96% Success</strong> • Prevents road collapse
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: '#064E3B' }}>
+                        <CheckCircle2 style={{ width: '13px', height: '13px', color: '#10B981', flexShrink: 0 }} />
+                        <span>Dispatched to <strong>Er. Sanjay Sharma (AEE DJB)</strong> & PWD Safety Crew</span>
+                      </div>
                     </div>
+
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <button type="button" onClick={() => setDemoStep(0)} style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
-                        ↺ Replay Flow
+                      <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                        Human officer verifies and commits work order
+                      </span>
+                      <button type="button" onClick={() => handleStepJump(4)} className="btn-primary btn-sm">
+                        <span>See Citizen Verify →</span>
                       </button>
-                      <Link to="/officer" className="btn-primary btn-sm">
-                        <span>Open Officer Brief</span>
-                        <ArrowUpRight style={{ width: '13px', height: '13px' }} />
+                    </div>
+                  </div>
+                )}
+
+                {/* ================================================================
+                    STAGE 4: Closed-Loop Citizen Verification (16s - 20s)
+                    ================================================================ */}
+                {demoStep === 4 && (
+                  <div style={{ animation: 'fadeIn 200ms ease-out' }}>
+                    <div style={{ padding: '13px', borderRadius: 'var(--radius-md)', background: '#F8FAFC', border: '1px solid #CBD5E1', marginBottom: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '10.5px', fontWeight: 800, color: 'var(--color-text-primary)', textTransform: 'uppercase' }}>
+                          Closed-Loop Citizen Verification
+                        </span>
+                        <span style={{ fontSize: '10px', color: '#15803D', background: '#DCFCE7', padding: '1.5px 6px', borderRadius: '9999px', fontWeight: 700 }}>
+                          Resolved in 11h 24m
+                        </span>
+                      </div>
+
+                      <div style={{ background: '#FFFFFF', padding: '10px 12px', borderRadius: '6px', border: '1px solid #E2E8F0', marginBottom: '8px' }}>
+                        <p style={{ fontSize: '12px', color: 'var(--color-text-primary)', fontWeight: 600, margin: '0 0 8px 0', lineHeight: 1.3 }}>
+                          "Municipal crew reports valve repair complete. Has clean, odorless drinking water resumed?"
+                        </p>
+
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            type="button"
+                            onClick={() => setCitizenVerified(true)}
+                            style={{
+                              flex: 1,
+                              padding: '7px 10px',
+                              borderRadius: '6px',
+                              background: citizenVerified ? '#10B981' : '#0E5E3A',
+                              color: '#FFFFFF',
+                              fontSize: '11.5px',
+                              fontWeight: 700,
+                              border: 'none',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '5px',
+                              boxShadow: '0 2px 6px rgba(14, 94, 58, 0.2)'
+                            }}
+                          >
+                            <CheckCircle2 style={{ width: '13px', height: '13px' }} />
+                            <span>{citizenVerified ? '✓ Verified by Aditya (Ward 14)' : 'Yes, Supply is Clean!'}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            style={{
+                              padding: '7px 10px',
+                              borderRadius: '6px',
+                              background: '#FFFFFF',
+                              color: '#64748B',
+                              fontSize: '11.5px',
+                              fontWeight: 600,
+                              border: '1px solid #CBD5E1',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Still Dirty
+                          </button>
+                        </div>
+                      </div>
+
+                      {citizenVerified && (
+                        <div style={{ fontSize: '10.5px', color: '#15803D', background: '#F0FDF4', padding: '5px 8px', borderRadius: '4px', border: '1px solid #BBF7D0', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                          <Sparkles style={{ width: '12px', height: '12px', color: '#10B981', flexShrink: 0 }} />
+                          <span>Ticket permanently closed on citizen sign-off. Precedent logged to Civic Memory.</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleStepJump(0)}
+                        style={{ fontSize: '11.5px', color: 'var(--color-primary)', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer' }}
+                      >
+                        ↺ Replay 20s Flow
+                      </button>
+                      <Link to="/intelligence" className="btn-primary btn-sm">
+                        <span>Open Civic Intelligence Suite →</span>
                       </Link>
                     </div>
                   </div>
