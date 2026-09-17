@@ -802,6 +802,15 @@ export function AppProvider({ children }) {
       value={{
         token,
         user,
+        currentCitizen: (user && user.role === 'citizen') ? user : {
+          id: 'USR-CITIZEN-01',
+          name: 'Aditya Verma',
+          email: 'aditya@citizen.in',
+          role: 'citizen',
+          phone: '+91 98712-88210',
+          ward: 'Ward 14 (Rohini Sector 14)',
+          pincode: '110085'
+        },
         role: user?.role || 'citizen',
         login,
         register,

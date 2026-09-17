@@ -14,20 +14,31 @@ import {
   Shield
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import WhyExplainer from '../components/common/WhyExplainer';
 
 export default function CitizenDashboard() {
-  const { grievances, upvoteGrievance, currentCitizen } = useApp();
+  const { grievances = [], upvoteGrievance, user, currentCitizen: contextCitizen } = useApp();
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredGrievances = grievances.filter(g => {
-    const matchesSearch = g.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          g.descriptionRaw.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          g.id.toLowerCase().includes(searchQuery.toLowerCase());
+  const citizen = user || contextCitizen || {
+    name: 'Aditya Verma',
+    ward: 'Ward 14 (Rohini Sector 14)',
+    pincode: '110085',
+    phone: '+91 98712-88210'
+  };
+
+  const filteredGrievances = (grievances || []).filter(g => {
+    const title = g?.title || '';
+    const desc = g?.descriptionRaw || '';
+    const id = g?.id || '';
+    const matchesSearch = title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          id.toLowerCase().includes(searchQuery.toLowerCase());
     
     if (!matchesSearch) return false;
-    if (activeTab === 'resolved') return g.status === 'RESOLVED';
-    if (activeTab === 'active') return g.status !== 'RESOLVED';
+    if (activeTab === 'resolved') return g?.status === 'RESOLVED';
+    if (activeTab === 'active') return g?.status !== 'RESOLVED';
     return true;
   });
 
@@ -50,11 +61,11 @@ export default function CitizenDashboard() {
               CITIZEN ACCESS PORTAL
             </div>
             <h1 style={{ fontSize: '32px', color: 'var(--color-text-primary)' }}>
-              Namaste, {currentCitizen.name}
+              Namaste, {citizen.name || 'Citizen'}
             </h1>
             <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
               <MapPin style={{ width: '14px', height: '14px', color: 'var(--color-primary)' }} />
-              Registered in: <strong>{currentCitizen.ward}</strong> • PIN: {currentCitizen.pincode}
+              Registered in: <strong>{citizen.ward || 'Ward 14'}</strong> • PIN: {citizen.pincode || '110085'}
             </p>
           </div>
 
@@ -139,6 +150,8 @@ export default function CitizenDashboard() {
                 background: activeTab === 'all' ? '#FFFFFF' : 'transparent',
                 color: activeTab === 'all' ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
                 boxShadow: activeTab === 'all' ? 'var(--shadow-xs)' : 'none',
+                border: 'none',
+                cursor: 'pointer',
                 transition: 'all 150ms ease'
               }}
             >
@@ -154,6 +167,8 @@ export default function CitizenDashboard() {
                 background: activeTab === 'active' ? '#FFFFFF' : 'transparent',
                 color: activeTab === 'active' ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
                 boxShadow: activeTab === 'active' ? 'var(--shadow-xs)' : 'none',
+                border: 'none',
+                cursor: 'pointer',
                 transition: 'all 150ms ease'
               }}
             >
@@ -169,6 +184,8 @@ export default function CitizenDashboard() {
                 background: activeTab === 'resolved' ? '#FFFFFF' : 'transparent',
                 color: activeTab === 'resolved' ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
                 boxShadow: activeTab === 'resolved' ? 'var(--shadow-xs)' : 'none',
+                border: 'none',
+                cursor: 'pointer',
                 transition: 'all 150ms ease'
               }}
             >
@@ -225,7 +242,7 @@ export default function CitizenDashboard() {
                       {item.id}
                     </span>
                     <span className="category-pill" style={{ height: '22px', fontSize: '10px' }}>
-                      {item.department}
+                      {item.department || 'Civic Services'}
                     </span>
                     <span style={{
                       fontSize: '11px',
@@ -235,11 +252,21 @@ export default function CitizenDashboard() {
                       background: item.status === 'RESOLVED' ? '#ECFDF5' : (item.urgency === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB'),
                       color: item.status === 'RESOLVED' ? '#065F46' : (item.urgency === 'CRITICAL' ? '#991B1B' : '#92400E')
                     }}>
-                      ● {item.status.replace('_', ' ')}
+                      ● {(item.status || 'IN_PROGRESS').replace('_', ' ')}
                     </span>
+                    <WhyExplainer
+                      label="Why?"
+                      title="Why this Priority?"
+                      reasons={[
+                        'Severity classified from citizen report',
+                        `Ward: ${item.location?.ward || 'Ward Area'}`,
+                        'Municipal SLA monitoring active'
+                      ]}
+                      align="left"
+                    />
                     {item.clusterCount > 1 && (
                       <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-primary)', background: 'var(--color-accent-tint)', padding: '2px 8px', borderRadius: '9999px' }}>
-                        Cluster: {item.clusterCount} linked neighbors
+                        Cluster: {item.clusterCount} linked reports
                       </span>
                     )}
                   </div>
@@ -251,17 +278,17 @@ export default function CitizenDashboard() {
                   </h3>
 
                   <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '10px', maxWidth: '680px' }}>
-                    "{item.descriptionRaw.substring(0, 140)}..."
+                    "{(item.descriptionRaw || item.title || '').substring(0, 140)}..."
                   </p>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '12px', color: 'var(--color-text-muted)' }}>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                       <MapPin style={{ width: '13px', height: '13px' }} />
-                      {item.location.area}
+                      {item.location?.area || 'Ward Area'}, {item.location?.ward || ''}
                     </span>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                       <Clock style={{ width: '13px', height: '13px' }} />
-                      SLA: {item.slaDeadline}
+                      SLA: {item.slaDeadline || '12h'}
                     </span>
                   </div>
                 </div>
