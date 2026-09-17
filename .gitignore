@@ -86,3 +86,13 @@ temp/
 *.swp
 *.swo
 *~
+
+# AI Workspaces & Local Agent Caches
+.gemini/
+.agents/
+.claude/
+.copilot/
+
+# Docker Local Overrides
+docker-compose.override.yml
+

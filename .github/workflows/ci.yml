@@ -1,4 +1,4 @@
-name: JanSahayk CI
+name: JanSahayk Production CI
 
 on:
   push:
@@ -8,17 +8,22 @@ on:
 
 jobs:
   build-and-verify:
-    name: Build & Verify
-    runs-on: ubuntu-latest
+    name: Node ${{ matrix.node-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest ]
+        node-version: [ 18.x, 20.x ]
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
       - name: Install Dependencies
@@ -33,3 +38,6 @@ jobs:
 
       - name: Build Frontend Application
         run: npm run build
+        env:
+          NODE_ENV: production
+

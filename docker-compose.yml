@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  jansahayk-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jansahayk-platform
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - AI_PROVIDER=local_indic_bert
+    volumes:
+      - jansahayk-data:/app/server/data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  jansahayk-data:
+    driver: local

@@ -1,7 +1,14 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import { db } from './db/database.js';
 import { orchestrator } from './agents/orchestrator.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const distPath = path.resolve(__dirname, '..', 'dist');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -57,7 +64,12 @@ const USERS = [
   }
 ];
 
-let SESSIONS = {}; // token -> user
+let SESSIONS = {
+  'demo_token_citizen': USERS[0],
+  'demo_token_officer': USERS[1],
+  'demo_token_dept_admin': USERS[2],
+  'demo_token_super_admin': USERS[3],
+}; // token -> user
 let AUDIT_LOGS = [
   { id: 'LOG-101', timestamp: '2026-09-16 09:31 AM', actor: 'System AI Engine', action: 'GRIEVANCE_TRIAGED', targetId: 'DL-2026-W14-0892', details: 'Autoclassified as Critical Biological Hazard, routed to DJB' },
   { id: 'LOG-102', timestamp: '2026-09-16 10:15 AM', actor: 'Er. Sanjay Sharma', action: 'DISPATCH_APPROVED', targetId: 'DL-2026-W14-0892', details: 'Emergency repair clamp squad mobilized to Mother Dairy junction' }
@@ -328,6 +340,21 @@ function requireRole(allowedRoles) {
     next();
   };
 }
+
+// ============================================================================
+// System Health & Diagnostics
+// ============================================================================
+
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    uptimeSeconds: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+    service: 'JanSahayk Civic Intelligence API',
+    version: '1.0.0',
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
 
 // ============================================================================
 // Auth Endpoints
@@ -1699,8 +1726,23 @@ app.post('/api/intelligence/signals', async (req, res) => {
 });
 
 
+// ============================================================================
+// Production Static Bundle Serving (SPA Fallback)
+// ============================================================================
+
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.resolve(distPath, 'index.html'));
+  });
+}
+
 // Start Server
 app.listen(PORT, () => {
   console.log(`JanSahayk Express API Server running on port ${PORT}`);
 });
+
 
