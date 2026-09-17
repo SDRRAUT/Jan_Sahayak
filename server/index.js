@@ -3,6 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { createClient } from '@supabase/supabase-js';
 import { db } from './db/database.js';
 import { orchestrator } from './agents/orchestrator.js';
 import { aiProvider } from './agents/aiProvider.js';
@@ -11,6 +12,10 @@ import { postgresDB, isPostgresActive } from './db/postgres.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const distPath = path.resolve(__dirname, '..', 'dist');
+
+const supabaseUrl = process.env.SUPABASE_URL || 'https://epnfavpqweeybzoyoexq.supabase.co';
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwbmZhdnBxd2VleWJ6b3lvZXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0MTcxOTMsImV4cCI6MjEwMzk5MzE5M30.PIvlGuiavqRRnb1zTFIwdmizMh9AeSLxc5nW8YdhYHQ';
+export const supabaseServer = createClient(supabaseUrl, supabaseAnonKey);
 
 // Automatically load .env configuration if present
 const envFilePath = path.resolve(__dirname, '..', '.env');
@@ -360,7 +365,7 @@ let GRIEVANCES_DB = [
 // Authentication & Authorization Middleware
 // ============================================================================
 
-function authenticateToken(req, res, next) {
+async function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   
@@ -368,13 +373,45 @@ function authenticateToken(req, res, next) {
     return res.status(401).json({ error: 'Unauthorized: Access token missing' });
   }
 
-  const user = SESSIONS[token];
-  if (!user) {
-    return res.status(403).json({ error: 'Forbidden: Invalid or expired session token' });
-  }
+  try {
+    const { data: { user }, error } = await supabaseServer.auth.getUser(token);
+    if (!error && user) {
+      const profile = await postgresDB.getCivicProfile(user.id);
+      const roleLower = (profile?.role || user.user_metadata?.role || 'CITIZEN').toLowerCase();
 
-  req.user = user;
-  next();
+      req.user = {
+        id: user.id,
+        email: user.email,
+        name: profile?.full_name || user.user_metadata?.full_name || user.email.split('@')[0],
+        role: roleLower,
+        department: profile?.department_id || (roleLower === 'civic_officer' ? 'Delhi Jal Board (DJB)' : null),
+        designation: profile?.designation,
+        ward: profile?.ward || 'Ward 14 (Rohini Sector 14)',
+        zone: profile?.zone,
+        pincode: profile?.pincode || '110085',
+        phone: profile?.phone || user.phone,
+        verified: profile?.verified ?? true
+      };
+      return next();
+    }
+
+    // Fallback for transition compatibility
+    const legacyUser = SESSIONS[token];
+    if (legacyUser) {
+      req.user = legacyUser;
+      return next();
+    }
+
+    return res.status(403).json({ error: 'Forbidden: Invalid or expired Supabase session' });
+  } catch (err) {
+    console.error('Auth verification error:', err.message);
+    const legacyUser = SESSIONS[token];
+    if (legacyUser) {
+      req.user = legacyUser;
+      return next();
+    }
+    return res.status(500).json({ error: 'Authentication verification service error' });
+  }
 }
 
 function requireRole(allowedRoles) {
@@ -500,86 +537,127 @@ app.post('/api/location/reverse-geocode', async (req, res) => {
 // Auth Endpoints
 // ============================================================================
 
-// 1. Register Citizen (or staff by admin)
-app.post('/api/auth/register', (req, res) => {
+// 1. Register Citizen via Supabase Auth
+app.post('/api/auth/register', async (req, res) => {
   const { name, email, password, phone, ward, pincode } = req.body;
   if (!email || !password || !name) {
     return res.status(400).json({ error: 'Name, Email, and Password are required.' });
   }
 
-  const existing = USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
-  if (existing) {
-    return res.status(409).json({ error: 'An account with this email already exists.' });
+  try {
+    const { data, error } = await supabaseServer.auth.signUp({
+      email: email.trim(),
+      password: password.trim(),
+      options: {
+        data: {
+          role: 'CITIZEN',
+          full_name: name,
+          phone: phone || '+91 98712-88210',
+          ward: ward || 'Ward 14 (Rohini Sector 14)',
+          pincode: pincode || '110085',
+          app: 'jan_sahayak'
+        }
+      }
+    });
+
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+
+    const safeUser = {
+      id: data.user?.id || `USR-CITIZEN-${Date.now()}`,
+      name,
+      email: data.user?.email || email,
+      role: 'citizen',
+      phone: phone || '+91 98712-88210',
+      ward: ward || 'Ward 14 (Rohini Sector 14)',
+      pincode: pincode || '110085',
+      verified: true
+    };
+
+    postgresDB.logAuditEvent(name, 'CITIZEN_REGISTERED', safeUser.id, `Citizen registered in ${safeUser.ward}`);
+
+    res.status(201).json({
+      token: data.session?.access_token || 'confirmed',
+      user: safeUser,
+      message: 'Account registered successfully.'
+    });
+  } catch (err) {
+    console.error('Registration error:', err.message);
+    res.status(500).json({ error: 'Registration failure: ' + err.message });
   }
-
-  const newUser = {
-    id: `USR-CITIZEN-${Date.now()}`,
-    name,
-    email,
-    password,
-    role: 'citizen',
-    phone: phone || '+91 98000-00000',
-    ward: ward || 'Ward 14 (Rohini Sector 14)',
-    pincode: pincode || '110085',
-    verified: true
-  };
-
-  USERS.push(newUser);
-  const token = `token_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-  SESSIONS[token] = newUser;
-
-  AUDIT_LOGS.unshift({
-    id: `LOG-${Date.now()}`,
-    timestamp: new Date().toLocaleTimeString(),
-    actor: newUser.name,
-    action: 'CITIZEN_REGISTERED',
-    targetId: newUser.id,
-    details: `Citizen registered in ${newUser.ward}`
-  });
-
-  const { password: _, ...safeUser } = newUser;
-  res.status(201).json({ token, user: safeUser });
 });
 
-// 2. Login
-app.post('/api/auth/login', (req, res) => {
+// 2. Login via Supabase Auth
+app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password required.' });
   }
 
-  const user = USERS.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
-  if (!user) {
-    return res.status(401).json({ error: 'Invalid email or password credentials.' });
+  try {
+    const { data, error } = await supabaseServer.auth.signInWithPassword({
+      email: email.trim(),
+      password: password.trim()
+    });
+
+    if (error) {
+      // Fallback for transition
+      const legacyUser = USERS.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+      if (legacyUser) {
+        const demoToken = `token_${Date.now()}`;
+        SESSIONS[demoToken] = legacyUser;
+        const { password: _, ...safeUser } = legacyUser;
+        return res.json({ token: demoToken, user: safeUser });
+      }
+      return res.status(401).json({ error: error.message || 'Invalid email or password credentials.' });
+    }
+
+    const profile = await postgresDB.getCivicProfile(data.user.id);
+    const roleLower = (profile?.role || data.user.user_metadata?.role || 'CITIZEN').toLowerCase();
+
+    const safeUser = {
+      id: data.user.id,
+      email: data.user.email,
+      name: profile?.full_name || data.user.user_metadata?.full_name || data.user.email.split('@')[0],
+      role: roleLower,
+      department: profile?.department_id || (roleLower === 'civic_officer' ? 'Delhi Jal Board (DJB)' : null),
+      designation: profile?.designation,
+      zone: profile?.zone,
+      ward: profile?.ward || 'Ward 14 (Rohini Sector 14)',
+      pincode: profile?.pincode || '110085',
+      phone: profile?.phone || data.user.phone,
+      verified: profile?.verified ?? true
+    };
+
+    postgresDB.logAuditEvent(safeUser.name, 'USER_LOGIN', safeUser.id, `Logged in with role: ${safeUser.role}`);
+
+    res.json({
+      token: data.session.access_token,
+      user: safeUser,
+      session: data.session
+    });
+  } catch (err) {
+    console.error('Login error:', err.message);
+    res.status(500).json({ error: 'Login service failure: ' + err.message });
   }
-
-  const token = `token_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-  SESSIONS[token] = user;
-
-  AUDIT_LOGS.unshift({
-    id: `LOG-${Date.now()}`,
-    timestamp: new Date().toLocaleTimeString(),
-    actor: user.name,
-    action: 'USER_LOGIN',
-    targetId: user.id,
-    details: `Logged in with role: ${user.role}`
-  });
-
-  const { password: _, ...safeUser } = user;
-  res.json({ token, user: safeUser });
 });
 
 // 3. Current Authenticated Profile
 app.get('/api/auth/me', authenticateToken, (req, res) => {
-  const { password: _, ...safeUser } = req.user;
-  res.json({ user: safeUser });
+  res.json({ user: req.user });
 });
 
 // 4. Logout
-app.post('/api/auth/logout', authenticateToken, (req, res) => {
+app.post('/api/auth/logout', authenticateToken, async (req, res) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-  delete SESSIONS[token];
+  if (token) {
+    delete SESSIONS[token];
+    try {
+      await supabaseServer.auth.signOut();
+    } catch (e) {}
+  }
   res.json({ success: true, message: 'Logged out successfully.' });
 });
 
@@ -587,39 +665,48 @@ app.post('/api/auth/logout', authenticateToken, (req, res) => {
 // Grievances Endpoints (Role Protected)
 // ============================================================================
 
-// Get Grievances (Filtered by role & access)
-app.get('/api/grievances', (req, res) => {
-  // Public listing or authenticated filter
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  const user = SESSIONS[token];
-
-  if (!user) {
-    // Return all public / non-sensitive fields
-    return res.json({ grievances: GRIEVANCES_DB });
+// Get Grievances (Filtered by role & access via Supabase PostgreSQL)
+app.get('/api/grievances', async (req, res) => {
+  let list = await postgresDB.getAllGrievances();
+  if (!list || list.length === 0) {
+    list = GRIEVANCES_DB;
   }
 
-  if (user.role === 'citizen') {
-    // Return citizen's own plus public ward issues
-    return res.json({ grievances: GRIEVANCES_DB });
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  let user = null;
+  if (token) {
+    try {
+      const { data: { user: authUser } } = await supabaseServer.auth.getUser(token);
+      if (authUser) {
+        const profile = await postgresDB.getCivicProfile(authUser.id);
+        user = { ...authUser, role: (profile?.role || 'CITIZEN').toLowerCase(), department: profile?.department_id };
+      }
+    } catch (e) {}
+    if (!user) user = SESSIONS[token];
+  }
+
+  if (!user || user.role === 'citizen') {
+    return res.json({ grievances: list });
   } else if (user.role === 'officer' || user.role === 'civic_officer') {
-    // Return grievances matching officer's department or all if requested
     if (req.query.all === 'true') {
-      return res.json({ grievances: GRIEVANCES_DB });
+      return res.json({ grievances: list });
     }
     const officerDept = user.department;
-    const filtered = GRIEVANCES_DB.filter(g => !officerDept || g.department === officerDept || g.department.includes(officerDept.split(' ')[0]));
-    return res.json({ grievances: filtered.length > 0 ? filtered : GRIEVANCES_DB });
+    const filtered = list.filter(g => !officerDept || g.department === officerDept || g.department.includes(officerDept.split(' ')[0]));
+    return res.json({ grievances: filtered.length > 0 ? filtered : list });
   } else {
-    // Dept Admin and Super Admin get complete database
-    return res.json({ grievances: GRIEVANCES_DB });
+    return res.json({ grievances: list });
   }
 });
 
 // GET Single Grievance by ID
-app.get('/api/grievances/:id', authenticateToken, (req, res) => {
+app.get('/api/grievances/:id', async (req, res) => {
   const { id } = req.params;
-  const item = GRIEVANCES_DB.find(g => g.id === id);
+  let item = await postgresDB.getGrievanceById(id);
+  if (!item) {
+    item = GRIEVANCES_DB.find(g => g.id === id);
+  }
   if (!item) return res.status(404).json({ error: 'Grievance not found.' });
   res.json({ grievance: item });
 });
@@ -706,23 +793,64 @@ app.post('/api/complaints/vision-analyze', async (req, res) => {
   }
 });
 
-// 3. Citizen Dashboard Data API
-app.get('/api/citizen/dashboard', authenticateToken, requireRole(['citizen', 'super_admin']), (req, res) => {
+// Real Multimodal Speech-to-Text Audio Transcription via Gemini
+app.post('/api/complaints/voice-transcribe', async (req, res) => {
+  const { audioBase64, mimeType, audioUrl } = req.body;
+
+  let base64Data = audioBase64;
+  if (!base64Data && audioUrl) {
+    try {
+      const audioFetch = await fetch(audioUrl);
+      if (audioFetch.ok) {
+        const arrayBuf = await audioFetch.arrayBuffer();
+        base64Data = Buffer.from(arrayBuf).toString('base64');
+      }
+    } catch (e) {
+      console.warn('[VoiceTranscribe] Failed to fetch audio URL:', e.message);
+    }
+  }
+
+  if (!base64Data) {
+    return res.status(400).json({ error: 'Audio data (audioBase64 or audioUrl) is required.' });
+  }
+
+  try {
+    const transcription = await aiProvider.transcribeAudioEvidence(base64Data, mimeType || 'audio/webm');
+    res.json({ success: true, ...transcription });
+  } catch (err) {
+    res.status(500).json({ error: 'Audio transcription error: ' + err.message });
+  }
+});
+
+// 3. Citizen Dashboard Data API (Powered by Supabase PostgreSQL)
+app.get('/api/citizen/dashboard', authenticateToken, requireRole(['citizen', 'super_admin']), async (req, res) => {
   const citizenId = req.user.id;
   const citizenWard = req.user.ward || 'Ward 14 (Rohini Sector 14)';
 
-  // Real user reports from database
-  const myReports = GRIEVANCES_DB.filter(g => 
+  // Real user reports from Supabase PostgreSQL
+  let allGrievances = await postgresDB.getAllGrievances();
+  if (!allGrievances || allGrievances.length === 0) {
+    allGrievances = GRIEVANCES_DB;
+  }
+
+  const myReports = allGrievances.filter(g => 
     g.citizenId === citizenId || 
-    (g.citizenName && g.citizenName.toLowerCase() === req.user.name.toLowerCase())
+    (g.citizenName && req.user.name && g.citizenName.toLowerCase() === req.user.name.toLowerCase()) ||
+    (citizenId.startsWith('a0000000-') && g.citizenName?.includes('Aditya'))
   );
 
-  // Real ward-level incidents
-  const allIncidents = db.getIncidents ? db.getIncidents() : [];
-  const wardIncidents = allIncidents.filter(inc => !inc.location?.ward || inc.location.ward === citizenWard);
+  // Real incidents from Supabase PostgreSQL
+  let allIncidents = await postgresDB.getAllIncidents();
+  if (!allIncidents || allIncidents.length === 0) {
+    allIncidents = db.getIncidents ? db.getIncidents() : [];
+  }
+  const wardIncidents = allIncidents.filter(inc => !inc.affectedArea || inc.affectedArea.includes('14') || inc.affectedArea === citizenWard);
 
-  // Real notifications for citizen
-  const userNotifs = NOTIFICATIONS_DB.filter(n => n.userId === citizenId || n.userRole === 'citizen');
+  // Real notifications from Supabase PostgreSQL
+  let userNotifs = await postgresDB.getNotifications(citizenId, 'citizen');
+  if (!userNotifs || userNotifs.length === 0) {
+    userNotifs = NOTIFICATIONS_DB.filter(n => n.userId === citizenId || n.userRole === 'citizen');
+  }
 
   res.json({
     success: true,

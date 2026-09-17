@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../services/supabaseClient';
 import { INITIAL_GRIEVANCES, MOCK_CLUSTERS, SYSTEM_METRICS, INITIAL_NOTIFICATIONS } from '../data/mockGrievances';
 import { CIVIC_INCIDENTS, CIVIC_SIGNALS, CIVIC_INTELLIGENCE_METRICS } from '../data/civicIntelligenceData';
 import { analyzeGrievanceInput } from '../services/aiEngine';
@@ -7,14 +8,14 @@ import { hasPermission, getRoleLabel, PERMISSIONS, ROLES } from '../utils/permis
 
 const AppContext = createContext();
 
-// Pre-seeded demo credentials for instant 1-click persona switching (3 Primary Roles)
+// Pre-seeded credentials for instant 1-click persona switching (3 Primary Roles)
 export const DEMO_CREDENTIALS = {
   citizen: { email: 'aditya@citizen.in', password: 'citizen123', label: 'Citizen (Aditya Verma)' },
-  civic_officer: { email: 'officer.djb@delhi.gov.in', password: 'officer123', label: 'Government Officer (Er. Sanjay Sharma - Field Engineer & Dept Lead)' },
-  super_admin: { email: 'superadmin@delhi.gov.in', password: 'superadmin123', label: 'Administrator / Admin (Dr. Meenakshi Sundaram, IAS)' },
+  civic_officer: { email: 'civic.officer@djb.gov.in', password: 'civicofficer123', label: 'Civic Officer (Er. Sanjay Sharma - DJB)' },
+  super_admin: { email: 'superadmin@delhi.gov.in', password: 'superadmin123', label: 'Super Admin (Dr. Meenakshi Sundaram, IAS)' },
   // Backward-compatible aliases for legacy credentials
-  officer: { email: 'sanjay.sharma@djb.gov.in', password: 'officer123', label: 'Government Officer (Field Engineering Lead)' },
-  dept_admin: { email: 'admin.djb@delhi.gov.in', password: 'deptadmin123', label: 'Government Officer (Department Operations Lead)' }
+  officer: { email: 'civic.officer@djb.gov.in', password: 'civicofficer123', label: 'Civic Officer (Field Engineering Lead)' },
+  dept_admin: { email: 'civic.officer@djb.gov.in', password: 'civicofficer123', label: 'Civic Officer (Department Operations Lead)' }
 };
 
 // Full profile objects for offline and instant demo switching
@@ -156,7 +157,7 @@ export function AppProvider({ children }) {
     localStorage.setItem('jansahayk_notifications', JSON.stringify(notifications));
   }, [notifications]);
 
-  // Real backend synchronization and real-time SSE stream
+  // Real backend synchronization and real-time Supabase Realtime / SSE stream
   useEffect(() => {
     fetchGrievances();
     fetchNotifications();
@@ -170,22 +171,46 @@ export function AppProvider({ children }) {
         .catch(() => {});
     }
 
-    // Subscribe to Server-Sent Events (SSE)
+    // 1. Subscribe to Supabase Realtime postgres_changes
+    let realtimeChannel = null;
+    try {
+      realtimeChannel = supabase
+        .channel('public:jan_sahayak_realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'grievances' }, (payload) => {
+          console.log('[Supabase Realtime] Grievance event:', payload.eventType);
+          fetchGrievances();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'civic_incidents' }, (payload) => {
+          console.log('[Supabase Realtime] Incident event:', payload.eventType);
+          fetchCivicIntelligence();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, (payload) => {
+          console.log('[Supabase Realtime] Notification event:', payload.eventType);
+          fetchNotifications();
+        })
+        .subscribe();
+    } catch (e) {
+      console.warn('Supabase Realtime channel init failed:', e.message);
+    }
+
+    // 2. Fallback / supplementary SSE listener
     let eventSource = null;
     try {
-      eventSource = new EventSource('/api/intelligence/events');
+      eventSource = new EventSource('/api/events');
       const handleServerEvent = () => {
         fetchCivicIntelligence();
         fetchGrievances();
+        fetchNotifications();
       };
 
       eventSource.addEventListener('complaint_created', handleServerEvent);
+      eventSource.addEventListener('complaint_analyzed', handleServerEvent);
       eventSource.addEventListener('cluster_updated', handleServerEvent);
       eventSource.addEventListener('incident_updated', handleServerEvent);
+      eventSource.addEventListener('status_changed', handleServerEvent);
       eventSource.addEventListener('verification_submitted', handleServerEvent);
 
       eventSource.onerror = () => {
-        // If backend server is offline, close to avoid repetitive reconnect spam
         if (eventSource && eventSource.readyState === EventSource.CONNECTING) {
           eventSource.close();
         }
@@ -195,6 +220,7 @@ export function AppProvider({ children }) {
     }
 
     return () => {
+      if (realtimeChannel) supabase.removeChannel(realtimeChannel);
       if (eventSource) eventSource.close();
     };
   }, []);
@@ -329,27 +355,46 @@ export function AppProvider({ children }) {
     };
   }, [token]);
 
-  // Real Login with Offline Demo Fallback
+  // Real Supabase Auth Login
   const login = async (email, password) => {
     setIsLoadingAuth(true);
     setAuthError(null);
 
-    const cleanEmail = (email || '').trim().toLowerCase();
-    const matchedKey = Object.keys(DEMO_CREDENTIALS).find(
-      k => DEMO_CREDENTIALS[k].email.toLowerCase() === cleanEmail && DEMO_CREDENTIALS[k].password === password
-    );
-
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2000);
+      // 1. Direct Supabase Auth
+      try {
+        const { data: supaData, error: supaErr } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password: password.trim()
+        });
 
+        if (!supaErr && supaData?.session) {
+          const accessToken = supaData.session.access_token;
+          setToken(accessToken);
+          localStorage.setItem('jansahayk_token', accessToken);
+
+          // Get profile from backend
+          const meRes = await fetch('/api/auth/me', {
+            headers: { 'Authorization': `Bearer ${accessToken}` }
+          });
+          if (meRes.ok) {
+            const meData = await meRes.json();
+            setUser(meData.user);
+            localStorage.setItem('jansahayk_user', JSON.stringify(meData.user));
+            setIsLoadingAuth(false);
+            return meData.user;
+          }
+        }
+      } catch (e) {
+        console.warn('Direct Supabase sign-in fallback to API:', e.message);
+      }
+
+      // 2. Fallback via backend Express API endpoint
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-        signal: controller.signal
+        body: JSON.stringify({ email, password })
       });
-      clearTimeout(timeoutId);
 
       const data = await res.json();
       if (!res.ok) {
@@ -362,16 +407,6 @@ export function AppProvider({ children }) {
       setIsLoadingAuth(false);
       return data.user;
     } catch (err) {
-      if (matchedKey && DEMO_USERS[matchedKey]) {
-        const targetUser = DEMO_USERS[matchedKey];
-        const demoToken = `demo_token_${matchedKey}`;
-        setToken(demoToken);
-        setUser(targetUser);
-        localStorage.setItem('jansahayk_token', demoToken);
-        localStorage.setItem('jansahayk_user', JSON.stringify(targetUser));
-        setIsLoadingAuth(false);
-        return targetUser;
-      }
       setAuthError(err.message || 'Authentication failed');
       setIsLoadingAuth(false);
       throw err;

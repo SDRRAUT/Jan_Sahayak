@@ -87,7 +87,7 @@ export class CivicIntelligenceOrchestrator {
 
       // 2. AGENT 2: Complaint DNA
       console.log(`[Orchestrator] Running Agent 2 (ComplaintDNAAgent)...`);
-      const dna = ComplaintDNAAgent.generateDNA(analysis, complaint);
+      const dna = await ComplaintDNAAgent.generateDNA(analysis, complaint);
       complaint.dna = dna;
       complaint.status = 'DNA_GENERATED';
       db.saveComplaint(complaint);

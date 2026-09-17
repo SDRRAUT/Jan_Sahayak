@@ -28,6 +28,10 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTimer, setRecordingTimer] = useState(0);
   const [speechMsg, setSpeechMsg] = useState(null);
+  const [interimText, setInterimText] = useState('');   // live interim transcript shown while speaking
+  const [speechLang, setSpeechLang] = useState('hi-IN'); // hi-IN or en-IN
+  const [finalAccumulated, setFinalAccumulated] = useState(''); // finalized text accumulated so far
+
 
   // Step 2: Photo Evidence
   const [photoPreview, setPhotoPreview] = useState(null);
@@ -86,6 +90,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
     }
   }, [isOpen, defaultCategory, user]);
 
+  // ─── Real-time Speech-to-Text ───────────────────────────────────────────────
   const handleToggleVoice = () => {
     if (isRecording) {
       handleStopVoice();
@@ -93,66 +98,126 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
     }
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
     if (!SpeechRecognition) {
-      setSpeechMsg('Speech recognition is not supported in this browser. Please type directly.');
+      // Fallback: show helpful message + open mic via MediaRecorder if available
+      setSpeechMsg('⚠️ Your browser does not support live speech. Please use Chrome or Edge, or type your complaint below.');
       return;
     }
 
     try {
+      // Reset interim & accumulated before starting fresh
+      setInterimText('');
+      setFinalAccumulated('');
+
       const recognition = new SpeechRecognition();
       recognitionRef.current = recognition;
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = 'hi-IN';
+
+      recognition.continuous = true;       // keep listening until manually stopped
+      recognition.interimResults = true;   // show live partial results
+      recognition.maxAlternatives = 1;
+      recognition.lang = speechLang;       // hi-IN or en-IN
 
       recognition.onstart = () => {
         setIsRecording(true);
         setRecordingTimer(0);
-        setSpeechMsg('Listening... Speak in Hindi, Hinglish, or English');
+        setSpeechMsg(speechLang === 'hi-IN'
+          ? '🎙️ Sun raha hoon... Hindi, Hinglish ya English mein bolein'
+          : '🎙️ Listening... Speak clearly in English');
         timerIntervalRef.current = setInterval(() => {
           setRecordingTimer(prev => prev + 1);
         }, 1000);
       };
 
       recognition.onresult = (e) => {
-        let transcript = '';
-        for (let i = 0; i < e.results.length; i++) {
-          transcript += e.results[i][0].transcript + ' ';
-        }
-        if (transcript.trim()) {
-          setDescription(transcript.trim());
-          if (!title) {
-            setTitle(transcript.trim().slice(0, 45) + (transcript.length > 45 ? '...' : ''));
+        let interim = '';
+        let newFinal = '';
+
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const transcript = e.results[i][0].transcript;
+          if (e.results[i].isFinal) {
+            newFinal += transcript + ' ';
+          } else {
+            interim += transcript;
           }
+        }
+
+        // Update interim live display
+        setInterimText(interim);
+
+        if (newFinal) {
+          // Append final text to description textarea + accumulated ref
+          setFinalAccumulated(prev => {
+            const updated = prev + newFinal;
+            setDescription(updated.trim());
+            // Auto-fill title from first few words if title is empty
+            if (!title) {
+              setTitle(updated.trim().slice(0, 50) + (updated.trim().length > 50 ? '...' : ''));
+            }
+            return updated;
+          });
         }
       };
 
-      recognition.onerror = () => {
-        handleStopVoice();
+      recognition.onerror = (e) => {
+        if (e.error === 'no-speech') {
+          // No speech detected — just show a gentle hint, keep going
+          setSpeechMsg('🤫 Koi awaaz nahi aayi... phir se bolein / No speech detected, please speak again');
+        } else if (e.error === 'not-allowed') {
+          setSpeechMsg('❌ Microphone access denied. Please allow mic in browser settings.');
+          handleStopVoice();
+        } else if (e.error === 'network') {
+          setSpeechMsg('⚠️ Network error. Retrying...');
+          // Auto-restart on network errors
+          setTimeout(() => {
+            if (recognitionRef.current) {
+              try { recognitionRef.current.start(); } catch (_) {}
+            }
+          }, 500);
+        } else {
+          handleStopVoice();
+        }
       };
 
       recognition.onend = () => {
-        handleStopVoice();
+        // Auto-restart if still in recording mode (continuous mode sometimes stops)
+        if (isRecording) {
+          try {
+            if (recognitionRef.current) recognitionRef.current.start();
+          } catch (_) {
+            // recognition already started or modal closed
+          }
+        }
+        setInterimText('');
       };
 
       recognition.start();
     } catch (err) {
+      setSpeechMsg('Could not start microphone. Please try again.');
       setIsRecording(false);
     }
   };
 
   const handleStopVoice = () => {
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch (e) {}
-    }
+    setIsRecording(false);
+    setInterimText('');
+    setSpeechMsg(null);
     if (timerIntervalRef.current) {
       clearInterval(timerIntervalRef.current);
+      timerIntervalRef.current = null;
     }
-    setIsRecording(false);
-    setSpeechMsg(null);
+    if (recognitionRef.current) {
+      try { recognitionRef.current.onend = null; recognitionRef.current.stop(); } catch (_) {}
+      recognitionRef.current = null;
+    }
   };
+
+  // Cleanup on modal close
+  useEffect(() => {
+    if (!isOpen) handleStopVoice();
+  }, [isOpen]); // eslint-disable-line
+
+
 
   const handlePhotoSelect = async (e) => {
     const file = e.target.files?.[0];
@@ -581,55 +646,163 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                   </div>
 
                   <div style={{ marginBottom: '12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    {/* Row: Label + Language Toggle + Mic Button */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px', flexWrap: 'wrap', gap: '6px' }}>
                       <label style={{ fontSize: '12px', fontWeight: 700, color: '#334155' }}>
                         Description (Bol Kar Ya Likh Kar Batayein):
                       </label>
-                      <button
-                        type="button"
-                        onClick={handleToggleVoice}
-                        style={{
-                          background: isRecording ? '#FEE2E2' : '#EFF6FF',
-                          color: isRecording ? '#DC2626' : '#2563EB',
-                          border: isRecording ? '1px solid #FCA5A5' : '1px solid #BFDBFE',
-                          borderRadius: '999px',
-                          padding: '3px 10px',
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '5px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {isRecording ? <MicOff style={{ width: '13px', height: '13px' }} /> : <Mic style={{ width: '13px', height: '13px' }} />}
-                        <span>{isRecording ? `Recording (${recordingTimer}s) - Stop` : '🎙️ Speak Hindi/English'}</span>
-                      </button>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {/* Language Toggle */}
+                        {!isRecording && (
+                          <div style={{ display: 'flex', borderRadius: '999px', overflow: 'hidden', border: '1px solid #CBD5E1', fontSize: '10px', fontWeight: 700 }}>
+                            <button
+                              type="button"
+                              onClick={() => setSpeechLang('hi-IN')}
+                              style={{
+                                padding: '3px 9px',
+                                background: speechLang === 'hi-IN' ? '#2563EB' : '#F1F5F9',
+                                color: speechLang === 'hi-IN' ? '#fff' : '#475569',
+                                border: 'none',
+                                cursor: 'pointer'
+                              }}
+                            >हिंदी</button>
+                            <button
+                              type="button"
+                              onClick={() => setSpeechLang('en-IN')}
+                              style={{
+                                padding: '3px 9px',
+                                background: speechLang === 'en-IN' ? '#2563EB' : '#F1F5F9',
+                                color: speechLang === 'en-IN' ? '#fff' : '#475569',
+                                border: 'none',
+                                cursor: 'pointer'
+                              }}
+                            >ENG</button>
+                          </div>
+                        )}
+
+                        {/* Mic Button */}
+                        <button
+                          type="button"
+                          onClick={handleToggleVoice}
+                          style={{
+                            background: isRecording ? '#FEF2F2' : '#EFF6FF',
+                            color: isRecording ? '#DC2626' : '#2563EB',
+                            border: isRecording ? '2px solid #FCA5A5' : '1px solid #BFDBFE',
+                            borderRadius: '999px',
+                            padding: '4px 12px',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            cursor: 'pointer',
+                            boxShadow: isRecording ? '0 0 0 3px rgba(220,38,38,0.15)' : 'none',
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          {isRecording
+                            ? <><MicOff style={{ width: '13px', height: '13px' }} /><span>⏹ Stop ({recordingTimer}s)</span></>
+                            : <><Mic style={{ width: '13px', height: '13px' }} /><span>🎙️ {speechLang === 'hi-IN' ? 'Boliye Hindi/English' : 'Speak English'}</span></>
+                          }
+                        </button>
+                      </div>
                     </div>
 
+                    {/* Status message */}
                     {speechMsg && (
-                      <div style={{ fontSize: '11px', color: '#2563EB', marginBottom: '4px', fontStyle: 'italic' }}>
+                      <div style={{
+                        fontSize: '11px',
+                        color: speechMsg.startsWith('❌') ? '#DC2626' : '#2563EB',
+                        marginBottom: '6px',
+                        padding: '5px 10px',
+                        background: speechMsg.startsWith('❌') ? '#FEF2F2' : '#EFF6FF',
+                        borderRadius: '8px',
+                        lineHeight: 1.4
+                      }}>
                         {speechMsg}
                       </div>
                     )}
 
-                    <textarea 
-                      rows={3}
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Gali/mohalle mein kya problem hai? Hindi, Hinglish, ya English mein likhein..."
-                      style={{
-                        width: '100%',
-                        padding: '10px 12px',
-                        borderRadius: '10px',
-                        border: '1px solid #CBD5E1',
-                        fontSize: '13px',
-                        fontFamily: 'inherit',
-                        boxSizing: 'border-box',
-                        resize: 'none'
-                      }}
-                    />
+                    {/* Textarea — with real-time interim overlay */}
+                    <div style={{ position: 'relative' }}>
+                      <textarea
+                        rows={3}
+                        value={description}
+                        onChange={(e) => {
+                          setDescription(e.target.value);
+                          setFinalAccumulated(e.target.value);
+                        }}
+                        placeholder="Gali/mohalle mein kya problem hai? Hindi, Hinglish, ya English mein likhein..."
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          borderRadius: '10px',
+                          border: isRecording ? '2px solid #2563EB' : '1px solid #CBD5E1',
+                          fontSize: '13px',
+                          fontFamily: 'inherit',
+                          boxSizing: 'border-box',
+                          resize: 'none',
+                          transition: 'border-color 0.2s',
+                          background: isRecording ? '#F0F7FF' : '#fff'
+                        }}
+                      />
+
+                      {/* Live interim transcript — shown in gray below existing text */}
+                      {isRecording && interimText && (
+                        <div style={{
+                          position: 'absolute',
+                          bottom: '10px',
+                          left: '12px',
+                          right: '12px',
+                          fontSize: '12px',
+                          color: '#94A3B8',
+                          fontStyle: 'italic',
+                          pointerEvents: 'none',
+                          lineHeight: 1.4,
+                          background: 'transparent'
+                        }}>
+                          {interimText}
+                          <span style={{
+                            display: 'inline-block',
+                            width: '2px',
+                            height: '14px',
+                            background: '#2563EB',
+                            marginLeft: '2px',
+                            verticalAlign: 'middle',
+                            animation: 'blink 1s step-end infinite'
+                          }} />
+                        </div>
+                      )}
+
+                      {/* Pulsing recording indicator */}
+                      {isRecording && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '8px',
+                          right: '10px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          <div style={{
+                            width: '8px',
+                            height: '8px',
+                            borderRadius: '50%',
+                            background: '#DC2626',
+                            animation: 'pulse 1s ease-in-out infinite'
+                          }} />
+                          <span style={{ fontSize: '10px', color: '#DC2626', fontWeight: 700 }}>LIVE</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Blinking cursor + pulse animation */}
+                    <style>{`
+                      @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+                      @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+                    `}</style>
                   </div>
+
 
                   <div>
                     <span style={{ fontSize: '11px', color: '#64748B', display: 'block', marginBottom: '4px' }}>

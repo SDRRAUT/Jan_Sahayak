@@ -194,31 +194,9 @@ export default function CitizenDashboard() {
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <button
-                type="button"
-                onClick={() => setShowSignalModal(true)}
-                style={{
-                  height: '42px',
-                  fontSize: '13px',
-                  padding: '0 16px',
-                  borderRadius: 'var(--radius-full)',
-                  border: '1px solid var(--color-border-medium)',
-                  background: '#FFFFFF',
-                  color: 'var(--color-text-primary)',
-                  fontWeight: 600,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  cursor: 'pointer'
-                }}
-              >
-                <Radio style={{ width: '15px', height: '15px', color: 'var(--color-primary)' }} />
-                <span>Report Civic Signal</span>
-              </button>
-
               <button onClick={() => setShowFileModal(true)} className="btn-primary" style={{ height: '42px', fontSize: '13px' }}>
                 <Plus style={{ width: '16px', height: '16px' }} />
-                <span>Report a Problem</span>
+                <span>File Grievance</span>
               </button>
             </div>
           </div>

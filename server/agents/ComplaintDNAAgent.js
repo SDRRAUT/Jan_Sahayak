@@ -1,9 +1,11 @@
+import { aiProvider } from './aiProvider.js';
+
 /**
  * AGENT 2: COMPLAINT DNA AGENT
- * Creates a normalized fingerprint and dense feature embedding for vector similarity.
+ * Creates a normalized fingerprint and dense 768-dim feature embedding for pgvector similarity.
  */
 export class ComplaintDNAAgent {
-  static generateDNA(analysisResult, complaintInput) {
+  static async generateDNA(analysisResult, complaintInput) {
     const location = complaintInput.location || {};
     const lat = Number(location.lat) || 28.7180;
     const lng = Number(location.lng) || 77.1260;
@@ -14,29 +16,36 @@ export class ComplaintDNAAgent {
       analysisResult.problem_type,
       analysisResult.category,
       analysisResult.subcategory,
+      analysisResult.summary,
+      complaintInput.descriptionRaw || complaintInput.description || '',
       ...(analysisResult.infrastructure || []),
       ...(analysisResult.keywords || []),
       ...(analysisResult.entities || [])
-    ].join(' ').toLowerCase();
+    ].filter(Boolean).join(' ');
 
-    // Generate normalized semantic embedding hash/vector for clustering
-    const embedding = this.generateFeatureEmbedding(textFeatures);
+    // Generate 768-dimensional pgvector semantic embedding
+    const embedding = await aiProvider.generateEmbedding(textFeatures);
 
-    const dnaId = `DNA-${Math.floor(10000 + Math.random() * 90000)}-${ward.replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase()}`;
+    // Feature buckets for categorical alignment
+    const semanticEmbedding = this.generateFeatureEmbedding(textFeatures.toLowerCase());
+
+    const cleanWard = ward.replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase();
+    const dnaId = `DNA-${String(complaintInput.id || Date.now()).slice(-6)}-${cleanWard}`;
 
     return {
       dnaId,
-      problem: analysisResult.problem_type || 'general_civic',
+      problem: analysisResult.problem_type || 'General Civic Infrastructure',
       infrastructure: (analysisResult.infrastructure && analysisResult.infrastructure[0]) || 'Municipal Public Corridor',
       location: { lat, lng, ward },
       landmarks: analysisResult.entities || [],
-      affected_groups: analysisResult.affected_groups || ['Citizens'],
-      severity: analysisResult.severity || 5,
-      urgency: analysisResult.urgency || 5,
+      affected_groups: analysisResult.affected_groups || ['Local Residents', 'Commuters'],
+      severity: analysisResult.severity || 'HIGH',
+      urgency: analysisResult.urgency || 8,
       time_pattern: (analysisResult.temporal_signals && analysisResult.temporal_signals[0]) || 'Recurring periodic',
-      semantic_embedding: embedding,
-      normalized_description: `${analysisResult.category}: ${analysisResult.subcategory} (${analysisResult.summary})`,
-      rawText: complaintInput.text || complaintInput.description || ''
+      embedding,
+      semantic_embedding: semanticEmbedding,
+      normalized_description: `${analysisResult.category}: ${analysisResult.subcategory || analysisResult.problem_type} (${analysisResult.summary || 'Civic report'})`,
+      rawText: complaintInput.descriptionRaw || complaintInput.description || ''
     };
   }
 

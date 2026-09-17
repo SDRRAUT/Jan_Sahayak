@@ -28,6 +28,7 @@ import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
 import GrievanceDnaCard from '../components/common/GrievanceDnaCard';
 import WhyExplainer from '../components/common/WhyExplainer';
+import { uploadComplaintMedia, uploadVoiceRecording } from '../services/supabaseClient';
 
 export default function CitizenSubmit() {
   const navigate = useNavigate();
@@ -57,10 +58,12 @@ export default function CitizenSubmit() {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [audioUrl, setAudioUrl] = useState(null);
+  const [audioStorageUrl, setAudioStorageUrl] = useState(null);
   const [micStatusMsg, setMicStatusMsg] = useState(null);
   
   const [photoPreview, setPhotoPreview] = useState(null);
   const [photoFile, setPhotoFile] = useState(null);
+  const [photoStorageUrl, setPhotoStorageUrl] = useState(null);
   const [isAnalyzingImage, setIsAnalyzingImage] = useState(false);
   const [visionAnalysis, setVisionAnalysis] = useState(null);
   const [photoTag, setPhotoTag] = useState('');
@@ -133,11 +136,43 @@ export default function CitizenSubmit() {
         }
       };
 
-      recorder.onstop = () => {
+      recorder.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        const url = URL.createObjectURL(audioBlob);
-        setAudioUrl(url);
+        const localUrl = URL.createObjectURL(audioBlob);
+        setAudioUrl(localUrl);
         stream.getTracks().forEach(t => t.stop());
+
+        // Upload to Supabase Storage voice-recordings bucket
+        try {
+          setMicStatusMsg('Uploading audio to Supabase and running AI transcription...');
+          const { publicUrl } = await uploadVoiceRecording(audioBlob);
+          setAudioStorageUrl(publicUrl);
+
+          const reader = new FileReader();
+          reader.onload = async () => {
+            try {
+              const base64Audio = reader.result;
+              const res = await fetch('/api/complaints/voice-transcribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ audioBase64: base64Audio, mimeType: 'audio/webm', audioUrl: publicUrl })
+              });
+
+              if (res.ok) {
+                const data = await res.json();
+                if (data.transcript) {
+                  setDescription(prev => (prev ? prev.trim() + ' ' : '') + data.transcript);
+                  setMicStatusMsg(`Transcribed in ${data.language || 'Hindi/English'}: "${data.transcript.slice(0, 60)}..."`);
+                }
+              }
+            } catch (err) {
+              console.warn('Voice transcription notice:', err.message);
+            }
+          };
+          reader.readAsDataURL(audioBlob);
+        } catch (uploadErr) {
+          console.warn('Voice recording upload notice:', uploadErr.message);
+        }
       };
 
       recorder.start();
@@ -209,6 +244,12 @@ export default function CitizenSubmit() {
     if (!file) return;
 
     setPhotoFile(file);
+    
+    // Upload to Supabase Storage complaint-media bucket
+    uploadComplaintMedia(file).then(({ publicUrl }) => {
+      setPhotoStorageUrl(publicUrl);
+    }).catch(e => console.warn('[Supabase Storage] Photo upload notice:', e.message));
+
     const reader = new FileReader();
 
     reader.onload = async (event) => {
@@ -377,11 +418,14 @@ export default function CitizenSubmit() {
           lng: gpsCoordinates?.lng || 77.1250
         },
         evidence: {
-          hasPhoto: !!photoPreview,
-          photoUrl: photoPreview,
+          hasPhoto: !!photoPreview || !!photoStorageUrl,
+          photoUrl: photoStorageUrl || photoPreview,
+          photoStorageUrl: photoStorageUrl || null,
           photoTag: photoTag || null,
           photoObservations: visionAnalysis?.observed_hazard || null,
-          hasAudio: !!audioUrl,
+          hasAudio: !!audioUrl || !!audioStorageUrl,
+          audioUrl: audioStorageUrl || audioUrl,
+          audioStorageUrl: audioStorageUrl || null,
           audioTranscript: description,
           hasDocument: !!documentFile,
           documentName: documentFile?.name || null

@@ -379,12 +379,12 @@ class Database {
 
   async initPostgres() {
     try {
-      const ready = await initPostgresSchema(INITIAL_STORE);
+      const ready = await checkPostgresConnection();
       if (ready) {
         await this.syncWithPostgres();
       }
     } catch (err) {
-      console.warn('PostgreSQL auto-init status:', err.message);
+      console.warn('Supabase PostgreSQL connection status:', err.message);
     }
   }
 
@@ -394,7 +394,17 @@ class Database {
       if (pgComplaints && pgComplaints.length > 0) {
         this.data.complaints = pgComplaints;
       }
-    } catch (e) {}
+      const pgIncidents = await postgresDB.getAllIncidents();
+      if (pgIncidents && pgIncidents.length > 0) {
+        this.data.civicIncidents = pgIncidents;
+      }
+      const pgSignals = await postgresDB.getAllSignals();
+      if (pgSignals && pgSignals.length > 0) {
+        this.data.civicSignals = pgSignals;
+      }
+    } catch (e) {
+      console.warn('Sync with PostgreSQL warning:', e.message);
+    }
   }
 
   load() {
@@ -440,7 +450,7 @@ class Database {
     }
     this.save();
     postgresDB.saveGrievance(complaint).catch((err) => {
-      // Non-fatal if postgres is disconnected in local dev
+      // Non-fatal if postgres has transient network hiccup
     });
     return complaint;
   }
@@ -484,6 +494,7 @@ class Database {
       this.data.civicIncidents.unshift(incident);
     }
     this.save();
+    postgresDB.saveIncident(incident).catch(() => {});
     return incident;
   }
 
@@ -496,6 +507,7 @@ class Database {
     if (!this.data.civicSignals) this.data.civicSignals = [];
     this.data.civicSignals.unshift(signal);
     this.save();
+    postgresDB.saveSignal(signal).catch(() => {});
     return signal;
   }
 
@@ -515,6 +527,12 @@ class Database {
     };
     this.data.incidentEvents.unshift(record);
     this.save();
+    postgresDB.logAuditEvent(
+      event.actorId || event.actorType || 'System AI Engine',
+      event.eventType || 'PIPELINE_EVENT',
+      event.incidentId || record.id,
+      typeof event.payload === 'string' ? event.payload : JSON.stringify(event.payload || {})
+    ).catch(() => {});
     return record;
   }
 

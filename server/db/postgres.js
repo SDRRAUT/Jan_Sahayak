@@ -2,12 +2,13 @@ import pg from 'pg';
 
 const { Pool } = pg;
 
-// Support various PostgreSQL connection strings (Vercel Postgres, Supabase, Neon, Railway, Local)
+// PostgreSQL connection string for Supabase
 const connectionString = 
   process.env.DATABASE_URL || 
   process.env.POSTGRES_URL || 
   process.env.POSTGRES_PRISMA_URL || 
-  process.env.PG_CONNECTION_STRING;
+  process.env.PG_CONNECTION_STRING ||
+  'postgres://jan_sahayak_app:JanSahayak_Secure_DB_2026!@db.epnfavpqweeybzoyoexq.supabase.co:5432/postgres';
 
 let pool = null;
 let isConnected = false;
@@ -19,13 +20,13 @@ export function getPool() {
     pool = new Pool({
       connectionString,
       ssl: isLocal ? false : { rejectUnauthorized: false },
-      max: 10,
+      max: 15,
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 5000
+      connectionTimeoutMillis: 10000
     });
 
     pool.on('error', (err) => {
-      console.error('[PostgreSQL] Unexpected idle client error:', err.message);
+      console.error('[Supabase PostgreSQL] Idle client error:', err.message);
     });
   }
   return pool;
@@ -36,12 +37,13 @@ export async function checkPostgresConnection() {
   if (!p) return false;
   try {
     const client = await p.connect();
+    const res = await client.query('SELECT current_user, current_database(), version();');
     client.release();
     isConnected = true;
-    console.log('🐘 Connected to PostgreSQL database successfully.');
+    console.log(`🐘 Connected to Supabase PostgreSQL: user=${res.rows[0].current_user}, db=${res.rows[0].current_database}`);
     return true;
   } catch (err) {
-    console.warn('⚠️ PostgreSQL connection failed:', err.message);
+    console.warn('⚠️ Supabase PostgreSQL connection failed:', err.message);
     isConnected = false;
     return false;
   }
@@ -52,262 +54,7 @@ export function isPostgresActive() {
 }
 
 /**
- * Auto-initialize tables and migrations in PostgreSQL
- */
-export async function initPostgresSchema(initialData = {}) {
-  const p = getPool();
-  if (!p) return false;
-
-  const connected = await checkPostgresConnection();
-  if (!connected) return false;
-
-  const client = await p.connect();
-  try {
-    await client.query('BEGIN');
-
-    // 1. Users Table
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id VARCHAR(64) PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        password VARCHAR(255) NOT NULL,
-        role VARCHAR(64) NOT NULL,
-        department VARCHAR(255),
-        designation VARCHAR(255),
-        zone VARCHAR(255),
-        phone VARCHAR(64),
-        ward VARCHAR(255),
-        pincode VARCHAR(32),
-        verified BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-      );
-    `);
-
-    // 2. Grievances / Complaints Table
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS grievances (
-        id VARCHAR(64) PRIMARY KEY,
-        title TEXT NOT NULL,
-        description_raw TEXT NOT NULL,
-        language_detected VARCHAR(128),
-        category VARCHAR(128),
-        department VARCHAR(128),
-        officer_name VARCHAR(128),
-        location JSONB,
-        urgency VARCHAR(32),
-        urgency_score INT,
-        status VARCHAR(64),
-        created_at VARCHAR(64),
-        timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-        sla_deadline VARCHAR(64),
-        sla_hours_left INT,
-        upvotes INT DEFAULT 1,
-        citizen_id VARCHAR(64),
-        citizen_name VARCHAR(128),
-        citizen_phone VARCHAR(64),
-        evidence JSONB,
-        dna JSONB,
-        analysis JSONB,
-        cluster_id VARCHAR(64),
-        cluster_title TEXT,
-        cluster_count INT DEFAULT 1,
-        incident_id VARCHAR(64),
-        resolution_notes TEXT,
-        resolution_photo_url TEXT,
-        citizen_verification JSONB,
-        timeline JSONB DEFAULT '[]'::jsonb,
-        information_requests JSONB DEFAULT '[]'::jsonb
-      );
-    `);
-
-    // 3. Clusters Table
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS clusters (
-        id VARCHAR(64) PRIMARY KEY,
-        title TEXT,
-        incident_id VARCHAR(64),
-        lead_department VARCHAR(128),
-        centroid JSONB,
-        radius_meters INT,
-        complaint_ids JSONB DEFAULT '[]'::jsonb,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-      );
-    `);
-
-    // 4. Civic Incidents Table
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS civic_incidents (
-        id VARCHAR(64) PRIMARY KEY,
-        title TEXT NOT NULL,
-        stage VARCHAR(64),
-        severity VARCHAR(32),
-        urgency VARCHAR(32),
-        summary TEXT,
-        lead_department VARCHAR(128),
-        participating_departments JSONB DEFAULT '[]'::jsonb,
-        affected_area TEXT,
-        affected_population TEXT,
-        complaint_count INT DEFAULT 0,
-        unique_citizens INT DEFAULT 0,
-        cluster_ids JSONB DEFAULT '[]'::jsonb,
-        complaint_ids JSONB DEFAULT '[]'::jsonb,
-        stage_velocity VARCHAR(64),
-        velocity_data JSONB,
-        evidence JSONB DEFAULT '[]'::jsonb,
-        root_cause JSONB,
-        simulations JSONB DEFAULT '[]'::jsonb,
-        cross_dept_coordination JSONB,
-        civic_memory JSONB,
-        human_decisions JSONB DEFAULT '[]'::jsonb,
-        status VARCHAR(64),
-        verification_status VARCHAR(64),
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-      );
-    `);
-
-    // 5. Civic Signals Table
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS civic_signals (
-        id VARCHAR(64) PRIMARY KEY,
-        incident_id VARCHAR(64),
-        citizen_name VARCHAR(128),
-        ward VARCHAR(128),
-        channel VARCHAR(64),
-        raw_input TEXT,
-        translated_text TEXT,
-        category VARCHAR(128),
-        inferred_asset VARCHAR(128),
-        has_photo BOOLEAN DEFAULT FALSE,
-        photo_url TEXT,
-        lat DOUBLE PRECISION,
-        lng DOUBLE PRECISION,
-        timestamp VARCHAR(64),
-        status VARCHAR(64),
-        confidence VARCHAR(64)
-      );
-    `);
-
-    // 6. Notifications Table
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS notifications (
-        id VARCHAR(64) PRIMARY KEY,
-        user_id VARCHAR(64),
-        user_role VARCHAR(64),
-        title TEXT,
-        message TEXT,
-        grievance_id VARCHAR(64),
-        link TEXT,
-        type VARCHAR(64),
-        read BOOLEAN DEFAULT FALSE,
-        created_at VARCHAR(64),
-        timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-      );
-    `);
-
-    // 7. Audit Logs Table
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS audit_logs (
-        id VARCHAR(64) PRIMARY KEY,
-        timestamp VARCHAR(64),
-        actor VARCHAR(128),
-        action VARCHAR(128),
-        target_id VARCHAR(64),
-        details TEXT,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-      );
-    `);
-
-    await client.query('COMMIT');
-    console.log('✅ PostgreSQL schema verified & updated.');
-
-    // Auto-seed if database is freshly created
-    await seedPostgresData(client, initialData);
-
-    return true;
-  } catch (err) {
-    await client.query('ROLLBACK');
-    console.error('❌ Error initializing PostgreSQL schema:', err);
-    return false;
-  } finally {
-    client.release();
-  }
-}
-
-/**
- * Seed initial baseline data into PostgreSQL
- */
-async function seedPostgresData(client, data) {
-  try {
-    // Seed Users
-    const userCountRes = await client.query('SELECT COUNT(*) FROM users');
-    if (parseInt(userCountRes.rows[0].count, 10) === 0 && data.users?.length) {
-      for (const u of data.users) {
-        await client.query(`
-          INSERT INTO users (id, name, email, password, role, department, designation, zone, phone, ward, pincode, verified)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-          ON CONFLICT (id) DO NOTHING
-        `, [u.id, u.name, u.email, u.password, u.role, u.department, u.designation, u.zone, u.phone, u.ward, u.pincode, u.verified || false]);
-      }
-      console.log(`🌱 Seeded ${data.users.length} users to PostgreSQL.`);
-    }
-
-    // Seed Grievances
-    const gCountRes = await client.query('SELECT COUNT(*) FROM grievances');
-    if (parseInt(gCountRes.rows[0].count, 10) === 0 && data.complaints?.length) {
-      for (const g of data.complaints) {
-        await client.query(`
-          INSERT INTO grievances (
-            id, title, description_raw, language_detected, category, department, officer_name,
-            location, urgency, urgency_score, status, created_at, sla_deadline, sla_hours_left,
-            upvotes, citizen_id, citizen_name, citizen_phone, evidence, dna, cluster_id, incident_id
-          ) VALUES (
-            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22
-          ) ON CONFLICT (id) DO NOTHING
-        `, [
-          g.id, g.title, g.descriptionRaw, g.languageDetected, g.category, g.department, g.officerName,
-          JSON.stringify(g.location || {}), g.urgency, g.urgencyScore, g.status, g.createdAt,
-          g.slaDeadline, g.slaHoursLeft, g.upvotes || 1, g.citizenId, g.citizenName, g.citizenPhone,
-          JSON.stringify(g.evidence || {}), JSON.stringify(g.dna || {}), g.clusterId, g.incidentId
-        ]);
-      }
-      console.log(`🌱 Seeded ${data.complaints.length} initial complaints to PostgreSQL.`);
-    }
-
-    // Seed Civic Incidents
-    const incCountRes = await client.query('SELECT COUNT(*) FROM civic_incidents');
-    if (parseInt(incCountRes.rows[0].count, 10) === 0 && data.civicIncidents?.length) {
-      for (const inc of data.civicIncidents) {
-        await client.query(`
-          INSERT INTO civic_incidents (
-            id, title, stage, severity, urgency, summary, lead_department, participating_departments,
-            affected_area, affected_population, complaint_count, unique_citizens, cluster_ids,
-            complaint_ids, stage_velocity, velocity_data, evidence, root_cause, simulations,
-            cross_dept_coordination, civic_memory, status, verification_status
-          ) VALUES (
-            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23
-          ) ON CONFLICT (id) DO NOTHING
-        `, [
-          inc.id, inc.title, inc.stage, inc.severity, inc.urgency, inc.summary, inc.leadDepartment,
-          JSON.stringify(inc.participatingDepartments || []), inc.affectedArea, inc.affectedPopulation,
-          inc.complaintCount, inc.uniqueCitizens, JSON.stringify(inc.clusterIds || []),
-          JSON.stringify(inc.complaintIds || []), inc.stageVelocity, JSON.stringify(inc.velocityData || {}),
-          JSON.stringify(inc.evidence || []), JSON.stringify(inc.rootCause || {}),
-          JSON.stringify(inc.simulations || []), JSON.stringify(inc.crossDeptCoordination || {}),
-          JSON.stringify(inc.civicMemory || {}), inc.status, inc.verificationStatus
-        ]);
-      }
-      console.log(`🌱 Seeded ${data.civicIncidents.length} civic incidents to PostgreSQL.`);
-    }
-  } catch (err) {
-    console.warn('Seed error (non-fatal):', err.message);
-  }
-}
-
-/**
- * Query Helper Methods
+ * High-Performance Supabase Data Access Layer
  */
 export const postgresDB = {
   async query(text, params) {
@@ -316,11 +63,20 @@ export const postgresDB = {
     return p.query(text, params);
   },
 
+  // --- Grievances (Complaints) ---
   async getAllGrievances() {
     const p = getPool();
-    if (!p) return null;
+    if (!p) return [];
     try {
-      const res = await p.query('SELECT * FROM grievances ORDER BY timestamp DESC');
+      const res = await p.query(`
+        SELECT 
+          g.*,
+          extensions.ST_Y(g.geom::extensions.geometry) AS lat_val,
+          extensions.ST_X(g.geom::extensions.geometry) AS lng_val
+        FROM public.grievances g
+        ORDER BY g.created_at DESC
+      `);
+
       return res.rows.map(r => ({
         id: r.id,
         title: r.title,
@@ -329,21 +85,90 @@ export const postgresDB = {
         category: r.category,
         department: r.department,
         officerName: r.officer_name,
-        location: r.location,
+        officerDesignation: r.officer_designation,
+        location: {
+          ward: r.location_ward,
+          area: r.location_area,
+          city: r.location_city || 'New Delhi',
+          pincode: r.location_pincode,
+          lat: r.lat_val || (r.location_ward?.includes('14') ? 28.7189 : 28.6139),
+          lng: r.lng_val || (r.location_ward?.includes('14') ? 77.1265 : 77.2090)
+        },
+        urgency: r.urgency,
+        urgencyScore: r.urgency_score,
+        status: r.status,
+        createdAt: r.created_at ? new Date(r.created_at).toLocaleString() : new Date().toLocaleString(),
+        timestamp: r.created_at || new Date().toISOString(),
+        slaDeadline: r.sla_deadline ? new Date(r.sla_deadline).toLocaleString() : '24 Hours',
+        slaHoursLeft: r.sla_hours_left ?? 24,
+        upvotes: r.upvotes || 1,
+        citizenId: r.citizen_id,
+        citizenName: r.citizen_name,
+        citizenPhone: r.citizen_phone,
+        evidence: r.evidence || {},
+        dna: r.dna || {},
+        analysis: r.analysis || {},
+        clusterId: r.cluster_id,
+        clusterTitle: r.cluster_title,
+        clusterCount: r.cluster_count || 1,
+        incidentId: r.incident_id,
+        resolutionNotes: r.resolution_notes,
+        resolutionPhotoUrl: r.resolution_photo_url,
+        citizenVerification: r.citizen_verification,
+        timeline: r.timeline || []
+      }));
+    } catch (err) {
+      console.error('PostgreSQL getAllGrievances error:', err.message);
+      return [];
+    }
+  },
+
+  async getGrievanceById(id) {
+    const p = getPool();
+    if (!p) return null;
+    try {
+      const res = await p.query(`
+        SELECT 
+          g.*,
+          extensions.ST_Y(g.geom::extensions.geometry) AS lat_val,
+          extensions.ST_X(g.geom::extensions.geometry) AS lng_val
+        FROM public.grievances g
+        WHERE g.id = $1
+      `, [id]);
+
+      if (!res.rows.length) return null;
+      const r = res.rows[0];
+      return {
+        id: r.id,
+        title: r.title,
+        descriptionRaw: r.description_raw,
+        languageDetected: r.language_detected,
+        category: r.category,
+        department: r.department,
+        officerName: r.officer_name,
+        officerDesignation: r.officer_designation,
+        location: {
+          ward: r.location_ward,
+          area: r.location_area,
+          city: r.location_city || 'New Delhi',
+          pincode: r.location_pincode,
+          lat: r.lat_val,
+          lng: r.lng_val
+        },
         urgency: r.urgency,
         urgencyScore: r.urgency_score,
         status: r.status,
         createdAt: r.created_at,
-        timestamp: r.timestamp,
+        timestamp: r.created_at,
         slaDeadline: r.sla_deadline,
         slaHoursLeft: r.sla_hours_left,
         upvotes: r.upvotes,
         citizenId: r.citizen_id,
         citizenName: r.citizen_name,
         citizenPhone: r.citizen_phone,
-        evidence: r.evidence,
-        dna: r.dna,
-        analysis: r.analysis,
+        evidence: r.evidence || {},
+        dna: r.dna || {},
+        analysis: r.analysis || {},
         clusterId: r.cluster_id,
         clusterTitle: r.cluster_title,
         clusterCount: r.cluster_count,
@@ -351,11 +176,10 @@ export const postgresDB = {
         resolutionNotes: r.resolution_notes,
         resolutionPhotoUrl: r.resolution_photo_url,
         citizenVerification: r.citizen_verification,
-        timeline: r.timeline || [],
-        informationRequests: r.information_requests || []
-      }));
+        timeline: r.timeline || []
+      };
     } catch (err) {
-      console.error('PostgreSQL getAllGrievances error:', err.message);
+      console.error('PostgreSQL getGrievanceById error:', err.message);
       return null;
     }
   },
@@ -364,39 +188,102 @@ export const postgresDB = {
     const p = getPool();
     if (!p) return false;
     try {
+      const lat = parseFloat(g.location?.lat) || 28.7185;
+      const lng = parseFloat(g.location?.lng) || 77.1250;
+      const citizenId = g.citizenId && g.citizenId.startsWith('a0000000-') ? g.citizenId : 'a0000000-0000-0000-0000-000000000001';
+
       await p.query(`
-        INSERT INTO grievances (
-          id, title, description_raw, language_detected, category, department, officer_name,
-          location, urgency, urgency_score, status, created_at, timestamp, sla_deadline,
-          sla_hours_left, upvotes, citizen_id, citizen_name, citizen_phone, evidence,
-          dna, analysis, cluster_id, cluster_title, cluster_count, incident_id,
-          resolution_notes, resolution_photo_url, citizen_verification, timeline, information_requests
+        INSERT INTO public.grievances (
+          id, citizen_id, citizen_name, citizen_phone, title, description_raw,
+          language_detected, category, department, officer_name, officer_designation,
+          location_ward, location_area, location_city, location_pincode,
+          geom, geog, urgency, urgency_score, status, sla_deadline, sla_hours_left,
+          upvotes, cluster_id, cluster_title, cluster_count, incident_id,
+          analysis, dna, evidence, timeline, resolution_notes, resolution_photo_url,
+          citizen_verification, created_at, updated_at
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW(), $13,
-          $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25,
-          $26, $27, $28, $29, $30
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
+          extensions.ST_SetSRID(extensions.ST_MakePoint($16, $17), 4326),
+          extensions.ST_SetSRID(extensions.ST_MakePoint($16, $17), 4326)::extensions.geography,
+          $18, $19, $20, NOW() + INTERVAL '24 hours', $21, $22, $23, $24, $25, $26,
+          $27, $28, $29, $30, $31, $32, $33, NOW(), NOW()
         ) ON CONFLICT (id) DO UPDATE SET
           title = EXCLUDED.title,
-          status = EXCLUDED.status,
           category = EXCLUDED.category,
           department = EXCLUDED.department,
           officer_name = EXCLUDED.officer_name,
+          urgency = EXCLUDED.urgency,
+          urgency_score = EXCLUDED.urgency_score,
+          status = EXCLUDED.status,
+          cluster_id = EXCLUDED.cluster_id,
+          cluster_title = EXCLUDED.cluster_title,
+          cluster_count = EXCLUDED.cluster_count,
+          incident_id = EXCLUDED.incident_id,
+          analysis = EXCLUDED.analysis,
+          dna = EXCLUDED.dna,
+          evidence = EXCLUDED.evidence,
+          timeline = EXCLUDED.timeline,
           resolution_notes = EXCLUDED.resolution_notes,
           resolution_photo_url = EXCLUDED.resolution_photo_url,
           citizen_verification = EXCLUDED.citizen_verification,
-          timeline = EXCLUDED.timeline,
-          information_requests = EXCLUDED.information_requests,
-          cluster_id = EXCLUDED.cluster_id,
-          incident_id = EXCLUDED.incident_id;
+          updated_at = NOW();
       `, [
-        g.id, g.title, g.descriptionRaw || g.description, g.languageDetected, g.category, g.department, g.officerName,
-        JSON.stringify(g.location || {}), g.urgency, g.urgencyScore, g.status, g.createdAt,
-        g.slaDeadline, g.slaHoursLeft, g.upvotes || 1, g.citizenId, g.citizenName, g.citizenPhone,
-        JSON.stringify(g.evidence || {}), JSON.stringify(g.dna || {}), JSON.stringify(g.analysis || {}),
-        g.clusterId, g.clusterTitle, g.clusterCount || 1, g.incidentId,
-        g.resolutionNotes, g.resolutionPhotoUrl, JSON.stringify(g.citizenVerification || null),
-        JSON.stringify(g.timeline || []), JSON.stringify(g.informationRequests || [])
+        g.id,
+        citizenId,
+        g.citizenName || 'Aditya Verma',
+        g.citizenPhone || '+91 98712-88210',
+        g.title,
+        g.descriptionRaw || g.description || '',
+        g.languageDetected || 'English / Hinglish',
+        g.category || 'General Civic Infrastructure',
+        g.department || 'Municipal Corporation of Delhi (MCD)',
+        g.officerName || 'Er. Sanjay Sharma',
+        g.officerDesignation || 'Assistant Executive Engineer',
+        g.location?.ward || 'Ward 14 (Rohini Sector 14)',
+        g.location?.area || 'Local Area',
+        g.location?.city || 'New Delhi',
+        g.location?.pincode || '110085',
+        lng,
+        lat,
+        g.urgency || 'HIGH',
+        g.urgencyScore || 80,
+        g.status || 'SUBMITTED',
+        g.slaHoursLeft || 24,
+        g.upvotes || 1,
+        g.clusterId || null,
+        g.clusterTitle || null,
+        g.clusterCount || 1,
+        g.incidentId || null,
+        JSON.stringify(g.analysis || {}),
+        JSON.stringify(g.dna || {}),
+        JSON.stringify(g.evidence || {}),
+        JSON.stringify(g.timeline || []),
+        g.resolutionNotes || null,
+        g.resolutionPhotoUrl || null,
+        JSON.stringify(g.citizenVerification || {})
       ]);
+
+      // If DNA embedding is available, persist to complaint_dna
+      if (g.dna?.embedding && Array.isArray(g.dna.embedding)) {
+        await p.query(`
+          INSERT INTO public.complaint_dna (
+            complaint_id, problem_type, category, infrastructure, affected_population,
+            severity, urgency_score, normalized_description, embedding
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::extensions.vector(768))
+          ON CONFLICT (id) DO NOTHING;
+        `, [
+          g.id,
+          g.dna.problem || g.category,
+          g.category,
+          g.dna.infrastructure || 'Municipal Infrastructure',
+          g.dna.affectedPopulation || 'Local Residents',
+          g.urgency,
+          g.urgencyScore || 80,
+          g.dna.normalizedDescription || g.descriptionRaw,
+          JSON.stringify(g.dna.embedding)
+        ]);
+      }
+
       return true;
     } catch (err) {
       console.error('PostgreSQL saveGrievance error:', err.message);
@@ -404,15 +291,252 @@ export const postgresDB = {
     }
   },
 
-  async saveNotification(n) {
+  // --- Civic Incidents ---
+  async getAllIncidents() {
+    const p = getPool();
+    if (!p) return [];
+    try {
+      const res = await p.query('SELECT * FROM public.civic_incidents ORDER BY updated_at DESC');
+      return res.rows.map(r => ({
+        id: r.id,
+        title: r.title,
+        stage: r.stage,
+        severity: r.severity,
+        urgency: r.urgency,
+        summary: r.summary,
+        leadDepartment: r.lead_department,
+        participatingDepartments: r.participating_departments || [],
+        affectedArea: r.affected_area,
+        affectedPopulation: r.affected_population,
+        complaintCount: r.complaint_count || 1,
+        uniqueCitizens: r.unique_citizens || 1,
+        clusterIds: r.cluster_ids || [],
+        complaintIds: r.complaint_ids || [],
+        stageVelocity: r.stage_velocity,
+        velocityData: r.velocity_data || {},
+        evidence: r.evidence || [],
+        rootCause: r.root_cause || {},
+        simulations: r.simulations || [],
+        crossDeptCoordination: r.cross_dept_coordination || {},
+        civicMemory: r.civic_memory || {},
+        humanDecisions: r.human_decisions || [],
+        status: r.status,
+        verificationStatus: r.verification_status,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at
+      }));
+    } catch (err) {
+      console.error('PostgreSQL getAllIncidents error:', err.message);
+      return [];
+    }
+  },
+
+  async getIncidentById(id) {
+    const p = getPool();
+    if (!p) return null;
+    try {
+      const res = await p.query('SELECT * FROM public.civic_incidents WHERE id = $1', [id]);
+      if (!res.rows.length) return null;
+      const r = res.rows[0];
+      return {
+        id: r.id,
+        title: r.title,
+        stage: r.stage,
+        severity: r.severity,
+        urgency: r.urgency,
+        summary: r.summary,
+        leadDepartment: r.lead_department,
+        participatingDepartments: r.participating_departments || [],
+        affectedArea: r.affected_area,
+        affectedPopulation: r.affected_population,
+        complaintCount: r.complaint_count,
+        uniqueCitizens: r.unique_citizens,
+        clusterIds: r.cluster_ids || [],
+        complaintIds: r.complaint_ids || [],
+        stageVelocity: r.stage_velocity,
+        velocityData: r.velocity_data || {},
+        evidence: r.evidence || [],
+        rootCause: r.root_cause || {},
+        simulations: r.simulations || [],
+        crossDeptCoordination: r.cross_dept_coordination || {},
+        civicMemory: r.civic_memory || {},
+        humanDecisions: r.human_decisions || [],
+        status: r.status,
+        verificationStatus: r.verification_status,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at
+      };
+    } catch (err) {
+      console.error('PostgreSQL getIncidentById error:', err.message);
+      return null;
+    }
+  },
+
+  async saveIncident(inc) {
     const p = getPool();
     if (!p) return false;
     try {
       await p.query(`
-        INSERT INTO notifications (id, user_id, user_role, title, message, grievance_id, link, type, read, created_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-        ON CONFLICT (id) DO NOTHING
-      `, [n.id, n.userId, n.userRole, n.title, n.message, n.grievanceId, n.link, n.type, n.read || false, n.createdAt]);
+        INSERT INTO public.civic_incidents (
+          id, title, stage, severity, urgency, summary, lead_department,
+          participating_departments, affected_area, affected_population,
+          complaint_count, unique_citizens, cluster_ids, complaint_ids,
+          stage_velocity, velocity_data, evidence, root_cause, simulations,
+          cross_dept_coordination, civic_memory, human_decisions,
+          status, verification_status, created_at, updated_at
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
+          $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, NOW(), NOW()
+        ) ON CONFLICT (id) DO UPDATE SET
+          title = EXCLUDED.title,
+          stage = EXCLUDED.stage,
+          severity = EXCLUDED.severity,
+          urgency = EXCLUDED.urgency,
+          summary = EXCLUDED.summary,
+          lead_department = EXCLUDED.lead_department,
+          participating_departments = EXCLUDED.participating_departments,
+          affected_area = EXCLUDED.affected_area,
+          affected_population = EXCLUDED.affected_population,
+          complaint_count = EXCLUDED.complaint_count,
+          unique_citizens = EXCLUDED.unique_citizens,
+          cluster_ids = EXCLUDED.cluster_ids,
+          complaint_ids = EXCLUDED.complaint_ids,
+          stage_velocity = EXCLUDED.stage_velocity,
+          velocity_data = EXCLUDED.velocity_data,
+          evidence = EXCLUDED.evidence,
+          root_cause = EXCLUDED.root_cause,
+          simulations = EXCLUDED.simulations,
+          cross_dept_coordination = EXCLUDED.cross_dept_coordination,
+          civic_memory = EXCLUDED.civic_memory,
+          human_decisions = EXCLUDED.human_decisions,
+          status = EXCLUDED.status,
+          verification_status = EXCLUDED.verification_status,
+          updated_at = NOW();
+      `, [
+        inc.id, inc.title, inc.stage || 'EMERGING', inc.severity || 'HIGH', inc.urgency || 'HIGH',
+        inc.summary, inc.leadDepartment || 'Delhi Jal Board (DJB)',
+        JSON.stringify(inc.participatingDepartments || []),
+        inc.affectedArea || 'Ward 14 (Rohini Sector 14)',
+        inc.affectedPopulation || '5,000 residents',
+        inc.complaintCount || 1, inc.uniqueCitizens || 1,
+        JSON.stringify(inc.clusterIds || []),
+        JSON.stringify(inc.complaintIds || []),
+        inc.stageVelocity || '2.8x Acceleration',
+        JSON.stringify(inc.velocityData || {}),
+        JSON.stringify(inc.evidence || []),
+        JSON.stringify(inc.rootCause || {}),
+        JSON.stringify(inc.simulations || []),
+        JSON.stringify(inc.crossDeptCoordination || {}),
+        JSON.stringify(inc.civicMemory || {}),
+        JSON.stringify(inc.humanDecisions || []),
+        inc.status || 'ACTIVE',
+        inc.verificationStatus || 'PENDING'
+      ]);
+      return true;
+    } catch (err) {
+      console.error('PostgreSQL saveIncident error:', err.message);
+      return false;
+    }
+  },
+
+  // --- Civic Signals ---
+  async getAllSignals() {
+    const p = getPool();
+    if (!p) return [];
+    try {
+      const res = await p.query('SELECT * FROM public.civic_signals ORDER BY created_at DESC');
+      return res.rows.map(r => ({
+        id: r.id,
+        incidentId: r.incident_id,
+        citizenName: r.citizen_name,
+        ward: r.ward,
+        channel: r.channel,
+        rawInput: r.raw_input,
+        translatedText: r.translated_text,
+        category: r.category,
+        inferredAsset: r.inferred_asset,
+        hasPhoto: r.has_photo,
+        photoUrl: r.photo_url,
+        status: r.status,
+        confidence: r.confidence,
+        timestamp: r.created_at
+      }));
+    } catch (err) {
+      console.error('PostgreSQL getAllSignals error:', err.message);
+      return [];
+    }
+  },
+
+  async saveSignal(sig) {
+    const p = getPool();
+    if (!p) return false;
+    try {
+      const lat = parseFloat(sig.lat) || 28.7180;
+      const lng = parseFloat(sig.lng) || 77.1250;
+      await p.query(`
+        INSERT INTO public.civic_signals (
+          id, incident_id, citizen_name, ward, channel, raw_input,
+          translated_text, category, inferred_asset, has_photo, photo_url,
+          geom, geog, status, confidence, created_at
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,
+          extensions.ST_SetSRID(extensions.ST_MakePoint($12, $13), 4326),
+          extensions.ST_SetSRID(extensions.ST_MakePoint($12, $13), 4326)::extensions.geography,
+          $14, $15, NOW()
+        ) ON CONFLICT (id) DO NOTHING;
+      `, [
+        sig.id, sig.incidentId, sig.citizenName, sig.ward, sig.channel,
+        sig.rawInput, sig.translatedText, sig.category, sig.inferredAsset,
+        sig.hasPhoto || false, sig.photoUrl || null, lng, lat,
+        sig.status || 'CLUSTERED', sig.confidence || 'HIGH'
+      ]);
+      return true;
+    } catch (err) {
+      console.error('PostgreSQL saveSignal error:', err.message);
+      return false;
+    }
+  },
+
+  // --- Notifications ---
+  async getNotifications(userId, userRole) {
+    const p = getPool();
+    if (!p) return [];
+    try {
+      const res = await p.query(`
+        SELECT * FROM public.notifications 
+        WHERE user_id = $1 OR user_role = $2 OR user_role = 'all'
+        ORDER BY created_at DESC 
+        LIMIT 50
+      `, [userId, userRole]);
+
+      return res.rows.map(r => ({
+        id: r.id,
+        userId: r.user_id,
+        userRole: r.user_role,
+        title: r.title,
+        message: r.message,
+        grievanceId: r.grievance_id,
+        link: r.link,
+        type: r.type,
+        read: r.read,
+        createdAt: r.created_at ? new Date(r.created_at).toLocaleTimeString() : 'Just now',
+        timestamp: r.created_at
+      }));
+    } catch (err) {
+      console.error('PostgreSQL getNotifications error:', err.message);
+      return [];
+    }
+  },
+
+  async saveNotification(n) {
+    const p = getPool();
+    if (!p) return false;
+    try {
+      const targetUserId = (n.userId && n.userId.startsWith('a0000000-')) ? n.userId : 'a0000000-0000-0000-0000-000000000001';
+      await p.query(`
+        INSERT INTO public.notifications (user_id, user_role, title, message, grievance_id, link, type, read, created_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+      `, [targetUserId, n.userRole, n.title, n.message, n.grievanceId, n.link, n.type || 'GENERAL', n.read || false]);
       return true;
     } catch (err) {
       console.error('PostgreSQL saveNotification error:', err.message);
@@ -420,19 +544,119 @@ export const postgresDB = {
     }
   },
 
-  async logAuditEvent(actor, action, targetId, details) {
+  async markNotificationRead(id) {
     const p = getPool();
     if (!p) return false;
     try {
-      const id = `LOG-${Date.now()}`;
+      await p.query('UPDATE public.notifications SET read = true WHERE id = $1', [id]);
+      return true;
+    } catch (err) {
+      console.error('PostgreSQL markNotificationRead error:', err.message);
+      return false;
+    }
+  },
+
+  // --- Audit Logs ---
+  async logAuditEvent(actor, action, targetId, details, metadata = {}) {
+    const p = getPool();
+    if (!p) return false;
+    try {
       await p.query(`
-        INSERT INTO audit_logs (id, timestamp, actor, action, target_id, details)
-        VALUES ($1, $2, $3, $4, $5, $6)
-      `, [id, new Date().toLocaleTimeString(), actor, action, targetId, details]);
+        INSERT INTO public.audit_logs (actor_name, actor_role, action, target_id, details, metadata, created_at)
+        VALUES ($1, $2, $3, $4, $5, $6, NOW())
+      `, [actor || 'System AI Engine', 'SYSTEM', action, targetId, details, JSON.stringify(metadata)]);
       return true;
     } catch (err) {
       console.error('PostgreSQL logAuditEvent error:', err.message);
       return false;
+    }
+  },
+
+  async getAuditLogs(limit = 100) {
+    const p = getPool();
+    if (!p) return [];
+    try {
+      const res = await p.query('SELECT * FROM public.audit_logs ORDER BY created_at DESC LIMIT $1', [limit]);
+      return res.rows.map(r => ({
+        id: r.id,
+        timestamp: new Date(r.created_at).toLocaleString(),
+        actor: r.actor_name,
+        action: r.action,
+        targetId: r.target_id,
+        details: r.details,
+        metadata: r.metadata
+      }));
+    } catch (err) {
+      console.error('PostgreSQL getAuditLogs error:', err.message);
+      return [];
+    }
+  },
+
+  // --- Spatial & Vector Queries ---
+  async searchNearbyGrievances(lat, lng, radiusMeters = 1500) {
+    const p = getPool();
+    if (!p) return [];
+    try {
+      const res = await p.query(`
+        SELECT * FROM public.search_nearby_complaints($1, $2, $3)
+      `, [lat, lng, radiusMeters]);
+      return res.rows;
+    } catch (err) {
+      console.error('PostgreSQL searchNearbyGrievances error:', err.message);
+      return [];
+    }
+  },
+
+  async searchSimilarComplaints(embeddingArray, matchThreshold = 0.70, matchCount = 10) {
+    const p = getPool();
+    if (!p) return [];
+    try {
+      const res = await p.query(`
+        SELECT * FROM public.search_similar_complaints($1::extensions.vector(768), $2, $3)
+      `, [JSON.stringify(embeddingArray), matchThreshold, matchCount]);
+      return res.rows;
+    } catch (err) {
+      console.error('PostgreSQL searchSimilarComplaints error:', err.message);
+      return [];
+    }
+  },
+
+  async searchCivicMemory(embeddingArray, matchThreshold = 0.65, matchCount = 5) {
+    const p = getPool();
+    if (!p) return [];
+    try {
+      const res = await p.query(`
+        SELECT * FROM public.search_civic_memory($1::extensions.vector(768), $2, $3)
+      `, [JSON.stringify(embeddingArray), matchThreshold, matchCount]);
+      return res.rows;
+    } catch (err) {
+      console.error('PostgreSQL searchCivicMemory error:', err.message);
+      return [];
+    }
+  },
+
+  // --- Profiles & Departments ---
+  async getCivicProfile(userId) {
+    const p = getPool();
+    if (!p) return null;
+    try {
+      const res = await p.query('SELECT * FROM public.civic_profiles WHERE id = $1', [userId]);
+      return res.rows[0] || null;
+    } catch (err) {
+      console.error('PostgreSQL getCivicProfile error:', err.message);
+      return null;
+    }
+  },
+
+  async getDepartments() {
+    const p = getPool();
+    if (!p) return [];
+    try {
+      const res = await p.query('SELECT * FROM public.civic_departments ORDER BY name ASC');
+      return res.rows;
+    } catch (err) {
+      console.error('PostgreSQL getDepartments error:', err.message);
+      return [];
     }
   }
 };
