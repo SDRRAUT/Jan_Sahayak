@@ -322,18 +322,7 @@ export default function Home() {
                 A public grievance intelligence platform that turns everyday citizen voices into structured insights, connected evidence, and actionable resolution recommendations.
               </p>
 
-              {/* Primary Call-to-Actions */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap', marginBottom: '36px' }}>
-                <Link to="/citizen/submit" className="btn-primary" style={{ padding: '0 28px' }}>
-                  <span>Report a Problem</span>
-                  <ArrowRight className="btn-arrow" style={{ width: '16px', height: '16px' }} />
-                </Link>
 
-                <Link to="/citizen" className="btn-secondary">
-                  <Search style={{ width: '15px', height: '15px', color: 'var(--color-text-muted)' }} />
-                  <span>Track My Grievance</span>
-                </Link>
-              </div>
 
               {/* Subtle Trust Indicators */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap', paddingTop: '16px', borderTop: '1px solid var(--color-divider)' }}>
