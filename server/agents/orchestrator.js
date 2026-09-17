@@ -1,4 +1,6 @@
 import { db } from '../db/database.js';
+import { postgresDB } from '../db/postgres.js';
+import { CANONICAL_EVENTS } from '../constants/events.js';
 import { ComplaintAnalyzerAgent } from './ComplaintAnalyzerAgent.js';
 import { ComplaintDNAAgent } from './ComplaintDNAAgent.js';
 import { SimilarityClusterAgent } from './SimilarityClusterAgent.js';
@@ -235,6 +237,16 @@ export class CivicIntelligenceOrchestrator {
 
       // Persist synthesized incident
       db.saveIncident(synthesizedIncident);
+      await postgresDB.saveIncident(synthesizedIncident);
+      await postgresDB.saveGrievance(complaint);
+
+      await postgresDB.logAuditEvent(
+        'CivicIntelligenceOrchestrator',
+        'INCIDENT_SYNTHESIZED',
+        synthesizedIncident.id,
+        `Synthesized incident from ${synthesizedIncident.complaintCount} signals with lead department ${synthesizedIncident.leadDepartment}`,
+        { complaintId: complaint.id, clusterId: cluster.id }
+      );
 
       db.logEvent({
         incidentId: synthesizedIncident.id,
@@ -248,10 +260,24 @@ export class CivicIntelligenceOrchestrator {
         }
       });
 
-      this.broadcastEvent('incident_updated', {
+      this.broadcastEvent(CANONICAL_EVENTS.INCIDENT_CREATED, {
+        incidentId: synthesizedIncident.id,
+        stage: synthesizedIncident.stage,
+        complaintCount: synthesizedIncident.complaintCount,
+        leadDepartment: synthesizedIncident.leadDepartment,
+        complaintId: complaint.id
+      });
+
+      this.broadcastEvent(CANONICAL_EVENTS.INCIDENT_UPDATED, {
         incidentId: synthesizedIncident.id,
         stage: synthesizedIncident.stage,
         complaintCount: synthesizedIncident.complaintCount
+      });
+
+      this.broadcastEvent(CANONICAL_EVENTS.AUTHORITY_ASSIGNED, {
+        incidentId: synthesizedIncident.id,
+        leadDepartment: synthesizedIncident.leadDepartment,
+        complaintId: complaint.id
       });
 
       console.log(`[Orchestrator] Pipeline completed successfully for ${complaint.id} -> Incident ${synthesizedIncident.id}`);
@@ -277,11 +303,28 @@ export class CivicIntelligenceOrchestrator {
    */
   processVerification(incidentId, verificationPayload) {
     const result = VerificationAgent.processCitizenVerification(incidentId, verificationPayload);
+    const isResolved = result.incident.verificationStatus === 'VERIFIED_SATISFIED' || result.incident.status === 'RESOLVED';
+    
+    this.broadcastEvent(CANONICAL_EVENTS.VERIFICATION_SUBMITTED, {
+      incidentId,
+      status: result.incident.status,
+      verificationStatus: result.incident.verificationStatus,
+      isResolved
+    });
+
+    this.broadcastEvent(isResolved ? CANONICAL_EVENTS.INCIDENT_RESOLVED : CANONICAL_EVENTS.INCIDENT_REOPENED, {
+      incidentId,
+      status: result.incident.status,
+      verificationStatus: result.incident.verificationStatus
+    });
+
+    // Also legacy event
     this.broadcastEvent('verification_submitted', {
       incidentId,
       status: result.incident.status,
       verificationStatus: result.incident.verificationStatus
     });
+
     return result;
   }
 }

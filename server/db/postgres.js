@@ -597,13 +597,28 @@ export const postgresDB = {
     const p = getPool();
     if (!p) return false;
     try {
-      const validOfficerId = (officerId && officerId.length === 36) ? officerId : 'b0000000-0000-0000-0000-000000000001';
-      await p.query(`
-        INSERT INTO public.field_actions (
-          incident_id, grievance_id, officer_id, officer_name, action_type, status, notes, evidence_url, started_at, completed_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW() - INTERVAL '2 hours', NOW())
-      `, [incidentId || null, grievanceId || null, validOfficerId, officerName || 'Field Officer', actionType || 'REPAIR', status || 'COMPLETED', notes || '', evidenceUrl || null]);
-      return true;
+      let validOfficerId = null;
+      if (officerId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(officerId)) {
+        validOfficerId = officerId;
+      }
+      try {
+        await p.query(`
+          INSERT INTO public.field_actions (
+            incident_id, grievance_id, officer_id, officer_name, action_type, status, notes, evidence_url, started_at, completed_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW() - INTERVAL '2 hours', NOW())
+        `, [incidentId || null, grievanceId || null, validOfficerId, officerName || 'Field Officer', actionType || 'REPAIR', status || 'COMPLETED', notes || '', evidenceUrl || null]);
+        return true;
+      } catch (fkErr) {
+        if (validOfficerId && fkErr.code === '23503') {
+          await p.query(`
+            INSERT INTO public.field_actions (
+              incident_id, grievance_id, officer_id, officer_name, action_type, status, notes, evidence_url, started_at, completed_at
+            ) VALUES ($1, $2, null, $3, $4, $5, $6, $7, NOW() - INTERVAL '2 hours', NOW())
+          `, [incidentId || null, grievanceId || null, officerName || 'Field Officer', actionType || 'REPAIR', status || 'COMPLETED', notes || '', evidenceUrl || null]);
+          return true;
+        }
+        throw fkErr;
+      }
     } catch (err) {
       console.error('PostgreSQL recordFieldAction error:', err.message);
       return false;
@@ -632,13 +647,37 @@ export const postgresDB = {
     const p = getPool();
     if (!p) return false;
     try {
-      const validCitizenId = (citizenId && citizenId.length === 36) ? citizenId : 'a0000000-0000-0000-0000-000000000001';
-      await p.query(`
-        INSERT INTO public.verification_records (
-          grievance_id, incident_id, citizen_id, status, feedback, rating, photo_url, verified_at, created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
-      `, [grievanceId || null, incidentId || null, validCitizenId, status || 'VERIFIED', feedback || '', rating || 5, photoUrl || null]);
-      return true;
+      let normalizedStatus = 'PENDING';
+      const upperStatus = (status || '').toUpperCase();
+      if (['CONFIRMED', 'VERIFIED_SATISFIED', 'SATISFIED', 'VERIFIED', 'RESOLVED_CONFIRMED'].includes(upperStatus)) {
+        normalizedStatus = 'CONFIRMED';
+      } else if (['DISPUTED', 'DISPUTE_REOPENED', 'REOPENED'].includes(upperStatus)) {
+        normalizedStatus = 'DISPUTED';
+      }
+
+      let validCitizenId = null;
+      if (citizenId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(citizenId)) {
+        validCitizenId = citizenId;
+      }
+
+      try {
+        await p.query(`
+          INSERT INTO public.verification_records (
+            grievance_id, incident_id, citizen_id, status, feedback, rating, photo_url, verified_at, created_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+        `, [grievanceId || null, incidentId || null, validCitizenId, normalizedStatus, feedback || '', rating || 5, photoUrl || null]);
+        return true;
+      } catch (fkErr) {
+        if (validCitizenId && fkErr.code === '23503') {
+          await p.query(`
+            INSERT INTO public.verification_records (
+              grievance_id, incident_id, citizen_id, status, feedback, rating, photo_url, verified_at, created_at
+            ) VALUES ($1, $2, null, $3, $4, $5, $6, NOW(), NOW())
+          `, [grievanceId || null, incidentId || null, normalizedStatus, feedback || '', rating || 5, photoUrl || null]);
+          return true;
+        }
+        throw fkErr;
+      }
     } catch (err) {
       console.error('PostgreSQL recordVerification error:', err.message);
       return false;
@@ -650,13 +689,36 @@ export const postgresDB = {
     const p = getPool();
     if (!p) return false;
     try {
-      const validUserId = (uploadedBy && uploadedBy.length === 36) ? uploadedBy : 'a0000000-0000-0000-0000-000000000001';
-      await p.query(`
-        INSERT INTO public.evidence_records (
-          complaint_id, incident_id, uploaded_by, type, storage_path, file_url, mime_type, metadata, created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
-      `, [complaintId || null, incidentId || null, validUserId, type || 'IMAGE', storagePath || '', fileUrl || '', mimeType || 'image/jpeg', JSON.stringify(metadata || {})]);
-      return true;
+      let validUserId = null;
+      if (uploadedBy && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uploadedBy)) {
+        validUserId = uploadedBy;
+      }
+
+      let normalizedType = 'PHOTO';
+      const upperType = (type || '').toUpperCase();
+      if (['PHOTO', 'IMAGE', 'RESOLUTION_PHOTO'].some(t => upperType.includes(t))) normalizedType = 'PHOTO';
+      else if (upperType.includes('VIDEO')) normalizedType = 'VIDEO';
+      else if (upperType.includes('AUDIO') || upperType.includes('VOICE')) normalizedType = 'AUDIO';
+      else if (upperType.includes('DOC') || upperType.includes('PDF')) normalizedType = 'DOCUMENT';
+
+      try {
+        await p.query(`
+          INSERT INTO public.evidence_records (
+            complaint_id, incident_id, uploaded_by, type, storage_path, file_url, mime_type, metadata, created_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+        `, [complaintId || null, incidentId || null, validUserId, normalizedType, storagePath || '', fileUrl || '', mimeType || 'image/jpeg', JSON.stringify(metadata || {})]);
+        return true;
+      } catch (fkErr) {
+        if (validUserId && fkErr.code === '23503') {
+          await p.query(`
+            INSERT INTO public.evidence_records (
+              complaint_id, incident_id, uploaded_by, type, storage_path, file_url, mime_type, metadata, created_at
+            ) VALUES ($1, $2, null, $3, $4, $5, $6, $7, NOW())
+          `, [complaintId || null, incidentId || null, normalizedType, storagePath || '', fileUrl || '', mimeType || 'image/jpeg', JSON.stringify(metadata || {})]);
+          return true;
+        }
+        throw fkErr;
+      }
     } catch (err) {
       console.error('PostgreSQL saveEvidenceRecord error:', err.message);
       return false;
@@ -781,11 +843,12 @@ export const postgresDB = {
     const p = getPool();
     if (!p) return false;
     try {
+      const role = metadata?.role || 'SYSTEM';
       await p.query(`
         INSERT INTO public.audit_logs (
-          actor_name, action, target_id, details, metadata, created_at
-        ) VALUES ($1, $2, $3, $4, $5, NOW())
-      `, [actorName, action, targetId, details, JSON.stringify(metadata)]);
+          actor_name, actor_role, action, target_id, details, metadata, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, NOW())
+      `, [actorName || 'System AI Engine', role, action, targetId, details, JSON.stringify(metadata)]);
       return true;
     } catch (err) {
       console.warn('[PostgreSQL] logAuditEvent:', err.message);
@@ -899,6 +962,7 @@ export const postgresDB = {
     const p = getPool();
     if (!p) return null;
     try {
+      const isUUID = typeof userId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
       let result;
       if (userRole === 'super_admin') {
         result = await p.query(`
@@ -907,20 +971,38 @@ export const postgresDB = {
           LIMIT 100
         `);
       } else if (userRole === 'civic_officer' || userRole === 'officer' || userRole === 'dept_admin') {
-        result = await p.query(`
-          SELECT * FROM public.notifications
-          WHERE user_id = $1
-             OR user_role IN ('officer', 'dept_admin', 'civic_officer')
-          ORDER BY created_at DESC
-          LIMIT 50
-        `, [userId]);
+        if (isUUID) {
+          result = await p.query(`
+            SELECT * FROM public.notifications
+            WHERE user_id = $1
+               OR user_role IN ('officer', 'dept_admin', 'civic_officer')
+            ORDER BY created_at DESC
+            LIMIT 50
+          `, [userId]);
+        } else {
+          result = await p.query(`
+            SELECT * FROM public.notifications
+            WHERE user_role IN ('officer', 'dept_admin', 'civic_officer', 'all')
+            ORDER BY created_at DESC
+            LIMIT 50
+          `);
+        }
       } else {
-        result = await p.query(`
-          SELECT * FROM public.notifications
-          WHERE user_id = $1 OR user_role = 'citizen'
-          ORDER BY created_at DESC
-          LIMIT 50
-        `, [userId]);
+        if (isUUID) {
+          result = await p.query(`
+            SELECT * FROM public.notifications
+            WHERE user_id = $1 OR user_role = 'citizen'
+            ORDER BY created_at DESC
+            LIMIT 50
+          `, [userId]);
+        } else {
+          result = await p.query(`
+            SELECT * FROM public.notifications
+            WHERE user_role IN ('citizen', 'all')
+            ORDER BY created_at DESC
+            LIMIT 50
+          `);
+        }
       }
       return result.rows.map(r => ({
         id: r.id,
@@ -1037,12 +1119,13 @@ export const postgresDB = {
       `, [grievanceId, incidentId || grievanceId]);
 
       verRes.rows.forEach(r => {
+        const isSatisfied = ['CONFIRMED', 'VERIFIED_SATISFIED', 'SATISFIED'].includes(r.status);
         timelineEvents.push({
           id: `VR-${r.id}`,
           type: 'VERIFICATION',
-          stage: r.status === 'VERIFIED_SATISFIED' ? 'Citizen Verified & Closed' : 'Dispute Reopened by Citizen',
+          stage: isSatisfied ? 'Citizen Verified & Closed' : 'Dispute Reopened by Citizen',
           status: r.status,
-          detail: r.feedback || (r.status === 'VERIFIED_SATISFIED' ? 'Problem confirmed resolved by citizen' : 'Citizen disputed resolution'),
+          detail: r.feedback || (isSatisfied ? 'Problem confirmed resolved by citizen' : 'Citizen disputed resolution'),
           rating: r.rating,
           photoUrl: r.photo_url,
           timestamp: r.created_at,

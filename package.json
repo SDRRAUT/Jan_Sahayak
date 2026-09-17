@@ -32,6 +32,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "verify:syntax": "node --check server/index.js && node --check start.js",
+    "test": "node --test test/**/*.test.js",
     "test:pipeline": "node scripts/test_civic_pipeline.js"
   },
   "dependencies": {

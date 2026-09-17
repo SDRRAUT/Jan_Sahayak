@@ -946,7 +946,7 @@ app.post('/api/grievances/:id/verify', authenticateToken, requireRole(['citizen'
     grievanceId: item.id,
     incidentId: item.incidentId || item.clusterId || null,
     citizenId: req.user.id,
-    status: isSatisfied ? 'VERIFIED_SATISFIED' : 'DISPUTED_REOPENED',
+    status: isSatisfied ? 'CONFIRMED' : 'DISPUTED',
     feedback: item.citizenVerification.feedbackText,
     rating: item.citizenVerification.rating,
     photoUrl: item.citizenVerification.evidencePhotos?.[0] || null
@@ -1241,7 +1241,7 @@ app.post('/api/grievances/:id/resolve', authenticateToken, requireRole(['officer
       complaintId: item.id,
       incidentId: item.incidentId || null,
       uploadedBy: req.user.id,
-      type: 'RESOLUTION_PHOTO',
+      type: 'PHOTO',
       storagePath: resolutionPhotoUrl,
       fileUrl: resolutionPhotoUrl,
       mimeType: 'image/jpeg',
@@ -1753,9 +1753,28 @@ app.get('/api/admin/users', authenticateToken, requireRole(['super_admin']), (re
   res.json({ users: safeUsers });
 });
 
-// Super Admin Audit Logs
-app.get('/api/admin/audit-logs', authenticateToken, requireRole(['super_admin']), (req, res) => {
+// Super Admin Audit Logs (Authoritative Supabase PostgreSQL with memory fallback)
+app.get('/api/admin/audit-logs', authenticateToken, requireRole(['super_admin']), async (req, res) => {
+  try {
+    const logs = await postgresDB.getAuditLogs(100);
+    if (logs && logs.length > 0) {
+      return res.json({ auditLogs: logs });
+    }
+  } catch (e) {
+    console.warn('[AuditLogs] DB read failed:', e.message);
+  }
   res.json({ auditLogs: AUDIT_LOGS });
+});
+
+// Admin Departments
+app.get('/api/admin/departments', authenticateToken, async (req, res) => {
+  try {
+    const depts = await postgresDB.getDepartments();
+    if (depts && depts.length > 0) {
+      return res.json({ departments: depts });
+    }
+  } catch (e) {}
+  res.json({ departments: DEPARTMENTS });
 });
 
 // Super Admin SLA Rules
