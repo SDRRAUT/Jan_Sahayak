@@ -30,10 +30,15 @@ export default function Platform() {
       <div className="container">
         {/* Header */}
         <div className="section-header center" style={{ marginBottom: '48px' }}>
-          <div className="category-pill">TECHNICAL BLUEPRINT</div>
-          <h2>Precision-Engineered for Scale</h2>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}>
+            <span className="category-pill">PLATFORM ARCHITECTURE</span>
+            <span className="pilot-tag" style={{ background: '#F1F5F9', color: '#475569' }}>
+              Prototype Environment
+            </span>
+          </div>
+          <h2>Civic Intelligence Architecture</h2>
           <p>
-            An inside look at the JanSahayk AI architecture: from raw acoustic waveform processing to RAG-grounded resolution recommendations.
+            An inside look at how JanSahayak जनसहायक processes everyday citizen voices, connects spatial evidence, and suggests resolution paths for municipal officers.
           </p>
         </div>
 
@@ -138,7 +143,7 @@ export default function Platform() {
                   className="btn-primary btn-sm"
                   style={{ background: 'var(--color-accent)', color: '#0B1914', fontWeight: 700 }}
                 >
-                  <span>Execute Neural Analysis</span>
+                  <span>Analyze Understanding</span>
                   <ArrowRight className="btn-arrow" style={{ width: '14px', height: '14px' }} />
                 </button>
               </div>

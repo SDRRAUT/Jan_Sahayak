@@ -52,10 +52,15 @@ export default function Impact() {
       <div className="container">
         {/* Header */}
         <div className="section-header center" style={{ marginBottom: '48px' }}>
-          <div className="category-pill">PUBLIC TRANSPARENCY</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}>
+            <span className="category-pill">PUBLIC TRANSPARENCY</span>
+            <span className="pilot-tag" style={{ background: '#F1F5F9', color: '#475569' }}>
+              Prototype Pilot Dataset
+            </span>
+          </div>
           <h2>Transforming Public Grievance Governance</h2>
           <p>
-            Rigorous benchmarks proving how JanSahayk replaces slow administrative bureaucracies with high-performance digital craftsmanship.
+            Field benchmarks proving how JanSahayak जनसहायक turns everyday citizen grievances into structured evidence, faster municipal resolution, and verified outcomes.
           </p>
         </div>
 
@@ -107,9 +112,9 @@ export default function Impact() {
         <div className="card" style={{ padding: '36px', marginBottom: '56px' }}>
           <div style={{ marginBottom: '24px' }}>
             <span className="category-pill" style={{ marginBottom: '8px' }}>ARCHITECTURAL COMPARISON</span>
-            <h3 style={{ fontSize: '24px' }}>Legacy Portals vs. JanSahayk Platform</h3>
+            <h3 style={{ fontSize: '24px' }}>Legacy Portals vs. JanSahayak Platform</h3>
             <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px' }}>
-              A side-by-side analysis of traditional grievance intake systems versus algorithmic intelligence.
+              A side-by-side analysis of traditional grievance intake systems versus evidence-backed resolution intelligence.
             </p>
           </div>
 
@@ -119,7 +124,7 @@ export default function Impact() {
                 <tr style={{ borderBottom: '2px solid var(--color-border-medium)' }}>
                   <th style={{ padding: '12px 16px', fontWeight: 700, color: 'var(--color-text-muted)', width: '22%' }}>DIMENSION</th>
                   <th style={{ padding: '12px 16px', fontWeight: 700, color: '#991B1B', width: '39%' }}>TRADITIONAL PORTAL (CPGRAMS / STATE)</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 700, color: 'var(--color-primary)', width: '39%' }}>JANSAHAYK AI PLATFORM</th>
+                  <th style={{ padding: '12px 16px', fontWeight: 700, color: 'var(--color-primary)', width: '39%' }}>JANSAHAYAK जनसहायक</th>
                 </tr>
               </thead>
               <tbody>
@@ -163,7 +168,7 @@ export default function Impact() {
           </h3>
 
           <p style={{ color: 'var(--color-text-inverse-muted)', fontSize: '15px', lineHeight: 1.6, marginBottom: '24px', maxWidth: '720px' }}>
-            When a burst 100mm underground valve allowed storm drain water into drinking conduits across Sector 14, 18 separate households submitted complaints in Hinglish. JanSahayk grouped them into Cluster #CL-W14-WATER-03 in 2 minutes, dispatched emergency excavation crews with replacement gaskets, and cleared the biohazard within 14 hours.
+            When a burst 100mm underground valve allowed storm drain water into drinking conduits across Sector 14, 18 separate households submitted complaints in Hinglish. JanSahayak grouped them into Cluster #CL-W14-WATER-03 in 2 minutes, dispatched emergency excavation crews with replacement gaskets, and cleared the biohazard within 14 hours.
           </p>
 
           <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
