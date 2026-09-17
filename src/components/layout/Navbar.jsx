@@ -308,6 +308,37 @@ export default function Navbar() {
             {user && (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') && (
               <>
                 <Link
+                  to="/intelligence"
+                  className={`site-nav-link ${location.pathname.startsWith('/intelligence') ? 'active' : ''}`}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '6px 14px',
+                    borderRadius: '999px',
+                    background: location.pathname.startsWith('/intelligence')
+                      ? 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)'
+                      : 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
+                    color: location.pathname.startsWith('/intelligence') ? '#FFFFFF' : '#4338CA',
+                    border: '1.5px solid #818CF8',
+                    boxShadow: location.pathname.startsWith('/intelligence')
+                      ? '0 4px 12px rgba(79, 70, 229, 0.35)'
+                      : '0 2px 8px rgba(99, 102, 241, 0.16)',
+                    fontWeight: 700,
+                    fontSize: '13px',
+                    transition: 'all 200ms ease',
+                    marginRight: '4px'
+                  }}
+                >
+                  <Sparkles style={{ 
+                    width: '14px', 
+                    height: '14px', 
+                    color: location.pathname.startsWith('/intelligence') ? '#FFFFFF' : '#4F46E5', 
+                    flexShrink: 0 
+                  }} />
+                  <span>Civic Intelligence</span>
+                </Link>
+                <Link
                   to="/officer"
                   className={`site-nav-link ${location.pathname === '/officer' && !location.search.includes('operations') ? 'active' : ''}`}
                 >
@@ -324,19 +355,6 @@ export default function Navbar() {
                   className={`site-nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
                 >
                   Ward Heatmap
-                </Link>
-                <Link
-                  to="/intelligence"
-                  className={`site-nav-link ${location.pathname.startsWith('/intelligence') ? 'active' : ''}`}
-                  style={{
-                    position: 'relative',
-                    color: location.pathname.startsWith('/intelligence') ? '#4338CA' : undefined,
-                    background: location.pathname.startsWith('/intelligence') ? '#EEF2FF' : undefined,
-                    fontWeight: location.pathname.startsWith('/intelligence') ? 700 : 500
-                  }}
-                >
-                  <Sparkles style={{ width: '13px', height: '13px', color: '#4F46E5', flexShrink: 0 }} />
-                  <span>Civic Intelligence</span>
                 </Link>
               </>
             )}
@@ -1010,6 +1028,27 @@ export default function Navbar() {
               {user && (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') && (
                 <>
                   <Link
+                    to="/intelligence"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 700,
+                      color: '#4338CA',
+                      background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
+                      border: '1.5px solid #818CF8',
+                      boxShadow: '0 2px 8px rgba(99, 102, 241, 0.16)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      marginBottom: '4px'
+                    }}
+                  >
+                    <Sparkles style={{ width: '16px', height: '16px', color: '#4F46E5' }} />
+                    <span>Civic Intelligence</span>
+                  </Link>
+                  <Link
                     to="/officer"
                     onClick={() => setMobileMenuOpen(false)}
                     style={{
@@ -1050,24 +1089,6 @@ export default function Navbar() {
                     }}
                   >
                     🗺️ Ward Heatmap & GIS
-                  </Link>
-                  <Link
-                    to="/intelligence"
-                    onClick={() => setMobileMenuOpen(false)}
-                    style={{
-                      padding: '10px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '14px',
-                      fontWeight: 700,
-                      color: '#4338CA',
-                      background: '#EEF2FF',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}
-                  >
-                    <Sparkles style={{ width: '16px', height: '16px', color: '#4F46E5' }} />
-                    <span>Civic Intelligence</span>
                   </Link>
                 </>
               )}
