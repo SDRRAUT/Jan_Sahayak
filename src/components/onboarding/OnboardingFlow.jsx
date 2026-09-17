@@ -17,11 +17,59 @@ import { useApp, DEMO_CREDENTIALS, DEMO_USERS } from '../../context/AppContext';
 import complaintKeyImg from '../../assets/complaint-key.jpg';
 import onboardingBg from '../../assets/onboarding-bg.jpg';
 
+const STEP_THEMES = {
+  1: {
+    name: 'warm_peach',
+    bg: 'linear-gradient(150deg, #FFF9F3 0%, #FFF2E6 100%)',
+    border: '#FED7AA',
+    shadow: '0 25px 60px -10px rgba(234, 88, 12, 0.22), 0 0 0 1px rgba(251, 146, 60, 0.15)',
+    divider: 'rgba(234, 88, 12, 0.14)',
+    accent: '#EA580C',
+    buttonBg: '#EA580C',
+    dotActive: '#EA580C',
+    dotInactive: '#FDBA74'
+  },
+  2: {
+    name: 'fresh_mint',
+    bg: 'linear-gradient(150deg, #F0FDF9 0%, #E3F8F1 100%)',
+    border: '#A7F3D0',
+    shadow: '0 25px 60px -10px rgba(5, 150, 105, 0.20), 0 0 0 1px rgba(16, 185, 129, 0.15)',
+    divider: 'rgba(5, 150, 105, 0.14)',
+    accent: '#059669',
+    buttonBg: '#059669',
+    dotActive: '#059669',
+    dotInactive: '#86EFAC'
+  },
+  3: {
+    name: 'soft_lavender',
+    bg: 'linear-gradient(150deg, #FAF5FF 0%, #F3E8FE 100%)',
+    border: '#DDD6FE',
+    shadow: '0 25px 60px -10px rgba(124, 58, 237, 0.20), 0 0 0 1px rgba(139, 92, 246, 0.15)',
+    divider: 'rgba(124, 58, 237, 0.14)',
+    accent: '#7C3AED',
+    buttonBg: '#7C3AED',
+    dotActive: '#7C3AED',
+    dotInactive: '#C4B5FD'
+  },
+  4: {
+    name: 'sky_slate',
+    bg: 'linear-gradient(150deg, #F8FAFC 0%, #EFF6FF 100%)',
+    border: '#BFDBFE',
+    shadow: '0 25px 60px -10px rgba(37, 99, 235, 0.20), 0 0 0 1px rgba(59, 130, 246, 0.15)',
+    divider: 'rgba(37, 99, 235, 0.14)',
+    accent: '#2563EB',
+    buttonBg: '#1E2653',
+    dotActive: '#2563EB',
+    dotInactive: '#93C5FD'
+  }
+};
+
 export default function OnboardingFlow({ onComplete }) {
   const navigate = useNavigate();
   const { switchDemoRole, enterApp } = useApp();
 
   const [currentStep, setCurrentStep] = useState(1);
+  const currentTheme = STEP_THEMES[currentStep] || STEP_THEMES[1];
 
   // Persona Selection State for Step 4
   const [selectedRole, setSelectedRole] = useState('citizen');
@@ -195,11 +243,12 @@ export default function OnboardingFlow({ onComplete }) {
 
       {/* Central Single-Screen Non-Scrollable Card */}
       <div style={{
-        background: '#FFFFFF',
+        background: currentTheme.bg,
+        border: `1.5px solid ${currentTheme.border}`,
         borderRadius: '24px',
         maxWidth: '560px',
         width: '100%',
-        boxShadow: '0 25px 60px -10px rgba(15, 23, 42, 0.45)',
+        boxShadow: currentTheme.shadow,
         padding: '18px 24px 16px 24px',
         display: 'flex',
         flexDirection: 'column',
@@ -207,7 +256,8 @@ export default function OnboardingFlow({ onComplete }) {
         position: 'relative',
         zIndex: 2,
         overflow: 'hidden',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        transition: 'background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease'
       }}>
 
         {/* Top Header: Website Logo + Brand + Direct App Entry */}
@@ -217,7 +267,8 @@ export default function OnboardingFlow({ onComplete }) {
           justifyContent: 'space-between',
           paddingBottom: '10px',
           marginBottom: '10px',
-          borderBottom: '1px solid #F1F5F9'
+          borderBottom: `1px solid ${currentTheme.divider}`,
+          transition: 'border-color 0.4s ease'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <img 
@@ -238,18 +289,19 @@ export default function OnboardingFlow({ onComplete }) {
             type="button"
             onClick={handleDirectEnter}
             style={{
-              background: '#F1F5F9',
-              border: '1px solid #E2E8F0',
+              background: 'rgba(255, 255, 255, 0.85)',
+              border: `1px solid ${currentTheme.border}`,
               borderRadius: '999px',
               padding: '4px 12px',
               fontSize: '11.5px',
               fontWeight: 700,
-              color: '#3B52D4',
+              color: currentTheme.accent,
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '4px',
-              transition: 'all 150ms ease'
+              transition: 'all 200ms ease',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
             }}
             title="Enter platform directly as public guest"
           >
@@ -665,7 +717,8 @@ export default function OnboardingFlow({ onComplete }) {
           justifyContent: 'space-between',
           marginTop: '14px',
           paddingTop: '12px',
-          borderTop: '1px solid #F1F5F9'
+          borderTop: `1px solid ${currentTheme.divider}`,
+          transition: 'border-color 0.4s ease'
         }}>
           {/* Bottom Left: Circular Back Button (visible from Step 2) */}
           <div style={{ width: '44px', height: '44px' }}>
@@ -678,14 +731,15 @@ export default function OnboardingFlow({ onComplete }) {
                   width: '44px',
                   height: '44px',
                   borderRadius: '50%',
-                  background: '#F1F5F9',
-                  border: 'none',
+                  background: 'rgba(255, 255, 255, 0.85)',
+                  border: `1px solid ${currentTheme.border}`,
                   color: '#1E2653',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  transition: 'all 150ms ease'
+                  transition: 'all 200ms ease',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
                 }}
               >
                 <ArrowLeft style={{ width: '18px', height: '18px' }} />
@@ -704,14 +758,14 @@ export default function OnboardingFlow({ onComplete }) {
                   onClick={() => setCurrentStep(step)}
                   aria-label={`Jump to step ${step}`}
                   style={{
-                    width: currentStep === step ? '18px' : '7px',
+                    width: currentStep === step ? '22px' : '7px',
                     height: '7px',
                     borderRadius: '999px',
-                    background: currentStep === step ? '#1E2653' : '#CBD5E1',
+                    background: currentStep === step ? currentTheme.dotActive : currentTheme.dotInactive,
                     border: 'none',
                     padding: 0,
                     cursor: 'pointer',
-                    transition: 'all 200ms ease'
+                    transition: 'all 250ms ease'
                   }}
                 />
               ))}
@@ -725,10 +779,11 @@ export default function OnboardingFlow({ onComplete }) {
                 background: 'transparent',
                 border: 'none',
                 fontSize: '12.5px',
-                fontWeight: 600,
-                color: '#94A3B8',
+                fontWeight: 700,
+                color: currentTheme.accent,
                 cursor: 'pointer',
-                padding: '2px 8px'
+                padding: '2px 8px',
+                transition: 'color 0.3s ease'
               }}
             >
               {currentStep < 4 ? 'Skip' : 'Enter Public View'}
@@ -746,15 +801,15 @@ export default function OnboardingFlow({ onComplete }) {
                   width: '44px',
                   height: '44px',
                   borderRadius: '50%',
-                  background: '#1E2653',
+                  background: currentTheme.buttonBg,
                   border: 'none',
                   color: '#FFFFFF',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  boxShadow: '0 4px 12px rgba(30, 38, 83, 0.35)',
-                  transition: 'transform 150ms ease'
+                  boxShadow: '0 4px 14px rgba(15, 23, 42, 0.25)',
+                  transition: 'all 200ms ease'
                 }}
               >
                 <ArrowRight style={{ width: '18px', height: '18px' }} />

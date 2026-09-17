@@ -4,7 +4,6 @@ import {
   Mic, 
   MicOff, 
   Camera, 
-  Video,
   FileText,
   Sparkles, 
   ArrowRight, 
@@ -12,23 +11,71 @@ import {
   CheckCircle2, 
   MapPin, 
   Navigation,
-  Layers, 
-  UploadCloud, 
-  Radio, 
-  RefreshCw,
-  Eye,
-  Sliders,
-  X,
-  Volume2,
-  Check,
-  Loader2,
-  Trash2
+  Sliders, 
+  X, 
+  Volume2, 
+  Check, 
+  Loader2, 
+  Trash2,
+  Copy,
+  ShieldCheck,
+  Clock,
+  Building2,
+  RotateCcw,
+  ExternalLink,
+  ChevronRight
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
-import GrievanceDnaCard from '../components/common/GrievanceDnaCard';
-import WhyExplainer from '../components/common/WhyExplainer';
 import { uploadComplaintMedia, uploadVoiceRecording } from '../services/supabaseClient';
+
+const QUICK_PRESETS = [
+  {
+    label: '💧 Contaminated Water',
+    hindiLabel: 'दूषित पेयजल',
+    text: 'Pichle 3 din se hamare Sector 14 mein supply ka paani ganda aur badbudaar aa raha hai. Bacche bimaar pad rahe hain, urgent pipeline inspection required near Mother Dairy.',
+    category: 'Water Supply & Contamination',
+    department: 'Delhi Jal Board (DJB)',
+    severity: 'CRITICAL',
+    badgeColor: '#0284C7'
+  },
+  {
+    label: '🚧 Road Pothole / Crater',
+    hindiLabel: 'सड़क पर गहरा गड्ढा',
+    text: 'Main road outer ring road flyover ke neeche bohot bada dangerous gaddha ho gaya hai. Kal raat 2 do-pahiya vahan slip hue. Severe accident hazard and traffic disruption.',
+    category: 'Roads & Infrastructure',
+    department: 'Public Works Department (PWD)',
+    severity: 'HIGH',
+    badgeColor: '#D97706'
+  },
+  {
+    label: '🗑️ Garbage Dump & Stench',
+    hindiLabel: 'कचरे का ढेर व दुर्गंध',
+    text: 'Main market corner pe kude ka bohot bada dher laga hua hai, 4 din se koi sanitation truck nahi aaya. Animals spreading garbage and toxic stench everywhere.',
+    category: 'Sanitation & Solid Waste',
+    department: 'Municipal Corporation of Delhi (MCD)',
+    severity: 'MEDIUM',
+    badgeColor: '#059669'
+  },
+  {
+    label: '⚡ Transformer Sparking',
+    hindiLabel: 'ट्रांसफॉर्मर चिंगारी व खतरा',
+    text: 'Gali number 4 ke corner pe electric transformer se spark nikal raha hai aur blast hone ka khatra hai. Poori residential line trip ho rahi hai. Immediate repair needed.',
+    category: 'Electricity & Power Grid',
+    department: 'BSES Rajdhani Power Limited',
+    severity: 'CRITICAL',
+    badgeColor: '#7C3AED'
+  },
+  {
+    label: '🌊 Sewage / Drain Overflow',
+    hindiLabel: 'सीवर व नाली ओवरफ्लो',
+    text: 'Open stormwater drain chocked ho gaya hai aur ganda naali ka paani sadak pe bhar raha hai. Pedestrians cannot walk and dengue mosquito breeding risk.',
+    category: 'Drainage & Waterlogging',
+    department: 'Municipal Corporation of Delhi (MCD)',
+    severity: 'HIGH',
+    badgeColor: '#0891B2'
+  }
+];
 
 export default function CitizenSubmit() {
   const navigate = useNavigate();
@@ -41,26 +88,25 @@ export default function CitizenSubmit() {
     pincode: '110085'
   };
 
-  // Accessibility / Low Digital Literacy Toggle
+  // Accessibility / Saral (Easy Voice) Mode
   const [saralMode, setSaralMode] = useState(false);
 
-  // Form Inputs
+  // Form State
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [ward, setWard] = useState(citizenInfo.ward || 'Ward 14 (Rohini Sector 14)');
-  const [area, setArea] = useState('Sector 14 Corridor');
+  const [area, setArea] = useState('Sector 14 Pocket 2');
   const [pincode, setPincode] = useState(citizenInfo.pincode || '110085');
   const [manualCategory, setManualCategory] = useState('');
   const [severityLevel, setSeverityLevel] = useState('HIGH');
-  const [showLocationDetails, setShowLocationDetails] = useState(false);
 
-  // Real Multimodal & Geolocation State
+  // Media & Geolocation State
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [audioUrl, setAudioUrl] = useState(null);
   const [audioStorageUrl, setAudioStorageUrl] = useState(null);
   const [micStatusMsg, setMicStatusMsg] = useState(null);
-  
+
   const [photoPreview, setPhotoPreview] = useState(null);
   const [photoFile, setPhotoFile] = useState(null);
   const [photoStorageUrl, setPhotoStorageUrl] = useState(null);
@@ -74,15 +120,16 @@ export default function CitizenSubmit() {
   const [gpsCoordinates, setGpsCoordinates] = useState(null);
   const [locationStatusMsg, setLocationStatusMsg] = useState(null);
 
-  // AI & Workflow State
+  // AI Understanding State
   const [liveUnderstanding, setLiveUnderstanding] = useState(null);
   const [isAnalyzingText, setIsAnalyzingText] = useState(false);
-  const [showAiReviewModal, setShowAiReviewModal] = useState(false);
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [createdTicket, setCreatedTicket] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [copiedTicketId, setCopiedTicketId] = useState(false);
 
-  // Refs for real media capture
+  // Submission Flow
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createdTicket, setCreatedTicket] = useState(null);
+
+  // Refs for media capture
   const photoInputRef = useRef(null);
   const documentInputRef = useRef(null);
   const mediaRecorderRef = useRef(null);
@@ -90,31 +137,55 @@ export default function CitizenSubmit() {
   const speechRecognitionRef = useRef(null);
   const timerIntervalRef = useRef(null);
 
-  // Quick preset test prompts (for convenience during review)
-  const presets = [
-    {
-      label: '💧 Contaminated Drinking Water (Hinglish)',
-      text: 'Bhai pichle 3 din se hamare Sector 14 mein naali ka ganda badbudaar paani supply mein mix hoke aa raha hai. Bacche bimaar pad rahe hain, jaldi theek karwao please near Mother Dairy.',
-      category: 'Water Supply & Contamination'
-    },
-    {
-      label: '🚧 Road Cave-in & Pothole (Accident Hazard)',
-      text: 'Moolchand flyover ke neeche main road pe bohot bada gaddha ho gaya hai barish ke baad. 2 scooter gir chuke hain aaj subah. Severe traffic bottleneck and accident risk!',
-      category: 'Roads & Infrastructure'
-    },
-    {
-      label: '⚡ Transformer Sparking (Fire Hazard)',
-      text: 'Gali no 3 main market transformer mein se aag ki chingariyan nikal rahi hain aur blast hone ka khatra hai. Poori gali ki light chali gayi hai.',
-      category: 'Electricity & Power Grid'
-    },
-    {
-      label: '🗑️ Solid Waste Accumulation & Open Burning',
-      text: 'Main market ke saamne open kude ka dher hai, 5 din se koi truck nahi aaya. Toxic smoke and foul stench spreading across residential colony.',
-      category: 'Sanitation & Solid Waste'
+  // Real-time debounced AI synthesis trigger
+  useEffect(() => {
+    if (!description || description.trim().length < 12) {
+      if (!description.trim()) setLiveUnderstanding(null);
+      return;
     }
-  ];
 
-  // 1. REAL VOICE INPUT VIA MEDIARECORDER & WEB SPEECH API
+    const timer = setTimeout(() => {
+      fetchAiUnderstanding(description, ward, area);
+    }, 700);
+
+    return () => clearTimeout(timer);
+  }, [description, ward, area]);
+
+  const fetchAiUnderstanding = async (textToAnalyze, currentWard, currentArea) => {
+    if (isAnalyzingText) return;
+    setIsAnalyzingText(true);
+
+    try {
+      const res = await fetch('/api/complaints/ai-understand', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: textToAnalyze,
+          ward: currentWard,
+          area: currentArea
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.understanding) {
+          setLiveUnderstanding(data.understanding);
+          if (!title) {
+            setTitle(data.understanding.problem_type);
+          }
+          if (data.understanding.severity) {
+            setSeverityLevel(data.understanding.severity);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('AI understand background fetch notice:', err.message);
+    } finally {
+      setIsAnalyzingText(false);
+    }
+  };
+
+  // 1. REAL VOICE INPUT
   const handleStartVoice = async () => {
     if (isRecording) {
       handleStopVoice();
@@ -123,7 +194,6 @@ export default function CitizenSubmit() {
 
     setMicStatusMsg(null);
 
-    // Request real browser microphone permission
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       audioChunksRef.current = [];
@@ -142,9 +212,8 @@ export default function CitizenSubmit() {
         setAudioUrl(localUrl);
         stream.getTracks().forEach(t => t.stop());
 
-        // Upload to Supabase Storage voice-recordings bucket
         try {
-          setMicStatusMsg('Uploading audio to Supabase and running AI transcription...');
+          setMicStatusMsg('Saving audio & transcribing with AI...');
           const { publicUrl } = await uploadVoiceRecording(audioBlob);
           setAudioStorageUrl(publicUrl);
 
@@ -162,16 +231,16 @@ export default function CitizenSubmit() {
                 const data = await res.json();
                 if (data.transcript) {
                   setDescription(prev => (prev ? prev.trim() + ' ' : '') + data.transcript);
-                  setMicStatusMsg(`Transcribed in ${data.language || 'Hindi/English'}: "${data.transcript.slice(0, 60)}..."`);
+                  setMicStatusMsg(`Transcribed: "${data.transcript.slice(0, 55)}..."`);
                 }
               }
             } catch (err) {
-              console.warn('Voice transcription notice:', err.message);
+              console.warn('Voice transcription fallback notice:', err.message);
             }
           };
           reader.readAsDataURL(audioBlob);
         } catch (uploadErr) {
-          console.warn('Voice recording upload notice:', uploadErr.message);
+          console.warn('Voice upload notice:', uploadErr.message);
         }
       };
 
@@ -179,19 +248,17 @@ export default function CitizenSubmit() {
       setIsRecording(true);
       setRecordingSeconds(0);
 
-      // Start recording timer
       timerIntervalRef.current = setInterval(() => {
         setRecordingSeconds(prev => prev + 1);
       }, 1000);
 
-      // Also trigger SpeechRecognition if supported for real-time live transcription
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
         speechRecognitionRef.current = recognition;
         recognition.continuous = true;
         recognition.interimResults = true;
-        recognition.lang = 'hi-IN'; // Supports Hindi/Hinglish/English
+        recognition.lang = 'hi-IN';
 
         recognition.onresult = (event) => {
           let transcript = '';
@@ -199,27 +266,18 @@ export default function CitizenSubmit() {
             transcript += event.results[i][0].transcript + ' ';
           }
           if (transcript.trim()) {
-            setDescription(prev => {
-              const base = prev ? prev.trim() + ' ' : '';
-              return transcript.trim();
-            });
+            setDescription(prev => transcript.trim());
           }
-        };
-
-        recognition.onerror = (e) => {
-          console.warn('[SpeechRecognition] Note:', e.error);
         };
 
         try {
           recognition.start();
         } catch (err) {}
-      } else {
-        setMicStatusMsg('Audio recording active. (Browser voice typing not supported, audio clip will be saved)');
       }
     } catch (err) {
-      console.warn('Microphone error:', err);
+      console.warn('Microphone permission or hardware note:', err);
       setIsRecording(false);
-      setMicStatusMsg('Microphone access was denied or is unavailable. You can type your report directly.');
+      setMicStatusMsg('Microphone access was denied. You can type your complaint directly.');
     }
   };
 
@@ -238,20 +296,18 @@ export default function CitizenSubmit() {
     setIsRecording(false);
   };
 
-  // 2. REAL PHOTO UPLOAD & GEMINI COMPUTER VISION ANALYSIS
+  // 2. REAL PHOTO UPLOAD & GEMINI COMPUTER VISION
   const handlePhotoSelect = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setPhotoFile(file);
     
-    // Upload to Supabase Storage complaint-media bucket
     uploadComplaintMedia(file).then(({ publicUrl }) => {
       setPhotoStorageUrl(publicUrl);
-    }).catch(e => console.warn('[Supabase Storage] Photo upload notice:', e.message));
+    }).catch(e => console.warn('Supabase storage photo notice:', e.message));
 
     const reader = new FileReader();
-
     reader.onload = async (event) => {
       const base64Data = event.target.result;
       setPhotoPreview(base64Data);
@@ -259,7 +315,6 @@ export default function CitizenSubmit() {
       setPhotoTag(`Uploaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
 
       try {
-        // Real multimodal analysis through backend Gemini
         const res = await fetch('/api/complaints/vision-analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -281,12 +336,11 @@ export default function CitizenSubmit() {
           }
         }
       } catch (err) {
-        console.warn('Vision analysis fallback:', err.message);
+        console.warn('Vision analysis fallback notice:', err.message);
       } finally {
         setIsAnalyzingImage(false);
       }
     };
-
     reader.readAsDataURL(file);
   };
 
@@ -298,19 +352,10 @@ export default function CitizenSubmit() {
     if (photoInputRef.current) photoInputRef.current.value = '';
   };
 
-  // 3. REAL DOCUMENT UPLOAD
-  const handleDocumentSelect = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setDocumentFile(file);
-    }
-  };
-
-  // 4. REAL DEVICE GEOLOCATION & REVERSE GEOCODING
+  // 3. REAL DEVICE GEOLOCATION
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
-      setLocationStatusMsg('Geolocation is not supported by your browser.');
-      setShowLocationDetails(true);
+      setLocationStatusMsg('Geolocation not supported by browser.');
       return;
     }
 
@@ -324,7 +369,6 @@ export default function CitizenSubmit() {
         setGpsCoordinates({ lat, lng });
 
         try {
-          // Call real reverse geocode endpoint
           const res = await fetch('/api/location/reverse-geocode', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -337,7 +381,7 @@ export default function CitizenSubmit() {
               setWard(data.ward || ward);
               setArea(data.area || `${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E`);
               setPincode(data.pincode || pincode);
-              setLocationStatusMsg(`GPS Locked: ${data.formattedAddress}`);
+              setLocationStatusMsg(`GPS Locked: ${data.formattedAddress || `${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E`}`);
             }
           }
         } catch (err) {
@@ -345,64 +389,27 @@ export default function CitizenSubmit() {
           setLocationStatusMsg(`GPS Coords: ${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E`);
         } finally {
           setIsDetectingGps(false);
-          setShowLocationDetails(true);
         }
       },
       (err) => {
         setIsDetectingGps(false);
-        setLocationStatusMsg('Location access permission was denied. You can manually enter your area.');
-        setShowLocationDetails(true);
+        setLocationStatusMsg('Location permission denied. You can manually choose your ward and area.');
       },
       { timeout: 10000, enableHighAccuracy: true }
     );
   };
 
-  // 5. REAL-TIME AI UNDERSTANDING PRE-REVIEW VIA GEMINI
-  const handleProceedToReview = async (e) => {
+  // 4. SUBMIT GRIEVANCE DIRECTLY
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!description.trim()) return;
 
-    setIsAnalyzingText(true);
-    setShowAiReviewModal(true);
-
-    try {
-      const res = await fetch('/api/complaints/ai-understand', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: description,
-          ward,
-          area
-        })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.understanding) {
-          setLiveUnderstanding(data.understanding);
-          if (!title) {
-            setTitle(data.understanding.problem_type);
-          }
-          if (data.understanding.severity) {
-            setSeverityLevel(data.understanding.severity);
-          }
-        }
-      }
-    } catch (err) {
-      console.warn('AI understand note:', err.message);
-    } finally {
-      setIsAnalyzingText(false);
-    }
-  };
-
-  // 6. CONFIRM & SUBMIT TO REAL BACKEND
-  const handleConfirmSubmission = async () => {
     setIsSubmitting(true);
     const finalCategory = manualCategory || liveUnderstanding?.category || 'General Civic Infrastructure';
 
     try {
       const created = await submitGrievance({
-        title: title || liveUnderstanding?.problem_type || `${finalCategory} in ${ward}`,
+        title: title || liveUnderstanding?.problem_type || `${finalCategory} Issue in ${ward}`,
         description,
         ward,
         area,
@@ -434,24 +441,51 @@ export default function CitizenSubmit() {
 
       setCreatedTicket(created);
       setIsSubmitting(false);
-      setShowAiReviewModal(false);
-      setShowConfirmationModal(true);
 
       // Celebration confetti
       try {
         confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
       } catch (err) {}
     } catch (err) {
+      console.error('Submission error:', err);
       setIsSubmitting(false);
-      setShowAiReviewModal(false);
     }
   };
 
-  return (
-    <div className="section-spacing" style={{ paddingTop: '32px' }}>
-      <div className="container">
+  const handleCopyTicket = (id) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(id);
+      setCopiedTicketId(true);
+      setTimeout(() => setCopiedTicketId(false), 2000);
+    }
+  };
 
-        {/* Hidden File Inputs for Real Camera & Document Attachment */}
+  const resetForm = () => {
+    setTitle('');
+    setDescription('');
+    setAudioUrl(null);
+    setAudioStorageUrl(null);
+    setPhotoPreview(null);
+    setPhotoFile(null);
+    setPhotoStorageUrl(null);
+    setDocumentFile(null);
+    setLiveUnderstanding(null);
+    setCreatedTicket(null);
+    setGpsCoordinates(null);
+    setLocationStatusMsg(null);
+    setMicStatusMsg(null);
+  };
+
+  return (
+    <div style={{ 
+      minHeight: '100vh', 
+      backgroundColor: 'var(--color-bg-canvas, #F8FAFC)',
+      paddingTop: '28px',
+      paddingBottom: '64px'
+    }}>
+      <div className="container" style={{ maxWidth: '980px', margin: '0 auto', padding: '0 16px' }}>
+
+        {/* Hidden File Inputs */}
         <input 
           type="file" 
           ref={photoInputRef}
@@ -464,275 +498,478 @@ export default function CitizenSubmit() {
           type="file" 
           ref={documentInputRef}
           accept=".pdf,.doc,.docx,image/*"
-          onChange={handleDocumentSelect}
+          onChange={(e) => setDocumentFile(e.target.files?.[0] || null)}
           style={{ display: 'none' }}
         />
 
-        {/* Page Header */}
+        {/* ====================================================================
+            UNIFIED MASTER CARD CONTAINER
+            Arranges all content inside ONE cohesive, beautifully designed card.
+           ==================================================================== */}
         <div style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '16px',
-          marginBottom: '28px'
+          background: '#FFFFFF',
+          borderRadius: '24px',
+          border: '1px solid var(--color-border-subtle, rgba(15, 23, 42, 0.08))',
+          boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04)',
+          overflow: 'hidden'
         }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-              <img src="/logo.png" alt="JanSahayak" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
-              <div className="category-pill" style={{ background: '#ECFDF5', color: '#065F46', borderColor: '#A7F3D0' }}>
-                <Sparkles style={{ width: '13px', height: '13px' }} />
-                <span>CITIZEN REPORTING GATEWAY</span>
-              </div>
-            </div>
-            <h1 style={{ fontSize: '32px', marginBottom: '8px', color: 'var(--color-text-primary)' }}>
-              Report a Civic Problem
-            </h1>
-            <p style={{ color: 'var(--color-text-secondary)', fontSize: '14.5px', maxWidth: '640px' }}>
-              Describe what happened in your own words. JanSahayak’s live AI connects real evidence, assigns the responsible authority, and updates your timeline in real time.
-            </p>
-          </div>
 
-          {/* Saral / Easy Mode Toggle */}
+          {/* 1. MASTER CARD HEADER */}
           <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            background: saralMode ? 'linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)' : '#FFFFFF',
-            padding: '10px 18px',
-            borderRadius: 'var(--radius-lg)',
-            border: saralMode ? '2px solid #059669' : '1px solid var(--color-border-subtle)',
-            boxShadow: 'var(--shadow-sm)'
+            padding: '28px 32px 24px 32px',
+            borderBottom: '1px solid #F1F5F9',
+            background: 'linear-gradient(180deg, #FAFCFB 0%, #FFFFFF 100%)'
           }}>
-            <Sliders style={{ width: '16px', height: '16px', color: 'var(--color-primary)' }} />
-            <div>
-              <strong style={{ fontSize: '13px', display: 'block', color: 'var(--color-text-primary)' }}>
-                सरल मोड (Saral Mode)
-              </strong>
-              <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                Large buttons & voice-first guidance
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setSaralMode(!saralMode)}
-              style={{
-                width: '40px',
-                height: '22px',
-                borderRadius: '999px',
-                background: saralMode ? 'var(--color-primary)' : '#E2E8F0',
-                border: 'none',
-                cursor: 'pointer',
-                position: 'relative',
-                transition: 'background 200ms ease'
-              }}
-            >
-              <div style={{
-                width: '16px',
-                height: '16px',
-                borderRadius: '50%',
-                background: '#FFFFFF',
-                position: 'absolute',
-                top: '3px',
-                left: saralMode ? '21px' : '3px',
-                transition: 'left 200ms ease'
-              }} />
-            </button>
-          </div>
-        </div>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '16px',
+              marginBottom: '16px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <img 
+                  src="/logo.png" 
+                  alt="JanSahayak Emblem" 
+                  style={{ height: '36px', width: 'auto', objectFit: 'contain' }} 
+                />
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                      color: '#047857',
+                      background: '#ECFDF5',
+                      padding: '3px 10px',
+                      borderRadius: '999px',
+                      border: '1px solid #A7F3D0'
+                    }}>
+                      Official Redressal Portal
+                    </span>
+                    <span style={{ fontSize: '11px', color: 'var(--color-text-muted, #64748B)', fontWeight: 600 }}>
+                      NCT of Delhi
+                    </span>
+                  </div>
+                  <h1 style={{ 
+                    fontSize: '26px', 
+                    fontWeight: 800, 
+                    color: 'var(--color-text-primary, #0F172A)', 
+                    margin: '4px 0 0 0',
+                    letterSpacing: '-0.02em'
+                  }}>
+                    Register a Civic Grievance
+                  </h1>
+                </div>
+              </div>
 
-        {/* Main Grid: Input Form (Left) & Intelligence Sidebar (Right) */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '28px', alignItems: 'start' }}>
-          
-          {/* LEFT: CITIZEN REPORTING CARD */}
-          <div className="card" style={{ padding: '28px' }}>
-            
-            {/* Quick Test Presets Bar */}
-            <div style={{ marginBottom: '20px' }}>
-              <span style={{ fontSize: '11.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-text-muted)', display: 'block', marginBottom: '8px' }}>
-                Quick Sample Situations (Click to test):
-              </span>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {presets.map((p, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => {
-                      setDescription(p.text);
-                      setTitle(p.category);
-                      setManualCategory(p.category);
-                    }}
-                    style={{
-                      padding: '5px 12px',
-                      borderRadius: 'var(--radius-full)',
-                      background: '#F8FAFC',
-                      border: '1px solid rgba(15, 23, 42, 0.12)',
-                      fontSize: '12px',
-                      color: 'var(--color-text-secondary)',
-                      cursor: 'pointer',
-                      transition: 'all 150ms ease'
-                    }}
-                  >
-                    {p.label}
-                  </button>
-                ))}
+              {/* Saral / Voice Mode Switch */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '8px 14px',
+                borderRadius: '999px',
+                background: saralMode ? '#ECFDF5' : '#F8FAFC',
+                border: saralMode ? '1.5px solid #059669' : '1px solid #E2E8F0',
+                transition: 'all 200ms ease'
+              }}>
+                <Sliders style={{ width: '15px', height: '15px', color: saralMode ? '#059669' : '#64748B' }} />
+                <span style={{ fontSize: '12.5px', fontWeight: 700, color: saralMode ? '#065F46' : '#334155' }}>
+                  सरल मोड (Easy Voice)
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSaralMode(!saralMode)}
+                  aria-label="Toggle Saral Mode"
+                  style={{
+                    width: '38px',
+                    height: '20px',
+                    borderRadius: '999px',
+                    background: saralMode ? '#059669' : '#CBD5E1',
+                    border: 'none',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    transition: 'background 200ms ease'
+                  }}
+                >
+                  <div style={{
+                    width: '14px',
+                    height: '14px',
+                    borderRadius: '50%',
+                    background: '#FFFFFF',
+                    position: 'absolute',
+                    top: '3px',
+                    left: saralMode ? '21px' : '3px',
+                    transition: 'left 200ms ease',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.2)'
+                  }} />
+                </button>
               </div>
             </div>
 
-            <form onSubmit={handleProceedToReview}>
-              
-              {/* Complaint Description Textarea */}
-              <div style={{ marginBottom: '18px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>
-                  What is the problem? <span style={{ color: '#EF4444' }}>*</span>
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Describe the defect, leakage, road pothole, electricity issue, or sanitation problem..."
-                    rows={saralMode ? 6 : 4}
-                    style={{
-                      width: '100%',
-                      padding: '12px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      border: '1px solid var(--color-border-medium)',
-                      fontSize: saralMode ? '16px' : '14px',
-                      lineHeight: 1.6,
-                      background: '#FFFFFF',
-                      color: 'var(--color-text-primary)'
-                    }}
-                    required
-                  />
+            <p style={{ 
+              fontSize: '13.5px', 
+              color: 'var(--color-text-secondary, #475569)', 
+              margin: '0 0 20px 0', 
+              lineHeight: 1.5,
+              maxWidth: '780px' 
+            }}>
+              Describe what happened in your own words or speak in Hindi/English. JanSahayak’s AI immediately identifies the problem type, extracts evidence, determines responsible municipal division, and assigns official SLA deadlines.
+            </p>
+
+            {/* Visual Process Stepper (All-in-one guide) */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '8px',
+              padding: '10px 14px',
+              background: '#F8FAFC',
+              borderRadius: '12px',
+              border: '1px solid #E2E8F0'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ 
+                  width: '22px', 
+                  height: '22px', 
+                  borderRadius: '50%', 
+                  background: description.trim() ? '#10B981' : '#0F172A', 
+                  color: '#FFFFFF', 
+                  fontSize: '11px', 
+                  fontWeight: 700, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center' 
+                }}>
+                  {description.trim() ? '✓' : '1'}
+                </span>
+                <div>
+                  <strong style={{ fontSize: '12px', display: 'block', color: '#0F172A' }}>1. Describe & Evidence</strong>
+                  <span style={{ fontSize: '10.5px', color: '#64748B' }}>Voice, photo or text</span>
                 </div>
+              </div>
 
-                {/* Multimodal Input Controls (Microphone, Camera, Geolocation) */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginTop: '10px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                    
-                    {/* 1. Real Microphone Button */}
-                    <button
-                      type="button"
-                      onClick={handleStartVoice}
-                      style={{
-                        padding: '7px 14px',
-                        borderRadius: '9999px',
-                        background: isRecording ? '#FEF2F2' : '#FFFFFF',
-                        border: isRecording ? '1.5px solid #EF4444' : '1px solid var(--color-border-medium)',
-                        color: isRecording ? '#DC2626' : 'var(--color-text-primary)',
-                        fontSize: '12.5px',
-                        fontWeight: 700,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {isRecording ? (
-                        <>
-                          <MicOff style={{ width: '14px', height: '14px', animation: 'pulse 1s infinite' }} />
-                          <span>Stop Recording ({recordingSeconds}s)</span>
-                        </>
-                      ) : (
-                        <>
-                          <Mic style={{ width: '14px', height: '14px', color: '#059669' }} />
-                          <span>Speak (Voice Input)</span>
-                        </>
-                      )}
-                    </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ 
+                  width: '22px', 
+                  height: '22px', 
+                  borderRadius: '50%', 
+                  background: gpsCoordinates || area ? '#10B981' : '#94A3B8', 
+                  color: '#FFFFFF', 
+                  fontSize: '11px', 
+                  fontWeight: 700, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center' 
+                }}>
+                  {gpsCoordinates ? '✓' : '2'}
+                </span>
+                <div>
+                  <strong style={{ fontSize: '12px', display: 'block', color: '#0F172A' }}>2. Jurisdiction & GPS</strong>
+                  <span style={{ fontSize: '10.5px', color: '#64748B' }}>Ward, colony & landmark</span>
+                </div>
+              </div>
 
-                    {/* 2. Real Camera / Photo Button */}
-                    <button
-                      type="button"
-                      onClick={() => photoInputRef.current?.click()}
-                      disabled={isAnalyzingImage}
-                      style={{
-                        padding: '7px 14px',
-                        borderRadius: '9999px',
-                        background: photoPreview ? '#ECFDF5' : '#FFFFFF',
-                        border: photoPreview ? '1.5px solid #059669' : '1px solid var(--color-border-medium)',
-                        color: photoPreview ? '#065F46' : 'var(--color-text-primary)',
-                        fontSize: '12.5px',
-                        fontWeight: 700,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {isAnalyzingImage ? (
-                        <>
-                          <Loader2 className="animate-spin" style={{ width: '14px', height: '14px' }} />
-                          <span>Analyzing with Gemini...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Camera style={{ width: '14px', height: '14px', color: '#059669' }} />
-                          <span>{photoPreview ? 'Change Photo' : 'Upload / Capture Photo'}</span>
-                        </>
-                      )}
-                    </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ 
+                  width: '22px', 
+                  height: '22px', 
+                  borderRadius: '50%', 
+                  background: liveUnderstanding ? '#10B981' : '#94A3B8', 
+                  color: '#FFFFFF', 
+                  fontSize: '11px', 
+                  fontWeight: 700, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center' 
+                }}>
+                  {liveUnderstanding ? '✓' : '3'}
+                </span>
+                <div>
+                  <strong style={{ fontSize: '12px', display: 'block', color: '#0F172A' }}>3. AI Routing & DNA</strong>
+                  <span style={{ fontSize: '10.5px', color: '#64748B' }}>Department & SLA target</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-                    {/* 3. Real Device Geolocation Button */}
-                    <button
-                      type="button"
-                      onClick={handleDetectLocation}
-                      disabled={isDetectingGps}
-                      style={{
-                        padding: '7px 14px',
-                        borderRadius: '9999px',
-                        background: gpsCoordinates ? '#ECFDF5' : '#FFFFFF',
-                        border: gpsCoordinates ? '1.5px solid #059669' : '1px solid var(--color-border-medium)',
-                        color: gpsCoordinates ? '#065F46' : 'var(--color-text-primary)',
-                        fontSize: '12.5px',
-                        fontWeight: 700,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {isDetectingGps ? (
-                        <>
-                          <Loader2 className="animate-spin" style={{ width: '14px', height: '14px' }} />
-                          <span>Detecting GPS...</span>
-                        </>
-                      ) : (
-                        <>
-                          <MapPin style={{ width: '14px', height: '14px', color: '#059669' }} />
-                          <span>{gpsCoordinates ? 'GPS Locked ✓' : 'Detect GPS Location'}</span>
-                        </>
-                      )}
-                    </button>
+          {/* ==================================================================
+              IF SUBMITTED: SHOW BEAUTIFUL INLINE SUCCESS STATE
+              (No disjointed popups!)
+             ================================================================== */}
+          {createdTicket ? (
+            <div style={{ padding: '48px 32px', textAlign: 'center' }}>
+              <div style={{
+                width: '72px',
+                height: '72px',
+                borderRadius: '50%',
+                background: '#ECFDF5',
+                color: '#059669',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 20px auto',
+                boxShadow: '0 8px 24px rgba(16, 185, 129, 0.25)'
+              }}>
+                <CheckCircle2 style={{ width: '42px', height: '42px' }} />
+              </div>
 
-                    {/* 4. Document Button */}
-                    <button
-                      type="button"
-                      onClick={() => documentInputRef.current?.click()}
-                      style={{
-                        padding: '7px 14px',
-                        borderRadius: '9999px',
-                        background: documentFile ? '#F1F5F9' : '#FFFFFF',
-                        border: documentFile ? '1.5px solid #64748B' : '1px solid var(--color-border-medium)',
-                        color: documentFile ? '#334155' : 'var(--color-text-primary)',
-                        fontSize: '12.5px',
-                        fontWeight: 700,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <FileText style={{ width: '14px', height: '14px' }} />
-                      <span>{documentFile ? documentFile.name.slice(0, 18) + '...' : 'Attach Bill/Doc'}</span>
-                    </button>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#ECFDF5',
+                border: '1px solid #A7F3D0',
+                color: '#065F46',
+                padding: '4px 14px',
+                borderRadius: '999px',
+                fontSize: '12px',
+                fontWeight: 700,
+                marginBottom: '12px'
+              }}>
+                <ShieldCheck style={{ width: '14px', height: '14px' }} />
+                <span>MUNICIPAL COMPLAINT REGISTERED</span>
+              </div>
+
+              <h2 style={{ fontSize: '26px', fontWeight: 800, color: '#0F172A', marginBottom: '8px' }}>
+                Complaint #{createdTicket.id}
+              </h2>
+              <p style={{ fontSize: '14.5px', color: '#475569', maxWidth: '560px', margin: '0 auto 24px auto', lineHeight: 1.5 }}>
+                Your grievance has been permanently registered in the municipal database, categorized by AI, and dispatched to <strong>{createdTicket.department || 'the responsible authority'}</strong>.
+              </p>
+
+              {/* Ticket Details Summary Card */}
+              <div style={{
+                maxWidth: '640px',
+                margin: '0 auto 32px auto',
+                background: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                borderRadius: '16px',
+                padding: '20px',
+                textAlign: 'left'
+              }}>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: '16px',
+                  marginBottom: '16px'
+                }}>
+                  <div>
+                    <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>
+                      Ticket Identifier
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                      <strong style={{ fontSize: '14px', color: '#0F172A' }}>{createdTicket.id}</strong>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyTicket(createdTicket.id)}
+                        style={{
+                          border: 'none',
+                          background: '#E2E8F0',
+                          cursor: 'pointer',
+                          padding: '3px 6px',
+                          borderRadius: '4px',
+                          fontSize: '11px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '3px'
+                        }}
+                      >
+                        <Copy style={{ width: '11px', height: '11px' }} />
+                        <span>{copiedTicketId ? 'Copied!' : 'Copy'}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>
+                      Assigned Department
+                    </span>
+                    <strong style={{ fontSize: '14px', color: '#0E5E3A', display: 'block', marginTop: '2px' }}>
+                      {createdTicket.department || 'Municipal Corporation of Delhi'}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>
+                      Target SLA Resolution
+                    </span>
+                    <strong style={{ fontSize: '14px', color: '#D97706', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                      <Clock style={{ width: '13px', height: '13px' }} />
+                      <span>{createdTicket.slaDeadline || '24 Hours'}</span>
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>
+                      Jurisdiction
+                    </span>
+                    <strong style={{ fontSize: '14px', color: '#0F172A', display: 'block', marginTop: '2px' }}>
+                      {ward}
+                    </strong>
                   </div>
                 </div>
 
-                {/* Inline Real Notifications & Status Messages */}
+                <div style={{
+                  padding: '12px 14px',
+                  background: '#ECFDF5',
+                  border: '1px solid #A7F3D0',
+                  borderRadius: '10px',
+                  fontSize: '12.5px',
+                  color: '#065F46',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <Check style={{ width: '15px', height: '15px', flexShrink: 0 }} />
+                  <span>Grievance DNA™ generated, geo-coordinates linked, and field engineer alerted.</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/citizen/complaints/${createdTicket.id}`)}
+                  className="btn-primary"
+                  style={{
+                    height: '46px',
+                    padding: '0 24px',
+                    fontSize: '14px',
+                    background: 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)',
+                    boxShadow: '0 4px 14px rgba(14, 94, 58, 0.28)'
+                  }}
+                >
+                  <span>Track Timeline & Field Progress</span>
+                  <ArrowRight style={{ width: '16px', height: '16px' }} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => navigate('/citizen')}
+                  className="btn-secondary"
+                  style={{ height: '46px', padding: '0 20px', fontSize: '14px' }}
+                >
+                  Citizen Dashboard
+                </button>
+
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  style={{
+                    height: '46px',
+                    padding: '0 18px',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: 'var(--radius-md, 10px)',
+                    background: '#FFFFFF',
+                    color: '#334155',
+                    fontSize: '13.5px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <RotateCcw style={{ width: '14px', height: '14px' }} />
+                  <span>File Another Issue</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+
+            /* ================================================================
+               MAIN REPORTING WORKFLOW (ALL IN ONE)
+               ================================================================ */
+            <form onSubmit={handleSubmit} style={{ padding: '28px 32px' }}>
+
+              {/* A. QUICK SITUATION PRESETS (Clickable Chips) */}
+              <div style={{ marginBottom: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  <span style={{ 
+                    fontSize: '12px', 
+                    fontWeight: 700, 
+                    textTransform: 'uppercase', 
+                    letterSpacing: '0.04em', 
+                    color: 'var(--color-text-muted, #64748B)' 
+                  }}>
+                    Quick Civic Scenarios (Click to test AI routing):
+                  </span>
+                  <span style={{ fontSize: '11px', color: '#059669', fontWeight: 600 }}>
+                    ⚡ Instant Pre-fill
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {QUICK_PRESETS.map((p, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => {
+                        setDescription(p.text);
+                        setTitle(p.category);
+                        setManualCategory(p.category);
+                      }}
+                      style={{
+                        padding: '6px 14px',
+                        borderRadius: '999px',
+                        background: manualCategory === p.category ? '#ECFDF5' : '#F8FAFC',
+                        border: manualCategory === p.category ? '1.5px solid #059669' : '1px solid #E2E8F0',
+                        color: manualCategory === p.category ? '#065F46' : '#334155',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        transition: 'all 150ms ease'
+                      }}
+                    >
+                      <span>{p.label}</span>
+                      <span style={{ fontSize: '10.5px', opacity: 0.75 }}>({p.hindiLabel})</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* B. GRIEVANCE DESCRIPTION & TITLE */}
+              <div style={{ marginBottom: '22px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <label style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A' }}>
+                    What is the civic problem? <span style={{ color: '#EF4444' }}>*</span>
+                  </label>
+                  <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 600 }}>
+                    🌐 Hindi • Hinglish • English supported
+                  </span>
+                </div>
+
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="उदा: हमारे सेक्टर 14 में 3 दिन से गंदा पानी आ रहा है / Severe road pothole near Moolchand flyover causing accidents..."
+                  rows={saralMode ? 6 : 4}
+                  style={{
+                    width: '100%',
+                    padding: '14px 16px',
+                    borderRadius: '12px',
+                    border: '1.5px solid #CBD5E1',
+                    fontSize: saralMode ? '16px' : '14px',
+                    lineHeight: 1.6,
+                    background: '#FFFFFF',
+                    color: '#0F172A',
+                    boxShadow: 'inset 0 1px 2px rgba(15, 23, 42, 0.04)',
+                    outline: 'none',
+                    transition: 'border-color 150ms ease'
+                  }}
+                  required
+                />
+
+                {/* Status Messages for Microphone/GPS */}
                 {micStatusMsg && (
-                  <div style={{ marginTop: '8px', fontSize: '12px', color: '#DC2626', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <AlertTriangle style={{ width: '13px', height: '13px' }} />
+                  <div style={{ marginTop: '8px', fontSize: '12px', color: '#059669', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Volume2 style={{ width: '13px', height: '13px' }} />
                     <span>{micStatusMsg}</span>
                   </div>
                 )}
@@ -743,40 +980,70 @@ export default function CitizenSubmit() {
                   </div>
                 )}
 
-                {/* Real Audio Playback Preview */}
+                {/* Inline Voice Playback if recorded */}
                 {audioUrl && (
-                  <div style={{ marginTop: '12px', padding: '10px 14px', borderRadius: 'var(--radius-md)', background: '#F8FAFC', border: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                  <div style={{
+                    marginTop: '10px',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                    background: '#F0FDF4',
+                    border: '1px solid #BBF7D0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '12px'
+                  }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <Volume2 style={{ width: '16px', height: '16px', color: '#059669' }} />
-                      <span style={{ fontSize: '12px', fontWeight: 600 }}>Your Voice Recording:</span>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#14532D' }}>Your Voice Clip:</span>
                     </div>
                     <audio controls src={audioUrl} style={{ height: '32px', flex: 1, maxWidth: '280px' }} />
-                    <button type="button" onClick={() => setAudioUrl(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#EF4444' }}>
-                      <Trash2 style={{ width: '14px', height: '14px' }} />
+                    <button 
+                      type="button" 
+                      onClick={() => setAudioUrl(null)} 
+                      style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#EF4444' }}
+                      title="Delete Voice Clip"
+                    >
+                      <Trash2 style={{ width: '15px', height: '15px' }} />
                     </button>
                   </div>
                 )}
 
-                {/* Real Photo Thumbnail & Vision Observations Banner */}
+                {/* Inline Photo Preview & Vision Hazard Badge */}
                 {photoPreview && (
-                  <div style={{ marginTop: '12px', padding: '12px', borderRadius: 'var(--radius-md)', background: '#F0FDF4', border: '1px solid #BBF7D0', display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div style={{
+                    marginTop: '10px',
+                    padding: '12px',
+                    borderRadius: '12px',
+                    background: '#F8FAFC',
+                    border: '1px solid #E2E8F0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '14px'
+                  }}>
                     <img 
                       src={photoPreview} 
                       alt="Complaint Evidence" 
-                      style={{ width: '56px', height: '56px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #A7F3D0' }} 
+                      style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #CBD5E1' }} 
                     />
                     <div style={{ flex: 1 }}>
-                      <strong style={{ fontSize: '13px', color: '#14532D', display: 'block' }}>
-                        📷 Visual Evidence Attached
-                      </strong>
-                      <span style={{ fontSize: '11.5px', color: '#166534', display: 'block' }}>
-                        {photoTag || 'Photo analyzed by Gemini Multimodal Vision.'}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <strong style={{ fontSize: '13px', color: '#0F172A' }}>Visual Evidence Attached</strong>
+                        {isAnalyzingImage && (
+                          <span style={{ fontSize: '11px', color: '#4F46E5', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <Loader2 className="animate-spin" style={{ width: '11px', height: '11px' }} />
+                            <span>Gemini analyzing...</span>
+                          </span>
+                        )}
+                      </div>
+                      <span style={{ fontSize: '12px', color: '#475569', display: 'block', marginTop: '2px' }}>
+                        {photoTag || 'Photo ready for municipal verification.'}
                       </span>
                     </div>
                     <button 
                       type="button" 
                       onClick={handleRemovePhoto} 
-                      style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#EF4444', padding: '4px' }}
+                      style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#EF4444', padding: '6px' }}
                       title="Remove Photo"
                     >
                       <Trash2 style={{ width: '16px', height: '16px' }} />
@@ -785,419 +1052,433 @@ export default function CitizenSubmit() {
                 )}
               </div>
 
-              {/* Location Selector & Landmark */}
+              {/* C. MULTIMODAL ACTION DOCK (4 Integrated Action Buttons) */}
               <div style={{
-                padding: '16px',
-                borderRadius: 'var(--radius-md)',
-                background: '#F8FAFC',
-                border: '1px solid var(--color-border-subtle)',
-                marginBottom: '20px'
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
+                gap: '10px',
+                marginBottom: '24px'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                    Jurisdiction & Street Location
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleDetectLocation}
-                    style={{
-                      border: 'none',
-                      background: 'none',
-                      fontSize: '11.5px',
-                      fontWeight: 700,
-                      color: gpsCoordinates ? '#059669' : 'var(--color-primary)',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}
-                  >
-                    <Navigation style={{ width: '12px', height: '12px' }} />
-                    <span>{gpsCoordinates ? 'GPS Active' : 'Refresh GPS'}</span>
-                  </button>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 0.8fr', gap: '10px' }}>
-                  <select
-                    value={ward}
-                    onChange={(e) => setWard(e.target.value)}
-                    style={{
-                      width: '100%',
-                      height: '38px',
-                      borderRadius: 'var(--radius-sm)',
-                      border: '1px solid var(--color-border-medium)',
-                      padding: '0 8px',
-                      background: '#FFFFFF',
-                      fontSize: '12.5px'
-                    }}
-                  >
-                    <option value="Ward 14 (Rohini Sector 14)">Ward 14 (Rohini Sector 14)</option>
-                    <option value="Ward 8 (Lajpat Nagar / Moolchand)">Ward 8 (Lajpat Nagar / Moolchand)</option>
-                    <option value="Ward 22 (Mayur Vihar Ph-1)">Ward 22 (Mayur Vihar Ph-1)</option>
-                    <option value="Ward 5 (Kalkaji / South)">Ward 5 (Kalkaji / South)</option>
-                    <option value="Ward 19 (Karol Bagh)">Ward 19 (Karol Bagh)</option>
-                  </select>
-
-                  <input
-                    type="text"
-                    value={area}
-                    onChange={(e) => setArea(e.target.value)}
-                    placeholder="Local Area / Landmark"
-                    style={{
-                      width: '100%',
-                      height: '38px',
-                      borderRadius: 'var(--radius-sm)',
-                      border: '1px solid var(--color-border-medium)',
-                      padding: '0 10px',
-                      background: '#FFFFFF',
-                      fontSize: '12.5px'
-                    }}
-                  />
-
-                  <input
-                    type="text"
-                    value={pincode}
-                    onChange={(e) => setPincode(e.target.value)}
-                    placeholder="Pincode"
-                    style={{
-                      width: '100%',
-                      height: '38px',
-                      borderRadius: 'var(--radius-sm)',
-                      border: '1px solid var(--color-border-medium)',
-                      padding: '0 10px',
-                      background: '#FFFFFF',
-                      fontSize: '12.5px'
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Primary Action Button: Review Real AI Understanding */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-                <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
-                  🔒 Official Delhi Grievance Redressal Gateway
-                </span>
-
+                {/* 1. Voice Record Button */}
                 <button
-                  type="submit"
-                  disabled={!description.trim() || isAnalyzingText}
-                  className="btn-primary"
+                  type="button"
+                  onClick={handleStartVoice}
                   style={{
-                    height: '46px',
-                    padding: '0 26px',
-                    fontSize: '14px',
-                    background: 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)',
-                    boxShadow: '0 4px 14px rgba(14, 94, 58, 0.28)'
+                    padding: '10px 14px',
+                    borderRadius: '12px',
+                    background: isRecording ? '#FEF2F2' : '#FFFFFF',
+                    border: isRecording ? '1.5px solid #EF4444' : '1px solid #CBD5E1',
+                    color: isRecording ? '#DC2626' : '#1E293B',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    cursor: 'pointer',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                    transition: 'all 150ms ease'
                   }}
                 >
-                  {isAnalyzingText ? (
+                  {isRecording ? (
                     <>
-                      <Loader2 className="animate-spin" style={{ width: '16px', height: '16px' }} />
-                      <span>Consulting Gemini AI...</span>
+                      <MicOff style={{ width: '16px', height: '16px', animation: 'pulse 1s infinite' }} />
+                      <span>Recording ({recordingSeconds}s)</span>
                     </>
                   ) : (
                     <>
-                      <span>Review AI Understanding</span>
-                      <ArrowRight style={{ width: '16px', height: '16px' }} />
+                      <Mic style={{ width: '16px', height: '16px', color: '#059669' }} />
+                      <span>Speak (Voice Input)</span>
+                    </>
+                  )}
+                </button>
+
+                {/* 2. Photo Upload Button */}
+                <button
+                  type="button"
+                  onClick={() => photoInputRef.current?.click()}
+                  disabled={isAnalyzingImage}
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: '12px',
+                    background: photoPreview ? '#ECFDF5' : '#FFFFFF',
+                    border: photoPreview ? '1.5px solid #059669' : '1px solid #CBD5E1',
+                    color: photoPreview ? '#065F46' : '#1E293B',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    cursor: 'pointer',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                    transition: 'all 150ms ease'
+                  }}
+                >
+                  {isAnalyzingImage ? (
+                    <>
+                      <Loader2 className="animate-spin" style={{ width: '16px', height: '16px' }} />
+                      <span>Analyzing Photo...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Camera style={{ width: '16px', height: '16px', color: '#059669' }} />
+                      <span>{photoPreview ? 'Change Photo' : 'Upload / Camera'}</span>
+                    </>
+                  )}
+                </button>
+
+                {/* 3. Auto-Detect GPS Button */}
+                <button
+                  type="button"
+                  onClick={handleDetectLocation}
+                  disabled={isDetectingGps}
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: '12px',
+                    background: gpsCoordinates ? '#ECFDF5' : '#FFFFFF',
+                    border: gpsCoordinates ? '1.5px solid #059669' : '1px solid #CBD5E1',
+                    color: gpsCoordinates ? '#065F46' : '#1E293B',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    cursor: 'pointer',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                    transition: 'all 150ms ease'
+                  }}
+                >
+                  {isDetectingGps ? (
+                    <>
+                      <Loader2 className="animate-spin" style={{ width: '16px', height: '16px' }} />
+                      <span>Detecting GPS...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Navigation style={{ width: '16px', height: '16px', color: '#059669' }} />
+                      <span>{gpsCoordinates ? 'GPS Locked ✓' : 'Detect GPS'}</span>
+                    </>
+                  )}
+                </button>
+
+                {/* 4. Attach Document Button */}
+                <button
+                  type="button"
+                  onClick={() => documentInputRef.current?.click()}
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: '12px',
+                    background: documentFile ? '#F1F5F9' : '#FFFFFF',
+                    border: documentFile ? '1.5px solid #64748B' : '1px solid #CBD5E1',
+                    color: documentFile ? '#334155' : '#1E293B',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    cursor: 'pointer',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                    transition: 'all 150ms ease'
+                  }}
+                >
+                  <FileText style={{ width: '16px', height: '16px', color: '#64748B' }} />
+                  <span>{documentFile ? documentFile.name.slice(0, 14) + '...' : 'Attach Bill / Doc'}</span>
+                </button>
+              </div>
+
+              {/* D. JURISDICTION & ADDRESS (Clean 3-column row) */}
+              <div style={{
+                background: '#F8FAFC',
+                borderRadius: '14px',
+                border: '1px solid #E2E8F0',
+                padding: '18px 20px',
+                marginBottom: '26px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <MapPin style={{ width: '15px', height: '15px', color: '#059669' }} />
+                    <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: '#0F172A' }}>
+                      Location & Municipal Ward
+                    </span>
+                  </div>
+                  {gpsCoordinates && (
+                    <span style={{ fontSize: '11px', color: '#059669', fontWeight: 700 }}>
+                      Lat: {gpsCoordinates.lat.toFixed(4)}, Lng: {gpsCoordinates.lng.toFixed(4)}
+                    </span>
+                  )}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 0.8fr', gap: '12px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#64748B', marginBottom: '4px' }}>
+                      MUNICIPAL WARD
+                    </label>
+                    <select
+                      value={ward}
+                      onChange={(e) => setWard(e.target.value)}
+                      style={{
+                        width: '100%',
+                        height: '40px',
+                        borderRadius: '8px',
+                        border: '1px solid #CBD5E1',
+                        padding: '0 10px',
+                        background: '#FFFFFF',
+                        fontSize: '13px',
+                        color: '#0F172A',
+                        fontWeight: 600
+                      }}
+                    >
+                      <option value="Ward 14 (Rohini Sector 14)">Ward 14 (Rohini Sector 14)</option>
+                      <option value="Ward 8 (Lajpat Nagar / Moolchand)">Ward 8 (Lajpat Nagar / Moolchand)</option>
+                      <option value="Ward 22 (Mayur Vihar Ph-1)">Ward 22 (Mayur Vihar Ph-1)</option>
+                      <option value="Ward 5 (Kalkaji / South)">Ward 5 (Kalkaji / South)</option>
+                      <option value="Ward 19 (Karol Bagh)">Ward 19 (Karol Bagh)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#64748B', marginBottom: '4px' }}>
+                      COLONY / LANDMARK
+                    </label>
+                    <input
+                      type="text"
+                      value={area}
+                      onChange={(e) => setArea(e.target.value)}
+                      placeholder="e.g. Pocket 2, Near Mother Dairy"
+                      style={{
+                        width: '100%',
+                        height: '40px',
+                        borderRadius: '8px',
+                        border: '1px solid #CBD5E1',
+                        padding: '0 12px',
+                        background: '#FFFFFF',
+                        fontSize: '13px',
+                        color: '#0F172A'
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#64748B', marginBottom: '4px' }}>
+                      PINCODE
+                    </label>
+                    <input
+                      type="text"
+                      value={pincode}
+                      onChange={(e) => setPincode(e.target.value)}
+                      placeholder="110085"
+                      style={{
+                        width: '100%',
+                        height: '40px',
+                        borderRadius: '8px',
+                        border: '1px solid #CBD5E1',
+                        padding: '0 12px',
+                        background: '#FFFFFF',
+                        fontSize: '13px',
+                        color: '#0F172A'
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* E. LIVE GRIEVANCE DNA™ & AI ROUTING (INTEGRATED DIRECTLY INSIDE THE FORM!) */}
+              <div style={{
+                background: liveUnderstanding ? '#F0FDF4' : '#F8FAFC',
+                borderRadius: '16px',
+                border: liveUnderstanding ? '1.5px solid #10B981' : '1px solid #E2E8F0',
+                padding: '22px',
+                marginBottom: '28px',
+                transition: 'all 250ms ease'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '8px',
+                      background: liveUnderstanding ? '#10B981' : '#E2E8F0',
+                      color: liveUnderstanding ? '#FFFFFF' : '#64748B',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <Sparkles style={{ width: '15px', height: '15px' }} />
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: '14px', color: '#0F172A', display: 'block' }}>
+                        Live Grievance DNA™ & Authority Routing
+                      </strong>
+                      <span style={{ fontSize: '11.5px', color: '#64748B' }}>
+                        Automated multi-agent synthesis powered by Gemini 3.5
+                      </span>
+                    </div>
+                  </div>
+
+                  {liveUnderstanding ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{
+                        fontSize: '11px',
+                        fontWeight: 800,
+                        padding: '3px 10px',
+                        borderRadius: '999px',
+                        background: liveUnderstanding.severity === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB',
+                        color: liveUnderstanding.severity === 'CRITICAL' ? '#991B1B' : '#B45309',
+                        border: liveUnderstanding.severity === 'CRITICAL' ? '1px solid #FECACA' : '1px solid #FDE68A'
+                      }}>
+                        ● {liveUnderstanding.severity || 'PRIORITY'}
+                      </span>
+                      <span style={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        padding: '3px 10px',
+                        borderRadius: '999px',
+                        background: '#ECFDF5',
+                        color: '#065F46',
+                        border: '1px solid #A7F3D0'
+                      }}>
+                        SLA: {liveUnderstanding.estimated_sla_hours || 24} Hours
+                      </span>
+                    </div>
+                  ) : (
+                    <span style={{ fontSize: '11px', color: '#94A3B8', fontWeight: 600 }}>
+                      {isAnalyzingText ? 'AI Analyzing...' : 'Ready for input'}
+                    </span>
+                  )}
+                </div>
+
+                {liveUnderstanding ? (
+                  <div>
+                    {/* Synthesis Banner */}
+                    <div style={{
+                      padding: '12px 16px',
+                      background: '#FFFFFF',
+                      borderRadius: '10px',
+                      border: '1px solid #BBF7D0',
+                      marginBottom: '14px'
+                    }}>
+                      <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', color: '#15803D', display: 'block', marginBottom: '3px' }}>
+                        AI Synthesis • हमने आपकी समस्या को इस प्रकार समझा है:
+                      </span>
+                      <p style={{ fontSize: '14px', fontWeight: 600, color: '#14532D', margin: 0, lineHeight: 1.5 }}>
+                        "{liveUnderstanding.summary || liveUnderstanding.problem_type}"
+                      </p>
+                    </div>
+
+                    {/* Department and Category Badges */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', marginBottom: '14px' }}>
+                      <div style={{ padding: '10px 14px', background: '#FFFFFF', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                        <span style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>
+                          Responsible Authority
+                        </span>
+                        <strong style={{ fontSize: '13px', color: '#0E5E3A', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                          <Building2 style={{ width: '14px', height: '14px' }} />
+                          <span>{liveUnderstanding.department || 'Municipal Corporation of Delhi'}</span>
+                        </strong>
+                      </div>
+
+                      <div style={{ padding: '10px 14px', background: '#FFFFFF', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                        <span style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>
+                          Problem Classification
+                        </span>
+                        <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block', marginTop: '2px' }}>
+                          {liveUnderstanding.category || 'General Civic Infrastructure'}
+                        </strong>
+                      </div>
+                    </div>
+
+                    {/* Root Cause & SOP */}
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '10px',
+                      fontSize: '12px'
+                    }}>
+                      <div style={{ padding: '10px 12px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                        <strong style={{ color: '#334155', display: 'block', marginBottom: '3px' }}>
+                          🔍 Likely Root Cause:
+                        </strong>
+                        <p style={{ margin: 0, color: '#475569', lineHeight: 1.4 }}>
+                          {liveUnderstanding.root_cause_hypothesis || 'Underground conduit stress requiring on-site pressure and flow inspection.'}
+                        </p>
+                      </div>
+
+                      <div style={{ padding: '10px 12px', background: '#EFF6FF', borderRadius: '8px', border: '1px solid #BFDBFE' }}>
+                        <strong style={{ color: '#1E40AF', display: 'block', marginBottom: '3px' }}>
+                          📋 Recommended SOP:
+                        </strong>
+                        <p style={{ margin: 0, color: '#1E3A8A', lineHeight: 1.4 }}>
+                          {liveUnderstanding.recommended_action || 'Dispatch municipal maintenance squad with repair kit and seal joint within SLA window.'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ padding: '18px', textAlign: 'center', color: '#64748B' }}>
+                    <p style={{ fontSize: '13px', margin: 0 }}>
+                      💡 Start typing your problem, speaking into the microphone, or click a quick scenario above. The AI engine will instantly classify the issue, route it to the exact Delhi municipal department, and preview the resolution plan here.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* F. FINAL SUBMIT BAR */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '16px',
+                paddingTop: '8px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <ShieldCheck style={{ width: '16px', height: '16px', color: '#059669' }} />
+                  <span style={{ fontSize: '12.5px', color: '#475569' }}>
+                    Direct dispatch to official Delhi Municipal ledger with immutable audit trail.
+                  </span>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={!description.trim() || isSubmitting}
+                  className="btn-primary"
+                  style={{
+                    height: '50px',
+                    padding: '0 32px',
+                    fontSize: '15px',
+                    fontWeight: 700,
+                    borderRadius: '12px',
+                    background: 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)',
+                    boxShadow: '0 4px 16px rgba(14, 94, 58, 0.32)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    cursor: !description.trim() || isSubmitting ? 'not-allowed' : 'pointer',
+                    opacity: !description.trim() || isSubmitting ? 0.7 : 1,
+                    transition: 'all 150ms ease'
+                  }}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="animate-spin" style={{ width: '18px', height: '18px' }} />
+                      <span>Registering with Authority...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Submit Grievance & Dispatch Authority (शिकायत दर्ज करें)</span>
+                      <ArrowRight style={{ width: '18px', height: '18px' }} />
                     </>
                   )}
                 </button>
               </div>
 
             </form>
-          </div>
-
-          {/* RIGHT: LIVE INTELLIGENCE SIDEBAR */}
-          <div>
-            {liveUnderstanding ? (
-              <div className="card" style={{ padding: '24px', border: '1.5px solid #10B981', background: '#FDFEFE' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-                  <div className="category-pill" style={{ background: '#ECFDF5', color: '#065F46' }}>
-                    <Sparkles style={{ width: '12px', height: '12px' }} />
-                    <span>REAL GEMINI AI UNDERSTANDING</span>
-                  </div>
-                  <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '999px', background: liveUnderstanding.severity === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB', color: liveUnderstanding.severity === 'CRITICAL' ? '#991B1B' : '#B45309' }}>
-                    ● {liveUnderstanding.severity}
-                  </span>
-                </div>
-
-                <h3 style={{ fontSize: '18px', color: 'var(--color-text-primary)', marginBottom: '8px' }}>
-                  {liveUnderstanding.problem_type}
-                </h3>
-                <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '16px' }}>
-                  {liveUnderstanding.summary}
-                </p>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px' }}>
-                  <div style={{ padding: '8px 10px', borderRadius: 'var(--radius-sm)', background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
-                    <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)', display: 'block' }}>Category</span>
-                    <strong style={{ fontSize: '12px', color: 'var(--color-text-primary)' }}>{liveUnderstanding.category}</strong>
-                  </div>
-                  <div style={{ padding: '8px 10px', borderRadius: 'var(--radius-sm)', background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
-                    <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)', display: 'block' }}>Target Department</span>
-                    <strong style={{ fontSize: '12px', color: '#0E5E3A' }}>{liveUnderstanding.department?.split('(')[0]}</strong>
-                  </div>
-                </div>
-
-                <div style={{ padding: '10px 12px', borderRadius: 'var(--radius-sm)', background: '#F0FDF4', border: '1px solid #BBF7D0', fontSize: '12px', color: '#166534', marginBottom: '14px' }}>
-                  <strong>Infrastructural Root Cause Hypothesis:</strong>
-                  <p style={{ margin: '4px 0 0 0', lineHeight: 1.4 }}>{liveUnderstanding.root_cause_hypothesis}</p>
-                </div>
-
-                <div style={{ padding: '10px 12px', borderRadius: 'var(--radius-sm)', background: '#EFF6FF', border: '1px solid #BFDBFE', fontSize: '12px', color: '#1E40AF' }}>
-                  <strong>Recommended Standard Operating Procedure:</strong>
-                  <p style={{ margin: '4px 0 0 0', lineHeight: 1.4 }}>{liveUnderstanding.recommended_action}</p>
-                </div>
-              </div>
-            ) : (
-              <div style={{
-                padding: '36px 20px',
-                borderRadius: 'var(--radius-lg)',
-                background: '#FFFFFF',
-                border: '2px dashed var(--color-border-medium)',
-                textAlign: 'center'
-              }}>
-                <div className="icon-squircle" style={{ margin: '0 auto 14px auto', background: '#ECFDF5', color: '#059669' }}>
-                  <Sparkles style={{ width: '22px', height: '22px' }} />
-                </div>
-                <h4 style={{ fontSize: '16px', marginBottom: '6px' }}>
-                  Live Multi-Agent Intelligence
-                </h4>
-                <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: 0 }}>
-                  Enter your complaint or speak via voice. JanSahayak’s Gemini 3.5 pipeline will instantly categorize the problem, identify root causes, and prepare authority routing.
-                </p>
-              </div>
-            )}
-          </div>
+          )}
 
         </div>
-
-        {/* STEP 2: REAL AI REVIEW MODAL */}
-        {showAiReviewModal && (
-          <div style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(11, 25, 20, 0.75)',
-            backdropFilter: 'blur(6px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-            padding: '20px'
-          }}>
-            <div className="card" style={{ maxWidth: '680px', width: '100%', padding: '32px', maxHeight: '92vh', overflowY: 'auto' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <div className="category-pill" style={{ background: '#ECFDF5', color: '#065F46' }}>
-                  <Sparkles style={{ width: '13px', height: '13px' }} />
-                  <span>PRE-SUBMISSION INTELLIGENCE REVIEW</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowAiReviewModal(false)}
-                  style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}
-                >
-                  <X style={{ width: '20px', height: '20px' }} />
-                </button>
-              </div>
-
-              {/* Gemini Understanding Banner */}
-              <div style={{
-                padding: '16px 20px',
-                borderRadius: 'var(--radius-lg)',
-                background: '#F0FDF4',
-                border: '1px solid #BBF7D0',
-                marginBottom: '20px'
-              }}>
-                <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#15803D', display: 'block', marginBottom: '4px' }}>
-                  JanSahayak AI Synthesis • हमने आपकी समस्या को इस प्रकार समझा है:
-                </span>
-                <p style={{ fontSize: '15px', fontWeight: 700, color: '#14532D', lineHeight: 1.5, margin: 0 }}>
-                  "{liveUnderstanding?.summary || `A civic defect in ${ward} near ${area} requiring priority intervention.`}"
-                </p>
-              </div>
-
-              {/* Original Citizen Verbatim Text */}
-              <div style={{
-                padding: '14px 18px',
-                borderRadius: 'var(--radius-md)',
-                background: '#F8FAFC',
-                border: '1px solid var(--color-border-subtle)',
-                marginBottom: '20px'
-              }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '4px' }}>
-                  Your Verbatim Words:
-                </span>
-                <p style={{ fontSize: '13px', color: 'var(--color-text-primary)', lineHeight: 1.6, margin: 0, fontStyle: 'italic' }}>
-                  "{description}"
-                </p>
-              </div>
-
-              {/* Editable Fields: Title & Department */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '14px', marginBottom: '18px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
-                    Title:
-                  </label>
-                  <input
-                    type="text"
-                    value={title || liveUnderstanding?.problem_type || ''}
-                    onChange={(e) => setTitle(e.target.value)}
-                    style={{
-                      width: '100%',
-                      height: '38px',
-                      borderRadius: 'var(--radius-sm)',
-                      border: '1px solid var(--color-border-medium)',
-                      padding: '0 10px',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      background: '#FFFFFF'
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
-                    Department:
-                  </label>
-                  <div style={{
-                    height: '38px',
-                    borderRadius: 'var(--radius-sm)',
-                    background: '#F1F5F9',
-                    padding: '0 10px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    fontSize: '12px'
-                  }}>
-                    <strong>{liveUnderstanding?.department ? liveUnderstanding.department.split('(')[0] : 'MCD'}</strong>
-                    <span style={{ fontSize: '10.5px', color: '#059669', fontWeight: 700 }}>
-                      SLA: {liveUnderstanding?.estimated_sla_hours || 24}h
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-                <button
-                  type="button"
-                  onClick={() => setShowAiReviewModal(false)}
-                  className="btn-secondary btn-sm"
-                >
-                  ✏️ Edit Details
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleConfirmSubmission}
-                  disabled={isSubmitting}
-                  className="btn-primary"
-                  style={{
-                    height: '44px',
-                    padding: '0 24px',
-                    background: 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)'
-                  }}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="animate-spin" style={{ width: '15px', height: '15px' }} />
-                      <span>Logging to Municipal Ledger...</span>
-                    </>
-                  ) : (
-                    <span>✓ Confirm & Submit Problem</span>
-                  )}
-                </button>
-              </div>
-
-            </div>
-          </div>
-        )}
-
-        {/* STEP 3: REAL CONFIRMATION MODAL */}
-        {showConfirmationModal && createdTicket && (
-          <div style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(11, 25, 20, 0.8)',
-            backdropFilter: 'blur(8px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-            padding: '20px'
-          }}>
-            <div className="card" style={{ maxWidth: '540px', width: '100%', padding: '36px', textAlign: 'center' }}>
-              <div style={{
-                width: '64px',
-                height: '64px',
-                borderRadius: '50%',
-                background: '#ECFDF5',
-                color: '#059669',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 16px auto'
-              }}>
-                <CheckCircle2 style={{ width: '36px', height: '36px' }} />
-              </div>
-
-              <div className="category-pill" style={{ margin: '0 auto 12px auto' }}>
-                GRIEVANCE SUCCESSFULLY LOGGED
-              </div>
-
-              <h2 style={{ fontSize: '24px', marginBottom: '8px' }}>
-                Ticket #{createdTicket.id}
-              </h2>
-              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '20px' }}>
-                Your report has been saved to the municipal database, categorized, and assigned to <strong>{createdTicket.department}</strong>.
-              </p>
-
-              {/* Status Summary */}
-              <div style={{
-                padding: '14px',
-                borderRadius: 'var(--radius-md)',
-                background: '#F0FDF4',
-                border: '1px solid #BBF7D0',
-                fontSize: '12.5px',
-                color: '#166534',
-                marginBottom: '24px',
-                textAlign: 'left'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, marginBottom: '6px' }}>
-                  <Check style={{ width: '14px', height: '14px' }} />
-                  <span>Real-time System Action:</span>
-                </div>
-                <ul style={{ paddingLeft: '18px', margin: 0, lineHeight: 1.6 }}>
-                  <li>Ticket ID: <strong>{createdTicket.id}</strong></li>
-                  <li>Assigned Department: <strong>{createdTicket.department}</strong></li>
-                  <li>SLA Target: <strong>{createdTicket.slaDeadline || '24 Hours'}</strong></li>
-                  <li>Complaint DNA & Cluster Linkage generated</li>
-                </ul>
-              </div>
-
-              {/* Navigation Buttons */}
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-                <button
-                  type="button"
-                  onClick={() => navigate(`/citizen/complaints/${createdTicket.id}`)}
-                  className="btn-primary"
-                  style={{ flex: 1 }}
-                >
-                  <span>Track Timeline</span>
-                  <ArrowRight style={{ width: '16px', height: '16px' }} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate('/citizen')}
-                  className="btn-secondary"
-                  style={{ flex: 1 }}
-                >
-                  Citizen Dashboard
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
       </div>
     </div>
