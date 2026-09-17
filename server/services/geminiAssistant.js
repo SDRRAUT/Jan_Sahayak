@@ -6,16 +6,39 @@
  * Zero Client-Side API Key Exposure
  */
 
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { getToolsForRole, executeAssistantTool } from './assistantTools.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const envFilePath = path.resolve(__dirname, '../../.env');
+if (fs.existsSync(envFilePath)) {
+  try {
+    const rawEnv = fs.readFileSync(envFilePath, 'utf8');
+    for (const line of rawEnv.split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
+        const eqIdx = trimmed.indexOf('=');
+        const envKey = trimmed.substring(0, eqIdx).trim();
+        const envVal = trimmed.substring(eqIdx + 1).trim();
+        if (!process.env[envKey]) {
+          process.env[envKey] = envVal;
+        }
+      }
+    }
+  } catch (e) {}
+}
 
 export class GeminiAssistantService {
   constructor() {
-    this.defaultModel = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
-    this.modelsToTry = [this.defaultModel, 'gemini-2.0-flash', 'gemini-1.5-flash-8b'];
+    this.defaultModel = process.env.AI_MODEL || 'gemini-flash-latest';
+    this.modelsToTry = ['gemini-flash-latest', 'gemini-3.6-flash', 'gemini-flash-lite-latest'];
   }
 
   getApiKey() {
-    return process.env.GEMINI_API_KEY || process.env.AI_API_KEY || null;
+    return process.env.AI_API_KEY || process.env.GEMINI_API_KEY || null;
   }
 
   /**
@@ -27,31 +50,34 @@ export class GeminiAssistantService {
       ? `Active entity context: ${context.current_entity_type || 'entity'} ID: ${context.current_entity_id}. Current route: ${context.current_route || 'unknown'}.`
       : `Current route: ${context.current_route || '/'}. Current page: ${context.current_page || 'Overview'}.`;
 
-    return `You are Jan_Sahayak Assistant, the official civic intelligence AI for the JanSahayak Municipal Grievance & Resolution Platform.
+    return `You are Jan_Sahayak Assistant, the advanced generative AI reasoning intelligence for the JanSahayak Municipal Grievance & Civic Resolution Platform.
 
-AUTHENTICATED USER CONTEXT:
-- Name: ${user.name || 'Citizen'}
-- User ID: ${user.id || 'USR-CITIZEN-01'}
-- Role: ${role}
-- Department: ${user.department || 'N/A'}
-- Ward: ${user.ward || 'N/A'}
-- ${entityContext}
+CAPABILITIES:
+1. GENERAL KNOWLEDGE & ANY USER COMMAND:
+   - You are a fully capable generative AI. Answer ANY question or command the user asks with deep intelligence, clarity, and helpfulness (e.g. general questions like "what is github", technical concepts, explanations, drafting text, life advice, civic laws, etc.).
+   - Format your answers beautifully using Markdown: use **bold** for key terms, clear bullet points (•), and structured paragraphs.
 
-CRITICAL RULES:
-1. NEVER INVENT OR HALLUCINATE: You must never guess or fabricate complaint statuses, incident numbers, officer assignments, resolution timelines, or citywide counts.
-2. ALWAYS USE AUTHORIZED TOOLS: Whenever the user asks about specific complaints, incidents, timelines, evidence, root causes, emerging clusters, or municipal metrics, call the appropriate tool.
-3. DATA GROUNDING: Only state facts that were directly returned in the tool response. If no record is found or data is missing, respond: "Mujhe is information ka verified record nahi mil raha."
-4. ROLE BOUNDARIES: You are strictly scoped to the user's role (${role}).
-   - CITIZEN: Provide empathetic, simple, reassuring, and clear updates. Avoid bureaucratic jargon. Explain what is happening on the ground and what steps are next.
-   - CIVIC OFFICER: Provide crisp, operational summaries: (1) Situation, (2) Possible Cause, (3) Supporting Evidence, (4) Recommended Next Step, (5) Verification Needed.
-   - SUPER ADMIN: Provide high-level governance insights: cluster growth, cross-department dependencies, SLA compliance, and ward hotspots.
-5. MULTILINGUAL HINGLISH: Understand and reply naturally in Hindi, Hinglish, or English depending on how the user addresses you.
-   Example: If user asks "Meri complaint ka status kya hai?", reply in friendly Hinglish like "Aapki complaint field inspection ke liye assign ho chuki hai..."
+2. JAN_SAHAYAK PLATFORM & CIVIC GROUNDING:
+   - When the user asks about specific complaints, incidents, timelines, evidence, root causes, emerging clusters, or municipal metrics, ALWAYS call the appropriate tool.
+   - Only state facts that were directly returned in the tool response. If no record is found, state clearly: "Mujhe is information ka verified record nahi mil raha."
+
+3. AUTHENTICATED USER CONTEXT:
+   - User Name: ${user.name || 'Citizen'}
+   - Role: ${role}
+   - Department: ${user.department || 'N/A'}
+   - Ward: ${user.ward || 'N/A'}
+   - ${entityContext}
+
+4. ROLE TONE:
+   - CITIZEN: Empathetic, simple, reassuring, and conversational. Avoid bureaucratic jargon.
+   - CIVIC OFFICER: Crisp, operational summaries (Situation, Cause, Evidence, Next Steps).
+   - SUPER ADMIN: High-level governance insights (clusters, cross-department bottlenecks, SLA compliance).
+
+5. MULTILINGUAL & HINGLISH:
+   - Respond naturally in the user's language: Hindi, Hinglish, or English. Match their tone and vocabulary.
+
 6. SENSITIVE ACTIONS REQUIRE CONFIRMATION:
-   - If the user asks to perform a high-impact operation (e.g. "Reopen this complaint", "Escalate to SE", "Approve resolution"), DO NOT claim the action succeeded!
-   - Ask for confirmation first, specifying the reason and entity.
-   - Mark in your response that user confirmation is needed.
-7. CONTEXT AWARENESS: If the user asks an ambiguous question like "Ab iska kya hoga?" or "Short summary do", resolve it using the active entity context (${context.current_entity_id || 'none'}).`;
+   - If the user asks to perform a high-impact operation (e.g. "Reopen this complaint", "Escalate to SE", "Approve resolution"), DO NOT claim the action succeeded! Ask for confirmation first.`;
   }
 
   /**
@@ -134,9 +160,9 @@ CRITICAL RULES:
             // Send tool result back to Gemini in turn 2 to get final grounded response
             const turn2Contents = [
               ...contents,
-              { role: 'model', parts: [{ functionCall: { name, args } }] },
+              { role: 'model', parts: [part] },
               {
-                role: 'function',
+                role: 'user',
                 parts: [{
                   functionResponse: {
                     name,
@@ -306,7 +332,27 @@ CRITICAL RULES:
         };
       }
 
-      // Default citizen answer
+      if (text.includes('github')) {
+        return {
+          reply: `**GitHub** is a cloud-based platform that helps software developers store, manage, track, and collaborate on code using **Git** version control. It powers repositories, pull requests, automated GitHub Actions CI/CD, and global open-source development.`,
+          toolsCalled: []
+        };
+      }
+
+      // If inquiry is not civic-related, don't blindly return complaints count
+      const isCivicQuery = text.includes('complaint') || text.includes('pani') || text.includes('paani') || 
+        text.includes('road') || text.includes('sadak') || text.includes('drain') || text.includes('nali') || 
+        text.includes('ward') || text.includes('delhi') || text.includes('sahayak') || text.includes('officer') || 
+        text.includes('status') || text.includes('ticket') || text.includes('report') || text.includes('grievance');
+
+      if (!isCivicQuery) {
+        return {
+          reply: `**JanSahayak AI**: Aapne poocha: "${message}". Main general knowledge aur technical queries ke saath-saath municipal services aur grievance tracking dono mein aapki sahayata kar sakta hoon.`,
+          toolsCalled: []
+        };
+      }
+
+      // Default citizen answer for civic queries
       const complaintsRes = await executeAssistantTool('get_my_complaints', {}, { ...user, ...context });
       toolsCalled.push({ name: 'get_my_complaints', args: {} });
       return {
