@@ -1,4 +1,5 @@
 import pg from 'pg';
+import { createClient } from '@supabase/supabase-js';
 
 const { Pool } = pg;
 
@@ -9,6 +10,10 @@ const connectionString =
   process.env.POSTGRES_PRISMA_URL || 
   process.env.PG_CONNECTION_STRING ||
   'postgres://jan_sahayak_app:JanSahayak_Secure_DB_2026!@db.epnfavpqweeybzoyoexq.supabase.co:5432/postgres';
+
+const supabaseUrl = process.env.SUPABASE_URL || 'https://epnfavpqweeybzoyoexq.supabase.co';
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwbmZhdnBxd2VleWJ6b3lvZXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0MTcxOTMsImV4cCI6MjEwMzk5MzE5M30.PIvlGuiavqRRnb1zTFIwdmizMh9AeSLxc5nW8YdhYHQ';
+const supabaseRestClient = createClient(supabaseUrl, supabaseAnonKey);
 
 let pool = null;
 let isConnected = false;
@@ -66,61 +71,118 @@ export const postgresDB = {
   // --- Grievances (Complaints) ---
   async getAllGrievances() {
     const p = getPool();
-    if (!p) return [];
-    try {
-      const res = await p.query(`
-        SELECT 
-          g.*,
-          extensions.ST_Y(g.geom::extensions.geometry) AS lat_val,
-          extensions.ST_X(g.geom::extensions.geometry) AS lng_val
-        FROM public.grievances g
-        ORDER BY g.created_at DESC
-      `);
+    if (p) {
+      try {
+        const res = await p.query(`
+          SELECT 
+            g.*,
+            extensions.ST_Y(g.geom::extensions.geometry) AS lat_val,
+            extensions.ST_X(g.geom::extensions.geometry) AS lng_val
+          FROM public.grievances g
+          ORDER BY g.created_at DESC
+        `);
 
-      return res.rows.map(r => ({
-        id: r.id,
-        title: r.title,
-        descriptionRaw: r.description_raw,
-        languageDetected: r.language_detected,
-        category: r.category,
-        department: r.department,
-        officerName: r.officer_name,
-        officerDesignation: r.officer_designation,
-        location: {
-          ward: r.location_ward,
-          area: r.location_area,
-          city: r.location_city || 'New Delhi',
-          pincode: r.location_pincode,
-          lat: r.lat_val || (r.location_ward?.includes('14') ? 28.7189 : 28.6139),
-          lng: r.lng_val || (r.location_ward?.includes('14') ? 77.1265 : 77.2090)
-        },
-        urgency: r.urgency,
-        urgencyScore: r.urgency_score,
-        status: r.status,
-        createdAt: r.created_at ? new Date(r.created_at).toLocaleString() : new Date().toLocaleString(),
-        timestamp: r.created_at || new Date().toISOString(),
-        slaDeadline: r.sla_deadline ? new Date(r.sla_deadline).toLocaleString() : '24 Hours',
-        slaHoursLeft: r.sla_hours_left ?? 24,
-        upvotes: r.upvotes || 1,
-        citizenId: r.citizen_id,
-        citizenName: r.citizen_name,
-        citizenPhone: r.citizen_phone,
-        evidence: r.evidence || {},
-        dna: r.dna || {},
-        analysis: r.analysis || {},
-        clusterId: r.cluster_id,
-        clusterTitle: r.cluster_title,
-        clusterCount: r.cluster_count || 1,
-        incidentId: r.incident_id,
-        resolutionNotes: r.resolution_notes,
-        resolutionPhotoUrl: r.resolution_photo_url,
-        citizenVerification: r.citizen_verification,
-        timeline: r.timeline || []
-      }));
-    } catch (err) {
-      console.error('PostgreSQL getAllGrievances error:', err.message);
-      return [];
+        if (res.rows && res.rows.length > 0) {
+          return res.rows.map(r => ({
+            id: r.id,
+            title: r.title,
+            descriptionRaw: r.description_raw,
+            languageDetected: r.language_detected,
+            category: r.category,
+            department: r.department,
+            officerName: r.officer_name,
+            officerDesignation: r.officer_designation,
+            location: {
+              ward: r.location_ward,
+              area: r.location_area,
+              city: r.location_city || 'New Delhi',
+              pincode: r.location_pincode,
+              lat: r.lat_val || (r.location_ward?.includes('14') ? 28.7189 : 28.6139),
+              lng: r.lng_val || (r.location_ward?.includes('14') ? 77.1265 : 77.2090)
+            },
+            urgency: r.urgency,
+            urgencyScore: r.urgency_score,
+            status: r.status,
+            createdAt: r.created_at ? new Date(r.created_at).toLocaleString() : new Date().toLocaleString(),
+            timestamp: r.created_at || new Date().toISOString(),
+            slaDeadline: r.sla_deadline ? new Date(r.sla_deadline).toLocaleString() : '24 Hours',
+            slaHoursLeft: r.sla_hours_left ?? 24,
+            upvotes: r.upvotes || 1,
+            citizenId: r.citizen_id,
+            citizenName: r.citizen_name,
+            citizenPhone: r.citizen_phone,
+            evidence: r.evidence || {},
+            dna: r.dna || {},
+            analysis: r.analysis || {},
+            clusterId: r.cluster_id,
+            clusterTitle: r.cluster_title,
+            clusterCount: r.cluster_count || 1,
+            incidentId: r.incident_id,
+            resolutionNotes: r.resolution_notes,
+            resolutionPhotoUrl: r.resolution_photo_url,
+            citizenVerification: r.citizen_verification,
+            timeline: r.timeline || []
+          }));
+        }
+      } catch (err) {
+        console.warn('[PostgreSQL Pool] Connection failed, falling back to Supabase REST:', err.message);
+      }
     }
+
+    // High-Reliability Fallback: Supabase REST API (via HTTPS, works on Vercel)
+    try {
+      const { data, error } = await supabaseRestClient
+        .from('grievances')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        return data.map(r => ({
+          id: r.id,
+          title: r.title,
+          descriptionRaw: r.description_raw,
+          languageDetected: r.language_detected,
+          category: r.category,
+          department: r.department,
+          officerName: r.officer_name,
+          officerDesignation: r.officer_designation,
+          location: {
+            ward: r.location_ward,
+            area: r.location_area,
+            city: r.location_city || 'New Delhi',
+            pincode: r.location_pincode,
+            lat: r.lat || 28.7185,
+            lng: r.lng || 77.1250
+          },
+          urgency: r.urgency,
+          urgencyScore: r.urgency_score,
+          status: r.status,
+          createdAt: r.created_at ? new Date(r.created_at).toLocaleString() : new Date().toLocaleString(),
+          timestamp: r.created_at || new Date().toISOString(),
+          slaDeadline: r.sla_deadline ? new Date(r.sla_deadline).toLocaleString() : '24 Hours',
+          slaHoursLeft: r.sla_hours_left ?? 24,
+          upvotes: r.upvotes || 1,
+          citizenId: r.citizen_id,
+          citizenName: r.citizen_name,
+          citizenPhone: r.citizen_phone,
+          evidence: r.evidence || {},
+          dna: r.dna || {},
+          analysis: r.analysis || {},
+          clusterId: r.cluster_id,
+          clusterTitle: r.cluster_title,
+          clusterCount: r.cluster_count || 1,
+          incidentId: r.incident_id,
+          resolutionNotes: r.resolution_notes,
+          resolutionPhotoUrl: r.resolution_photo_url,
+          citizenVerification: r.citizen_verification,
+          timeline: r.timeline || []
+        }));
+      }
+    } catch (restErr) {
+      console.warn('[Supabase REST] Error fetching grievances:', restErr.message);
+    }
+
+    return [];
   },
 
   async getGrievanceById(id) {

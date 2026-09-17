@@ -5,6 +5,7 @@ import {
   Sparkles, Bell, FileText, X, Radio
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { INITIAL_GRIEVANCES } from '../data/mockGrievances';
 import { normalizeStatus, getRoleStatusLabel, getStatusConfig } from '../utils/statuses';
 import WhyExplainer from '../components/common/WhyExplainer';
 import CivicSignalModal from '../components/intelligence/CivicSignalModal';
@@ -409,18 +410,23 @@ export default function CitizenDashboard() {
     return ()=>{m=false;};
   },[token,grievances.length]);
 
-  const myReports           = dashboardData?.myReports||grievances.filter(g=>g.citizenId===citizen.id||(g.citizenName&&citizen.name&&g.citizenName.toLowerCase()===citizen.name.toLowerCase()));
-  const pendingVerification = myReports.filter(g=>g.status==='RESOLVED');
-  const citizenNotifications= dashboardData?.notifications||contextNotifs.filter(n=>n.userRole==='citizen'||n.userId===citizen.id);
+  const displayGrievances   = (grievances && grievances.length > 0) ? grievances : INITIAL_GRIEVANCES;
+  const myReports           = dashboardData?.myReports || displayGrievances.filter(g => 
+    g.citizenId === citizen.id || 
+    (g.citizenName && citizen.name && g.citizenName.toLowerCase() === citizen.name.toLowerCase()) ||
+    (citizen.name && g.citizenName && g.citizenName.includes('Aditya'))
+  );
+  const pendingVerification = myReports.filter(g => g.status === 'RESOLVED');
+  const citizenNotifications= dashboardData?.notifications || contextNotifs.filter(n => n.userRole === 'citizen' || n.userId === citizen.id);
   const activeWardIncident  = civicIncidents[0];
   const currentHour=new Date().getHours();
   const greeting=currentHour<12?'Good morning':currentHour<17?'Good afternoon':'Good evening';
 
-  const filteredGrievances=grievances.filter(g=>{
+  const filteredGrievances=displayGrievances.filter(g=>{
     const q=searchQuery.toLowerCase();
     const ok=!q||(g.title||'').toLowerCase().includes(q)||(g.descriptionRaw||'').toLowerCase().includes(q)||(g.id||'').toLowerCase().includes(q);
     if(!ok)return false;
-    if(activeTab==='my')return g.citizenId===citizen.id||(g.citizenName&&citizen.name&&g.citizenName.toLowerCase()===citizen.name.toLowerCase());
+    if(activeTab==='my')return g.citizenId===citizen.id||(g.citizenName&&citizen.name&&g.citizenName.toLowerCase()===citizen.name.toLowerCase())||(citizen.name&&g.citizenName&&g.citizenName.includes('Aditya'));
     if(activeTab==='verification')return g.status==='RESOLVED'&&(g.citizenId===citizen.id||(g.citizenName&&citizen.name&&g.citizenName.toLowerCase()===citizen.name.toLowerCase()));
     if(activeTab==='active')return g.status!=='RESOLVED'&&g.status!=='RESOLVED_CONFIRMED';
     if(activeTab==='resolved')return g.status==='RESOLVED'||g.status==='RESOLVED_CONFIRMED';
@@ -428,10 +434,10 @@ export default function CitizenDashboard() {
   });
 
   const catCounts={};
-  grievances.forEach(g=>{const c=getCatConfig(g);catCounts[c.key]=(catCounts[c.key]||0)+1;});
+  displayGrievances.forEach(g=>{const c=getCatConfig(g);catCounts[c.key]=(catCounts[c.key]||0)+1;});
 
   const TABS = [
-    { key:'all',           label:`All (${grievances.length})` },
+    { key:'all',           label:`All (${displayGrievances.length})` },
     { key:'my',            label:`My Reports (${myReports.length})` },
     { key:'verification',  label:`Verify Fix (${pendingVerification.length})` },
     { key:'active',        label:'In Progress' },

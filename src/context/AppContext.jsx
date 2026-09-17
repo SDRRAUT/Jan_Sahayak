@@ -326,7 +326,7 @@ export function AppProvider({ children }) {
   const fetchGrievances = async () => {
     try {
       const complaints = await ComplaintService.getComplaints(token);
-      if (Array.isArray(complaints)) {
+      if (Array.isArray(complaints) && complaints.length > 0) {
         setGrievances(complaints);
       }
     } catch (e) {

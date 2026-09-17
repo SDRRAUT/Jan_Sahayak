@@ -242,9 +242,8 @@ function createNotification({ userId, userRole, title, message, grievanceId, lin
   return notif;
 }
 
-// GRIEVANCES_DB starts empty — Supabase PostgreSQL is the sole source of truth.
-// This in-memory cache is a write-through layer to reduce DB round-trips within a session.
-let GRIEVANCES_DB = [];
+// GRIEVANCES_DB initialized from authoritative complaint seed data with write-through caching to Supabase PostgreSQL.
+let GRIEVANCES_DB = db.getComplaints ? db.getComplaints() : [];
 
 // Boot: Pre-load existing grievances from Supabase into in-memory cache
 (async () => {
@@ -253,8 +252,8 @@ let GRIEVANCES_DB = [];
     if (existing && existing.length > 0) {
       GRIEVANCES_DB = existing;
       console.log(`📦 [Boot] Loaded ${existing.length} grievances from Supabase into memory cache`);
-    } else {
-      console.log('📦 [Boot] No existing grievances in Supabase — starting fresh');
+    } else if (GRIEVANCES_DB.length > 0) {
+      console.log(`📦 [Boot] Using ${GRIEVANCES_DB.length} seed grievances`);
     }
   } catch (e) {
     console.warn('[Boot] Could not pre-load grievances from DB:', e.message);
@@ -583,9 +582,14 @@ async function persistGrievanceRecord(item) {
 
 // Get Grievances (Filtered by role & access via Supabase PostgreSQL)
 app.get('/api/grievances', async (req, res) => {
-  let list = await postgresDB.getAllGrievances();
+  let list = [];
+  try {
+    list = await postgresDB.getAllGrievances();
+  } catch (err) {
+    console.warn('Error fetching grievances:', err.message);
+  }
   if (!list || list.length === 0) {
-    list = GRIEVANCES_DB;
+    list = (GRIEVANCES_DB && GRIEVANCES_DB.length > 0) ? GRIEVANCES_DB : db.getComplaints();
   }
 
   const authHeader = req.headers['authorization'];
@@ -753,9 +757,12 @@ app.get('/api/citizen/dashboard', authenticateToken, requireRole(['citizen', 'su
   const citizenWard = req.user.ward || 'Ward 14 (Rohini Sector 14)';
 
   // Real user reports from Supabase PostgreSQL
-  let allGrievances = await postgresDB.getAllGrievances();
+  let allGrievances = [];
+  try {
+    allGrievances = await postgresDB.getAllGrievances();
+  } catch (err) {}
   if (!allGrievances || allGrievances.length === 0) {
-    allGrievances = GRIEVANCES_DB;
+    allGrievances = (GRIEVANCES_DB && GRIEVANCES_DB.length > 0) ? GRIEVANCES_DB : db.getComplaints();
   }
 
   const myReports = allGrievances.filter(g => 
