@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { initPostgresSchema, postgresDB, isPostgresActive } from './postgres.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -368,11 +369,32 @@ const INITIAL_STORE = {
   ]
 };
 
-// Thread-safe memory cached file database with auto-flush
+// Thread-safe memory cached file database with auto-flush and PostgreSQL sync
 class Database {
   constructor() {
     this.data = null;
     this.load();
+    this.initPostgres();
+  }
+
+  async initPostgres() {
+    try {
+      const ready = await initPostgresSchema(INITIAL_STORE);
+      if (ready) {
+        await this.syncWithPostgres();
+      }
+    } catch (err) {
+      console.warn('PostgreSQL auto-init status:', err.message);
+    }
+  }
+
+  async syncWithPostgres() {
+    try {
+      const pgComplaints = await postgresDB.getAllGrievances();
+      if (pgComplaints && pgComplaints.length > 0) {
+        this.data.complaints = pgComplaints;
+      }
+    } catch (e) {}
   }
 
   load() {
@@ -417,6 +439,9 @@ class Database {
       this.data.complaints.unshift(complaint);
     }
     this.save();
+    postgresDB.saveGrievance(complaint).catch((err) => {
+      // Non-fatal if postgres is disconnected in local dev
+    });
     return complaint;
   }
 

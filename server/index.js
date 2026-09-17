@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import { db } from './db/database.js';
 import { orchestrator } from './agents/orchestrator.js';
 import { aiProvider } from './agents/aiProvider.js';
+import { postgresDB, isPostgresActive } from './db/postgres.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -230,6 +231,7 @@ function createNotification({ userId, userRole, title, message, grievanceId, lin
     timestamp: new Date().toISOString()
   };
   NOTIFICATIONS_DB.unshift(notif);
+  postgresDB.saveNotification(notif).catch(() => {});
   return notif;
 }
 
@@ -620,6 +622,20 @@ app.get('/api/grievances/:id', authenticateToken, (req, res) => {
   const item = GRIEVANCES_DB.find(g => g.id === id);
   if (!item) return res.status(404).json({ error: 'Grievance not found.' });
   res.json({ grievance: item });
+});
+
+// GET Database Health & PostgreSQL Status
+app.get('/api/health/db', (req, res) => {
+  res.json({
+    status: 'healthy',
+    postgres: {
+      active: isPostgresActive(),
+      urlConfigured: Boolean(process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.POSTGRES_PRISMA_URL)
+    },
+    totalGrievances: GRIEVANCES_DB.length,
+    totalIncidents: db.getIncidents().length,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // ============================================================================
