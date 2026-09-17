@@ -66,23 +66,23 @@ export default function Login() {
       <div className="container" style={{ maxWidth: '980px' }}>
         {/* Header */}
         <div className="section-header center" style={{ marginBottom: '36px' }}>
-          <div className="category-pill">OFFICIAL CIVIC AUTHENTICATION</div>
-          <h2>JanSahayk Citizen & Authority Gateway</h2>
+          <div className="category-pill">OFFICIAL ACCESS</div>
+          <h2>JanSahayak जनसहायक Portal Access</h2>
           <p>
-            Secure, role-based access verified by Delhi Municipal Administration & National Informatics Standards.
+            Secure, role-based access for citizens, municipal officers, and department administrators.
           </p>
         </div>
 
-        {/* 1-Click Role Switcher Demo Cards (Mandatory for rapid hackathon testing) */}
+        {/* 1-Click Role Switcher Demo Cards */}
         <div style={{ marginBottom: '36px' }}>
           <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-text-muted)', display: 'block', marginBottom: '12px', textAlign: 'center' }}>
-            ⚡ 1-Click Persona Authentication (Instant Role Access):
+            Select Persona to Access Portal (Prototype Environment):
           </span>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '14px'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '16px'
           }}>
             {/* Role 1: Citizen */}
             <button
@@ -90,24 +90,24 @@ export default function Login() {
               onClick={() => handleQuickDemoLogin('citizen')}
               className="card card-interactive"
               style={{
-                padding: '16px',
+                padding: '18px',
                 textAlign: 'left',
                 border: '1px solid rgba(14, 94, 58, 0.2)',
                 background: '#FFFFFF'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                <div className="icon-squircle" style={{ width: '28px', height: '28px' }}>
-                  <User style={{ width: '14px', height: '14px' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                <div className="icon-squircle" style={{ width: '32px', height: '32px', background: 'var(--color-accent-tint)' }}>
+                  <User style={{ width: '16px', height: '16px', color: 'var(--color-primary)' }} />
                 </div>
-                <strong style={{ fontSize: '13px', color: 'var(--color-primary)' }}>Citizen Role</strong>
+                <div>
+                  <strong style={{ fontSize: '14px', color: 'var(--color-primary)', display: 'block' }}>Citizen</strong>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Public Reporting & Tracking</span>
+                </div>
               </div>
-              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
-                Aditya Verma (Ward 14)
+              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                Aditya Verma (Ward 14) • File, track, upvote & verify grievance resolution.
               </p>
-              <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                File, track, & reopen complaints
-              </span>
             </button>
 
             {/* Role 2: Officer */}
@@ -116,24 +116,24 @@ export default function Login() {
               onClick={() => handleQuickDemoLogin('officer')}
               className="card card-interactive"
               style={{
-                padding: '16px',
+                padding: '18px',
                 textAlign: 'left',
                 border: '1px solid rgba(14, 94, 58, 0.2)',
                 background: '#FFFFFF'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                <div className="icon-squircle" style={{ width: '28px', height: '28px' }}>
-                  <Briefcase style={{ width: '14px', height: '14px' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                <div className="icon-squircle" style={{ width: '32px', height: '32px', background: '#ECFDF5' }}>
+                  <Briefcase style={{ width: '16px', height: '16px', color: '#065F46' }} />
                 </div>
-                <strong style={{ fontSize: '13px', color: 'var(--color-primary)' }}>Govt Officer</strong>
+                <div>
+                  <strong style={{ fontSize: '14px', color: '#065F46', display: 'block' }}>Government Officer</strong>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Field Triage & Work Orders</span>
+                </div>
               </div>
-              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
-                Er. Sanjay Sharma (AEE - DJB)
+              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                Er. Sanjay Sharma (AEE DJB) • Review AI brief, authorize SOPs & dispatch crews.
               </p>
-              <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                AI brief, RAG SOPs, & dispatch
-              </span>
             </button>
 
             {/* Role 3: Dept Admin */}
@@ -142,50 +142,42 @@ export default function Login() {
               onClick={() => handleQuickDemoLogin('dept_admin')}
               className="card card-interactive"
               style={{
-                padding: '16px',
+                padding: '18px',
                 textAlign: 'left',
                 border: '1px solid rgba(14, 94, 58, 0.2)',
                 background: '#FFFFFF'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                <div className="icon-squircle" style={{ width: '28px', height: '28px' }}>
-                  <Building2 style={{ width: '14px', height: '14px' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                <div className="icon-squircle" style={{ width: '32px', height: '32px', background: '#EFF6FF' }}>
+                  <Building2 style={{ width: '16px', height: '16px', color: '#1E40AF' }} />
                 </div>
-                <strong style={{ fontSize: '13px', color: 'var(--color-primary)' }}>Dept Admin</strong>
+                <div>
+                  <strong style={{ fontSize: '14px', color: '#1E40AF', display: 'block' }}>Department Admin</strong>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>SLA Health & Macro Hotspots</span>
+                </div>
               </div>
-              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
-                Chief Engineer (DJB Dept)
+              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                Chief Engineer • Monitor ward SLA compliance, recurring defects & allocation.
               </p>
-              <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                SLA health, workload, & recurring
-              </span>
             </button>
+          </div>
 
-            {/* Role 4: Super Admin */}
+          {/* Deemphasized Super Admin link */}
+          <div style={{ textAlign: 'center', marginTop: '14px' }}>
             <button
               type="button"
               onClick={() => handleQuickDemoLogin('super_admin')}
-              className="card card-interactive"
               style={{
-                padding: '16px',
-                textAlign: 'left',
-                border: '1px solid rgba(14, 94, 58, 0.2)',
-                background: '#FFFFFF'
+                fontSize: '11px',
+                color: 'var(--color-text-muted)',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                textDecoration: 'underline'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                <div className="icon-squircle" style={{ width: '28px', height: '28px' }}>
-                  <ShieldCheck style={{ width: '14px', height: '14px' }} />
-                </div>
-                <strong style={{ fontSize: '13px', color: 'var(--color-primary)' }}>Super Admin</strong>
-              </div>
-              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
-                Principal Secretary (IAS)
-              </p>
-              <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                Audit logs, SLA rules, & depts
-              </span>
+              Municipal System Administrator (State Level IAS Console) →
             </button>
           </div>
         </div>
