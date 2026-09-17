@@ -220,7 +220,7 @@ export default function CitizenSubmit() {
           <div>
             <div className="category-pill" style={{ marginBottom: '10px' }}>
               <Sparkles style={{ width: '13px', height: '13px' }} />
-              <span>CITIZEN ACCESS • जनसहायक</span>
+              <span>CITIZEN ACCESS PORTAL</span>
             </div>
             <h1 style={{ fontSize: '36px', marginBottom: '8px', color: 'var(--color-text-primary)' }}>
               What happened?

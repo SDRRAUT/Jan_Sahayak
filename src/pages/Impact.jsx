@@ -60,7 +60,7 @@ export default function Impact() {
           </div>
           <h2>Transforming Public Grievance Governance</h2>
           <p>
-            Field benchmarks proving how JanSahayak जनसहायक turns everyday citizen grievances into structured evidence, faster municipal resolution, and verified outcomes.
+            Field benchmarks proving how JanSahayak turns everyday citizen grievances into structured evidence, faster municipal resolution, and verified outcomes.
           </p>
         </div>
 
@@ -124,7 +124,7 @@ export default function Impact() {
                 <tr style={{ borderBottom: '2px solid var(--color-border-medium)' }}>
                   <th style={{ padding: '12px 16px', fontWeight: 700, color: 'var(--color-text-muted)', width: '22%' }}>DIMENSION</th>
                   <th style={{ padding: '12px 16px', fontWeight: 700, color: '#991B1B', width: '39%' }}>TRADITIONAL PORTAL (CPGRAMS / STATE)</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 700, color: 'var(--color-primary)', width: '39%' }}>JANSAHAYAK जनसहायक</th>
+                  <th style={{ padding: '12px 16px', fontWeight: 700, color: 'var(--color-primary)', width: '39%' }}>JANSAHAYAK PLATFORM</th>
                 </tr>
               </thead>
               <tbody>

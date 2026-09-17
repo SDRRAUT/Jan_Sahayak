@@ -67,7 +67,7 @@ export default function Login() {
         {/* Header */}
         <div className="section-header center" style={{ marginBottom: '36px' }}>
           <div className="category-pill">OFFICIAL ACCESS</div>
-          <h2>JanSahayak जनसहायक Portal Access</h2>
+          <h2>JanSahayak Portal Access</h2>
           <p>
             Secure, role-based access for citizens, municipal officers, and department administrators.
           </p>

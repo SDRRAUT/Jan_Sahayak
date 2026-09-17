@@ -119,7 +119,7 @@ export default function Navbar() {
           justifyContent: 'space-between'
         }}
       >
-        {/* Brand Logo: JanSahayak जनसहायक */}
+        {/* Brand Logo: JanSahayak */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
             width: '34px',
@@ -134,12 +134,9 @@ export default function Navbar() {
           }}>
             <Shield style={{ width: '18px', height: '18px' }} />
           </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-            <span style={{ fontWeight: 800, fontSize: '17px', letterSpacing: '-0.02em', color: 'var(--color-text-primary)' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline' }}>
+            <span style={{ fontWeight: 800, fontSize: '18px', letterSpacing: '-0.02em', color: 'var(--color-text-primary)' }}>
               JanSahayak
-            </span>
-            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-primary)' }}>
-              जनसहायक
             </span>
           </div>
         </Link>

@@ -42,7 +42,7 @@ export default function Footer() {
                 <Shield style={{ width: '20px', height: '20px', color: '#FFFFFF' }} />
               </div>
               <div>
-                <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#FFFFFF' }}>JanSahayak (जनसहायक)</h3>
+                <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#FFFFFF' }}>JanSahayak</h3>
                 <p style={{ fontSize: '12px', color: 'var(--color-accent)' }}>Aapki Awaaz, Ab Samjhi Jayegi</p>
               </div>
             </div>
@@ -134,7 +134,7 @@ export default function Footer() {
           }}
         >
           <div>
-            © 2026 JanSahayak (जनसहायक). Public Grievance Intelligence Platform.
+            © 2026 JanSahayak. Public Grievance Intelligence Platform.
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <span style={{ color: '#10B981', fontWeight: 600 }}>Closed-Loop Civic Governance</span>

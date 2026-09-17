@@ -38,7 +38,7 @@ export default function Platform() {
           </div>
           <h2>Civic Intelligence Architecture</h2>
           <p>
-            An inside look at how JanSahayak जनसहायक processes everyday citizen voices, connects spatial evidence, and suggests resolution paths for municipal officers.
+            An inside look at how JanSahayak processes everyday citizen voices, connects spatial evidence, and suggests resolution paths for municipal officers.
           </p>
         </div>
 
