@@ -10,14 +10,15 @@ import {
   Navigation, 
   CheckCircle2, 
   Loader2,
-  Trash2
+  Trash2,
+  Building2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../../context/AppContext';
 
 export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = '' }) {
   const navigate = useNavigate();
-  const { user, submitGrievance } = useApp();
+  const { user, submitGrievance, switchDemoRole } = useApp();
 
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -621,18 +622,70 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              {/* Officer Dispatch Verification Badge */}
+              <div style={{
+                background: '#F0FDF4',
+                border: '1.5px solid #BBF7D0',
+                borderRadius: '14px',
+                padding: '13px 16px',
+                marginBottom: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '12px',
+                textAlign: 'left'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '10px',
+                    background: '#DCFCE7',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#059669',
+                    flexShrink: 0
+                  }}>
+                    <Building2 style={{ width: '20px', height: '20px' }} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '12.5px', fontWeight: 800, color: '#065F46' }}>
+                      Transmitted to Govt Officer: {createdTicket.officerName || 'Er. Sanjay Sharma (AEE DJB)'}
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#047857' }}>
+                      {createdTicket.department || 'Delhi Municipal Authority'} • Ready in Officer Workspace queue
+                    </div>
+                  </div>
+                </div>
+                <span style={{
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  background: '#10B981',
+                  color: '#FFFFFF',
+                  padding: '3px 10px',
+                  borderRadius: '999px',
+                  whiteSpace: 'nowrap'
+                }}>
+                  ● Live on Officer Desk
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={async () => {
                     onClose();
+                    if (!user || user.role !== 'citizen') {
+                      await switchDemoRole('citizen');
+                    }
                     navigate(`/citizen/complaints/${createdTicket.id}`);
                   }}
                   style={{
                     height: '42px',
                     padding: '0 20px',
                     borderRadius: '10px',
-                    background: '#0E5E3A',
+                    background: 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)',
                     color: '#FFFFFF',
                     border: 'none',
                     fontSize: '13px',
@@ -640,7 +693,8 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '8px'
+                    gap: '8px',
+                    boxShadow: '0 4px 14px rgba(14, 94, 58, 0.35)'
                   }}
                 >
                   <span>Track Grievance Live</span>
@@ -649,10 +703,37 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
 
                 <button
                   type="button"
-                  onClick={onClose}
+                  onClick={async () => {
+                    onClose();
+                    await switchDemoRole('civic_officer');
+                    navigate(`/officer?caseId=${createdTicket.id}`);
+                  }}
                   style={{
                     height: '42px',
                     padding: '0 20px',
+                    borderRadius: '10px',
+                    background: '#1E293B',
+                    color: '#FFFFFF',
+                    border: '1px solid #334155',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: '0 4px 14px rgba(30, 41, 59, 0.25)'
+                  }}
+                >
+                  <Building2 style={{ width: '15px', height: '15px', color: '#38BDF8' }} />
+                  <span>View on Govt Officer Desk</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={onClose}
+                  style={{
+                    height: '42px',
+                    padding: '0 16px',
                     borderRadius: '10px',
                     background: '#F1F5F9',
                     color: '#334155',

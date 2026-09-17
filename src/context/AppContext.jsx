@@ -605,17 +605,37 @@ export function AppProvider({ children }) {
 
   // Submit Grievance
   const submitGrievance = async (formData) => {
-    const analysis = analyzeGrievanceInput(formData.description, { ward: formData.ward || user?.ward });
+    // If user is not yet logged in as citizen, establish citizen session so tracking and state persist seamlessly
+    let activeUser = user;
+    let activeToken = token;
+    if (!activeUser || !activeToken) {
+      activeUser = await switchDemoRole('citizen');
+      activeToken = localStorage.getItem('jansahayk_token') || 'demo-token-citizen';
+    }
+
+    const analysis = analyzeGrievanceInput(formData.description, { ward: formData.ward || activeUser?.ward });
+    
+    // Assign appropriate municipal field officer based on department
+    const assignedOfficer = analysis.department.includes('Jal Board') || analysis.department.includes('DJB')
+      ? 'Er. Sanjay Sharma (AEE DJB)'
+      : analysis.department.includes('PWD')
+      ? 'Er. Amit Khurana (EE PWD)'
+      : analysis.department.includes('BSES')
+      ? 'Er. Neha Singh (BSES Power)'
+      : 'Er. Rajesh Gupta (AE MCD)';
+
     const newGrievance = {
-      title: formData.title || `${analysis.category} Issue in ${formData.ward || user?.ward}`,
+      title: formData.title || `${analysis.category} Issue in ${formData.ward || activeUser?.ward}`,
       description: formData.description,
       category: analysis.category,
       department: analysis.department,
+      officerName: assignedOfficer,
+      officerDesignation: 'Assistant Executive Engineer',
       location: {
-        ward: formData.ward || user?.ward || 'Ward 14 (Rohini Sector 14)',
+        ward: formData.ward || activeUser?.ward || 'Ward 14 (Rohini Sector 14)',
         area: formData.area || 'Pocket 2, Near Market',
         city: 'New Delhi',
-        pincode: formData.pincode || user?.pincode || '110085'
+        pincode: formData.pincode || activeUser?.pincode || '110085'
       },
       urgency: analysis.urgency,
       urgencyScore: analysis.urgencyScore,
@@ -634,7 +654,7 @@ export function AppProvider({ children }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${activeToken}`
         },
         body: JSON.stringify(newGrievance)
       });
@@ -644,6 +664,7 @@ export function AppProvider({ children }) {
         // Augment with rich DNA for UI display
         created.grievanceDna = analysis;
         created.aiOfficerBrief = analysis.aiBrief;
+        created.officerName = created.officerName || assignedOfficer;
         created.recommendedResolution = {
           primaryAction: analysis.recommendedAction,
           standardOperatingProcedure: analysis.sops[0] || 'STANDARD-MUNICIPAL-SOP',
@@ -652,25 +673,31 @@ export function AppProvider({ children }) {
           citizenDraftHindi: analysis.draftResponseHindi,
           citizenDraftEnglish: analysis.draftResponseEnglish
         };
-        setGrievances(prev => [created, ...prev]);
+        setGrievances(prev => {
+          const updated = [created, ...prev];
+          localStorage.setItem('jansahayk_grievances_v4', JSON.stringify(updated));
+          return updated;
+        });
         return created;
       }
     } catch (e) {}
 
     // Fallback in-memory with JS- prefix
-    const wardNum = (formData.ward || user?.ward || 'Ward 14').match(/\d+/)?.[0] || '14';
+    const wardNum = (formData.ward || activeUser?.ward || 'Ward 14').match(/\d+/)?.[0] || '14';
     const fallbackId = `JS-2026-W${wardNum}-${String(Date.now()).slice(-4)}`;
     const fallbackItem = {
       ...newGrievance,
       id: fallbackId,
       status: 'TRIAGED',
+      officerName: assignedOfficer,
+      officerDesignation: 'Assistant Executive Engineer',
       createdAt: 'Just now',
       slaDeadline: '24 Hours from now',
       slaHoursLeft: analysis.targetSlaHours,
       upvotes: 1,
-      citizenId: user?.id || 'USR-CITIZEN-01',
-      citizenName: user?.name || 'Aditya Verma',
-      citizenPhone: user?.phone || '+91 98712-88210',
+      citizenId: activeUser?.id || 'USR-CITIZEN-01',
+      citizenName: activeUser?.name || 'Aditya Verma',
+      citizenPhone: activeUser?.phone || '+91 98712-88210',
       grievanceDna: analysis,
       aiOfficerBrief: analysis.aiBrief,
       recommendedResolution: {
@@ -682,13 +709,35 @@ export function AppProvider({ children }) {
         citizenDraftEnglish: analysis.draftResponseEnglish
       },
       timeline: [
-        { stage: 'Submitted', time: 'Just now', detail: 'Submitted via JanSahayk Web Portal', status: 'completed' },
-        { stage: 'AI Triage & DNA Generated', time: 'Just now', detail: `Grievance DNA formed; routed to ${analysis.department}`, status: 'completed' }
+        { stage: 'Submitted', time: 'Just now', detail: 'Submitted via JanSahayak Municipal Gateway', status: 'completed' },
+        { stage: 'AI Triage & DNA Generated', time: 'Just now', detail: `Grievance DNA formed; routed to ${analysis.department}`, status: 'completed' },
+        { stage: 'Assigned to Govt Officer', time: 'Just now', detail: `Case dispatched to ${assignedOfficer} for on-ground inspection & work order`, status: 'completed' }
       ],
       informationRequests: [],
       reopenedDispute: null
     };
-    setGrievances(prev => [fallbackItem, ...prev]);
+
+    // Create notifications for both citizen tracking and government officer desk
+    const officerNotif = {
+      id: `NOTIF-OFFICER-${Date.now()}`,
+      userId: 'USR-OFFICER-01',
+      userRole: 'officer',
+      title: `New Case Assigned: ${(formData.title || analysis.category).slice(0, 35)}...`,
+      message: `Ticket #${fallbackId} routed with ${analysis.urgency} priority to ${assignedOfficer}.`,
+      grievanceId: fallbackId,
+      link: `/officer?caseId=${fallbackId}`,
+      type: 'ASSIGNMENT',
+      read: false,
+      createdAt: 'Just now',
+      timestamp: new Date().toISOString()
+    };
+    setNotifications(prev => [officerNotif, ...prev]);
+
+    setGrievances(prev => {
+      const updated = [fallbackItem, ...prev];
+      localStorage.setItem('jansahayk_grievances_v4', JSON.stringify(updated));
+      return updated;
+    });
     return fallbackItem;
   };
 

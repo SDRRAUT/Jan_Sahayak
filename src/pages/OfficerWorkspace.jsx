@@ -109,7 +109,14 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
   };
 
   // Selected grievance for deep workspace inspection
-  const [selectedId, setSelectedId] = useState(id || grievances[0]?.id || 'DL-2026-W14-0892');
+  const queryCaseId = searchParams.get('caseId');
+  const [selectedId, setSelectedId] = useState(id || queryCaseId || grievances[0]?.id || 'DL-2026-W14-0892');
+
+  useEffect(() => {
+    if (queryCaseId && queryCaseId !== selectedId) {
+      setSelectedId(queryCaseId);
+    }
+  }, [queryCaseId]);
   const [searchQuery, setSearchQuery] = useState('');
   const [urgencyFilter, setUrgencyFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
