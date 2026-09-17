@@ -73,6 +73,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
   // AI category detection state
   const [isAiDetecting, setIsAiDetecting] = useState(false);
   const [aiDetectedCategory, setAiDetectedCategory] = useState(null); // null = not detected yet
+  const [aiModeSelected, setAiModeSelected] = useState(false); // true = user explicitly chose AI mode
   const aiDebounceRef = useRef(null);
 
 
@@ -89,6 +90,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
       setCurrentStep(1);
       setCreatedTicket(null);
       setAiDetectedCategory(null);
+      setAiModeSelected(false);
       if (defaultCategory) setCategory(defaultCategory);
       if (user?.name) setCitizenName(user.name);
       if (user?.phone) setCitizenPhone(user.phone);
@@ -669,37 +671,45 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                       <label style={{ fontSize: '12px', fontWeight: 700, color: '#334155' }}>
                         1. Problem Category:
                       </label>
-                      {/* AI detection badge */}
-                      <span style={{
-                        fontSize: '10px',
-                        fontWeight: 700,
-                        color: aiDetectedCategory ? '#065F46' : '#6366F1',
-                        background: aiDetectedCategory ? '#ECFDF5' : '#EEF2FF',
-                        border: `1px solid ${aiDetectedCategory ? '#A7F3D0' : '#C7D2FE'}`,
-                        borderRadius: '999px',
-                        padding: '2px 8px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}>
+                      {/* AI detection badge — clickable to activate AI mode */}
+                      <button
+                        type="button"
+                        onClick={() => { setAiModeSelected(true); setCategory(''); setAiDetectedCategory(null); }}
+                        style={{
+                          fontSize: '10px',
+                          fontWeight: 700,
+                          color: aiDetectedCategory ? '#065F46' : aiModeSelected ? '#4338CA' : '#6366F1',
+                          background: aiDetectedCategory ? '#ECFDF5' : aiModeSelected ? '#EDE9FE' : '#EEF2FF',
+                          border: `1px solid ${aiDetectedCategory ? '#A7F3D0' : aiModeSelected ? '#A5B4FC' : '#C7D2FE'}`,
+                          borderRadius: '999px',
+                          padding: '3px 10px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          cursor: 'pointer',
+                          transition: 'all 150ms'
+                        }}
+                      >
                         {isAiDetecting
                           ? <><Loader2 style={{ width: '10px', height: '10px', animation: 'spin 1s linear infinite' }} /> AI detecting...</>
                           : aiDetectedCategory
                             ? <>✅ AI detected</>
-                            : <>🤖 AI will auto-detect</>
+                            : aiModeSelected
+                              ? <>🤖 AI mode ON</>
+                              : <>🤖 AI will auto-detect</>
                         }
-                      </span>
+                      </button>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                       {categories.map((cat) => {
-                        const isSelected = category === cat.key;
+                        const isSelected = !aiModeSelected && category === cat.key;
                         const isAiPick = aiDetectedCategory === cat.key;
                         return (
                           <button
                             key={cat.key}
                             type="button"
-                            onClick={() => { setCategory(cat.key); setAiDetectedCategory(null); }}
+                            onClick={() => { setCategory(cat.key); setAiDetectedCategory(null); setAiModeSelected(false); }}
                             style={{
                               padding: '9px 6px',
                               borderRadius: '10px',
@@ -733,18 +743,24 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                         );
                       })}
 
-                      {/* 6th slot: AI Detection tile */}
-                      <div style={{
-                        padding: '9px 6px',
-                        borderRadius: '10px',
-                        border: '1px dashed #A5B4FC',
-                        background: '#F5F3FF',
-                        textAlign: 'center',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
+                      {/* 6th slot: AI Detection tile — clickable button */}
+                      <button
+                        type="button"
+                        onClick={() => { setAiModeSelected(true); setCategory(''); setAiDetectedCategory(null); }}
+                        style={{
+                          padding: '9px 6px',
+                          borderRadius: '10px',
+                          border: aiModeSelected ? '2px solid #6366F1' : '1px dashed #A5B4FC',
+                          background: aiModeSelected ? '#EDE9FE' : '#F5F3FF',
+                          textAlign: 'center',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                      >
                         {isAiDetecting ? (
                           <>
                             <Loader2 style={{ width: '18px', height: '18px', color: '#6366F1', animation: 'spin 1s linear infinite', marginBottom: '2px' }} />
@@ -755,13 +771,18 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                             <div style={{ fontSize: '16px', marginBottom: '2px' }}>✅</div>
                             <strong style={{ fontSize: '10px', color: '#059669', lineHeight: 1.2 }}>AI detected!</strong>
                           </>
+                        ) : aiModeSelected ? (
+                          <>
+                            <div style={{ fontSize: '16px', marginBottom: '2px' }}>🤖</div>
+                            <strong style={{ fontSize: '10px', color: '#4338CA', lineHeight: 1.2 }}>AI Mode ON</strong>
+                          </>
                         ) : (
                           <>
                             <div style={{ fontSize: '16px', marginBottom: '2px' }}>🤖</div>
                             <strong style={{ fontSize: '10px', color: '#6366F1', lineHeight: 1.2 }}>Type to detect</strong>
                           </>
                         )}
-                      </div>
+                      </button>
                     </div>
 
                     <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
