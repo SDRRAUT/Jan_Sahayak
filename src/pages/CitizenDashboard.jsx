@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Plus, Search, MapPin, ThumbsUp, ArrowRight,
-  Sparkles, Bell, FileText, X
+  Sparkles, Bell, FileText, X, Radio
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import WhyExplainer from '../components/common/WhyExplainer';
@@ -406,16 +406,34 @@ export default function CitizenDashboard() {
 
         {/* Complaints */}
         <div>
-          <div style={{display:'flex',gap:'8px',marginBottom:'16px',overflowX:'auto',paddingBottom:'4px',flexWrap:'wrap'}}>
-            {TABS.map(tab=>(
-              <button key={tab.key} onClick={()=>setActiveTab(tab.key)} style={{padding:'7px 14px',borderRadius:'999px',fontSize:'12px',fontWeight:700,border:activeTab===tab.key?'none':'1.5px solid #E2E8F0',background:activeTab===tab.key?tab.color:'#fff',color:activeTab===tab.key?'#fff':'#64748B',cursor:'pointer',whiteSpace:'nowrap',boxShadow:activeTab===tab.key?'0 4px 12px rgba(0,0,0,0.18)':'none',transition:'all 0.2s'}}>
-                {tab.label}
-              </button>
-            ))}
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'18px',flexWrap:'wrap',gap:'12px'}}>
+            <div style={{display:'flex',gap:'6px',overflowX:'auto',paddingBottom:'2px',flexWrap:'wrap'}}>
+              {TABS.map(tab=>{
+                const isActive = activeTab === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={()=>setActiveTab(tab.key)}
+                    style={{
+                      padding:'7px 14px', borderRadius:'999px',
+                      fontSize:'12.5px', fontWeight: isActive ? 700 : 500,
+                      border: isActive ? '1px solid #2563EB' : '1px solid #E2E8F0',
+                      background: isActive ? '#2563EB' : '#FFFFFF',
+                      color: isActive ? '#FFFFFF' : '#475569',
+                      cursor:'pointer', whiteSpace:'nowrap',
+                      boxShadow: isActive ? '0 2px 6px rgba(37,99,235,0.2)' : 'none',
+                      transition:'all 0.15s ease'
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
             {activeTab!=='notifications'&&(
-              <div style={{position:'relative',marginLeft:'auto'}}>
-                <Search style={{position:'absolute',left:'10px',top:'50%',transform:'translateY(-50%)',width:'14px',height:'14px',color:'#94A3B8'}}/>
-                <input value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} placeholder="Search..." style={{height:'36px',borderRadius:'999px',border:'1.5px solid #E2E8F0',paddingLeft:'32px',paddingRight:'14px',fontSize:'12px',background:'#fff',width:'180px'}}/>
+              <div style={{position:'relative',minWidth:'220px'}}>
+                <Search style={{position:'absolute',left:'12px',top:'50%',transform:'translateY(-50%)',width:'14px',height:'14px',color:'#94A3B8'}}/>
+                <input value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} placeholder="Search complaints..." style={{height:'38px',width:'100%',borderRadius:'999px',border:'1px solid #E2E8F0',paddingLeft:'34px',paddingRight:'14px',fontSize:'12.5px',background:'#FFFFFF',outline:'none',boxSizing:'border-box'}}/>
               </div>
             )}
           </div>
@@ -423,26 +441,26 @@ export default function CitizenDashboard() {
           {activeTab==='notifications'?(
             <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
               {citizenNotifications.length===0?(
-                <div style={{textAlign:'center',padding:'48px',background:'#fff',borderRadius:'16px'}}><Bell style={{width:'36px',height:'36px',color:'#CBD5E1',margin:'0 auto 12px'}}/><p style={{color:'#94A3B8',fontSize:'14px'}}>No notifications yet</p></div>
+                <div style={{textAlign:'center',padding:'48px',background:'#fff',borderRadius:'16px',border:'1px solid #E2E8F0'}}><Bell style={{width:'36px',height:'36px',color:'#CBD5E1',margin:'0 auto 12px'}}/><p style={{color:'#94A3B8',fontSize:'14px'}}>No notifications yet</p></div>
               ):citizenNotifications.map(notif=>(
-                <div key={notif.id} style={{background:'#fff',borderRadius:'12px',padding:'14px 18px',borderLeft:`4px solid ${notif.type==='STATUS_UPDATE'?'#10B981':notif.type==='DISPUTE'?'#EF4444':'#2563EB'}`,boxShadow:'0 1px 6px rgba(0,0,0,0.06)'}}>
+                <div key={notif.id} style={{background:'#fff',borderRadius:'12px',padding:'14px 18px',border:'1px solid #E2E8F0',borderLeft:`4px solid ${notif.type==='STATUS_UPDATE'?'#10B981':notif.type==='DISPUTE'?'#EF4444':'#2563EB'}`,boxShadow:'0 1px 4px rgba(0,0,0,0.03)'}}>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:'12px'}}>
                     <div><strong style={{fontSize:'13px',color:'#0F172A'}}>{notif.title}</strong><p style={{fontSize:'12px',color:'#64748B',marginTop:'3px',lineHeight:1.4}}>{notif.message}</p></div>
-                    {notif.grievanceId&&<Link to={`/citizen/complaints/${notif.grievanceId}`} style={{fontSize:'12px',color:'#2563EB',fontWeight:700,whiteSpace:'nowrap'}}>View →</Link>}
+                    {notif.grievanceId&&<Link to={`/citizen/complaints/${notif.grievanceId}`} style={{fontSize:'12px',color:'#2563EB',fontWeight:700,whiteSpace:'nowrap',textDecoration:'none'}}>View →</Link>}
                   </div>
                 </div>
               ))}
             </div>
           ):filteredGrievances.length===0?(
-            <div style={{textAlign:'center',padding:'60px',background:'#fff',borderRadius:'20px'}}>
+            <div style={{textAlign:'center',padding:'60px',background:'#fff',borderRadius:'20px',border:'1px solid #E2E8F0'}}>
               <FileText style={{width:'40px',height:'40px',color:'#CBD5E1',margin:'0 auto 14px'}}/>
               <p style={{color:'#64748B',fontSize:'15px',marginBottom:'16px'}}>No complaints found here.</p>
-              <button onClick={()=>setShowFileModal(true)} style={{padding:'10px 24px',background:'linear-gradient(135deg,#1D4ED8,#7C3AED)',color:'#fff',borderRadius:'12px',border:'none',fontWeight:800,fontSize:'14px',cursor:'pointer'}}>+ File Your First Complaint</button>
+              <button onClick={()=>setShowFileModal(true)} style={{padding:'10px 22px',background:'#2563EB',color:'#fff',borderRadius:'12px',border:'none',fontWeight:700,fontSize:'13.5px',cursor:'pointer',boxShadow:'0 2px 8px rgba(37,99,235,0.25)'}}>+ File Your First Complaint</button>
             </div>
           ):(
             <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:'14px'}}>
               {filteredGrievances.map(item=>(
-                <GrievanceCard key={item.id} item={item} citizen={citizen} onOpen={setSelectedGrievance} upvoteGrievance={upvoteGrievance}/>
+                <GrievanceCard key={item.id} item={item} citizen={citizen} onOpen={setSelectedGrievance}/>
               ))}
             </div>
           )}
