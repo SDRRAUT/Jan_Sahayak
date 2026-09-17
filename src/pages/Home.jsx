@@ -27,6 +27,7 @@ import {
   History
 } from 'lucide-react';
 import WhyExplainer from '../components/common/WhyExplainer';
+import CivicInteractiveBackground from '../components/common/CivicInteractiveBackground';
 import { INITIAL_GRIEVANCES, SYSTEM_METRICS } from '../data/mockGrievances';
 
 export default function Home() {
@@ -207,10 +208,22 @@ export default function Home() {
   return (
     <div>
       {/* ==========================================================================
-          02. HERO SECTION
+          02. HERO SECTION WITH INTERACTIVE CIVIC INFRASTRUCTURE BACKGROUND
           ========================================================================== */}
-      <section className="section-spacing" style={{ paddingTop: '40px', paddingBottom: '56px' }}>
-        <div className="container">
+      <section 
+        className="section-spacing" 
+        style={{ 
+          position: 'relative', 
+          paddingTop: '44px', 
+          paddingBottom: '60px', 
+          overflow: 'hidden',
+          background: 'radial-gradient(ellipse at 50% 0%, rgba(232, 247, 240, 0.55) 0%, rgba(248, 249, 250, 0.85) 60%, #F8F9FA 100%)' 
+        }}
+      >
+        {/* Interactive Public Infrastructure Canvas Background */}
+        <CivicInteractiveBackground />
+
+        <div className="container" style={{ position: 'relative', zIndex: 2 }}>
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(12, 1fr)',
@@ -220,7 +233,7 @@ export default function Home() {
             {/* Left Narrative (7 Cols) */}
             <div style={{ gridColumn: 'span 7' }} className="hero-left-col">
               {/* Category Overline: Professional Public Civic Intelligence */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
                 <span className="category-pill" style={{ background: '#E8F7F0', color: '#0E5E3A', borderColor: 'rgba(14, 94, 58, 0.2)' }}>
                   <ShieldCheck style={{ width: '13px', height: '13px' }} />
                   <span>PUBLIC GRIEVANCE INTELLIGENCE</span>
@@ -228,6 +241,26 @@ export default function Home() {
                 <span className="pilot-tag">
                   Interactive Pilot Demonstration
                 </span>
+              </div>
+
+              {/* Interactive civic beacon guide indicator */}
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '4px 12px',
+                borderRadius: '9999px',
+                background: 'rgba(255, 255, 255, 0.85)',
+                border: '1px solid rgba(14, 94, 58, 0.16)',
+                backdropFilter: 'blur(8px)',
+                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
+                fontSize: '11px',
+                color: 'var(--color-primary)',
+                fontWeight: 600,
+                marginBottom: '16px'
+              }}>
+                <span className="status-dot active" style={{ width: '6px', height: '6px' }} />
+                <span>Interactive Civic Grid: Move cursor across background to scan utility nodes (💧 🛣️ 💡 📡)</span>
               </div>
 
               {/* Core Hero Headline */}
