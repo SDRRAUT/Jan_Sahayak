@@ -392,8 +392,11 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
     );
   };
 
-  const handleFinalSubmit = async () => {
+  const handleFinalSubmit = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    console.log('[FileGrievanceModal] handleFinalSubmit triggered');
     if (!description.trim()) {
+      console.warn('[FileGrievanceModal] Description empty, switching to step 1');
       setCurrentStep(1);
       return;
     }
@@ -427,6 +430,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
         }
       });
 
+      console.log('[FileGrievanceModal] Grievance created successfully:', created);
       setCreatedTicket(created);
       setIsSubmitting(false);
 
@@ -434,6 +438,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
         confetti({ particleCount: 90, spread: 75, origin: { y: 0.6 } });
       } catch (err) {}
     } catch (err) {
+      console.error('[FileGrievanceModal] Submit error:', err);
       setIsSubmitting(false);
     }
   };
@@ -675,6 +680,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
 
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
                 <button
+                  id="btn-track-grievance-live"
                   type="button"
                   onClick={async () => {
                     onClose();
@@ -704,6 +710,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                 </button>
 
                 <button
+                  id="btn-view-officer-desk"
                   type="button"
                   onClick={async () => {
                     onClose();
@@ -1593,6 +1600,8 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
               </button>
             ) : (
               <button
+                id="btn-confirm-submit-grievance"
+                data-testid="btn-confirm-submit-grievance"
                 type="button"
                 onClick={handleFinalSubmit}
                 disabled={isSubmitting}
