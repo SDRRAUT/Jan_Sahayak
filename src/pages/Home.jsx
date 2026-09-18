@@ -1081,8 +1081,19 @@ export default function Home() {
       {/* ==========================================================================
           06. ONE COMPLAINT → BIGGER PROBLEM (Interactive Storytelling Section)
           ========================================================================== */}
-      <section className="section-spacing" style={{ background: 'var(--color-surface-inset-dark)', color: 'var(--color-text-inverse)' }}>
-        <div className="container">
+      <section style={{ padding: '0 clamp(14px, 2.5vw, 32px)', margin: '16px 0 36px 0' }}>
+        <div
+          style={{
+            background: 'var(--color-surface-inset-dark)',
+            color: 'var(--color-text-inverse)',
+            borderRadius: '28px',
+            border: '1px solid var(--color-border-dark)',
+            boxShadow: '0 20px 50px -12px rgba(11, 25, 20, 0.45)',
+            overflow: 'hidden'
+          }}
+          className="section-spacing"
+        >
+          <div className="container">
           {/* Header in Simple, Plain English */}
           <div style={{ textAlign: 'center', maxWidth: '820px', margin: '0 auto 40px auto' }}>
             <span className="category-pill" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10B981', borderColor: 'rgba(16, 185, 129, 0.3)', marginBottom: '14px' }}>
@@ -1514,7 +1525,8 @@ export default function Home() {
             );
           })()}
         </div>
-      </section>
+      </div>
+    </section>
 
       {/* ==========================================================================
           07. CIVIC INTELLIGENCE MAP PREVIEW (Interactive Delhi GIS Radar)
