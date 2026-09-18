@@ -42,7 +42,7 @@ export default function SplashScreen({ onStart }) {
       alignItems: 'center',
       justifyContent: 'center',
       overflow: 'hidden',
-      fontFamily: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
     }}>
       {/* Soft Ethereal Atmospheric Background Glows matching reference design */}
       <div 
@@ -381,7 +381,7 @@ export default function SplashScreen({ onStart }) {
           <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>Verified Fix</span>
         </div>
 
-        {/* Central Card Hierarchy — Directly Inspired by Reference Design */}
+        {/* Central Card Hierarchy — Refined typography matching the reference design */}
         <div style={{
           position: 'relative',
           zIndex: 3,
@@ -389,74 +389,74 @@ export default function SplashScreen({ onStart }) {
           flexDirection: 'column',
           alignItems: 'center',
           textAlign: 'center',
-          maxWidth: '560px'
+          maxWidth: '560px',
+          fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
         }}>
 
-          {/* Monospace Micro-Tag: { civic intelligence network } */}
+          {/* Elegant Micro-Tag: { civic intelligence network } (Minimal, No bubble background) */}
           <div style={{
-            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-            fontSize: '13px',
-            fontWeight: 600,
-            color: '#6366F1',
-            letterSpacing: '0.04em',
-            marginBottom: '16px',
-            background: 'rgba(99, 102, 241, 0.08)',
-            padding: '4px 14px',
-            borderRadius: '999px',
-            border: '1px solid rgba(99, 102, 241, 0.16)'
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontSize: '12.5px',
+            fontWeight: 500,
+            color: '#7C3AED',
+            letterSpacing: '0.01em',
+            marginBottom: '14px'
           }}>
             {'{ civic intelligence network }'}
           </div>
 
-          {/* Central Pill Title Box with Delicate Border & Logo */}
+          {/* Central Pill Title Box with Refined Geometric Typography */}
           <div style={{
             position: 'relative',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '14px',
-            padding: '12px 36px 12px 24px',
+            gap: '12px',
+            padding: '10px 28px 10px 20px',
             background: '#FFFFFF',
-            border: '1px solid #E2E8F0',
+            border: '1px solid #E5E7EB',
             borderRadius: '999px',
-            boxShadow: '0 12px 35px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(226, 232, 240, 0.6)',
-            marginBottom: '18px'
+            boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 0 0 1px rgba(243, 244, 246, 0.8)',
+            marginBottom: '16px'
           }}>
             <img 
               src="/logo.png" 
               alt="JanSahayak" 
               style={{
-                width: '36px',
-                height: '36px',
+                width: '30px',
+                height: '30px',
                 objectFit: 'contain'
               }}
             />
             <h1 style={{
-              fontSize: '34px',
-              fontWeight: 800,
-              letterSpacing: '-0.03em',
-              color: '#0F172A',
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              fontSize: '32px',
+              fontWeight: 700,
+              letterSpacing: '-0.025em',
+              color: '#111827',
               margin: 0,
-              lineHeight: 1
+              lineHeight: 1.1
             }}>
               JanSahayak
             </h1>
           </div>
 
-          {/* Hindi Slogan in Vibrant Accent */}
+          {/* Hindi Slogan in Refined Typography */}
           <div style={{
-            fontSize: '15px',
-            fontWeight: 700,
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontSize: '14px',
+            fontWeight: 600,
             color: '#059669',
             marginBottom: '14px',
-            letterSpacing: '0.01em'
+            letterSpacing: '-0.01em'
           }}>
             जन सहायक • Aapki Awaaz, Ab Samjhi Jayegi
           </div>
 
           {/* Clean Subtitle Paragraph matching reference typography */}
           <p style={{
-            fontSize: '13.5px',
-            lineHeight: 1.6,
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontSize: '14px',
+            lineHeight: 1.65,
             color: '#64748B',
             maxWidth: '480px',
             margin: '0 0 24px 0',
