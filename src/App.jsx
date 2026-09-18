@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
@@ -28,9 +28,62 @@ function RoleHome() {
   return <Home />;
 }
 
+// Track whether the initial page reload/refresh redirect has already been processed in this runtime
+let hasHandledInitialReload = false;
+
 export default function App() {
   const location = useLocation();
-  const { user, token } = useApp();
+  const { user, token, role } = useApp();
+
+  // For citizen: on every browser refresh / reload, always redirect to home page ('/')
+  const [redirectOnReload] = useState(() => {
+    if (hasHandledInitialReload) return false;
+    try {
+      const navEntry = typeof window !== 'undefined' && window.performance?.getEntriesByType?.('navigation')?.[0];
+      const isReload = (navEntry && navEntry.type === 'reload') ||
+        (typeof window !== 'undefined' && window.performance?.navigation?.type === 1) ||
+        (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('jansahayak_page_refreshed') === 'true');
+
+      let currentRole = role || user?.role;
+      if (!currentRole && typeof localStorage !== 'undefined') {
+        const raw = localStorage.getItem('jansahayk_user');
+        if (raw) currentRole = JSON.parse(raw)?.role;
+      }
+
+      if (currentRole === 'citizen' && isReload && location.pathname !== '/') {
+        hasHandledInitialReload = true;
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.removeItem('jansahayak_page_refreshed');
+        }
+        return true;
+      }
+    } catch (e) {}
+    hasHandledInitialReload = true;
+    return false;
+  });
+
+  useEffect(() => {
+    // Record page refresh in sessionStorage before unload
+    const handleBeforeUnload = () => {
+      try {
+        sessionStorage.setItem('jansahayak_page_refreshed', 'true');
+      } catch (e) {}
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // Clean up flag if present
+    try {
+      sessionStorage.removeItem('jansahayak_page_refreshed');
+    } catch (e) {}
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
+  if (redirectOnReload) {
+    return <Navigate to="/" replace />;
+  }
 
   // Full Screen Onboarding Condition:
   // 1. Explicitly navigating to /onboarding
