@@ -917,7 +917,7 @@ export default function Navbar() {
                     <div style={{ paddingTop: '8px', borderTop: '1px solid var(--color-divider)' }}>
                       <button
                         type="button"
-                        onClick={() => { logout(); setShowUserMenu(false); navigate('/'); }}
+                        onClick={() => { logout(); setShowUserMenu(false); navigate('/login'); }}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -1393,7 +1393,7 @@ export default function Navbar() {
                 <div style={{ marginTop: '8px' }}>
                   <button
                     type="button"
-                    onClick={() => { logout(); setMobileMenuOpen(false); navigate('/'); }}
+                    onClick={() => { logout(); setMobileMenuOpen(false); navigate('/login'); }}
                     style={{
                       display: 'flex',
                       alignItems: 'center',

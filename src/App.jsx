@@ -52,7 +52,7 @@ let hasHandledInitialReload = false;
 
 export default function App() {
   const location = useLocation();
-  const { user, token, role } = useApp();
+  const { user, token, role, hasEnteredApp } = useApp();
 
   // For citizen: on every browser refresh / reload, always redirect to home page ('/')
   const [redirectOnReload] = useState(() => {
@@ -104,14 +104,19 @@ export default function App() {
     return <Navigate to="/" replace />;
   }
 
-  // Full Screen Onboarding Condition:
-  // 1. Explicitly navigating to /onboarding
-  // 2. Or landing at root '/' when user has not passed and logged in
-  const isFullScreenOnboarding = location.pathname === '/onboarding' || 
-    (location.pathname === '/' && (!token || !user));
+  const searchParams = new URLSearchParams(location.search);
+  const isDirectLogin = location.pathname === '/login' || searchParams.get('login') === 'true' || searchParams.get('step') === '4';
+
+  // Full Screen Onboarding / Direct Login Condition:
+  // 1. Explicitly navigating to /login (renders Step 4 Persona Login directly)
+  // 2. Explicitly navigating to /onboarding
+  // 3. Or landing at root '/' when user has not yet entered app and is not logged in
+  const isFullScreenOnboarding = location.pathname === '/login' ||
+    location.pathname === '/onboarding' || 
+    (location.pathname === '/' && (!token || !user) && !hasEnteredApp);
 
   if (isFullScreenOnboarding) {
-    return <Onboarding />;
+    return <Onboarding initialStep={isDirectLogin ? 4 : 1} skipSplash={isDirectLogin} />;
   }
 
   return (
@@ -148,8 +153,8 @@ export default function App() {
           
           {/* Authentication & Onboarding Gateway */}
           <Route path="/onboarding" element={<Onboarding />} />
-          {/* /login redirects to home — login is handled via the navbar modal */}
-          <Route path="/login" element={<Navigate to="/" replace />} />
+          {/* Direct 1-Click Login Screen */}
+          <Route path="/login" element={<Onboarding initialStep={4} skipSplash={true} />} />
           <Route path="/register" element={<Register />} />
 
           {/* Citizen Routes (Role: citizen, super_admin) */}
