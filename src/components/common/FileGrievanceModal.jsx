@@ -733,12 +733,12 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                   }}
                   style={{
                     height: '42px',
-                    padding: '0 18px',
+                    padding: '0 22px',
                     borderRadius: '10px',
                     background: 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)',
                     color: '#FFFFFF',
                     border: 'none',
-                    fontSize: '13px',
+                    fontSize: '13.5px',
                     fontWeight: 700,
                     cursor: 'pointer',
                     display: 'inline-flex',
@@ -747,64 +747,8 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                     boxShadow: '0 4px 14px rgba(14, 94, 58, 0.35)'
                   }}
                 >
-                  <span>Track Live (Citizen Portal)</span>
+                  <span>Track Complaint</span>
                   <ArrowRight style={{ width: '15px', height: '15px' }} />
-                </button>
-
-                <button
-                  id="btn-view-officer-desk"
-                  type="button"
-                  onClick={async () => {
-                    onClose();
-                    await switchDemoRole('civic_officer');
-                    navigate(`/officer?caseId=${createdTicket.id}`);
-                  }}
-                  style={{
-                    height: '42px',
-                    padding: '0 18px',
-                    borderRadius: '10px',
-                    background: '#1E293B',
-                    color: '#FFFFFF',
-                    border: '1px solid #334155',
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    boxShadow: '0 4px 14px rgba(30, 41, 59, 0.25)'
-                  }}
-                >
-                  <Building2 style={{ width: '15px', height: '15px', color: '#38BDF8' }} />
-                  <span>View on Officer Desk (#1)</span>
-                </button>
-
-                <button
-                  id="btn-view-admin-panel"
-                  type="button"
-                  onClick={async () => {
-                    onClose();
-                    await switchDemoRole('super_admin');
-                    navigate(`/admin?caseId=${createdTicket.id}`);
-                  }}
-                  style={{
-                    height: '42px',
-                    padding: '0 16px',
-                    borderRadius: '10px',
-                    background: '#2563EB',
-                    color: '#FFFFFF',
-                    border: 'none',
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    boxShadow: '0 4px 14px rgba(37, 99, 235, 0.25)'
-                  }}
-                >
-                  <ShieldCheck style={{ width: '15px', height: '15px' }} />
-                  <span>Admin Panel</span>
                 </button>
 
                 <button

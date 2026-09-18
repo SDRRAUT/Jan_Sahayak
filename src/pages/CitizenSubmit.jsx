@@ -842,34 +842,8 @@ export default function CitizenSubmit() {
                     boxShadow: '0 4px 14px rgba(14, 94, 58, 0.28)'
                   }}
                 >
-                  <span>Track Timeline & Field Progress</span>
+                  <span>Track Complaint</span>
                   <ArrowRight style={{ width: '16px', height: '16px' }} />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await switchDemoRole('civic_officer');
-                    navigate(`/officer?caseId=${createdTicket.id}`);
-                  }}
-                  style={{
-                    height: '46px',
-                    padding: '0 20px',
-                    fontSize: '14px',
-                    borderRadius: 'var(--radius-md, 10px)',
-                    background: '#1E293B',
-                    color: '#FFFFFF',
-                    border: '1px solid #334155',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    boxShadow: '0 4px 12px rgba(30, 41, 59, 0.25)'
-                  }}
-                >
-                  <Building2 style={{ width: '16px', height: '16px', color: '#38BDF8' }} />
-                  <span>View on Govt Officer Desk</span>
                 </button>
 
                 <button
