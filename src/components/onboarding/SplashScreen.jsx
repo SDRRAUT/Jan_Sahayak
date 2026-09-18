@@ -393,27 +393,22 @@ export default function SplashScreen({ onStart }) {
           fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
         }}>
 
-          {/* Prominent Brand Logo Emblem in upper space */}
+          {/* Large Brand Logo — Clean, Transparent, No Borders */}
           <div style={{
-            width: '80px',
-            height: '80px',
-            borderRadius: '24px',
-            background: '#FFFFFF',
-            border: '1px solid #E5E7EB',
-            boxShadow: '0 12px 32px -4px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(243, 244, 246, 0.9)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '12px',
-            marginBottom: '20px'
+            marginBottom: '18px'
           }}>
             <img 
               src="/logo.png" 
               alt="JanSahayak Logo" 
               style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain'
+                width: '115px',
+                height: 'auto',
+                maxHeight: '115px',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 10px 20px rgba(15, 23, 42, 0.06))'
               }}
             />
           </div>
