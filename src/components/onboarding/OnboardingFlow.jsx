@@ -156,7 +156,7 @@ export default function OnboardingFlow({ onComplete }) {
       if (onComplete) onComplete();
 
       if (roleKey === 'citizen') {
-        navigate('/citizen');
+        navigate('/');
       } else if (roleKey === 'civic_officer' || roleKey === 'officer' || roleKey === 'dept_admin') {
         navigate('/officer');
       } else if (roleKey === 'super_admin') {

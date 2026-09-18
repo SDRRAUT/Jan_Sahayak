@@ -42,7 +42,7 @@ export default function Login() {
       navigate(redirectPath);
       return;
     }
-    if (role === 'citizen') navigate('/citizen');
+    if (role === 'citizen') navigate('/');
     else if (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') navigate('/officer');
     else if (role === 'super_admin') navigate('/admin/super');
     else navigate('/');

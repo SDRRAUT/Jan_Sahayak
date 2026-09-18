@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useApp, DEMO_CREDENTIALS } from '../../context/AppContext';
 import FileGrievanceModal from '../common/FileGrievanceModal';
+import UserProfileModal from '../common/UserProfileModal';
 
 export default function Navbar() {
   const location = useLocation();
@@ -46,6 +47,8 @@ export default function Navbar() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showTrackModal, setShowTrackModal] = useState(false);
   const [showFileGrievanceModal, setShowFileGrievanceModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [profileModalTab, setProfileModalTab] = useState('profile');
   const [trackTicketId, setTrackTicketId] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -129,7 +132,7 @@ export default function Navbar() {
       setLoginIsVerifying(false);
       setLoginVerifyProgress(0);
       const targetRole = logged?.role || roleKey;
-      if (targetRole === 'citizen') navigate('/citizen');
+      if (targetRole === 'citizen') navigate('/');
       else if (targetRole === 'civic_officer' || targetRole === 'officer' || targetRole === 'dept_admin') navigate('/officer');
       else if (targetRole === 'super_admin') navigate('/admin/super');
       else navigate('/');
@@ -139,7 +142,7 @@ export default function Navbar() {
       setMobileMenuOpen(false);
       setLoginIsVerifying(false);
       setLoginVerifyProgress(0);
-      if (roleKey === 'citizen') navigate('/citizen');
+      if (roleKey === 'citizen') navigate('/');
       else if (roleKey === 'civic_officer' || roleKey === 'officer' || roleKey === 'dept_admin') navigate('/officer');
       else if (roleKey === 'super_admin') navigate('/admin/super');
       else navigate('/');
@@ -222,7 +225,7 @@ export default function Navbar() {
 
   const getHomeLink = () => {
     if (!user) return '/';
-    if (role === 'citizen') return '/citizen';
+    if (role === 'citizen') return '/';
     if (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') return '/officer';
     if (role === 'super_admin') return '/admin/super';
     return '/';
@@ -857,7 +860,11 @@ export default function Navbar() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                       <button
                         type="button"
-                        onClick={() => { setShowUserMenu(false); navigate(role === 'citizen' ? '/citizen' : role === 'super_admin' ? '/admin/super' : '/officer'); }}
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          setProfileModalTab('profile');
+                          setShowProfileModal(true);
+                        }}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -868,7 +875,8 @@ export default function Navbar() {
                           fontSize: '12px',
                           color: 'var(--color-text-secondary)',
                           background: 'transparent',
-                          textAlign: 'left'
+                          textAlign: 'left',
+                          cursor: 'pointer'
                         }}
                       >
                         <User style={{ width: '13px', height: '13px' }} />
@@ -876,7 +884,11 @@ export default function Navbar() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => { setShowUserMenu(false); navigate(role === 'citizen' ? '/citizen' : role === 'super_admin' ? '/admin/super' : '/officer'); }}
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          setProfileModalTab('settings');
+                          setShowProfileModal(true);
+                        }}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -887,7 +899,8 @@ export default function Navbar() {
                           fontSize: '12px',
                           color: 'var(--color-text-secondary)',
                           background: 'transparent',
-                          textAlign: 'left'
+                          textAlign: 'left',
+                          cursor: 'pointer'
                         }}
                       >
                         <Settings style={{ width: '13px', height: '13px' }} />
@@ -1311,7 +1324,62 @@ export default function Navbar() {
                   </div>
                 )}
 
-                <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--color-divider)' }}>
+                {/* Mobile Profile & Settings Quick Buttons */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--color-divider)' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setProfileModalTab('profile');
+                      setShowProfileModal(true);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      padding: '9px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '12.5px',
+                      fontWeight: 600,
+                      color: 'var(--color-text-primary)',
+                      background: '#F8FAFC',
+                      border: '1px solid #E2E8F0',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <User style={{ width: '13px', height: '13px', color: '#2563EB' }} />
+                    <span>My Profile</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setProfileModalTab('settings');
+                      setShowProfileModal(true);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      padding: '9px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '12.5px',
+                      fontWeight: 600,
+                      color: 'var(--color-text-primary)',
+                      background: '#F8FAFC',
+                      border: '1px solid #E2E8F0',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <Settings style={{ width: '13px', height: '13px', color: '#64748B' }} />
+                    <span>Settings</span>
+                  </button>
+                </div>
+
+                <div style={{ marginTop: '8px' }}>
                   <button
                     type="button"
                     onClick={() => { logout(); setMobileMenuOpen(false); navigate('/'); }}
@@ -1619,6 +1687,13 @@ export default function Navbar() {
       <FileGrievanceModal
         isOpen={showFileGrievanceModal}
         onClose={() => setShowFileGrievanceModal(false)}
+      />
+
+      {/* Universal User Profile & Account Settings Modal (Works across all roles) */}
+      <UserProfileModal 
+        isOpen={showProfileModal} 
+        onClose={() => setShowProfileModal(false)} 
+        initialTab={profileModalTab} 
       />
     </>
   );

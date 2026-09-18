@@ -20,7 +20,7 @@ export default function Register() {
     setError('');
     try {
       await register({ name, email, phone, ward, pincode, password });
-      navigate('/citizen');
+      navigate('/');
     } catch (err) {
       setError(err.message);
     }
