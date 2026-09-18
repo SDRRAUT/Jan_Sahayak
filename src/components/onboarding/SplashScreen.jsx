@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, ArrowRight, Volume2, Shield } from 'lucide-react';
-import onboardingBg from '../../assets/onboarding-bg.jpg';
+import { Volume2, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
 
 export default function SplashScreen({ onStart }) {
   const [progress, setProgress] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(4);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const durationMs = 4000;
-    const intervalMs = 40;
+    const durationMs = 3600;
+    const intervalMs = 36;
     const increment = (intervalMs / durationMs) * 100;
 
     const timer = setInterval(() => {
@@ -24,264 +22,536 @@ export default function SplashScreen({ onStart }) {
       });
     }, intervalMs);
 
-    const countdownTimer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(countdownTimer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => {
-      clearInterval(timer);
-      clearInterval(countdownTimer);
-    };
+    return () => clearInterval(timer);
   }, []);
 
   const getStatusText = () => {
-    if (progress < 30) return 'Initializing Public Grievance Engine...';
-    if (progress < 65) return 'Connecting Municipal AI & Department DNA...';
-    if (progress < 95) return 'Calibrating Multilingual Voice & Image Triage...';
-    return 'System Ready • Click Start to Begin Audio Tour';
+    if (progress < 30) return 'Connecting Municipal AI Engine...';
+    if (progress < 70) return 'Mapping Multi-Department DNA & GIS Nodes...';
+    if (progress < 95) return 'Calibrating Multilingual Voice Triage...';
+    return 'Civic Network Ready';
   };
 
   return (
     <div style={{
-      width: '100vw',
-      height: '100vh',
-      maxHeight: '100vh',
-      overflow: 'hidden',
-      backgroundColor: '#0F172A',
+      position: 'fixed',
+      inset: 0,
+      zIndex: 99999,
+      backgroundColor: '#FFFFFF',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      position: 'relative',
-      padding: '16px',
-      boxSizing: 'border-box',
-      fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      overflow: 'hidden',
+      fontFamily: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
-      {/* Crisp background image with 50% opacity matching Onboarding */}
+      {/* Soft Ethereal Atmospheric Background Glows matching reference design */}
       <div 
         aria-hidden="true"
         style={{
           position: 'absolute',
-          inset: 0,
-          backgroundImage: `url(${onboardingBg})`,
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'cover',
-          opacity: 0.50,
-          zIndex: 1,
+          top: '-15%',
+          right: '-10%',
+          width: '600px',
+          height: '600px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(147, 197, 253, 0.45) 0%, rgba(199, 210, 254, 0.25) 40%, rgba(255, 255, 255, 0) 70%)',
+          filter: 'blur(60px)',
           pointerEvents: 'none'
-        }} 
+        }}
+      />
+      <div 
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          bottom: '-15%',
+          left: '-10%',
+          width: '650px',
+          height: '650px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(196, 181, 253, 0.40) 0%, rgba(221, 214, 254, 0.20) 45%, rgba(255, 255, 255, 0) 70%)',
+          filter: 'blur(70px)',
+          pointerEvents: 'none'
+        }}
+      />
+      <div 
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: '30%',
+          left: '10%',
+          width: '350px',
+          height: '350px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(167, 243, 208, 0.35) 0%, rgba(255, 255, 255, 0) 70%)',
+          filter: 'blur(50px)',
+          pointerEvents: 'none'
+        }}
       />
 
-      {/* Central Card Matching Onboarding Theme & Layout */}
+      {/* Main Interactive Stage Container */}
       <div style={{
-        background: 'linear-gradient(155deg, #F0FDF4 0%, #DCFCE7 100%)',
-        border: '1.5px solid #86EFAC',
-        borderRadius: '24px',
-        maxWidth: '560px',
+        position: 'relative',
         width: '100%',
-        boxShadow: '0 25px 60px -10px rgba(5, 150, 105, 0.20), 0 0 0 1px rgba(16, 185, 129, 0.22)',
-        padding: '20px 26px 20px 26px',
+        maxWidth: '1040px',
+        minHeight: '520px',
         display: 'flex',
         flexDirection: 'column',
-        position: 'relative',
-        zIndex: 2,
-        overflow: 'hidden',
-        boxSizing: 'border-box'
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        zIndex: 2
       }}>
-        {/* Top Header Row matching OnboardingFlow */}
+
+        {/* SVG Network Circuit Lines branching from Title Box to Floating Integration Nodes */}
+        <svg 
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            pointerEvents: 'none',
+            overflow: 'visible'
+          }}
+          viewBox="0 0 1000 500"
+          fill="none"
+        >
+          {/* Left Branch Circuit Lines */}
+          <path d="M 330 220 L 240 220 L 170 150 L 150 150" stroke="#E2E8F0" strokeWidth="1.6" strokeDasharray="3 3" />
+          <path d="M 330 235 L 280 235 L 230 195 L 200 195" stroke="#CBD5E1" strokeWidth="1.8" />
+          <path d="M 330 250 L 250 250 L 190 290 L 170 290" stroke="#CBD5E1" strokeWidth="1.8" />
+          <path d="M 330 265 L 240 265 L 180 345 L 150 345" stroke="#E2E8F0" strokeWidth="1.6" strokeDasharray="3 3" />
+
+          {/* Right Branch Circuit Lines */}
+          <path d="M 670 220 L 760 220 L 830 145 L 850 145" stroke="#E2E8F0" strokeWidth="1.6" strokeDasharray="3 3" />
+          <path d="M 670 235 L 720 235 L 775 190 L 805 190" stroke="#CBD5E1" strokeWidth="1.8" />
+          <path d="M 670 250 L 730 250 L 785 285 L 815 285" stroke="#CBD5E1" strokeWidth="1.8" />
+          <path d="M 670 265 L 755 265 L 825 340 L 850 340" stroke="#E2E8F0" strokeWidth="1.6" strokeDasharray="3 3" />
+
+          {/* Circuit connection dots */}
+          <circle cx="330" cy="220" r="3" fill="#94A3B8" />
+          <circle cx="330" cy="235" r="3" fill="#10B981" />
+          <circle cx="330" cy="250" r="3" fill="#3B82F6" />
+          <circle cx="330" cy="265" r="3" fill="#94A3B8" />
+
+          <circle cx="670" cy="220" r="3" fill="#94A3B8" />
+          <circle cx="670" cy="235" r="3" fill="#F59E0B" />
+          <circle cx="670" cy="250" r="3" fill="#6366F1" />
+          <circle cx="670" cy="265" r="3" fill="#94A3B8" />
+        </svg>
+
+        {/* Floating Integration Node Pills (Left Side — Municipal Authorities) */}
+        {/* Node L1: DJB */}
         <div style={{
+          position: 'absolute',
+          left: '10%',
+          top: '23%',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingBottom: '12px',
-          marginBottom: '16px',
-          borderBottom: '1px solid rgba(5, 150, 105, 0.16)'
+          gap: '8px',
+          padding: '6px 12px 6px 8px',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '999px',
+          boxShadow: '0 8px 22px rgba(15, 23, 42, 0.07)',
+          animation: 'floatSlow 4s ease-in-out infinite'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img 
-              src="/logo.png" 
-              alt="JanSahayak Logo" 
-              style={{ height: '32px', width: 'auto', objectFit: 'contain' }} 
-            />
-            <div>
-              <div style={{ fontWeight: 800, fontSize: '15px', color: '#1E2653', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-                JanSahayak
-              </div>
-              <div style={{ fontSize: '10px', color: '#64748B', fontWeight: 600 }}>
-                AI Civic Resolution Platform
-              </div>
-            </div>
-          </div>
-
           <div style={{
-            display: 'inline-flex',
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#EFF6FF',
+            display: 'flex',
             alignItems: 'center',
-            gap: '6px',
-            background: 'rgba(255, 255, 255, 0.88)',
-            border: '1px solid #86EFAC',
-            borderRadius: '999px',
-            padding: '4px 12px',
-            fontSize: '11.5px',
-            fontWeight: 700,
-            color: '#059669',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+            justifyContent: 'center',
+            fontSize: '13px'
           }}>
-            <span>🇮🇳</span>
-            <span>Digital India Initiative</span>
+            💧
           </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>DJB Water</span>
         </div>
 
-        {/* Central Emblem & Identity */}
+        {/* Node L2: PWD */}
         <div style={{
+          position: 'absolute',
+          left: '16%',
+          top: '35%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '6px 12px 6px 8px',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '999px',
+          boxShadow: '0 8px 22px rgba(15, 23, 42, 0.07)',
+          animation: 'floatSlow 4.5s ease-in-out infinite 0.5s'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#F0FDF4',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '13px'
+          }}>
+            🛣️
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>PWD Roads</span>
+        </div>
+
+        {/* Node L3: MCD */}
+        <div style={{
+          position: 'absolute',
+          left: '13%',
+          top: '55%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '6px 12px 6px 8px',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '999px',
+          boxShadow: '0 8px 22px rgba(15, 23, 42, 0.07)',
+          animation: 'floatSlow 4.2s ease-in-out infinite 1s'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#FEF3C7',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '13px'
+          }}>
+            ♻️
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>MCD Waste</span>
+        </div>
+
+        {/* Node L4: BSES */}
+        <div style={{
+          position: 'absolute',
+          left: '10%',
+          top: '68%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '6px 12px 6px 8px',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '999px',
+          boxShadow: '0 8px 22px rgba(15, 23, 42, 0.07)',
+          animation: 'floatSlow 5s ease-in-out infinite 1.5s'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#FEF2F2',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '13px'
+          }}>
+            ⚡
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>BSES Power</span>
+        </div>
+
+        {/* Floating Integration Node Pills (Right Side — Intelligence & AI Capabilities) */}
+        {/* Node R1: Gemini 9-Agent */}
+        <div style={{
+          position: 'absolute',
+          right: '9%',
+          top: '22%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '6px 12px 6px 8px',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '999px',
+          boxShadow: '0 8px 22px rgba(15, 23, 42, 0.07)',
+          animation: 'floatSlow 4.3s ease-in-out infinite 0.2s'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#F5F3FF',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '13px'
+          }}>
+            🤖
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>Gemini DNA</span>
+        </div>
+
+        {/* Node R2: Indic Voice */}
+        <div style={{
+          position: 'absolute',
+          right: '15%',
+          top: '34%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '6px 12px 6px 8px',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '999px',
+          boxShadow: '0 8px 22px rgba(15, 23, 42, 0.07)',
+          animation: 'floatSlow 4.6s ease-in-out infinite 0.7s'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#FDF2F8',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '13px'
+          }}>
+            🎙️
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>Indic Voice</span>
+        </div>
+
+        {/* Node R3: Real GIS Satellite */}
+        <div style={{
+          position: 'absolute',
+          right: '13%',
+          top: '54%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '6px 12px 6px 8px',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '999px',
+          boxShadow: '0 8px 22px rgba(15, 23, 42, 0.07)',
+          animation: 'floatSlow 4.8s ease-in-out infinite 1.2s'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#ECFEFF',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '13px'
+          }}>
+            🛰️
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>Satellite GIS</span>
+        </div>
+
+        {/* Node R4: Verified Resolution */}
+        <div style={{
+          position: 'absolute',
+          right: '9%',
+          top: '67%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '6px 12px 6px 8px',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '999px',
+          boxShadow: '0 8px 22px rgba(15, 23, 42, 0.07)',
+          animation: 'floatSlow 5.2s ease-in-out infinite 1.6s'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#ECFDF5',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '13px'
+          }}>
+            🛡️
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>Verified Fix</span>
+        </div>
+
+        {/* Central Card Hierarchy — Directly Inspired by Reference Design */}
+        <div style={{
+          position: 'relative',
+          zIndex: 3,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           textAlign: 'center',
-          padding: '8px 0 14px 0'
+          maxWidth: '560px'
         }}>
-          {/* Logo Card with Onboarding Styling */}
+
+          {/* Monospace Micro-Tag: { civic intelligence network } */}
+          <div style={{
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+            fontSize: '13px',
+            fontWeight: 600,
+            color: '#6366F1',
+            letterSpacing: '0.04em',
+            marginBottom: '16px',
+            background: 'rgba(99, 102, 241, 0.08)',
+            padding: '4px 14px',
+            borderRadius: '999px',
+            border: '1px solid rgba(99, 102, 241, 0.16)'
+          }}>
+            {'{ civic intelligence network }'}
+          </div>
+
+          {/* Central Pill Title Box with Delicate Border & Logo */}
           <div style={{
             position: 'relative',
-            width: '92px',
-            height: '92px',
-            borderRadius: '24px',
-            background: '#FFFFFF',
-            boxShadow: '0 12px 30px rgba(5, 150, 105, 0.16), 0 0 0 1px rgba(16, 185, 129, 0.20)',
-            display: 'flex',
+            display: 'inline-flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            padding: '12px',
-            marginBottom: '16px'
+            gap: '14px',
+            padding: '12px 36px 12px 24px',
+            background: '#FFFFFF',
+            border: '1px solid #E2E8F0',
+            borderRadius: '999px',
+            boxShadow: '0 12px 35px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(226, 232, 240, 0.6)',
+            marginBottom: '18px'
           }}>
             <img 
               src="/logo.png" 
-              alt="JanSahayak Logo" 
+              alt="JanSahayak" 
               style={{
-                width: '100%',
-                height: '100%',
+                width: '36px',
+                height: '36px',
                 objectFit: 'contain'
               }}
             />
+            <h1 style={{
+              fontSize: '34px',
+              fontWeight: 800,
+              letterSpacing: '-0.03em',
+              color: '#0F172A',
+              margin: 0,
+              lineHeight: 1
+            }}>
+              JanSahayak
+            </h1>
           </div>
 
-          {/* Title & Slogans */}
-          <h1 style={{
-            fontSize: '28px',
-            fontWeight: 800,
-            letterSpacing: '-0.02em',
-            margin: '0 0 4px 0',
-            color: '#0F172A'
-          }}>
-            JanSahayak
-          </h1>
-
-          <p style={{
-            fontSize: '14.5px',
+          {/* Hindi Slogan in Vibrant Accent */}
+          <div style={{
+            fontSize: '15px',
             fontWeight: 700,
             color: '#059669',
-            margin: '0 0 8px 0',
+            marginBottom: '14px',
             letterSpacing: '0.01em'
           }}>
             जन सहायक • Aapki Awaaz, Ab Samjhi Jayegi
-          </p>
+          </div>
 
+          {/* Clean Subtitle Paragraph matching reference typography */}
           <p style={{
-            fontSize: '13px',
-            color: '#475569',
-            fontWeight: 500,
-            maxWidth: '430px',
-            lineHeight: 1.5,
-            margin: '0 0 20px 0'
+            fontSize: '13.5px',
+            lineHeight: 1.6,
+            color: '#64748B',
+            maxWidth: '480px',
+            margin: '0 0 24px 0',
+            fontWeight: 400
           }}>
-            Empowering citizens with AI problem discovery, instant department routing, and verified resolution tracking.
+            Simplify and streamline public grievance resolution with AI-native problem discovery, 
+            instant multi-department routing, and verified field closure.
           </p>
 
-          {/* Animated Loading Progress Section */}
-          <div style={{ width: '100%', maxWidth: '420px', marginBottom: '20px' }}>
+          {/* Sleek Dark Pill CTA Button matching reference: "Book a demo • 15 minutes →" */}
+          <button
+            type="button"
+            onClick={onStart}
+            style={{
+              height: '46px',
+              padding: '0 26px',
+              borderRadius: '999px',
+              background: '#0F172A',
+              color: '#FFFFFF',
+              border: 'none',
+              fontSize: '14px',
+              fontWeight: 600,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              cursor: 'pointer',
+              boxShadow: '0 10px 25px rgba(15, 23, 42, 0.25)',
+              transition: 'all 200ms ease',
+              letterSpacing: '-0.01em'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 14px 30px rgba(15, 23, 42, 0.35)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 10px 25px rgba(15, 23, 42, 0.25)';
+            }}
+          >
+            <Volume2 style={{ width: '16px', height: '16px', color: '#10B981' }} />
+            <span>Start Audio Tour • 2 minutes</span>
+            <ArrowRight style={{ width: '15px', height: '15px', color: '#94A3B8' }} />
+          </button>
+
+          {/* Subtle Live Status & Animated Pulse Bar */}
+          <div style={{
+            marginTop: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '8px',
+            width: '100%',
+            maxWidth: '320px'
+          }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              fontSize: '11.5px',
-              fontWeight: 700,
-              color: '#334155',
-              marginBottom: '6px'
+              width: '100%',
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#94A3B8'
             }}>
               <span>{getStatusText()}</span>
-              <span style={{ color: '#059669', fontWeight: 800 }}>
-                {isReady ? '100%' : `${Math.round(progress)}%`}
+              <span style={{ color: isReady ? '#059669' : '#6366F1', fontWeight: 700 }}>
+                {isReady ? 'Ready' : `${Math.round(progress)}%`}
               </span>
             </div>
 
             <div style={{
-              height: '7px',
               width: '100%',
-              background: 'rgba(255, 255, 255, 0.90)',
+              height: '4px',
+              background: '#F1F5F9',
               borderRadius: '999px',
               overflow: 'hidden',
-              position: 'relative',
-              border: '1px solid #86EFAC'
+              position: 'relative'
             }}>
               <div style={{
                 height: '100%',
                 width: `${progress}%`,
-                background: 'linear-gradient(90deg, #059669 0%, #10B981 100%)',
+                background: 'linear-gradient(90deg, #6366F1 0%, #10B981 100%)',
                 borderRadius: '999px',
                 transition: 'width 60ms linear'
               }} />
             </div>
           </div>
-
-          {/* Action Button: Start Experience + Audio */}
-          <button
-            type="button"
-            onClick={onStart}
-            style={{
-              height: '48px',
-              padding: '0 32px',
-              borderRadius: '999px',
-              background: '#059669',
-              color: '#FFFFFF',
-              border: 'none',
-              fontSize: '14.5px',
-              fontWeight: 700,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              cursor: 'pointer',
-              boxShadow: '0 8px 24px rgba(5, 150, 105, 0.35)',
-              transform: isReady ? 'scale(1.02)' : 'scale(1)',
-              transition: 'all 200ms ease'
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = isReady ? 'scale(1.02)' : 'scale(1)'; }}
-          >
-            <Volume2 style={{ width: '18px', height: '18px' }} />
-            <span>Start Platform & Audio Tour</span>
-            <ArrowRight style={{ width: '16px', height: '16px' }} />
-          </button>
-
-          {/* Subtle Helper Note */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            marginTop: '14px',
-            fontSize: '11.5px',
-            fontWeight: 600,
-            color: '#64748B'
-          }}>
-            <Sparkles style={{ width: '13px', height: '13px', color: '#F59E0B' }} />
-            <span>Audio narration in Hindi/English will guide your tour</span>
-          </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes floatSlow {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
+        }
+      `}</style>
     </div>
   );
 }
