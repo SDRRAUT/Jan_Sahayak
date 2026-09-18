@@ -393,6 +393,31 @@ export default function SplashScreen({ onStart }) {
           fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
         }}>
 
+          {/* Prominent Brand Logo Emblem in upper space */}
+          <div style={{
+            width: '80px',
+            height: '80px',
+            borderRadius: '24px',
+            background: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            boxShadow: '0 12px 32px -4px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(243, 244, 246, 0.9)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '12px',
+            marginBottom: '20px'
+          }}>
+            <img 
+              src="/logo.png" 
+              alt="JanSahayak Logo" 
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain'
+              }}
+            />
+          </div>
+
           {/* Elegant Micro-Tag: { civic intelligence network } (Minimal, No bubble background) */}
           <div style={{
             fontFamily: "'Plus Jakarta Sans', sans-serif",
@@ -410,23 +435,14 @@ export default function SplashScreen({ onStart }) {
             position: 'relative',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '12px',
-            padding: '10px 28px 10px 20px',
+            justifyContent: 'center',
+            padding: '10px 36px',
             background: '#FFFFFF',
             border: '1px solid #E5E7EB',
             borderRadius: '999px',
             boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 0 0 1px rgba(243, 244, 246, 0.8)',
             marginBottom: '16px'
           }}>
-            <img 
-              src="/logo.png" 
-              alt="JanSahayak" 
-              style={{
-                width: '30px',
-                height: '30px',
-                objectFit: 'contain'
-              }}
-            />
             <h1 style={{
               fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontSize: '32px',
