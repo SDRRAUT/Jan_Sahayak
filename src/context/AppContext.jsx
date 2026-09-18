@@ -662,7 +662,7 @@ export function AppProvider({ children }) {
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1500);
+      const timeoutId = setTimeout(() => controller.abort(), 600);
       const res = await fetch('/api/grievances', {
         method: 'POST',
         headers: {
@@ -677,6 +677,8 @@ export function AppProvider({ children }) {
         const data = await res.json();
         const created = data.grievance;
         // Augment with rich DNA for UI display
+        created.timestamp = created.timestamp || new Date().toISOString();
+        created.createdAt = created.createdAt || 'Just now';
         created.grievanceDna = analysis;
         created.aiOfficerBrief = analysis.aiBrief || analysis.structuredSummary?.headline || analysis.coreIssue;
         created.officerName = created.officerName || assignedOfficer;
@@ -688,8 +690,37 @@ export function AppProvider({ children }) {
           citizenDraftHindi: analysis.aiRecommendation?.citizenDraftHindi || analysis.draftResponseHindi || 'आपकी शिकायत दर्ज कर ली गई है।',
           citizenDraftEnglish: analysis.aiRecommendation?.citizenDraftEnglish || analysis.draftResponseEnglish || 'Your grievance has been registered.'
         };
+
+        const officerNotif = {
+          id: `NOTIF-OFFICER-${Date.now()}`,
+          userId: 'USR-OFFICER-01',
+          userRole: 'officer',
+          title: `New Case Assigned: ${(formData.title || analysis.category).slice(0, 35)}...`,
+          message: `Ticket #${created.id} routed with ${analysis.urgency} priority to ${assignedOfficer}.`,
+          grievanceId: created.id,
+          link: `/officer?caseId=${created.id}`,
+          type: 'ASSIGNMENT',
+          read: false,
+          createdAt: 'Just now',
+          timestamp: new Date().toISOString()
+        };
+        const adminNotif = {
+          id: `NOTIF-ADMIN-${Date.now()}`,
+          userId: 'USR-SUPERADMIN-01',
+          userRole: 'super_admin',
+          title: `New Inbound Incident: ${created.id}`,
+          message: `Case ${created.id} logged in ${created.location?.ward || 'Ward 14'} under ${created.department}.`,
+          grievanceId: created.id,
+          link: `/admin?caseId=${created.id}`,
+          type: 'INCIDENT_ALERT',
+          read: false,
+          createdAt: 'Just now',
+          timestamp: new Date().toISOString()
+        };
+        setNotifications(prev => [officerNotif, adminNotif, ...prev]);
+
         setGrievances(prev => {
-          const updated = [created, ...prev];
+          const updated = [created, ...prev.filter(g => g.id !== created.id)];
           localStorage.setItem('jansahayk_grievances_v4', JSON.stringify(updated));
           return updated;
         });
@@ -707,6 +738,7 @@ export function AppProvider({ children }) {
       officerName: assignedOfficer,
       officerDesignation: 'Assistant Executive Engineer',
       createdAt: 'Just now',
+      timestamp: new Date().toISOString(),
       slaDeadline: '24 Hours from now',
       slaHoursLeft: analysis.slaTargetHours || analysis.targetSlaHours || 24,
       upvotes: 1,
@@ -732,7 +764,7 @@ export function AppProvider({ children }) {
       reopenedDispute: null
     };
 
-    // Create notifications for both citizen tracking and government officer desk
+    // Create notifications for both citizen tracking, government officer desk, and central administration
     const officerNotif = {
       id: `NOTIF-OFFICER-${Date.now()}`,
       userId: 'USR-OFFICER-01',
@@ -746,10 +778,23 @@ export function AppProvider({ children }) {
       createdAt: 'Just now',
       timestamp: new Date().toISOString()
     };
-    setNotifications(prev => [officerNotif, ...prev]);
+    const adminNotif = {
+      id: `NOTIF-ADMIN-${Date.now()}`,
+      userId: 'USR-SUPERADMIN-01',
+      userRole: 'super_admin',
+      title: `New Inbound Incident: ${fallbackId}`,
+      message: `Case ${fallbackId} logged in ${fallbackItem.location?.ward || 'Ward 14'} under ${fallbackItem.department}.`,
+      grievanceId: fallbackId,
+      link: `/admin?caseId=${fallbackId}`,
+      type: 'INCIDENT_ALERT',
+      read: false,
+      createdAt: 'Just now',
+      timestamp: new Date().toISOString()
+    };
+    setNotifications(prev => [officerNotif, adminNotif, ...prev]);
 
     setGrievances(prev => {
-      const updated = [fallbackItem, ...prev];
+      const updated = [fallbackItem, ...prev.filter(g => g.id !== fallbackId)];
       localStorage.setItem('jansahayk_grievances_v4', JSON.stringify(updated));
       return updated;
     });

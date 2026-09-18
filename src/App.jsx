@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -14,7 +14,6 @@ import CivicIncidentDetail from './pages/CivicIncidentDetail';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import CitizenDashboard from './pages/CitizenDashboard';
-import CitizenSubmit from './pages/CitizenSubmit';
 import CitizenDetail from './pages/CitizenDetail';
 import OfficerWorkspace from './pages/OfficerWorkspace';
 import AdminHeatmap from './pages/AdminHeatmap';
@@ -26,6 +25,26 @@ import JanSahayakAssistant from './components/assistant/JanSahayakAssistant';
 function RoleHome() {
   // Logged-in citizen or officer opening root sees the Home page with their authenticated profile
   return <Home />;
+}
+
+function CitizenSubmitRedirect() {
+  const { user, token, switchDemoRole } = useApp();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // If not logged in as citizen, establish citizen session then open modal
+    if (!token || !user || (user.role !== 'citizen' && user.role !== 'super_admin')) {
+      switchDemoRole('citizen').then(() => {
+        navigate('/citizen?fileGrievance=true', { replace: true });
+      }).catch(() => {
+        navigate('/citizen?fileGrievance=true', { replace: true });
+      });
+    } else {
+      navigate('/citizen?fileGrievance=true', { replace: true });
+    }
+  }, [user, token, navigate, switchDemoRole]);
+
+  return null;
 }
 
 // Track whether the initial page reload/refresh redirect has already been processed in this runtime
@@ -144,11 +163,7 @@ export default function App() {
           />
           <Route 
             path="/citizen/submit" 
-            element={
-              <ProtectedRoute allowedRoles={['citizen', 'super_admin']}>
-                <CitizenSubmit />
-              </ProtectedRoute>
-            } 
+            element={<CitizenSubmitRedirect />} 
           />
           <Route 
             path="/citizen/complaints/:id" 

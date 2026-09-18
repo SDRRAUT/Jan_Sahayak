@@ -93,15 +93,21 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
 
   // 7 Logical Workspace Sections per Architecture Mandate:
   // 1. dashboard | 2. my_work | 3. operations | 4. intelligence | 5. investigation | 6. coordination | 7. reports
+  const queryCaseId = searchParams.get('caseId');
   const querySection = searchParams.get('section');
-  const initialSection = id ? 'investigation' : (querySection || defaultSection || 'dashboard');
+  const initialSection = (id || queryCaseId) ? 'investigation' : (querySection || defaultSection || 'dashboard');
   const [activeSection, setActiveSection] = useState(initialSection);
 
   useEffect(() => {
-    if (querySection && querySection !== activeSection) {
+    if (queryCaseId) {
+      setSelectedId(queryCaseId);
+      if (!querySection) {
+        setActiveSection('investigation');
+      }
+    } else if (querySection && querySection !== activeSection) {
       setActiveSection(querySection);
     }
-  }, [querySection]);
+  }, [querySection, queryCaseId]);
 
   const switchSection = (sectionKey) => {
     setActiveSection(sectionKey);
@@ -109,14 +115,13 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
   };
 
   // Selected grievance for deep workspace inspection
-  const queryCaseId = searchParams.get('caseId');
   const [selectedId, setSelectedId] = useState(id || queryCaseId || grievances[0]?.id || 'DL-2026-W14-0892');
 
   useEffect(() => {
     if (queryCaseId && queryCaseId !== selectedId) {
       setSelectedId(queryCaseId);
     }
-  }, [queryCaseId]);
+  }, [queryCaseId, selectedId]);
   const [searchQuery, setSearchQuery] = useState('');
   const [urgencyFilter, setUrgencyFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -290,9 +295,9 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
     { citizen: 'Harish Bansal', ward: 'Ward 14', rating: 4, comment: 'Repaired the leak fast, but trench filling on the road took an extra day.', date: '2 days ago' }
   ];
 
-  // Filtering Queues
+  // Filtering Queues (Guaranteed newest submissions & targeted cases at the absolute top)
   const filteredGrievances = useMemo(() => {
-    return grievances.filter(g => {
+    const list = grievances.filter(g => {
       const matchesSearch = !searchQuery || 
         g.id?.toLowerCase().includes(searchQuery.toLowerCase()) || 
         g.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -301,15 +306,35 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
       const matchesStatus = statusFilter === 'ALL' || g.status === statusFilter;
       return matchesSearch && matchesUrgency && matchesStatus;
     });
-  }, [grievances, searchQuery, urgencyFilter, statusFilter]);
+
+    return [...list].sort((a, b) => {
+      if (queryCaseId && a.id === queryCaseId) return -1;
+      if (queryCaseId && b.id === queryCaseId) return 1;
+      if (a.createdAt === 'Just now' && b.createdAt !== 'Just now') return -1;
+      if (b.createdAt === 'Just now' && a.createdAt !== 'Just now') return 1;
+      const timeA = new Date(a.timestamp || 0).getTime();
+      const timeB = new Date(b.timestamp || 0).getTime();
+      return timeB - timeA;
+    });
+  }, [grievances, searchQuery, urgencyFilter, statusFilter, queryCaseId]);
 
   // "My Work" Filter (Cases assigned directly to current officer or marked priority for their field team)
   const myWorkGrievances = useMemo(() => {
-    return grievances.filter(g => {
+    const list = grievances.filter(g => {
+      if (queryCaseId && g.id === queryCaseId) return true;
+      if (g.createdAt === 'Just now') return true;
       if (!g.officerName) return true;
       return g.officerName.includes('Sanjay') || g.officerName.includes('AEE') || g.status === 'IN_PROGRESS' || g.urgency === 'CRITICAL';
     });
-  }, [grievances]);
+
+    return [...list].sort((a, b) => {
+      if (queryCaseId && a.id === queryCaseId) return -1;
+      if (queryCaseId && b.id === queryCaseId) return 1;
+      if (a.createdAt === 'Just now' && b.createdAt !== 'Just now') return -1;
+      if (b.createdAt === 'Just now' && a.createdAt !== 'Just now') return 1;
+      return 0;
+    });
+  }, [grievances, queryCaseId]);
 
   const activeItem = grievances.find(g => g.id === selectedId) || filteredGrievances[0] || grievances[0] || {
     id: 'DL-2026-W14-0892',

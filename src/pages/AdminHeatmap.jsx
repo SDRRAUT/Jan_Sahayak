@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { 
   MapPin, 
   Layers, 
@@ -21,7 +21,10 @@ import { useApp } from '../context/AppContext';
 import WhyExplainer from '../components/common/WhyExplainer';
 
 export default function AdminHeatmap() {
-  const { grievances, clusters, metrics } = useApp();
+  const [searchParams] = useSearchParams();
+  const { grievances = [], clusters = [], metrics } = useApp();
+  const targetCaseId = searchParams.get('caseId');
+  const latestGrievance = (targetCaseId ? grievances.find(g => g.id === targetCaseId) : null) || grievances[0];
   const [selectedWard, setSelectedWard] = useState('Ward 14 (Rohini Sector 14)');
   const [selectedCluster, setSelectedCluster] = useState(clusters[0]);
   const [categoryFilter, setCategoryFilter] = useState('ALL');
@@ -90,6 +93,63 @@ export default function AdminHeatmap() {
             </Link>
           </div>
         </div>
+
+        {/* TOP OF ADMINISTRATION PANEL: LIVE INBOUND INCIDENT QUEUE */}
+        {latestGrievance && (
+          <div style={{
+            padding: '16px 20px',
+            borderRadius: 'var(--radius-lg)',
+            background: 'linear-gradient(90deg, #F0FDF4 0%, #EFF6FF 100%)',
+            border: '1.5px solid #86EFAC',
+            marginBottom: '20px',
+            boxShadow: '0 4px 14px rgba(16, 185, 129, 0.08)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '14px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                background: '#10B981',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}>
+                <Shield style={{ width: '20px', height: '20px' }} />
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '10px', fontWeight: 800, padding: '2px 8px', borderRadius: '999px', background: '#059669', color: '#FFFFFF' }}>
+                    ● TOP OF ADMINISTRATION QUEUE
+                  </span>
+                  <strong style={{ fontSize: '13px', color: '#065F46' }}>
+                    #{latestGrievance.id}: {latestGrievance.title}
+                  </strong>
+                  <span style={{ fontSize: '11px', color: '#047857' }}>
+                    ({latestGrievance.createdAt || 'Just now'})
+                  </span>
+                </div>
+                <div style={{ fontSize: '12px', color: '#047857', marginTop: '3px' }}>
+                  Reported in <strong>{latestGrievance.location?.ward || 'Ward 14'}</strong> by {latestGrievance.citizenName || 'Citizen'} • Assigned to <strong>{latestGrievance.officerName || latestGrievance.department || 'DJB'}</strong> • Target SLA: 24h
+                </div>
+              </div>
+            </div>
+
+            <Link
+              to={`/officer?caseId=${latestGrievance.id}`}
+              className="btn-primary btn-sm"
+              style={{ background: '#059669', borderColor: '#059669', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <span>Inspect in Officer Workspace →</span>
+            </Link>
+          </div>
+        )}
 
         {/* SECTION 17: EMERGING THIS WEEK CALLOUT BANNER */}
         <div style={{

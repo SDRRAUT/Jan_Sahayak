@@ -708,9 +708,12 @@ export default function Navbar() {
                             </div>
                             <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
                           </Link>
-                          <Link
-                            to="/citizen/submit"
-                            onClick={() => setShowUserMenu(false)}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowUserMenu(false);
+                              setShowFileGrievanceModal(true);
+                            }}
                             style={{
                               display: 'flex',
                               alignItems: 'center',
@@ -718,18 +721,20 @@ export default function Navbar() {
                               padding: '7px 10px',
                               borderRadius: 'var(--radius-sm)',
                               fontSize: '12px',
-                              textDecoration: 'none',
                               color: 'var(--color-text-primary)',
                               background: '#F8FAFC',
-                              border: '1px solid rgba(15, 23, 42, 0.06)'
+                              border: '1px solid rgba(15, 23, 42, 0.06)',
+                              cursor: 'pointer',
+                              width: '100%',
+                              textAlign: 'left'
                             }}
                           >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <Plus style={{ width: '14px', height: '14px', color: 'var(--color-primary)' }} />
-                              <span>File New Grievance</span>
+                              <span>File New Grievance (Popup)</span>
                             </div>
                             <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>+</span>
-                          </Link>
+                          </button>
                         </>
                       )}
 
@@ -1304,9 +1309,12 @@ export default function Navbar() {
                       <span>Track Ticket</span>
                     </button>
 
-                    <Link
-                      to="/citizen/submit"
-                      onClick={() => setMobileMenuOpen(false)}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setShowFileGrievanceModal(true);
+                      }}
                       className="btn-primary"
                       style={{
                         flex: 1,
@@ -1316,12 +1324,14 @@ export default function Navbar() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '6px'
+                        gap: '6px',
+                        border: 'none',
+                        cursor: 'pointer'
                       }}
                     >
                       <span>Report Issue</span>
                       <ArrowRight style={{ width: '14px', height: '14px' }} />
-                    </Link>
+                    </button>
                   </div>
                 )}
 

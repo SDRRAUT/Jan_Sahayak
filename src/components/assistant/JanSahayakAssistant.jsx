@@ -17,7 +17,7 @@ import {
 import { useApp } from '../../context/AppContext';
 
 // ============================================================================
-// Markdown Content Formatter (Renders **bold**, bullets, headings, lists)
+// Markdown Content Formatter (Light, Modern, High Contrast)
 // ============================================================================
 
 function renderFormattedInline(str) {
@@ -33,7 +33,7 @@ function renderFormattedInline(str) {
       parts.push(str.substring(lastIdx, match.index));
     }
     parts.push(
-      <strong key={`b-${key++}`} style={{ fontWeight: 700, color: '#FFFFFF' }}>
+      <strong key={`b-${key++}`} style={{ fontWeight: 700, color: '#0F172A' }}>
         {match[1]}
       </strong>
     );
@@ -53,7 +53,7 @@ function FormattedMarkdown({ content }) {
   const lines = content.split('\n');
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
       {lines.map((line, lineIdx) => {
         const trimmed = line.trim();
         if (!trimmed) {
@@ -63,7 +63,7 @@ function FormattedMarkdown({ content }) {
         // Heading 3: ### ...
         if (trimmed.startsWith('### ')) {
           return (
-            <div key={lineIdx} style={{ fontSize: '13.5px', fontWeight: 800, color: '#38BDF8', marginTop: '4px', letterSpacing: '-0.01em' }}>
+            <div key={lineIdx} style={{ fontSize: '14px', fontWeight: 800, color: '#0284C7', marginTop: '4px', letterSpacing: '-0.01em' }}>
               {renderFormattedInline(trimmed.replace('### ', ''))}
             </div>
           );
@@ -72,7 +72,7 @@ function FormattedMarkdown({ content }) {
         // Heading 2: ## ...
         if (trimmed.startsWith('## ')) {
           return (
-            <div key={lineIdx} style={{ fontSize: '14.5px', fontWeight: 800, color: '#60A5FA', marginTop: '6px', letterSpacing: '-0.01em' }}>
+            <div key={lineIdx} style={{ fontSize: '15px', fontWeight: 800, color: '#0369A1', marginTop: '6px', letterSpacing: '-0.01em' }}>
               {renderFormattedInline(trimmed.replace('## ', ''))}
             </div>
           );
@@ -83,8 +83,8 @@ function FormattedMarkdown({ content }) {
           const bulletText = trimmed.replace(/^([•\*\-]\s*)/, '');
           return (
             <div key={lineIdx} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', paddingLeft: '2px' }}>
-              <span style={{ color: '#10B981', fontSize: '13px', lineHeight: '1.5', flexShrink: 0 }}>•</span>
-              <span style={{ flex: 1, fontSize: '13px', lineHeight: '1.55', color: '#E2E8F0' }}>
+              <span style={{ color: '#059669', fontSize: '14px', lineHeight: '1.5', flexShrink: 0, fontWeight: 700 }}>•</span>
+              <span style={{ flex: 1, fontSize: '13.5px', lineHeight: '1.55', color: '#334155' }}>
                 {renderFormattedInline(bulletText)}
               </span>
             </div>
@@ -96,8 +96,8 @@ function FormattedMarkdown({ content }) {
         if (numMatch) {
           return (
             <div key={lineIdx} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', paddingLeft: '2px' }}>
-              <span style={{ color: '#38BDF8', fontSize: '12px', fontWeight: 700, lineHeight: '1.5', flexShrink: 0 }}>{numMatch[1]}.</span>
-              <span style={{ flex: 1, fontSize: '13px', lineHeight: '1.55', color: '#E2E8F0' }}>
+              <span style={{ color: '#0284C7', fontSize: '13px', fontWeight: 700, lineHeight: '1.5', flexShrink: 0 }}>{numMatch[1]}.</span>
+              <span style={{ flex: 1, fontSize: '13.5px', lineHeight: '1.55', color: '#334155' }}>
                 {renderFormattedInline(numMatch[2])}
               </span>
             </div>
@@ -106,12 +106,12 @@ function FormattedMarkdown({ content }) {
 
         // Divider
         if (trimmed === '---') {
-          return <div key={lineIdx} style={{ height: '1px', background: 'rgba(255, 255, 255, 0.1)', margin: '6px 0' }} />;
+          return <div key={lineIdx} style={{ height: '1px', background: '#E2E8F0', margin: '6px 0' }} />;
         }
 
         // Standard Paragraph
         return (
-          <p key={lineIdx} style={{ margin: 0, fontSize: '13.5px', lineHeight: '1.55', color: '#E2E8F0' }}>
+          <p key={lineIdx} style={{ margin: 0, fontSize: '13.5px', lineHeight: '1.55', color: '#1E293B' }}>
             {renderFormattedInline(line)}
           </p>
         );
@@ -121,7 +121,7 @@ function FormattedMarkdown({ content }) {
 }
 
 // ============================================================================
-// Modern JanSahayak Assistant Component
+// Modern JanSahayak Assistant Component (Light & Interactive Theme)
 // ============================================================================
 
 export default function JanSahayakAssistant() {
@@ -155,10 +155,8 @@ export default function JanSahayakAssistant() {
       entityType = 'incident';
       entityId = path.replace('/intelligence/incidents/', '');
       pageLabel = `Incident #${entityId}`;
-    } else if (path === '/citizen') {
-      pageLabel = 'Citizen Portal';
-    } else if (path === '/citizen/submit') {
-      pageLabel = 'File Grievance';
+    } else if (path === '/citizen' || path === '/citizen/submit') {
+      pageLabel = 'Citizen Portal & Grievance Filing';
     } else if (path === '/officer') {
       pageLabel = 'Officer Workspace';
     } else if (path === '/intelligence') {
@@ -181,33 +179,37 @@ export default function JanSahayakAssistant() {
     citizen: {
       label: 'Citizen Sahayak',
       icon: User,
-      badgeColor: '#10B981',
-      glow: 'rgba(16, 185, 129, 0.25)',
-      gradient: 'linear-gradient(135deg, #064E3B 0%, #047857 100%)',
+      badgeColor: '#059669',
+      badgeBg: '#ECFDF5',
+      glow: 'rgba(5, 150, 105, 0.15)',
+      gradient: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
       welcome: `Namaste **${user?.name || 'Citizen'}**! Main aapka JanSahayak AI Assistant hoon.\n\nAap mujhse **kuch bhi** pooch sakte hain — apni complaints ka status, timeline, Grievance DNA™ analysis, ya koi bhi general sawaal.`
     },
     civic_officer: {
       label: 'Officer Co-Pilot',
       icon: Building2,
-      badgeColor: '#3B82F6',
-      glow: 'rgba(59, 130, 246, 0.25)',
-      gradient: 'linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%)',
+      badgeColor: '#0284C7',
+      badgeBg: '#F0F9FF',
+      glow: 'rgba(2, 132, 199, 0.15)',
+      gradient: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
       welcome: `Hello Officer **${user?.name || 'In-Charge'}**! I am your operational Co-Pilot.\n\nAsk for structured operational briefs, root-cause forensics, contractor SOP guidance, or general engineering queries.`
     },
     officer: {
       label: 'Officer Co-Pilot',
       icon: Building2,
-      badgeColor: '#3B82F6',
-      glow: 'rgba(59, 130, 246, 0.25)',
-      gradient: 'linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%)',
+      badgeColor: '#0284C7',
+      badgeBg: '#F0F9FF',
+      glow: 'rgba(2, 132, 199, 0.15)',
+      gradient: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
       welcome: `Hello Officer **${user?.name || 'In-Charge'}**! I am your operational Co-Pilot.\n\nAsk for structured operational briefs, root-cause forensics, contractor SOP guidance, or general engineering queries.`
     },
     super_admin: {
       label: 'Executive Intelligence',
       icon: Shield,
-      badgeColor: '#8B5CF6',
-      glow: 'rgba(139, 92, 246, 0.25)',
-      gradient: 'linear-gradient(135deg, #4C1D95 0%, #7C3AED 100%)',
+      badgeColor: '#7C3AED',
+      badgeBg: '#F5F3FF',
+      glow: 'rgba(124, 58, 237, 0.15)',
+      gradient: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)',
       welcome: `JanSahayak Executive Intelligence active.\n\nQuery citywide SLA compliance, emerging problem clusters, cross-department bottlenecks, or municipal ward hotspot analytics.`
     }
   };
@@ -403,7 +405,7 @@ export default function JanSahayakAssistant() {
 
   return (
     <>
-      {/* Modern Floating Trigger Button */}
+      {/* Light & Modern Floating Trigger Button */}
       {!isOpen && (
         <button
           id="jansahayak-ai-launcher"
@@ -416,13 +418,13 @@ export default function JanSahayakAssistant() {
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
-            padding: '12px 22px',
-            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)',
+            padding: '10px 20px',
+            background: 'linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%)',
             backdropFilter: 'blur(16px)',
-            color: '#FFFFFF',
-            border: `1.5px solid ${activeRoleConfig.badgeColor}`,
+            color: '#0F172A',
+            border: '1.5px solid rgba(226, 232, 240, 0.9)',
             borderRadius: '999px',
-            boxShadow: `0 14px 35px rgba(0, 0, 0, 0.5), 0 0 25px ${activeRoleConfig.glow}`,
+            boxShadow: '0 12px 30px -4px rgba(15, 23, 42, 0.15), 0 4px 12px rgba(0, 0, 0, 0.05)',
             cursor: 'pointer',
             fontFamily: 'inherit',
             fontWeight: 700,
@@ -431,11 +433,13 @@ export default function JanSahayakAssistant() {
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)';
-            e.currentTarget.style.boxShadow = `0 20px 45px rgba(0, 0, 0, 0.6), 0 0 35px ${activeRoleConfig.glow}`;
+            e.currentTarget.style.boxShadow = '0 18px 36px -4px rgba(15, 23, 42, 0.2), 0 6px 16px rgba(0, 0, 0, 0.08)';
+            e.currentTarget.style.borderColor = activeRoleConfig.badgeColor;
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'translateY(0) scale(1)';
-            e.currentTarget.style.boxShadow = `0 14px 35px rgba(0, 0, 0, 0.5), 0 0 25px ${activeRoleConfig.glow}`;
+            e.currentTarget.style.boxShadow = '0 12px 30px -4px rgba(15, 23, 42, 0.15), 0 4px 12px rgba(0, 0, 0, 0.05)';
+            e.currentTarget.style.borderColor = 'rgba(226, 232, 240, 0.9)';
           }}
         >
           <div style={{
@@ -443,36 +447,36 @@ export default function JanSahayakAssistant() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '34px',
-            height: '34px',
+            width: '36px',
+            height: '36px',
             borderRadius: '50%',
-            background: `linear-gradient(135deg, ${activeRoleConfig.badgeColor} 0%, #0E5E3A 100%)`,
+            background: activeRoleConfig.gradient,
             color: '#FFFFFF',
-            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)'
+            boxShadow: `0 4px 12px ${activeRoleConfig.glow}`
           }}>
             <Sparkles size={18} />
             <span style={{
               position: 'absolute',
-              top: '-2px',
-              right: '-2px',
+              top: '-1px',
+              right: '-1px',
               width: '10px',
               height: '10px',
               borderRadius: '50%',
-              backgroundColor: '#22C55E',
-              border: '2px solid #0F172A',
-              boxShadow: '0 0 8px #22C55E'
+              backgroundColor: '#10B981',
+              border: '2px solid #FFFFFF',
+              boxShadow: '0 0 6px rgba(16, 185, 129, 0.6)'
             }} />
           </div>
           <div style={{ textAlign: 'left' }}>
-            <div style={{ fontSize: '13.5px', fontWeight: 800, letterSpacing: '-0.01em' }}>JanSahayak AI</div>
-            <div style={{ fontSize: '11px', color: activeRoleConfig.badgeColor, fontWeight: 600 }}>
+            <div style={{ fontSize: '13.5px', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>JanSahayak AI</div>
+            <div style={{ fontSize: '11px', color: activeRoleConfig.badgeColor, fontWeight: 700 }}>
               {activeRoleConfig.label}
             </div>
           </div>
         </button>
       )}
 
-      {/* Modern Glassmorphic Window */}
+      {/* Modern Light Glassmorphic Window */}
       {isOpen && (
         <div
           id="jansahayak-ai-window"
@@ -480,19 +484,19 @@ export default function JanSahayakAssistant() {
             position: 'fixed',
             bottom: '16px',
             right: '16px',
-            width: isMinimized ? '300px' : '440px',
+            width: isMinimized ? '320px' : '440px',
             maxWidth: 'calc(100vw - 24px)',
-            height: isMinimized ? '52px' : 'min(550px, calc(100dvh - 32px))',
+            height: isMinimized ? '56px' : 'min(560px, calc(100dvh - 32px))',
             maxHeight: 'calc(100dvh - 32px)',
             zIndex: 9999,
             display: 'flex',
             flexDirection: 'column',
-            backgroundColor: '#090E17',
-            backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(30, 41, 59, 0.5) 0%, rgba(9, 14, 23, 0.95) 75%)',
-            color: '#F8FAFC',
-            borderRadius: '20px',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            boxShadow: `0 24px 60px -10px rgba(0, 0, 0, 0.8), 0 0 30px ${activeRoleConfig.glow}`,
+            backgroundColor: '#FFFFFF',
+            backgroundImage: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
+            color: '#0F172A',
+            borderRadius: '22px',
+            border: '1.5px solid rgba(226, 232, 240, 0.95)',
+            boxShadow: '0 25px 60px -12px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(15, 23, 42, 0.04)',
             overflow: 'hidden',
             fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             transition: 'height 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -502,12 +506,12 @@ export default function JanSahayakAssistant() {
           <div style={{
             padding: '12px 16px',
             background: activeRoleConfig.gradient,
-            borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             userSelect: 'none',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
             flexShrink: 0
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -516,9 +520,9 @@ export default function JanSahayakAssistant() {
                 width: '36px',
                 height: '36px',
                 borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.22)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.25)',
+                background: 'rgba(255, 255, 255, 0.25)',
+                backdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -532,20 +536,20 @@ export default function JanSahayakAssistant() {
                   width: '9px',
                   height: '9px',
                   borderRadius: '50%',
-                  backgroundColor: '#22C55E',
-                  border: '2px solid #064E3B'
+                  backgroundColor: '#34D399',
+                  border: '2px solid #FFFFFF'
                 }} />
               </div>
               <div>
                 <div style={{ fontSize: '14.5px', fontWeight: 800, letterSpacing: '-0.01em', color: '#FFFFFF' }}>
                   JanSahayak AI
                 </div>
-                <div style={{ fontSize: '11px', color: '#E2E8F0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{ fontSize: '11px', color: '#E0F2FE', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ fontWeight: 600 }}>{activeRoleConfig.label}</span>
                   <span style={{ opacity: 0.6 }}>•</span>
                   <span style={{
-                    color: '#A7F3D0',
-                    background: 'rgba(0, 0, 0, 0.2)',
+                    color: '#FFFFFF',
+                    background: 'rgba(255, 255, 255, 0.2)',
                     padding: '2px 8px',
                     borderRadius: '999px',
                     fontSize: '10.5px',
@@ -557,12 +561,12 @@ export default function JanSahayakAssistant() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
               <button
                 onClick={handleClearChat}
                 title="Clear Conversation"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.12)',
+                  background: 'rgba(255, 255, 255, 0.18)',
                   border: 'none',
                   color: '#FFFFFF',
                   cursor: 'pointer',
@@ -574,8 +578,8 @@ export default function JanSahayakAssistant() {
                   justifyContent: 'center',
                   transition: 'background 0.2s ease'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.22)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.12)'}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.18)'}
               >
                 <RefreshCw size={14} />
               </button>
@@ -583,7 +587,7 @@ export default function JanSahayakAssistant() {
                 onClick={() => setIsMinimized(prev => !prev)}
                 title={isMinimized ? 'Expand' : 'Minimize'}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.12)',
+                  background: 'rgba(255, 255, 255, 0.18)',
                   border: 'none',
                   color: '#FFFFFF',
                   cursor: 'pointer',
@@ -595,8 +599,8 @@ export default function JanSahayakAssistant() {
                   justifyContent: 'center',
                   transition: 'background 0.2s ease'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.22)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.12)'}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.18)'}
               >
                 {isMinimized ? <Maximize2 size={14} /> : <Minimize2 size={14} />}
               </button>
@@ -604,7 +608,7 @@ export default function JanSahayakAssistant() {
                 onClick={() => setIsOpen(false)}
                 title="Close Assistant"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.12)',
+                  background: 'rgba(255, 255, 255, 0.18)',
                   border: 'none',
                   color: '#FFFFFF',
                   cursor: 'pointer',
@@ -616,8 +620,8 @@ export default function JanSahayakAssistant() {
                   justifyContent: 'center',
                   transition: 'background 0.2s ease'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.8)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.12)'}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.9)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.18)'}
               >
                 <X size={16} />
               </button>
@@ -634,7 +638,7 @@ export default function JanSahayakAssistant() {
               display: 'flex',
               flexDirection: 'column',
               gap: '14px',
-              background: 'transparent',
+              background: '#F8FAFC',
               minHeight: 0
             }}>
               {messages.map((msg) => {
@@ -662,14 +666,14 @@ export default function JanSahayakAssistant() {
                           width: '28px',
                           height: '28px',
                           borderRadius: '8px',
-                          background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                          background: activeRoleConfig.gradient,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           color: '#FFFFFF',
                           flexShrink: 0,
                           marginTop: '2px',
-                          boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
                         }}>
                           <Bot size={16} />
                         </div>
@@ -680,21 +684,20 @@ export default function JanSahayakAssistant() {
                           padding: '11px 14px',
                           borderRadius: isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
                           background: isUser 
-                            ? 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)' 
-                            : 'rgba(30, 41, 59, 0.75)',
-                          backdropFilter: isUser ? 'none' : 'blur(10px)',
-                          color: '#F8FAFC',
+                            ? 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)' 
+                            : '#FFFFFF',
+                          color: isUser ? '#FFFFFF' : '#1E293B',
                           boxShadow: isUser 
-                            ? '0 4px 14px rgba(37, 99, 235, 0.25)' 
-                            : '0 4px 16px rgba(0, 0, 0, 0.35)',
-                          border: isUser ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
+                            ? '0 4px 14px rgba(2, 132, 199, 0.25)' 
+                            : '0 2px 8px -2px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04)',
+                          border: isUser ? 'none' : '1px solid #E2E8F0',
                           wordBreak: 'break-word',
                           overflowWrap: 'anywhere',
                           maxWidth: '100%'
                         }}
                       >
                         {isUser ? (
-                          <span style={{ fontSize: '13.5px', lineHeight: 1.5 }}>{msg.text}</span>
+                          <span style={{ fontSize: '13.5px', lineHeight: 1.5, color: '#FFFFFF', fontWeight: 500 }}>{msg.text}</span>
                         ) : (
                           <FormattedMarkdown content={msg.text} />
                         )}
@@ -708,22 +711,24 @@ export default function JanSahayakAssistant() {
                         alignItems: 'center',
                         gap: '6px',
                         marginLeft: '36px',
-                        padding: '2px 8px',
-                        background: 'rgba(255, 255, 255, 0.04)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        padding: '3px 10px',
+                        background: '#EFF6FF',
+                        border: '1px solid #BFDBFE',
                         borderRadius: '999px',
-                        fontSize: '10.5px',
-                        color: '#38BDF8',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        color: '#1D4ED8',
                         width: 'fit-content'
                       }}>
-                        <Database size={11} />
+                        <Database size={12} />
                         <span>Grounded via {msg.tools.map(t => t.name).join(', ')}</span>
                       </div>
                     )}
 
                     <span style={{
-                      fontSize: '10px',
-                      color: '#64748B',
+                      fontSize: '10.5px',
+                      color: '#94A3B8',
+                      fontWeight: 500,
                       padding: isUser ? '0 4px 0 0' : '0 0 0 38px'
                     }}>
                       {msg.timestamp}
@@ -735,18 +740,17 @@ export default function JanSahayakAssistant() {
               {/* Action Proposal Card (Sensitive Operations Gate) */}
               {activeActionProposal && (
                 <div style={{
-                  background: 'rgba(30, 41, 59, 0.85)',
-                  backdropFilter: 'blur(12px)',
+                  background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)',
                   border: '1.5px solid #F59E0B',
                   borderRadius: '16px',
                   padding: '16px',
-                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(245, 158, 11, 0.15)'
+                  boxShadow: '0 8px 24px -4px rgba(245, 158, 11, 0.2)'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#F59E0B', fontWeight: 800, fontSize: '13.5px', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#92400E', fontWeight: 800, fontSize: '13.5px', marginBottom: '8px' }}>
                     <AlertTriangle size={18} />
                     <span>{activeActionProposal.title}</span>
                   </div>
-                  <p style={{ fontSize: '13px', color: '#CBD5E1', margin: '0 0 14px 0', lineHeight: 1.45 }}>
+                  <p style={{ fontSize: '13px', color: '#78350F', margin: '0 0 14px 0', lineHeight: 1.45 }}>
                     {activeActionProposal.promptQuestion}
                   </p>
                   <div style={{ display: 'flex', gap: '10px' }}>
@@ -755,15 +759,15 @@ export default function JanSahayakAssistant() {
                       disabled={isLoading}
                       style={{
                         flex: 1,
-                        background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                        color: '#000000',
+                        background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
+                        color: '#FFFFFF',
                         border: 'none',
                         padding: '10px 14px',
                         borderRadius: '10px',
                         fontSize: '13px',
-                        fontWeight: 800,
+                        fontWeight: 700,
                         cursor: 'pointer',
-                        boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
+                        boxShadow: '0 4px 12px rgba(217, 119, 6, 0.3)'
                       }}
                     >
                       {isLoading ? 'Confirming...' : 'Yes, Confirm Action'}
@@ -771,9 +775,9 @@ export default function JanSahayakAssistant() {
                     <button
                       onClick={() => setActiveActionProposal(null)}
                       style={{
-                        background: 'rgba(255, 255, 255, 0.08)',
-                        color: '#94A3B8',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        background: '#FFFFFF',
+                        color: '#4B5563',
+                        border: '1px solid #D1D5DB',
                         padding: '10px 14px',
                         borderRadius: '10px',
                         fontSize: '13px',
@@ -789,26 +793,37 @@ export default function JanSahayakAssistant() {
 
               {/* Modern Reasoning Spinner */}
               {isLoading && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0', marginLeft: '6px', color: '#94A3B8', fontSize: '13px' }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '8px 12px',
+                  marginLeft: '4px',
+                  background: '#FFFFFF',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '12px',
+                  width: 'fit-content',
+                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)'
+                }}>
                   <div style={{
-                    width: '28px',
-                    height: '28px',
-                    borderRadius: '8px',
-                    background: 'rgba(16, 185, 129, 0.15)',
-                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '6px',
+                    background: '#E0F2FE',
+                    border: '1px solid #BAE6FD',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#10B981'
+                    color: '#0284C7'
                   }}>
-                    <Sparkles size={16} className="animate-spin" />
+                    <Sparkles size={14} className="animate-spin" />
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ color: '#CBD5E1', fontSize: '12.5px' }}>JanSahayak reasoning</span>
+                    <span style={{ color: '#475569', fontSize: '12.5px', fontWeight: 600 }}>JanSahayak thinking</span>
                     <span style={{ display: 'inline-flex', gap: '3px' }}>
-                      <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#10B981', display: 'inline-block' }} />
-                      <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#38BDF8', display: 'inline-block' }} />
-                      <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#818CF8', display: 'inline-block' }} />
+                      <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#0284C7', display: 'inline-block' }} />
+                      <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#059669', display: 'inline-block' }} />
+                      <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#7C3AED', display: 'inline-block' }} />
                     </span>
                   </div>
                 </div>
@@ -821,13 +836,13 @@ export default function JanSahayakAssistant() {
           {/* Contextual Suggestion Pills */}
           {!isMinimized && (
             <div style={{
-              padding: '8px 12px',
-              background: 'rgba(15, 23, 42, 0.85)',
-              borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+              padding: '10px 12px',
+              background: '#FFFFFF',
+              borderTop: '1px solid #E2E8F0',
               overflowX: 'auto',
               whiteSpace: 'nowrap',
               display: 'flex',
-              gap: '6px',
+              gap: '8px',
               scrollbarWidth: 'none',
               WebkitOverflowScrolling: 'touch',
               flexShrink: 0
@@ -838,27 +853,29 @@ export default function JanSahayakAssistant() {
                   onClick={() => handleSendMessage(chip)}
                   disabled={isLoading}
                   style={{
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    color: '#CBD5E1',
-                    fontSize: '11.5px',
+                    background: '#F1F5F9',
+                    border: '1px solid #E2E8F0',
+                    color: '#334155',
+                    fontSize: '12px',
                     fontWeight: 600,
-                    padding: '5px 12px',
+                    padding: '6px 14px',
                     borderRadius: '999px',
                     cursor: 'pointer',
                     flexShrink: 0,
                     transition: 'all 0.2s ease',
-                    backdropFilter: 'blur(8px)'
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.14)';
-                    e.currentTarget.style.color = '#FFFFFF';
-                    e.currentTarget.style.borderColor = activeRoleConfig.badgeColor;
+                    e.currentTarget.style.background = '#EFF6FF';
+                    e.currentTarget.style.color = '#0284C7';
+                    e.currentTarget.style.borderColor = '#93C5FD';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
-                    e.currentTarget.style.color = '#CBD5E1';
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+                    e.currentTarget.style.background = '#F1F5F9';
+                    e.currentTarget.style.color = '#334155';
+                    e.currentTarget.style.borderColor = '#E2E8F0';
+                    e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
                   {chip}
@@ -867,7 +884,7 @@ export default function JanSahayakAssistant() {
             </div>
           )}
 
-          {/* Modern Input Bar */}
+          {/* Modern Light Input Bar */}
           {!isMinimized && (
             <form
               onSubmit={(e) => {
@@ -876,8 +893,8 @@ export default function JanSahayakAssistant() {
               }}
               style={{
                 padding: '10px 12px',
-                background: 'rgba(15, 23, 42, 0.95)',
-                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                background: '#FFFFFF',
+                borderTop: '1px solid #E2E8F0',
                 display: 'flex',
                 gap: '8px',
                 alignItems: 'center',
@@ -899,21 +916,23 @@ export default function JanSahayakAssistant() {
                 disabled={isLoading}
                 style={{
                   flex: 1,
-                  background: 'rgba(30, 41, 59, 0.7)',
-                  border: '1px solid rgba(255, 255, 255, 0.14)',
+                  background: '#F8FAFC',
+                  border: '1.5px solid #E2E8F0',
                   borderRadius: '12px',
-                  color: '#FFFFFF',
+                  color: '#0F172A',
                   padding: '11px 16px',
                   fontSize: '13.5px',
                   outline: 'none',
-                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease'
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = activeRoleConfig.badgeColor;
-                  e.currentTarget.style.boxShadow = `0 0 0 3px ${activeRoleConfig.glow}`;
+                  e.currentTarget.style.backgroundColor = '#FFFFFF';
+                  e.currentTarget.style.borderColor = '#0284C7';
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(2, 132, 199, 0.15)';
                 }}
                 onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.14)';
+                  e.currentTarget.style.backgroundColor = '#F8FAFC';
+                  e.currentTarget.style.borderColor = '#E2E8F0';
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               />
@@ -922,9 +941,9 @@ export default function JanSahayakAssistant() {
                 disabled={isLoading || !inputMessage.trim()}
                 style={{
                   background: inputMessage.trim() 
-                    ? `linear-gradient(135deg, ${activeRoleConfig.badgeColor} 0%, #0E5E3A 100%)` 
-                    : 'rgba(255, 255, 255, 0.08)',
-                  color: '#FFFFFF',
+                    ? 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)' 
+                    : '#F1F5F9',
+                  color: inputMessage.trim() ? '#FFFFFF' : '#94A3B8',
                   border: 'none',
                   borderRadius: '12px',
                   width: '42px',
@@ -934,10 +953,10 @@ export default function JanSahayakAssistant() {
                   justifyContent: 'center',
                   cursor: inputMessage.trim() ? 'pointer' : 'default',
                   transition: 'all 0.2s ease',
-                  boxShadow: inputMessage.trim() ? `0 4px 12px ${activeRoleConfig.glow}` : 'none'
+                  boxShadow: inputMessage.trim() ? '0 4px 14px rgba(2, 132, 199, 0.3)' : 'none'
                 }}
                 onMouseEnter={(e) => {
-                  if (inputMessage.trim()) e.currentTarget.style.transform = 'scale(1.05)';
+                  if (inputMessage.trim()) e.currentTarget.style.transform = 'scale(1.04)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'scale(1)';
@@ -952,3 +971,4 @@ export default function JanSahayakAssistant() {
     </>
   );
 }
+

@@ -89,7 +89,7 @@ export default function CommandPalette({ isOpen, onClose, onOpenSignalModal }) {
         subtitle: 'Voice, photo, or conversational guided form',
         icon: PlusCircle,
         action: () => {
-          navigate('/citizen/submit');
+          navigate('/citizen?fileGrievance=true');
           onClose();
         }
       },
@@ -234,7 +234,7 @@ export default function CommandPalette({ isOpen, onClose, onOpenSignalModal }) {
         subtitle: 'Voice, photo, or conversational guided form',
         icon: PlusCircle,
         action: () => {
-          navigate('/citizen/submit');
+          navigate('/citizen?fileGrievance=true');
           onClose();
         }
       },

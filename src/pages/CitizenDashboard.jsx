@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   Plus, Search, MapPin, ThumbsUp, ArrowRight,
   Sparkles, Bell, FileText, X, Radio
@@ -393,6 +393,7 @@ function GrievanceCard({ item, citizen, onOpen }) {
 
 export default function CitizenDashboard() {
   const {grievances=[],upvoteGrievance,user,token,currentCitizen:contextCitizen,civicIncidents=[],notifications:contextNotifs=[]} = useApp();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab,setActiveTab]             = useState('all');
   const [searchQuery,setSearchQuery]         = useState('');
   const [showSignalModal,setShowSignalModal] = useState(false);
@@ -401,6 +402,16 @@ export default function CitizenDashboard() {
   const [selectedGrievance,setSelectedGrievance] = useState(null);
   const [dashboardData,setDashboardData]     = useState(null);
   const citizen = user||contextCitizen||{id:'USR-CITIZEN-01',name:'Aditya Verma',ward:'Ward 14 (Rohini Sector 14)',pincode:'110085'};
+
+  // If navigated with ?fileGrievance=true, automatically open the popup modal
+  useEffect(() => {
+    if (searchParams.get('fileGrievance') === 'true') {
+      setShowFileModal(true);
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('fileGrievance');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   useEffect(()=>{
     let m=true;

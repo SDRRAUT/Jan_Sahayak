@@ -37,6 +37,7 @@ import {
 import { INITIAL_GRIEVANCES, SYSTEM_METRICS } from '../data/mockGrievances';
 import citizenBg from '../assets/citizen-bg.jpg';
 import WhyExplainer from '../components/common/WhyExplainer';
+import FileGrievanceModal from '../components/common/FileGrievanceModal';
 
 const FOUR_STEPS = [
   {
@@ -98,6 +99,7 @@ const FOUR_STEPS = [
 ];
 
 export default function Home() {
+  const [showGrievanceModal, setShowGrievanceModal] = useState(false);
   const [mapCategory, setMapCategory] = useState('ALL');
   const [activeWardIndex, setActiveWardIndex] = useState(0);
   const [activeExampleIndex, setActiveExampleIndex] = useState(0);
@@ -2163,10 +2165,15 @@ export default function Home() {
             </p>
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
-              <Link to="/citizen/submit" className="btn-primary" style={{ background: 'var(--color-accent)', color: '#0B1914', fontWeight: 700 }}>
+              <button 
+                type="button" 
+                onClick={() => setShowGrievanceModal(true)} 
+                className="btn-primary" 
+                style={{ background: 'var(--color-accent)', color: '#0B1914', fontWeight: 700, border: 'none', cursor: 'pointer' }}
+              >
                 <span>Report a Problem Now</span>
                 <ArrowRight className="btn-arrow" style={{ width: '16px', height: '16px' }} />
-              </Link>
+              </button>
 
               <Link to="/officer" className="btn-secondary" style={{ background: 'rgba(255,255,255,0.08)', color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.18)' }}>
                 <span>Explore Officer Workspace</span>
@@ -2176,6 +2183,12 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Instant 4-Step Popup Intake Modal */}
+      <FileGrievanceModal 
+        isOpen={showGrievanceModal} 
+        onClose={() => setShowGrievanceModal(false)} 
+      />
     </div>
   );
 }

@@ -176,8 +176,8 @@ export default function Impact() {
               <span>Inspect Live Case Record</span>
               <ArrowRight className="btn-arrow" style={{ width: '14px', height: '14px' }} />
             </Link>
-            <Link to="/citizen/submit" className="btn-secondary btn-sm" style={{ background: 'rgba(255,255,255,0.08)', color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.15)' }}>
-              <span>File a New Issue</span>
+            <Link to="/citizen?fileGrievance=true" className="btn-secondary btn-sm" style={{ background: 'rgba(255,255,255,0.08)', color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.15)' }}>
+              <span>File a New Issue (Popup)</span>
             </Link>
           </div>
         </div>
