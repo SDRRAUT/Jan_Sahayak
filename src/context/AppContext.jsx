@@ -678,15 +678,15 @@ export function AppProvider({ children }) {
         const created = data.grievance;
         // Augment with rich DNA for UI display
         created.grievanceDna = analysis;
-        created.aiOfficerBrief = analysis.aiBrief;
+        created.aiOfficerBrief = analysis.aiBrief || analysis.structuredSummary?.headline || analysis.coreIssue;
         created.officerName = created.officerName || assignedOfficer;
         created.recommendedResolution = {
-          primaryAction: analysis.recommendedAction,
-          standardOperatingProcedure: analysis.sops[0] || 'STANDARD-MUNICIPAL-SOP',
-          estimatedFixTime: `${analysis.targetSlaHours / 2} Hours`,
-          equipmentRequired: ['Standard Maintenance Kit', 'Inspection Sensor'],
-          citizenDraftHindi: analysis.draftResponseHindi,
-          citizenDraftEnglish: analysis.draftResponseEnglish
+          primaryAction: analysis.aiRecommendation?.recommendedAction || analysis.recommendedAction || 'Emergency repair unit dispatched',
+          standardOperatingProcedure: analysis.sops?.[0] || analysis.aiRecommendation?.standardOperatingProcedure || 'STANDARD-MUNICIPAL-SOP',
+          estimatedFixTime: `${(analysis.slaTargetHours || analysis.targetSlaHours || 24) / 2} Hours`,
+          equipmentRequired: analysis.aiRecommendation?.equipmentRequired || ['Standard Maintenance Kit', 'Inspection Sensor'],
+          citizenDraftHindi: analysis.aiRecommendation?.citizenDraftHindi || analysis.draftResponseHindi || 'आपकी शिकायत दर्ज कर ली गई है।',
+          citizenDraftEnglish: analysis.aiRecommendation?.citizenDraftEnglish || analysis.draftResponseEnglish || 'Your grievance has been registered.'
         };
         setGrievances(prev => {
           const updated = [created, ...prev];
@@ -708,20 +708,20 @@ export function AppProvider({ children }) {
       officerDesignation: 'Assistant Executive Engineer',
       createdAt: 'Just now',
       slaDeadline: '24 Hours from now',
-      slaHoursLeft: analysis.targetSlaHours,
+      slaHoursLeft: analysis.slaTargetHours || analysis.targetSlaHours || 24,
       upvotes: 1,
       citizenId: activeUser?.id || 'USR-CITIZEN-01',
-      citizenName: activeUser?.name || 'Aditya Verma',
-      citizenPhone: activeUser?.phone || '+91 98712-88210',
+      citizenName: formData.citizenName || activeUser?.name || 'Aditya Verma',
+      citizenPhone: formData.citizenPhone || activeUser?.phone || '+91 98712-88210',
       grievanceDna: analysis,
-      aiOfficerBrief: analysis.aiBrief,
+      aiOfficerBrief: analysis.aiBrief || analysis.structuredSummary?.headline || analysis.coreIssue,
       recommendedResolution: {
-        primaryAction: analysis.recommendedAction,
-        standardOperatingProcedure: analysis.sops[0] || 'STANDARD-MUNICIPAL-SOP',
-        estimatedFixTime: `${analysis.targetSlaHours / 2} Hours`,
-        equipmentRequired: ['Standard Maintenance Kit', 'Inspection Sensor'],
-        citizenDraftHindi: analysis.draftResponseHindi,
-        citizenDraftEnglish: analysis.draftResponseEnglish
+        primaryAction: analysis.aiRecommendation?.recommendedAction || analysis.recommendedAction || 'Emergency repair unit dispatched',
+        standardOperatingProcedure: analysis.sops?.[0] || analysis.aiRecommendation?.standardOperatingProcedure || 'STANDARD-MUNICIPAL-SOP',
+        estimatedFixTime: `${(analysis.slaTargetHours || analysis.targetSlaHours || 24) / 2} Hours`,
+        equipmentRequired: analysis.aiRecommendation?.equipmentRequired || ['Standard Maintenance Kit', 'Inspection Sensor'],
+        citizenDraftHindi: analysis.aiRecommendation?.citizenDraftHindi || analysis.draftResponseHindi || 'आपकी शिकायत दर्ज कर ली गई है।',
+        citizenDraftEnglish: analysis.aiRecommendation?.citizenDraftEnglish || analysis.draftResponseEnglish || 'Your grievance has been registered.'
       },
       timeline: [
         { stage: 'Submitted', time: 'Just now', detail: 'Submitted via JanSahayak Municipal Gateway', status: 'completed' },
