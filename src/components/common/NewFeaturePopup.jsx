@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Sparkles, 
   X, 
@@ -14,27 +14,64 @@ import {
   Clock,
   HeartHandshake
 } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
 
 export default function NewFeaturePopup() {
+  const { user, token } = useApp();
   const [isOpen, setIsOpen] = useState(false);
+  const [countdown, setCountdown] = useState(5);
+  
+  const showTimerRef = useRef(null);
+  const hideTimerRef = useRef(null);
+  const countdownIntervalRef = useRef(null);
 
   useEffect(() => {
+    // Only schedule popup when user is logged in
+    if (!token && !user) return;
+
+    // Check if user already saw the popup in this session
     try {
-      const hasSeen = localStorage.getItem('jansahayak_workforce_preview_seen');
-      if (!hasSeen) {
-        // Show after a subtle delay for smooth entrance
-        const timer = setTimeout(() => {
-          setIsOpen(true);
-        }, 1200);
-        return () => clearTimeout(timer);
-      }
+      const hasSeen = sessionStorage.getItem('jansahayak_workforce_popup_shown');
+      if (hasSeen === 'true') return;
     } catch (e) {}
-  }, []);
+
+    // Wait 1 minute (60,000ms) after login before displaying popup
+    showTimerRef.current = setTimeout(() => {
+      setIsOpen(true);
+      setCountdown(5);
+
+      try {
+        sessionStorage.setItem('jansahayak_workforce_popup_shown', 'true');
+      } catch (e) {}
+
+      // Countdown ticker every 1s
+      let timeLeft = 5;
+      countdownIntervalRef.current = setInterval(() => {
+        timeLeft -= 1;
+        setCountdown(Math.max(0, timeLeft));
+        if (timeLeft <= 0) {
+          clearInterval(countdownIntervalRef.current);
+        }
+      }, 1000);
+
+      // Automatically hide after exactly 5 seconds (5000ms)
+      hideTimerRef.current = setTimeout(() => {
+        setIsOpen(false);
+      }, 5000);
+
+    }, 60000); // 1 minute delay
+
+    return () => {
+      if (showTimerRef.current) clearTimeout(showTimerRef.current);
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+    };
+  }, [user, token]);
 
   const handleClose = () => {
-    try {
-      localStorage.setItem('jansahayak_workforce_preview_seen', 'true');
-    } catch (e) {}
+    if (showTimerRef.current) clearTimeout(showTimerRef.current);
+    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
     setIsOpen(false);
   };
 
@@ -252,18 +289,59 @@ export default function NewFeaturePopup() {
             </div>
           </div>
 
-          {/* Action Footer */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px', paddingTop: '14px', borderTop: '1px solid #E2E8F0' }}>
+          {/* Action Footer & 5s Auto-Dismiss Progress Bar */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            paddingTop: '16px',
+            borderTop: '1px solid #E2E8F0',
+            flexWrap: 'wrap'
+          }}>
+            {/* Countdown Badge & Live Progress Bar */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{
+                fontSize: '11.5px',
+                fontWeight: 700,
+                color: '#0284C7',
+                background: '#E0F2FE',
+                padding: '3px 10px',
+                borderRadius: '999px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}>
+                <Clock size={12} />
+                <span>Auto-closing in {countdown}s</span>
+              </span>
+              <div style={{
+                width: '60px',
+                height: '4px',
+                background: '#E2E8F0',
+                borderRadius: '999px',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  width: `${(countdown / 5) * 100}%`,
+                  height: '100%',
+                  background: '#0284C7',
+                  borderRadius: '999px',
+                  transition: 'width 1s linear'
+                }} />
+              </div>
+            </div>
+
             <button
               onClick={handleClose}
               style={{
-                padding: '10px 22px',
+                padding: '9px 20px',
                 borderRadius: '12px',
                 background: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
                 color: '#FFFFFF',
                 border: 'none',
                 fontWeight: 700,
-                fontSize: '13.5px',
+                fontSize: '13px',
                 cursor: 'pointer',
                 boxShadow: '0 4px 14px rgba(2, 132, 199, 0.3)',
                 display: 'inline-flex',
@@ -275,7 +353,7 @@ export default function NewFeaturePopup() {
               onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >
               <span>Explore Platform</span>
-              <ArrowRight size={15} />
+              <ArrowRight size={14} />
             </button>
           </div>
         </div>
