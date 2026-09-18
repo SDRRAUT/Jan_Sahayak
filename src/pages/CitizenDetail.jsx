@@ -22,6 +22,7 @@ import VisualJourneyTimeline from '../components/common/VisualJourneyTimeline';
 import ResolutionVerificationCard from '../components/common/ResolutionVerificationCard';
 import WhyExplainer from '../components/common/WhyExplainer';
 import ResolutionIntelligenceCard from '../components/common/ResolutionIntelligenceCard';
+import ProblemSpreadMap from '../components/intelligence/ProblemSpreadMap';
 
 export default function CitizenDetail() {
   const { id } = useParams();
@@ -243,6 +244,11 @@ export default function CitizenDetail() {
                 onModify={() => setActionMessage('Citizen suggested custom feedback on the resolution path.')}
                 onRequestMoreEvidence={() => setActionMessage('Citizen requested more diagnostic telemetry.')}
               />
+            </div>
+
+            {/* Geographic Intelligence Engine: Problem Spread & Corridor Progression Map */}
+            <div style={{ marginBottom: '24px' }}>
+              <ProblemSpreadMap incident={item} spreadGeo={item.spreadGeo} />
             </div>
 
             {/* Officer Information Requests & Citizen Clarification Chat */}
