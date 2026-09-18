@@ -62,17 +62,17 @@ export default function SplashScreen({ onStart }) {
       overflow: 'hidden',
       fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
-      {/* Crisp, clear background image with 50% opacity (NO blur) matching onboarding */}
+      {/* Crisp background image with dark vignette overlay for 100% text readability */}
       <div 
         aria-hidden="true"
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: `url(${onboardingBg})`,
+          backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.82) 0%, rgba(15, 23, 42, 0.92) 100%), url(${onboardingBg})`,
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
-          opacity: 0.50,
+          opacity: 0.90,
           zIndex: 1,
           pointerEvents: 'none'
         }} 
@@ -86,7 +86,7 @@ export default function SplashScreen({ onStart }) {
         width: '380px',
         height: '380px',
         borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(0,0,0,0) 70%)',
+        background: 'radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, rgba(0,0,0,0) 70%)',
         filter: 'blur(40px)',
         zIndex: 1,
         pointerEvents: 'none'
@@ -98,22 +98,28 @@ export default function SplashScreen({ onStart }) {
         width: '420px',
         height: '420px',
         borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, rgba(0,0,0,0) 70%)',
+        background: 'radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(0,0,0,0) 70%)',
         filter: 'blur(50px)',
         zIndex: 1,
         pointerEvents: 'none'
       }} />
 
-      {/* Main Brand Card */}
+      {/* Main Brand Glass Card for High-Contrast Readable Text */}
       <div style={{
         position: 'relative',
         zIndex: 2,
-        maxWidth: '540px',
+        maxWidth: '560px',
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        textAlign: 'center'
+        textAlign: 'center',
+        background: 'rgba(15, 23, 42, 0.85)',
+        border: '1px solid rgba(255, 255, 255, 0.18)',
+        backdropFilter: 'blur(24px)',
+        borderRadius: '28px',
+        padding: '36px 32px',
+        boxShadow: '0 25px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(16, 185, 129, 0.12)'
       }}>
         {/* National / Trust Badge */}
         <div style={{
@@ -122,24 +128,24 @@ export default function SplashScreen({ onStart }) {
           gap: '8px',
           padding: '6px 16px',
           borderRadius: '999px',
-          background: 'rgba(255, 255, 255, 0.08)',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
+          background: 'rgba(255, 255, 255, 0.12)',
+          border: '1px solid rgba(255, 255, 255, 0.25)',
           backdropFilter: 'blur(12px)',
-          fontSize: '12px',
-          fontWeight: 600,
-          color: '#E2E8F0',
-          marginBottom: '28px',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
+          fontSize: '12.5px',
+          fontWeight: 700,
+          color: '#FFFFFF',
+          marginBottom: '24px',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
           animation: 'fadeIn 0.8s ease'
         }}>
-          <span style={{ fontSize: '14px' }}>🇮🇳</span>
+          <span style={{ fontSize: '15px' }}>🇮🇳</span>
           <span>Digital India Civic Intelligence Platform</span>
         </div>
 
         {/* Logo Container with Smooth Reveal & Backlight */}
         <div style={{
           position: 'relative',
-          marginBottom: '24px',
+          marginBottom: '20px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center'
@@ -151,7 +157,7 @@ export default function SplashScreen({ onStart }) {
             borderRadius: '50%',
             background: 'conic-gradient(from 0deg, #10B981, #3B82F6, #F59E0B, #10B981)',
             filter: 'blur(20px)',
-            opacity: 0.6,
+            opacity: 0.75,
             animation: 'spin 10s linear infinite'
           }} />
 
@@ -161,8 +167,8 @@ export default function SplashScreen({ onStart }) {
             width: '120px',
             height: '120px',
             borderRadius: '28px',
-            background: 'rgba(255, 255, 255, 0.96)',
-            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.5)',
+            background: 'rgba(255, 255, 255, 0.98)',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.8)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -177,7 +183,7 @@ export default function SplashScreen({ onStart }) {
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
-                filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.12))'
+                filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.15))'
               }}
             />
           </div>
@@ -185,59 +191,63 @@ export default function SplashScreen({ onStart }) {
 
         {/* Platform Title & Slogan */}
         <h1 style={{
-          fontSize: '36px',
-          fontWeight: 800,
+          fontSize: '38px',
+          fontWeight: 900,
           letterSpacing: '-0.03em',
           margin: '0 0 6px 0',
-          background: 'linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
+          color: '#FFFFFF',
+          textShadow: '0 2px 10px rgba(0, 0, 0, 0.6)'
         }}>
           JanSahayak
         </h1>
         <p style={{
-          fontSize: '15px',
-          fontWeight: 500,
+          fontSize: '16px',
+          fontWeight: 700,
           color: '#38BDF8',
-          margin: '0 0 10px 0',
-          letterSpacing: '0.02em'
+          margin: '0 0 12px 0',
+          letterSpacing: '0.02em',
+          textShadow: '0 2px 8px rgba(0, 0, 0, 0.5)'
         }}>
           जन सहायक • Aapki Awaaz, Ab Samjhi Jayegi
         </p>
         <p style={{
-          fontSize: '13.5px',
-          color: '#94A3B8',
-          maxWidth: '420px',
-          lineHeight: 1.5,
-          margin: '0 0 32px 0'
+          fontSize: '15px',
+          color: '#F1F5F9',
+          fontWeight: 500,
+          maxWidth: '460px',
+          lineHeight: 1.55,
+          margin: '0 0 28px 0',
+          textShadow: '0 2px 8px rgba(0, 0, 0, 0.6)'
         }}>
           Empowering citizens with AI problem discovery, instant department routing, and verified resolution tracking.
         </p>
 
         {/* 4-Second Animated Progress Bar */}
-        <div style={{ width: '100%', maxWidth: '380px', marginBottom: '28px' }}>
+        <div style={{ width: '100%', maxWidth: '420px', marginBottom: '28px' }}>
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            fontSize: '11.5px',
-            fontWeight: 600,
-            color: '#94A3B8',
-            marginBottom: '8px'
+            fontSize: '12.5px',
+            fontWeight: 700,
+            color: '#F8FAFC',
+            marginBottom: '8px',
+            textShadow: '0 1px 4px rgba(0,0,0,0.6)'
           }}>
             <span>{getStatusText()}</span>
-            <span style={{ color: isReady ? '#10B981' : '#38BDF8' }}>
+            <span style={{ color: isReady ? '#34D399' : '#38BDF8', fontWeight: 800, fontSize: '13.5px' }}>
               {isReady ? '100%' : `${Math.round(progress)}%`}
             </span>
           </div>
 
           <div style={{
-            height: '6px',
+            height: '8px',
             width: '100%',
-            background: 'rgba(255, 255, 255, 0.12)',
+            background: 'rgba(255, 255, 255, 0.18)',
             borderRadius: '999px',
             overflow: 'hidden',
-            position: 'relative'
+            position: 'relative',
+            border: '1px solid rgba(255, 255, 255, 0.2)'
           }}>
             <div style={{
               height: '100%',
@@ -245,7 +255,7 @@ export default function SplashScreen({ onStart }) {
               background: 'linear-gradient(90deg, #10B981 0%, #3B82F6 50%, #6366F1 100%)',
               borderRadius: '999px',
               transition: 'width 60ms linear',
-              boxShadow: '0 0 12px rgba(59, 130, 246, 0.6)'
+              boxShadow: '0 0 16px rgba(59, 130, 246, 0.8)'
             }} />
           </div>
         </div>
@@ -255,19 +265,19 @@ export default function SplashScreen({ onStart }) {
           type="button"
           onClick={onStart}
           style={{
-            height: '52px',
-            padding: '0 36px',
+            height: '54px',
+            padding: '0 38px',
             borderRadius: '999px',
             background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
             color: '#FFFFFF',
             border: 'none',
-            fontSize: '15px',
-            fontWeight: 700,
+            fontSize: '16px',
+            fontWeight: 800,
             display: 'inline-flex',
             alignItems: 'center',
             gap: '10px',
             cursor: 'pointer',
-            boxShadow: '0 10px 30px rgba(16, 185, 129, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 12px 36px rgba(16, 185, 129, 0.55), 0 0 0 2px rgba(255, 255, 255, 0.3)',
             transform: isReady ? 'scale(1.04)' : 'scale(1)',
             transition: 'all 250ms ease',
             letterSpacing: '-0.01em'
@@ -275,9 +285,9 @@ export default function SplashScreen({ onStart }) {
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.08)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.transform = isReady ? 'scale(1.04)' : 'scale(1)'; }}
         >
-          <Volume2 style={{ width: '18px', height: '18px' }} />
+          <Volume2 style={{ width: '20px', height: '20px' }} />
           <span>Start Platform & Audio Tour</span>
-          <ArrowRight style={{ width: '16px', height: '16px' }} />
+          <ArrowRight style={{ width: '18px', height: '18px' }} />
         </button>
 
         {/* Subtle helper note */}
@@ -285,11 +295,13 @@ export default function SplashScreen({ onStart }) {
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
-          marginTop: '16px',
-          fontSize: '11.5px',
-          color: '#64748B'
+          marginTop: '18px',
+          fontSize: '12.5px',
+          fontWeight: 600,
+          color: '#E2E8F0',
+          textShadow: '0 1px 4px rgba(0,0,0,0.6)'
         }}>
-          <Sparkles style={{ width: '12px', height: '12px', color: '#F59E0B' }} />
+          <Sparkles style={{ width: '14px', height: '14px', color: '#F59E0B' }} />
           <span>Audio narration in Hindi/English will guide your tour</span>
         </div>
       </div>
