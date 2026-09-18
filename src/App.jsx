@@ -21,6 +21,7 @@ import DeptAdmin from './pages/DeptAdmin';
 import SuperAdmin from './pages/SuperAdmin';
 import Onboarding from './pages/Onboarding';
 import JanSahayakAssistant from './components/assistant/JanSahayakAssistant';
+import NewFeaturePopup from './components/common/NewFeaturePopup';
 
 function RoleHome() {
   // Logged-in citizen or officer opening root sees the Home page with their authenticated profile
@@ -245,6 +246,9 @@ export default function App() {
 
       {/* JanSahayak Gemini AI Assistant (Accessible across Citizen, Officer & Admin) */}
       <JanSahayakAssistant />
+
+      {/* First-Time Feature Announcement Popup: Civic Workforce */}
+      <NewFeaturePopup />
     </div>
   );
 }

@@ -1508,13 +1508,13 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
               <div>
                 <span className="category-pill" style={{ background: '#EEF2FF', color: '#4338CA', borderColor: '#C7D2FE', marginBottom: '4px' }}>
-                  PREDICTIVE CIVIC INTELLIGENCE ENGINE
+                  🤖 SMART AI PROBLEM HELPER
                 </span>
                 <h2 style={{ fontSize: '22px', color: 'var(--color-text-primary)', margin: 0 }}>
-                  Macro Civic Insights & Root Cause Correlation
+                  Find The Real Root Cause Behind This Problem
                 </h2>
                 <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '4px 0 0 0' }}>
-                  Synthesizing active case <strong>#{activeItem.id}</strong> with ward sensor telemetry and historical work orders.
+                  Connected with Ward #{activeItem.ward || '14'} reports, sensor checks, and past street history for case <strong>#{activeItem.id}</strong>.
                 </p>
               </div>
 
@@ -1545,8 +1545,8 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
             {/* 5. Active Case Grievance DNA */}
             <div className="card" style={{ padding: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-                <h3 style={{ fontSize: '16px', margin: 0 }}>Grievance DNA & Semantic Feature Vector</h3>
-                <span style={{ fontSize: '11px', color: '#059669', fontWeight: 700 }}>Embeddings Model: All-MiniLM-L6-v2</span>
+                <h3 style={{ fontSize: '16px', margin: 0 }}>🧬 Problem Breakdown & Key Details</h3>
+                <span style={{ fontSize: '11px', color: '#059669', fontWeight: 700 }}>AI Grouped Similar Neighbor Reports</span>
               </div>
               <GrievanceDnaCard dna={activeItem.grievanceDna} compact={false} />
             </div>
@@ -1866,7 +1866,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 {/* Deep Sub-Tabs */}
                 <div style={{ display: 'flex', gap: '6px', borderBottom: '1px solid var(--color-divider)', paddingBottom: '8px', marginBottom: '18px', flexWrap: 'wrap' }}>
                   {[
-                    { id: 'recommendation', label: 'Resolution Intelligence' },
+                    { id: 'recommendation', label: '💡 Smart Action Plan (AI)' },
                     { id: 'brief', label: 'Citizen Report & DNA' },
                     { id: 'evidence', label: 'Field Evidence & Photos' },
                     { id: 'duplicates', label: `Duplicate Review (${liveAnalysis.duplicateCandidates?.length || 0})` },

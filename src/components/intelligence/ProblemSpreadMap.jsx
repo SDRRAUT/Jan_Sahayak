@@ -110,11 +110,11 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
               gap: '4px'
             }}>
               <Compass style={{ width: '12px', height: '12px' }} />
-              DSSDI Municipal GIS Engine
+              📍 LIVE PROBLEM MAP
             </span>
           </div>
           <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary, #0F172A)', marginTop: '4px', margin: 0 }}>
-            Problem Spread & Corridor Progression Map
+            Where The Problem Started & Where It Is Spreading
           </h3>
         </div>
 
@@ -148,7 +148,7 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
                 transition: 'all 150ms ease'
               }}
             >
-              <span>🗺️ GIS Street Map</span>
+              <span>🗺️ Street Map</span>
             </button>
             <button
               type="button"
@@ -168,7 +168,7 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
                 transition: 'all 150ms ease'
               }}
             >
-              <span>🛰️ Real Satellite</span>
+              <span>🛰️ Satellite View</span>
             </button>
           </div>
 
@@ -189,7 +189,7 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
                 boxShadow: activeLayer === 'spread' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
               }}
             >
-              Temporal Spread
+              Day-by-Day Spread
             </button>
             <button
               type="button"
@@ -206,7 +206,7 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
                 boxShadow: activeLayer === 'signals' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
               }}
             >
-              Citizen Signals
+              Citizen Complaints
             </button>
             <button
               type="button"
@@ -223,7 +223,7 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
                 boxShadow: activeLayer === 'cluster' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
               }}
             >
-              Cluster Boundary
+              Affected Area
             </button>
           </div>
         </div>
@@ -234,7 +234,7 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <Clock style={{ width: '14px', height: '14px', color: 'var(--color-text-muted, #64748B)' }} />
           <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--color-text-muted, #64748B)' }}>
-            Temporal Progression:
+            Timeline:
           </span>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
             {dataPoints.map((dp, idx) => (
@@ -736,11 +736,11 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <ShieldCheck style={{ width: '14px', height: '14px', color: '#0E5E3A' }} />
-          <span><strong>Privacy Protected:</strong> Coordinates aggregated at 100m corridor resolution to safeguard citizen privacy.</span>
+          <span><strong>🔒 Citizen Privacy Protected:</strong> Exact house numbers are hidden to protect privacy. Complaints are shown by street area.</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{ fontSize: '11px', color: '#64748B' }}>
-            Basemap: <strong>{mapMode === 'satellite' ? 'Real High-Res Satellite Imagery' : 'DSSDI Municipal GIS Vector Basemap'}</strong>
+            Map View: <strong>{mapMode === 'satellite' ? 'Satellite Photo' : 'Street Map'}</strong>
           </span>
           <span style={{ fontFamily: 'var(--font-mono, monospace)', fontWeight: 700, color: '#0F172A' }}>
             Lat: {currentPoint.lat.toFixed(4)}, Lng: {currentPoint.lng.toFixed(4)}

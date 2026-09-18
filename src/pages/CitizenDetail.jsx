@@ -14,7 +14,12 @@ import {
   Send,
   AlertCircle,
   HelpCircle,
-  Camera
+  Camera,
+  Layers,
+  Sparkles,
+  ExternalLink,
+  ChevronRight,
+  User
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import GrievanceDnaCard from '../components/common/GrievanceDnaCard';
@@ -41,40 +46,85 @@ export default function CitizenDetail() {
 
   const priorityReasons = [
     'Hazard severity classified from citizen verbatim text',
-    `Location in ${item.location?.ward || 'Ward 14'} under active priority watch`,
+    `Location in ${item.location?.ward || 'Ward 22 (Mayur Vihar Ph-1)'} under active priority watch`,
     'Response SLA target calculated from municipal guidelines'
   ];
 
   return (
-    <div className="section-spacing" style={{ paddingTop: '24px' }}>
-      <div className="container">
-        {/* Navigation back bar */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+    <div className="section-spacing" style={{ paddingTop: '20px', paddingBottom: '60px' }}>
+      <div className="container" style={{ maxWidth: '1280px' }}>
+        {/* Navigation & Action Bar */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '20px',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
           <Link
             to="/citizen"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
               fontSize: '13px',
-              fontWeight: 600,
-              color: 'var(--color-primary)'
+              fontWeight: 700,
+              color: '#0284C7',
+              background: '#F0F9FF',
+              padding: '6px 14px',
+              borderRadius: '999px',
+              border: '1px solid #BAE6FD',
+              textDecoration: 'none',
+              transition: 'all 0.2s ease'
             }}
           >
-            <ArrowLeft style={{ width: '16px', height: '16px' }} />
+            <ArrowLeft style={{ width: '15px', height: '15px' }} />
             <span>Back to Citizen Portal</span>
           </Link>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span className="font-mono-numbers" style={{ fontSize: '12px', padding: '4px 12px', borderRadius: 'var(--radius-full)', background: '#F1F5F9', color: 'var(--color-text-secondary)' }}>
-              Ticket: {item.id}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{
+              fontSize: '12px',
+              fontWeight: 700,
+              fontFamily: 'var(--font-mono, monospace)',
+              padding: '6px 14px',
+              borderRadius: '999px',
+              background: '#F1F5F9',
+              border: '1px solid #E2E8F0',
+              color: '#334155'
+            }}>
+              Ticket #{item.id}
             </span>
             <button
               onClick={() => upvoteGrievance(item.id)}
-              className="btn-secondary btn-sm"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#FFFFFF',
+                border: '1.5px solid #E2E8F0',
+                padding: '6px 14px',
+                borderRadius: '999px',
+                fontSize: '12.5px',
+                fontWeight: 700,
+                color: '#0F172A',
+                cursor: 'pointer',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#0284C7';
+                e.currentTarget.style.color = '#0284C7';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#E2E8F0';
+                e.currentTarget.style.color = '#0F172A';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
             >
-              <ThumbsUp style={{ width: '13px', height: '13px' }} />
+              <ThumbsUp style={{ width: '13px', height: '13px', color: '#0284C7' }} />
               <span>Upvote ({item.upvotes || 1})</span>
             </button>
           </div>
@@ -82,13 +132,26 @@ export default function CitizenDetail() {
 
         {/* Action Alert Banner if present */}
         {actionMessage && (
-          <div style={{ padding: '12px 16px', borderRadius: 'var(--radius-md)', background: '#ECFDF5', border: '1px solid #A7F3D0', color: '#065F46', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-            <CheckCircle2 style={{ width: '16px', height: '16px' }} />
+          <div style={{
+            padding: '12px 18px',
+            borderRadius: '12px',
+            background: '#ECFDF5',
+            border: '1.5px solid #A7F3D0',
+            color: '#065F46',
+            fontSize: '13.5px',
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            marginBottom: '20px',
+            boxShadow: '0 2px 8px rgba(16, 185, 129, 0.1)'
+          }}>
+            <CheckCircle2 style={{ width: '18px', height: '18px', color: '#059669', flexShrink: 0 }} />
             <span>{actionMessage}</span>
           </div>
         )}
 
-        {/* 6-Stage Visual Journey Stepper (Section 19) */}
+        {/* 6-Stage Visual Journey Stepper */}
         <div style={{ marginBottom: '24px' }}>
           <VisualJourneyTimeline
             status={item.status}
@@ -102,13 +165,13 @@ export default function CitizenDetail() {
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(12, 1fr)',
-          gap: '32px',
+          gap: '24px',
           alignItems: 'start'
         }}>
           {/* Left Column (7 Cols): Grievance Detail & Actions */}
           <div style={{ gridColumn: 'span 7' }} className="hero-left-col">
             
-            {/* Closed Loop Resolution Verification (Section 20 & 26) */}
+            {/* Closed Loop Resolution Verification */}
             {(item.status === 'RESOLVED' || item.status === 'RESOLVED_CONFIRMED' || item.status === 'DISPUTE_REOPENED') && (
               <div style={{ marginBottom: '24px' }}>
                 <ResolutionVerificationCard
@@ -130,18 +193,37 @@ export default function CitizenDetail() {
             )}
 
             {/* Main Grievance Information Card */}
-            <div className="card" style={{ padding: '32px', marginBottom: '24px' }}>
+            <div style={{
+              background: '#FFFFFF',
+              borderRadius: '18px',
+              border: '1.5px solid #E2E8F0',
+              padding: '28px',
+              marginBottom: '24px',
+              boxShadow: '0 4px 20px -4px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(0, 0, 0, 0.03)'
+            }}>
               {/* Header Tags & Priority */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
-                <span className="category-pill">{item.department}</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{
+                  padding: '4px 12px',
+                  borderRadius: '999px',
+                  fontSize: '11.5px',
+                  fontWeight: 700,
+                  background: '#F0F9FF',
+                  border: '1px solid #BAE6FD',
+                  color: '#0369A1'
+                }}>
+                  {item.department}
+                </span>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{
                     padding: '4px 10px',
-                    borderRadius: 'var(--radius-full)',
-                    fontSize: '11px',
+                    borderRadius: '999px',
+                    fontSize: '11.5px',
                     fontWeight: 700,
                     background: item.status === 'RESOLVED' || item.status === 'RESOLVED_CONFIRMED' ? '#ECFDF5' : (item.urgency === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB'),
-                    color: item.status === 'RESOLVED' || item.status === 'RESOLVED_CONFIRMED' ? '#065F46' : (item.urgency === 'CRITICAL' ? '#991B1B' : '#92400E')
+                    color: item.status === 'RESOLVED' || item.status === 'RESOLVED_CONFIRMED' ? '#065F46' : (item.urgency === 'CRITICAL' ? '#991B1B' : '#92400E'),
+                    border: `1px solid ${item.status === 'RESOLVED' || item.status === 'RESOLVED_CONFIRMED' ? '#A7F3D0' : (item.urgency === 'CRITICAL' ? '#FECACA' : '#FDE68A')}`
                   }}>
                     ● {item.urgency || 'HIGH'} Priority
                   </span>
@@ -152,38 +234,48 @@ export default function CitizenDetail() {
                     align="left"
                   />
                 </div>
-                <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginLeft: 'auto' }}>
+
+                <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 500, marginLeft: 'auto' }}>
                   Logged: {item.createdAt}
                 </span>
               </div>
 
               {/* Title */}
-              <h1 style={{ fontSize: '24px', lineHeight: 1.3, marginBottom: '16px', color: 'var(--color-text-primary)' }}>
+              <h1 style={{ fontSize: '22px', fontWeight: 800, lineHeight: 1.35, marginBottom: '16px', color: '#0F172A' }}>
                 {item.title}
               </h1>
 
               {/* Raw Citizen Submission */}
               <div style={{
-                padding: '16px',
-                borderRadius: 'var(--radius-md)',
-                background: '#F8F9FA',
-                border: '1px solid var(--color-border-subtle)',
+                padding: '18px 20px',
+                borderRadius: '14px',
+                background: 'linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%)',
+                border: '1.5px solid #E2E8F0',
                 marginBottom: '20px'
               }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
-                  Citizen Report ({item.languageDetected || 'Multilingual'}):
-                </span>
-                <p style={{ fontSize: '14px', lineHeight: 1.6, color: 'var(--color-text-primary)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B' }}>
+                    Citizen Report ({item.languageDetected || 'Hinglish (Confidence 99%)'}):
+                  </span>
+                  <span style={{ fontSize: '10.5px', fontWeight: 600, color: '#0284C7', background: '#E0F2FE', padding: '2px 8px', borderRadius: '6px' }}>
+                    Original Text Verified
+                  </span>
+                </div>
+
+                <p style={{ fontSize: '14px', lineHeight: 1.6, color: '#1E293B', fontWeight: 500, margin: '0 0 12px 0' }}>
                   "{item.descriptionRaw}"
                 </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '12px', fontSize: '12px', color: 'var(--color-text-secondary)', flexWrap: 'wrap' }}>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <MapPin style={{ width: '13px', height: '13px', color: 'var(--color-primary)' }} />
-                    {item.location?.area || 'Local Area'}, {item.location?.ward || 'Ward Area'}
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px', color: '#475569', flexWrap: 'wrap', paddingTop: '10px', borderTop: '1px solid #E2E8F0' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontWeight: 600 }}>
+                    <MapPin style={{ width: '14px', height: '14px', color: '#0284C7' }} />
+                    {item.location?.area || 'Sector 6 DDA Market Complex'}, {item.location?.ward || 'Ward 22 (Mayur Vihar Ph-1)'}
                   </span>
-                  <span>PIN: {item.location?.pincode || '110085'}</span>
+                  <span style={{ background: '#FFFFFF', padding: '2px 8px', borderRadius: '6px', border: '1px solid #E2E8F0', fontWeight: 600 }}>
+                    PIN: {item.location?.pincode || '110091'}
+                  </span>
                   {item.location?.lat && (
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px' }}>
+                    <span style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '11.5px', color: '#0369A1', background: '#F0F9FF', padding: '2px 8px', borderRadius: '6px', border: '1px solid #BAE6FD' }}>
                       📍 {Number(item.location.lat).toFixed(4)}, {Number(item.location.lng).toFixed(4)}
                     </span>
                   )}
@@ -199,26 +291,26 @@ export default function CitizenDetail() {
                   marginBottom: '16px'
                 }}>
                   {item.evidence?.photoUrl && (
-                    <div style={{ border: '1px solid var(--color-border-subtle)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-                      <span style={{ display: 'block', padding: '6px 10px', background: '#F1F5F9', fontSize: '11px', fontWeight: 700, color: 'var(--color-text-secondary)' }}>
+                    <div style={{ border: '1.5px solid #E2E8F0', borderRadius: '14px', overflow: 'hidden', background: '#FFFFFF' }}>
+                      <span style={{ display: 'block', padding: '8px 12px', background: '#F8FAFC', borderBottom: '1px solid #E2E8F0', fontSize: '11.5px', fontWeight: 700, color: '#475569' }}>
                         Original Problem Evidence
                       </span>
-                      <img src={item.evidence.photoUrl} alt="Reported problem" style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
+                      <img src={item.evidence.photoUrl} alt="Reported problem" style={{ width: '100%', height: '170px', objectFit: 'cover' }} />
                     </div>
                   )}
                   {item.resolutionPhotoUrl && (
-                    <div style={{ border: '1px solid #BBF7D0', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-                      <span style={{ display: 'block', padding: '6px 10px', background: '#F0FDF4', fontSize: '11px', fontWeight: 700, color: '#166534' }}>
+                    <div style={{ border: '1.5px solid #BBF7D0', borderRadius: '14px', overflow: 'hidden', background: '#FFFFFF' }}>
+                      <span style={{ display: 'block', padding: '8px 12px', background: '#F0FDF4', borderBottom: '1px solid #BBF7D0', fontSize: '11.5px', fontWeight: 700, color: '#166534' }}>
                         Officer Field Completion Photo
                       </span>
-                      <img src={item.resolutionPhotoUrl} alt="Resolution work" style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
+                      <img src={item.resolutionPhotoUrl} alt="Resolution work" style={{ width: '100%', height: '170px', objectFit: 'cover' }} />
                     </div>
                   )}
                 </div>
               )}
             </div>
 
-            {/* AI Resolution Intelligence Card (Section 24) */}
+            {/* AI Resolution Intelligence Card */}
             <div style={{ marginBottom: '24px' }}>
               <ResolutionIntelligenceCard
                 title="RESOLUTION INTELLIGENCE"
@@ -226,14 +318,14 @@ export default function CitizenDetail() {
                 standardOperatingProcedure={item.recommendedResolution?.standardOperatingProcedure || "Municipal Standard Operating Procedure Sec-4B"}
                 estimatedDuration="6 Hours"
                 whyPoints={[
-                  `${item.clusterCount || 12} similar complaints recorded in ${item.location?.ward || 'this ward'}`,
+                  `${item.clusterCount || 11} similar complaints recorded in ${item.location?.ward || 'Ward 22 (Mayur Vihar Ph-1)'}`,
                   "Nearby locations experiencing secondary overflow",
                   "Previous related municipal repairs logged in knowledge base",
                   "Relevant engineering standard operating procedure verified",
                   "Location clustering pattern identified across adjacent corridors"
                 ]}
                 supportingEvidence={[
-                  { label: `${item.clusterCount || 12} Similar Cases`, tag: item.location?.ward || 'Ward Area' },
+                  { label: `${item.clusterCount || 11} Similar Cases`, tag: item.location?.ward || 'Ward 22 (Mayur Vihar Ph-1)' },
                   { label: "Relevant Policy", tag: "SOP Sec-4B" },
                   { label: "Previous Resolution", tag: "Case #JS-0891" },
                   { label: "Location Pattern", tag: "Flow Telemetry" }
@@ -246,23 +338,19 @@ export default function CitizenDetail() {
               />
             </div>
 
-            {/* Geographic Intelligence Engine: Problem Spread & Corridor Progression Map */}
-            <div style={{ marginBottom: '24px' }}>
-              <ProblemSpreadMap incident={item} spreadGeo={item.spreadGeo} />
-            </div>
-
             {/* Officer Information Requests & Citizen Clarification Chat */}
             {item.informationRequests && item.informationRequests.length > 0 && (
               <div style={{
-                padding: '24px',
-                borderRadius: 'var(--radius-lg)',
+                padding: '22px',
+                borderRadius: '16px',
                 background: '#FFFBEB',
-                border: '1px solid #FDE68A',
-                marginBottom: '24px'
+                border: '1.5px solid #FDE68A',
+                marginBottom: '24px',
+                boxShadow: '0 2px 8px rgba(245, 158, 11, 0.06)'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: '#B45309' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px', color: '#B45309' }}>
                   <HelpCircle style={{ width: '18px', height: '18px' }} />
-                  <strong style={{ fontSize: '15px' }}>Clarification Requested by Officer</strong>
+                  <strong style={{ fontSize: '14.5px', fontWeight: 800 }}>Clarification Requested by Officer</strong>
                 </div>
 
                 {item.informationRequests.map((req, i) => (
@@ -273,7 +361,7 @@ export default function CitizenDetail() {
                     </p>
 
                     {req.response ? (
-                      <div style={{ padding: '10px 14px', borderRadius: '6px', background: '#FFFFFF', border: '1px solid #FCD34D', fontSize: '13px', color: '#92400E' }}>
+                      <div style={{ padding: '10px 14px', borderRadius: '10px', background: '#FFFFFF', border: '1px solid #FCD34D', fontSize: '13px', color: '#92400E' }}>
                         <strong>Your Reply: </strong> {req.response} ({req.answeredAt})
                       </div>
                     ) : (
@@ -285,19 +373,32 @@ export default function CitizenDetail() {
                           placeholder="Type your clarification for the officer..."
                           style={{
                             flex: 1,
-                            height: '40px',
-                            borderRadius: 'var(--radius-sm)',
-                            border: '1px solid #FCD34D',
-                            padding: '0 12px',
-                            fontSize: '13px',
-                            background: '#FFFFFF'
+                            height: '42px',
+                            borderRadius: '10px',
+                            border: '1.5px solid #FCD34D',
+                            padding: '0 14px',
+                            fontSize: '13.5px',
+                            background: '#FFFFFF',
+                            outline: 'none'
                           }}
                         />
                         <button
                           type="button"
                           onClick={() => handleSendClarification(req.id)}
-                          className="btn-primary btn-sm"
-                          style={{ height: '40px', background: '#B45309' }}
+                          style={{
+                            height: '42px',
+                            padding: '0 16px',
+                            borderRadius: '10px',
+                            background: '#B45309',
+                            color: '#FFFFFF',
+                            border: 'none',
+                            fontWeight: 700,
+                            fontSize: '13px',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                          }}
                         >
                           <Send style={{ width: '13px', height: '13px' }} />
                           <span>Reply</span>
@@ -310,110 +411,209 @@ export default function CitizenDetail() {
             )}
 
             {/* WhatsApp/SMS Broadcast Feed */}
-            <div className="card" style={{ padding: '24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-                <div className="icon-squircle" style={{ width: '32px', height: '32px' }}>
-                  <MessageSquare style={{ width: '16px', height: '16px' }} />
+            <div style={{
+              background: '#FFFFFF',
+              borderRadius: '18px',
+              border: '1.5px solid #E2E8F0',
+              padding: '24px',
+              boxShadow: '0 4px 20px -4px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(0, 0, 0, 0.03)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+                <div style={{
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '10px',
+                  background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#FFFFFF',
+                  boxShadow: '0 2px 8px rgba(5, 150, 105, 0.25)'
+                }}>
+                  <MessageSquare style={{ width: '17px', height: '17px' }} />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '15px', color: 'var(--color-text-primary)' }}>Official Citizen Updates</h3>
-                  <p style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Plain-language dispatches sent to {item.citizenPhone}</p>
+                  <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', margin: 0 }}>Official Citizen Updates</h3>
+                  <p style={{ fontSize: '12px', color: '#64748B', margin: '2px 0 0 0' }}>Plain-language dispatches sent to <strong>{item.citizenPhone || '+91 99532-88712'}</strong></p>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {/* WhatsApp Broadcast */}
                 <div style={{
-                  padding: '12px 14px',
-                  borderRadius: 'var(--radius-md)',
-                  background: '#F0FDF4',
-                  border: '1px solid #DCFCE7',
-                  fontSize: '13px',
+                  padding: '14px 16px',
+                  borderRadius: '14px',
+                  background: 'linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%)',
+                  border: '1.5px solid #BBF7D0',
+                  fontSize: '13.5px',
                   lineHeight: 1.5,
-                  color: '#166534'
+                  color: '#14532D'
                 }}>
-                  <strong style={{ display: 'block', fontSize: '11px', color: '#15803D', marginBottom: '2px' }}>
-                    WhatsApp Broadcast (Hindi)
-                  </strong>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <strong style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#15803D' }}>
+                      WhatsApp Broadcast (Hindi)
+                    </strong>
+                    <span style={{ fontSize: '10.5px', fontWeight: 600, color: '#059669', background: '#DCFCE7', padding: '1px 6px', borderRadius: '4px' }}>
+                      Delivered
+                    </span>
+                  </div>
                   "{item.recommendedResolution?.citizenDraftHindi || 'आपकी शिकायत पर कार्यवाही शुरू कर दी गई है।'}"
                 </div>
 
+                {/* SMS Broadcast */}
                 <div style={{
-                  padding: '12px 14px',
-                  borderRadius: 'var(--radius-md)',
-                  background: '#F8F9FA',
-                  border: '1px solid var(--color-border-subtle)',
-                  fontSize: '13px',
+                  padding: '14px 16px',
+                  borderRadius: '14px',
+                  background: 'linear-gradient(135deg, #F0F9FF 0%, #EFF6FF 100%)',
+                  border: '1.5px solid #BFDBFE',
+                  fontSize: '13.5px',
                   lineHeight: 1.5,
-                  color: 'var(--color-text-secondary)'
+                  color: '#1E3A8A'
                 }}>
-                  <strong style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '2px' }}>
-                    SMS Notification (English)
-                  </strong>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <strong style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#2563EB' }}>
+                      SMS Notification (English)
+                    </strong>
+                    <span style={{ fontSize: '10.5px', fontWeight: 600, color: '#2563EB', background: '#DBEAFE', padding: '1px 6px', borderRadius: '4px' }}>
+                      Sent
+                    </span>
+                  </div>
                   "{item.recommendedResolution?.citizenDraftEnglish || 'Field crew dispatched for grievance inspection.'}"
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column (5 Cols): Grievance DNA & Assigned Officer */}
+          {/* Right Column (5 Cols): Grievance DNA, Assigned Officer, and Problem Spread GIS Map */}
           <div style={{ gridColumn: 'span 5' }} className="hero-right-col">
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               {/* Grievance DNA Component with Progressive Disclosure */}
               <div>
-                <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-primary)', display: 'block', marginBottom: '10px' }}>
+                <span style={{
+                  fontSize: '11.5px',
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  color: '#0284C7',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  marginBottom: '10px'
+                }}>
+                  <Sparkles size={14} />
                   Underlying Intelligence
                 </span>
                 <GrievanceDnaCard dna={item.grievanceDna} compact={false} />
               </div>
 
+              {/* Geographic Intelligence Engine: Problem Spread & Corridor Progression Map */}
+              <div>
+                <ProblemSpreadMap incident={item} spreadGeo={item.spreadGeo} />
+              </div>
+
               {/* Assigned Public Authority Card */}
-              <div className="card" style={{ padding: '24px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-text-muted)', display: 'block', marginBottom: '12px' }}>
+              <div style={{
+                background: '#FFFFFF',
+                borderRadius: '18px',
+                border: '1.5px solid #E2E8F0',
+                padding: '24px',
+                boxShadow: '0 4px 20px -4px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(0, 0, 0, 0.03)'
+              }}>
+                <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#64748B', display: 'block', marginBottom: '14px' }}>
                   Assigned Public Authority
                 </span>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '18px' }}>
                   <div style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '50%',
-                    background: 'var(--color-primary)',
+                    width: '46px',
+                    height: '46px',
+                    borderRadius: '14px',
+                    background: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
                     color: '#FFFFFF',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontWeight: 700,
-                    fontSize: '15px'
+                    fontWeight: 800,
+                    fontSize: '16px',
+                    boxShadow: '0 4px 12px rgba(2, 132, 199, 0.3)'
                   }}>
-                    {item.officerName ? item.officerName.substring(3, 5) : 'EE'}
+                    {item.officerName ? item.officerName.substring(3, 5) : 'TY'}
                   </div>
                   <div>
-                    <h3 style={{ fontSize: '15px', color: 'var(--color-text-primary)' }}>{item.officerName}</h3>
-                    <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', display: 'block' }}>{item.officerDesignation}</span>
-                    <span style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: 600 }}>{item.department}</span>
+                    <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                      {item.officerName || 'Dr. K. S. Tyagi'}
+                    </h3>
+                    <span style={{ fontSize: '12px', color: '#475569', display: 'block', marginTop: '2px' }}>
+                      {item.officerDesignation || 'Superintending Engineer'}
+                    </span>
+                    <span style={{ fontSize: '11px', color: '#0284C7', fontWeight: 700 }}>
+                      {item.department}
+                    </span>
                   </div>
                 </div>
 
-                <div style={{ padding: '10px 14px', borderRadius: 'var(--radius-md)', background: '#F8F9FA', fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span>Target Resolution SLA:</span>
-                    <strong className="font-mono-numbers">{item.slaDeadline}</strong>
+                {/* SLA Meter */}
+                <div style={{
+                  padding: '14px 16px',
+                  borderRadius: '14px',
+                  background: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  fontSize: '12.5px',
+                  color: '#334155',
+                  lineHeight: 1.5,
+                  marginBottom: '16px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ color: '#64748B', fontWeight: 600 }}>Target Resolution SLA:</span>
+                    <strong style={{ fontFamily: 'var(--font-mono, monospace)', color: '#0F172A' }}>{item.slaDeadline || '18/9/2026, 06:47 pm'}</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>SLA Window Left:</span>
-                    <strong className="font-mono-numbers" style={{ color: item.slaHoursLeft < 6 ? '#EF4444' : '#10B981' }}>
-                      {item.slaHoursLeft} Hours
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                    <span style={{ color: '#64748B', fontWeight: 600 }}>SLA Window Left:</span>
+                    <strong style={{
+                      fontFamily: 'var(--font-mono, monospace)',
+                      fontWeight: 800,
+                      color: item.slaHoursLeft < 6 ? '#DC2626' : '#059669',
+                      background: item.slaHoursLeft < 6 ? '#FEF2F2' : '#ECFDF5',
+                      padding: '1px 8px',
+                      borderRadius: '6px'
+                    }}>
+                      {item.slaHoursLeft || 18} Hours
                     </strong>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div style={{ width: '100%', height: '6px', background: '#E2E8F0', borderRadius: '999px', overflow: 'hidden' }}>
+                    <div style={{
+                      width: '65%',
+                      height: '100%',
+                      background: item.slaHoursLeft < 6 ? '#EF4444' : 'linear-gradient(90deg, #10B981 0%, #0284C7 100%)',
+                      borderRadius: '999px'
+                    }} />
                   </div>
                 </div>
 
                 {user && user.role !== 'citizen' && (
                   <Link
                     to={`/officer/complaints/${item.id}`}
-                    className="btn-secondary btn-sm"
-                    style={{ width: '100%', justifyContent: 'center' }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      width: '100%',
+                      padding: '10px',
+                      borderRadius: '10px',
+                      background: '#F1F5F9',
+                      color: '#0F172A',
+                      fontWeight: 700,
+                      fontSize: '12.5px',
+                      textDecoration: 'none',
+                      border: '1px solid #E2E8F0',
+                      transition: 'all 0.2s ease'
+                    }}
                   >
-                    View in Officer Workspace
+                    <span>View in Officer Workspace</span>
+                    <ChevronRight size={14} />
                   </Link>
                 )}
               </div>
@@ -424,3 +624,4 @@ export default function CitizenDetail() {
     </div>
   );
 }
+
