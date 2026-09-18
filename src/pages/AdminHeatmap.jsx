@@ -243,12 +243,21 @@ export default function AdminHeatmap() {
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                {/* Background gridlines */}
+                {/* Real Cartographic GIS Basemap Image */}
                 <div style={{
                   position: 'absolute',
                   inset: 0,
-                  backgroundImage: 'radial-gradient(rgba(16, 185, 129, 0.2) 1px, transparent 1px)',
-                  backgroundSize: '24px 24px'
+                  backgroundImage: 'url("/delhi-gis-map-dark.jpg")',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  opacity: 0.88,
+                  filter: 'brightness(0.92) contrast(1.08)'
+                }} />
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'radial-gradient(ellipse at center, rgba(11, 25, 20, 0.2) 0%, rgba(11, 25, 20, 0.7) 100%)',
+                  pointerEvents: 'none'
                 }} />
 
                 {/* Simulated Ward Zones */}
