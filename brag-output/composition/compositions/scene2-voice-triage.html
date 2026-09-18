@@ -1,0 +1,131 @@
+<template id="scene2-voice-triage-template">
+  <div
+    data-composition-id="scene2-voice-triage"
+    data-width="1920"
+    data-height="1080"
+    data-duration="5.2"
+    class="scene-inner"
+  >
+    <div class="scene-header">
+      <div class="badge primary-badge">STAGE 01 • INTELLIGENT INTAKE</div>
+      <h1 class="headline-primary">Citizen Voice to AI Grievance DNA™</h1>
+      <p class="subheadline">Speak naturally in your own mother tongue. No portal bureaucracy, no forms.</p>
+    </div>
+
+    <div class="voice-triage-container">
+      <!-- Audio Input Live Card -->
+      <div id="voice-input-card" class="glass-card voice-card">
+        <div class="card-top-bar">
+          <div class="mic-pulsar">
+            <span class="mic-dot"></span>
+            <span class="mic-label">AUDIO INPUT DETECTED (HINGLISH)</span>
+          </div>
+          <div class="rec-time">00:04.8</div>
+        </div>
+
+        <!-- Dynamic Waveform Bars -->
+        <div class="waveform-visualizer" id="s2Waveform">
+          <div class="wave-bar active" style="height: 45px;"></div>
+          <div class="wave-bar active" style="height: 60px;"></div>
+          <div class="wave-bar" style="height: 25px;"></div>
+          <div class="wave-bar active" style="height: 55px;"></div>
+          <div class="wave-bar active" style="height: 70px;"></div>
+          <div class="wave-bar" style="height: 30px;"></div>
+          <div class="wave-bar active" style="height: 65px;"></div>
+          <div class="wave-bar active" style="height: 50px;"></div>
+          <div class="wave-bar active" style="height: 75px;"></div>
+          <div class="wave-bar" style="height: 20px;"></div>
+          <div class="wave-bar active" style="height: 58px;"></div>
+          <div class="wave-bar active" style="height: 64px;"></div>
+          <div class="wave-bar" style="height: 32px;"></div>
+          <div class="wave-bar active" style="height: 48px;"></div>
+          <div class="wave-bar active" style="height: 72px;"></div>
+          <div class="wave-bar active" style="height: 55px;"></div>
+        </div>
+
+        <!-- Live Audio Speech Transcript -->
+        <div class="transcript-box">
+          <span class="transcript-prefix">Citizen Audio:</span>
+          <span class="transcript-text">"Bhai pichle 3 din se Rohini Sector 14 mein naali ka ganda paani supply mein aa raha hai aur sadak par bohot bada gaddha dhas gaya hai..."</span>
+        </div>
+      </div>
+
+      <!-- Arrow Connection Pulse -->
+      <div id="voice-arrow-connector" class="connection-arrow">
+        <div class="arrow-line"></div>
+        <div class="ai-processing-pill">AI TRIAGE • 0.3s</div>
+      </div>
+
+      <!-- AI Grievance DNA™ Extraction Card -->
+      <div id="dna-diagnostic-card" class="glass-card dna-card">
+        <div class="dna-header">
+          <div class="dna-title">
+            <span class="dna-sparkle">✨</span>
+            <span>Grievance DNA™ Diagnostic Brief</span>
+          </div>
+          <div class="confidence-tag">98.4% CONFIDENCE</div>
+        </div>
+
+        <div class="dna-grid">
+          <div class="dna-item">
+            <label>INFERRED CATEGORY</label>
+            <div class="dna-value text-amber">Water Contamination & Subsidence</div>
+          </div>
+          <div class="dna-item">
+            <label>JURISDICTION / WARD</label>
+            <div class="dna-value">Ward 14 (Rohini Sector 14)</div>
+          </div>
+          <div class="dna-item">
+            <label>PRIMARY DEPT</label>
+            <div class="dna-value text-blue">Delhi Jal Board + PWD</div>
+          </div>
+          <div class="dna-item">
+            <label>MANDATORY SLA</label>
+            <div class="dna-value text-green font-mono">24:00:00 [COUNTDOWN LOCKED]</div>
+          </div>
+        </div>
+
+        <div class="dna-footer">
+          <div class="officer-auto-assigned">
+            <span class="officer-avatar">👨‍💼</span>
+            <span>Assigned Lead: <strong>Er. Sanjay Sharma (AEE)</strong></span>
+          </div>
+          <div class="token-hash">SHA256://8a9f...e10b</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const tl = gsap.timeline({ paused: true });
+
+        // Fade & slide in Voice Card
+        tl.fromTo(
+          "#voice-input-card",
+          { opacity: 0, x: -40 },
+          { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" },
+          0.2
+        );
+
+        // Connector pulses in
+        tl.fromTo(
+          "#voice-arrow-connector",
+          { opacity: 0, scale: 0.8 },
+          { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out" },
+          1.0
+        );
+
+        // DNA Card pops in with confidence
+        tl.fromTo(
+          "#dna-diagnostic-card",
+          { opacity: 0, x: 40, scale: 0.95 },
+          { opacity: 1, x: 0, scale: 1, duration: 0.7, ease: "back.out(1.4)" },
+          1.6
+        );
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines["scene2-voice-triage"] = tl;
+      })();
+    </script>
+  </div>
+</template>

@@ -1,0 +1,119 @@
+<template id="scene4-field-action-template">
+  <div
+    data-composition-id="scene4-field-action"
+    data-width="1920"
+    data-height="1080"
+    data-duration="5.0"
+    class="scene-inner"
+  >
+    <div class="scene-header">
+      <div class="badge green-badge">STAGE 03 • CLOSED-LOOP RESOLUTION</div>
+      <h1 class="headline-green">Autonomous Dispatch. Verified Field Closure.</h1>
+      <p class="subheadline">Government officers get structured SOP briefs. Citizens verify actual ground reality.</p>
+    </div>
+
+    <div class="resolution-split-grid">
+      <!-- Officer Work Order Card -->
+      <div id="officer-work-card" class="glass-card officer-card">
+        <div class="officer-card-header">
+          <div class="officer-id-badge">
+            <div class="badge-avatar">👷‍♂️</div>
+            <div>
+              <div class="officer-name">Er. Sanjay Sharma</div>
+              <div class="officer-dept">DJB Quick-Response Squad #4</div>
+            </div>
+          </div>
+          <div class="status-live-tag">DISPATCHED IN 4 MINS</div>
+        </div>
+
+        <div class="sop-checklist">
+          <div id="sop-1" class="sop-item completed">
+            <span class="sop-check">✓</span>
+            <span>100mm Pipe Isolation Clamp Installed</span>
+          </div>
+          <div id="sop-2" class="sop-item completed">
+            <span class="sop-check">✓</span>
+            <span>Residual Chlorine Levels Verified (0.5 ppm)</span>
+          </div>
+          <div id="sop-3" class="sop-item completed">
+            <span class="sop-check">✓</span>
+            <span>PWD Road Bed Cold-Mix Asphalt Sealed</span>
+          </div>
+        </div>
+
+        <div class="repair-proof-tag">
+          <span>📷 Field Crew Uploaded 3 Timestamped Photos</span>
+        </div>
+      </div>
+
+      <!-- Citizen Verification Sign-Off Card -->
+      <div id="citizen-signoff-card" class="glass-card citizen-verify-card">
+        <div class="verify-header">
+          <div class="citizen-badge">
+            <span>CITIZEN SIGN-OFF REQUIRED</span>
+          </div>
+          <div class="audit-pass">AUDIT LOCKED</div>
+        </div>
+
+        <!-- Before / After Comparison -->
+        <div class="before-after-container">
+          <div class="ba-box before">
+            <div class="ba-label">BEFORE: CAVITY (4.2m)</div>
+            <div class="ba-visual visual-before">
+              <span class="hazard-icon">⚠️</span>
+            </div>
+          </div>
+          <div class="ba-arrow">→</div>
+          <div class="ba-box after">
+            <div class="ba-label">AFTER: SEALED & RESTORED</div>
+            <div class="ba-visual visual-after">
+              <span class="success-icon">✅</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Citizen Confirmation Stamp -->
+        <div id="citizen-confirm-box" class="citizen-confirmation-box">
+          <div class="confirm-check">✓</div>
+          <div>
+            <div class="confirm-text">"Water clean, road completely repaved."</div>
+            <div class="confirm-author">Verified by Aditya Verma (Ward 14 Citizen)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const tl = gsap.timeline({ paused: true });
+
+        // Slide in officer work order card
+        tl.fromTo(
+          "#officer-work-card",
+          { opacity: 0, x: -50 },
+          { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" },
+          0.2
+        );
+
+        // Slide in citizen sign-off card
+        tl.fromTo(
+          "#citizen-signoff-card",
+          { opacity: 0, x: 50 },
+          { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" },
+          0.5
+        );
+
+        // Citizen confirm box pops in with checkmark
+        tl.fromTo(
+          "#citizen-confirm-box",
+          { opacity: 0, scale: 0.9 },
+          { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.5)" },
+          1.8
+        );
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines["scene4-field-action"] = tl;
+      })();
+    </script>
+  </div>
+</template>

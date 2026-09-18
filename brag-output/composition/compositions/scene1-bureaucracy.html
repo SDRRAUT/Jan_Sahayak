@@ -1,0 +1,83 @@
+<template id="scene1-bureaucracy-template">
+  <div
+    data-composition-id="scene1-bureaucracy"
+    data-width="1920"
+    data-height="1080"
+    data-duration="3.8"
+    class="scene-inner"
+  >
+    <div class="scene-header">
+      <div class="badge alert-badge">THE MUNICIPAL PROBLEM</div>
+      <h1 class="headline-glitch">1 Broken Pipe. 4 Departments. 0 Answers.</h1>
+      <p class="subheadline" data-layout-allow-occlusion>
+        When infrastructure decays underground, citizens get trapped in uncoordinated silos.
+      </p>
+    </div>
+
+    <div class="silos-grid" data-layout-allow-occlusion>
+      <!-- Silo 1: DJB -->
+      <div id="silo-djb-card" class="silo-card silo-djb" data-layout-allow-occlusion>
+        <div class="silo-icon" data-layout-allow-occlusion>💧</div>
+        <div class="silo-title" data-layout-allow-occlusion>Delhi Jal Board</div>
+        <div class="silo-issue" data-layout-allow-occlusion>"Water Contamination"</div>
+        <div class="silo-status status-red" data-layout-allow-occlusion>PENDING • 14 DAYS</div>
+        <div class="silo-quote" data-layout-allow-occlusion>"Wait for PWD road clearance before pipeline repair"</div>
+      </div>
+
+      <!-- Silo 2: PWD -->
+      <div id="silo-pwd-card" class="silo-card silo-pwd" data-layout-allow-occlusion>
+        <div class="silo-icon" data-layout-allow-occlusion>🛣️</div>
+        <div class="silo-title" data-layout-allow-occlusion>Public Works Dept</div>
+        <div class="silo-issue" data-layout-allow-occlusion>"Road Subsidence Cavity"</div>
+        <div class="silo-status status-red" data-layout-allow-occlusion>PENDING • 11 DAYS</div>
+        <div class="silo-quote" data-layout-allow-occlusion>"Cannot repave road until DJB seals underground leak"</div>
+      </div>
+
+      <!-- Silo 3: MCD -->
+      <div id="silo-mcd-card" class="silo-card silo-mcd" data-layout-allow-occlusion>
+        <div class="silo-icon" data-layout-allow-occlusion>♻️</div>
+        <div class="silo-title" data-layout-allow-occlusion>Municipal Corp (MCD)</div>
+        <div class="silo-issue" data-layout-allow-occlusion>"Drainage & Debris Clog"</div>
+        <div class="silo-status status-red" data-layout-allow-occlusion>PENDING • 9 DAYS</div>
+        <div class="silo-quote" data-layout-allow-occlusion>"Debris is PWD jurisdiction, out of sanitation remit"</div>
+      </div>
+
+      <!-- Silo 4: BSES -->
+      <div id="silo-bses-card" class="silo-card silo-bses" data-layout-allow-occlusion>
+        <div class="silo-icon" data-layout-allow-occlusion>⚡</div>
+        <div class="silo-title" data-layout-allow-occlusion>BSES Power</div>
+        <div class="silo-issue" data-layout-allow-occlusion>"Underground Cable Exposure"</div>
+        <div class="silo-status status-red" data-layout-allow-occlusion>PENDING • 7 DAYS</div>
+        <div class="silo-quote" data-layout-allow-occlusion>"Hazardous water contact, crew awaiting site dry-out"</div>
+      </div>
+    </div>
+
+    <!-- Stamp Overlay -->
+    <div id="scene1-stamp" class="stamp-overlay" data-layout-allow-overlap data-layout-allow-occlusion>
+      <div class="big-stamp" data-layout-allow-overlap data-layout-allow-occlusion>BUREAUCRATIC DEAD-END</div>
+    </div>
+
+    <script>
+      (function () {
+        const tl = gsap.timeline({ paused: true });
+        
+        // Stagger in the silo cards
+        tl.fromTo("#silo-djb-card", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.2);
+        tl.fromTo("#silo-pwd-card", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.4);
+        tl.fromTo("#silo-mcd-card", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.6);
+        tl.fromTo("#silo-bses-card", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.8);
+
+        // Slam down the big red stamp at 2.0s
+        tl.fromTo(
+          "#scene1-stamp",
+          { opacity: 0, scale: 2.2, rotation: 12 },
+          { opacity: 1, scale: 1, rotation: -8, duration: 0.35, ease: "back.out(1.7)" },
+          2.0
+        );
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines["scene1-bureaucracy"] = tl;
+      })();
+    </script>
+  </div>
+</template>
