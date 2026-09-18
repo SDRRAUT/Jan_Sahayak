@@ -477,13 +477,13 @@ export default function SplashScreen({ onStart }) {
             instant multi-department routing, and verified field closure.
           </p>
 
-          {/* Sleek Dark Pill CTA Button matching reference: "Book a demo • 15 minutes →" */}
+          {/* Sleek Dark Pill CTA Button: simply "Start" */}
           <button
             type="button"
             onClick={onStart}
             style={{
               height: '46px',
-              padding: '0 26px',
+              padding: '0 32px',
               borderRadius: '999px',
               background: '#0F172A',
               color: '#FFFFFF',
@@ -492,7 +492,7 @@ export default function SplashScreen({ onStart }) {
               fontWeight: 600,
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '10px',
+              gap: '8px',
               cursor: 'pointer',
               boxShadow: '0 10px 25px rgba(15, 23, 42, 0.25)',
               transition: 'all 200ms ease',
@@ -507,8 +507,7 @@ export default function SplashScreen({ onStart }) {
               e.currentTarget.style.boxShadow = '0 10px 25px rgba(15, 23, 42, 0.25)';
             }}
           >
-            <Volume2 style={{ width: '16px', height: '16px', color: '#10B981' }} />
-            <span>Start Audio Tour • 2 minutes</span>
+            <span>Start</span>
             <ArrowRight style={{ width: '15px', height: '15px', color: '#94A3B8' }} />
           </button>
 
