@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, ArrowRight, Volume2, Shield, CheckCircle2 } from 'lucide-react';
+import onboardingBg from '../../assets/onboarding-bg.jpg';
 
 export default function SplashScreen({ onStart }) {
   const [progress, setProgress] = useState(0);
@@ -51,7 +52,7 @@ export default function SplashScreen({ onStart }) {
       position: 'fixed',
       inset: 0,
       zIndex: 99999,
-      background: 'linear-gradient(145deg, #070B14 0%, #0F172A 45%, #0B192C 100%)',
+      backgroundColor: '#0F172A',
       color: '#FFFFFF',
       display: 'flex',
       flexDirection: 'column',
@@ -61,6 +62,22 @@ export default function SplashScreen({ onStart }) {
       overflow: 'hidden',
       fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
+      {/* Crisp, clear background image with 50% opacity (NO blur) matching onboarding */}
+      <div 
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: `url(${onboardingBg})`,
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          opacity: 0.50,
+          zIndex: 1,
+          pointerEvents: 'none'
+        }} 
+      />
+
       {/* Ambient background glow orbs */}
       <div style={{
         position: 'absolute',
@@ -71,6 +88,7 @@ export default function SplashScreen({ onStart }) {
         borderRadius: '50%',
         background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(0,0,0,0) 70%)',
         filter: 'blur(40px)',
+        zIndex: 1,
         pointerEvents: 'none'
       }} />
       <div style={{
@@ -82,6 +100,7 @@ export default function SplashScreen({ onStart }) {
         borderRadius: '50%',
         background: 'radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, rgba(0,0,0,0) 70%)',
         filter: 'blur(50px)',
+        zIndex: 1,
         pointerEvents: 'none'
       }} />
 
