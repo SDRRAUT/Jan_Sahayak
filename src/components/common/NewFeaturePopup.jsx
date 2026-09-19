@@ -61,52 +61,64 @@ export default function NewFeaturePopup() {
     };
   }, []);
 
-  // Automated 1-minute timer after login (shows for 5s and automatically hides)
+  // Popup schedule:
+  //  Show #1  → 30s after login
+  //  Show #2  → 30s after show #1 closes  (i.e. 30 + 5 + 30 ≈ 65s)
+  //  Show #3+ → every 2 min after each auto-close, forever
+  const showCounterRef = useRef(0);
+  const repeatTimerRef = useRef(null);
+
+  const showPopupAutomatic = () => {
+    setIsManual(false);
+    setIsOpen(true);
+    setCountdown(5);
+    countdownRef.current = 5;
+
+    // Countdown ticker
+    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+    countdownIntervalRef.current = setInterval(() => {
+      countdownRef.current -= 1;
+      setCountdown(Math.max(0, countdownRef.current));
+      if (countdownRef.current <= 0) {
+        clearInterval(countdownIntervalRef.current);
+        setIsOpen(false);
+
+        // Schedule next appearance
+        showCounterRef.current += 1;
+        const nextDelay = showCounterRef.current >= 2 ? 120000 : 30000; // 2 min after 2nd show, else 30s
+        repeatTimerRef.current = setTimeout(showPopupAutomatic, nextDelay);
+      }
+    }, 1000);
+  };
+
   useEffect(() => {
     // Only schedule popup when user is logged in
     if (!token && !user) return;
 
-    // Check if user already saw the popup in this session
-    try {
-      const hasSeen = sessionStorage.getItem('jansahayak_workforce_popup_shown');
-      if (hasSeen === 'true') return;
-    } catch (e) {}
-
-    // Wait 1 minute (60,000ms) after login before displaying popup
+    // First appearance: 30 seconds after login
     showTimerRef.current = setTimeout(() => {
-      setIsManual(false);
-      setIsOpen(true);
-      setCountdown(5);
-      countdownRef.current = 5;
-
-      try {
-        sessionStorage.setItem('jansahayak_workforce_popup_shown', 'true');
-      } catch (e) {}
-
-      // Countdown ticker every 1s
-      countdownIntervalRef.current = setInterval(() => {
-        countdownRef.current -= 1;
-        setCountdown(Math.max(0, countdownRef.current));
-        if (countdownRef.current <= 0) {
-          clearInterval(countdownIntervalRef.current);
-          setIsOpen(false);
-        }
-      }, 1000);
-
-    }, 60000); // 1 minute delay
+      showCounterRef.current = 1;
+      showPopupAutomatic();
+    }, 30000);
 
     return () => {
       if (showTimerRef.current) clearTimeout(showTimerRef.current);
+      if (repeatTimerRef.current) clearTimeout(repeatTimerRef.current);
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
       if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, token]);
 
   const handleClose = () => {
-    if (showTimerRef.current) clearTimeout(showTimerRef.current);
-    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    // Stop any active countdown but keep repeat schedule alive
     if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
     setIsOpen(false);
+
+    // If manually closed, still schedule the next auto-show at the appropriate interval
+    const nextDelay = showCounterRef.current >= 2 ? 120000 : 30000;
+    if (repeatTimerRef.current) clearTimeout(repeatTimerRef.current);
+    repeatTimerRef.current = setTimeout(showPopupAutomatic, nextDelay);
   };
 
   const [hoveredCard, setHoveredCard] = useState(null);
