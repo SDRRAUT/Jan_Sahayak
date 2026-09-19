@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   ChevronDown,
   Sparkles,
+  Megaphone,
   Plus,
   MapPin,
   Settings,
@@ -861,9 +862,49 @@ export default function Navbar() {
                       )}
                     </div>
 
-                    {/* Profile Settings */}
+                    {/* Announcements & Profile Settings */}
                     <div style={{ height: '1px', background: 'var(--color-divider)', margin: '8px 0' }} />
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          window.dispatchEvent(new CustomEvent('open-jansahayak-announcement', { detail: { manual: true } }));
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          width: '100%',
+                          padding: '7px 8px',
+                          borderRadius: 'var(--radius-sm)',
+                          fontSize: '12px',
+                          color: '#0284C7',
+                          background: '#F0F9FF',
+                          border: '1px solid #BAE6FD',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <Megaphone style={{ width: '13px', height: '13px', color: '#0284C7' }} />
+                          <span>What's New & Updates</span>
+                        </div>
+                        <span style={{
+                          fontSize: '9.5px',
+                          fontWeight: 700,
+                          background: '#0284C7',
+                          color: '#FFFFFF',
+                          padding: '1px 6px',
+                          borderRadius: '999px',
+                          letterSpacing: '0.02em'
+                        }}>
+                          NEW
+                        </span>
+                      </button>
+
                       <button
                         type="button"
                         onClick={() => {
@@ -1335,8 +1376,48 @@ export default function Navbar() {
                   </div>
                 )}
 
+                {/* Mobile Announcements & What's New */}
+                <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--color-divider)' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      window.dispatchEvent(new CustomEvent('open-jansahayak-announcement', { detail: { manual: true } }));
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      width: '100%',
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      color: '#0284C7',
+                      background: '#F0F9FF',
+                      border: '1.5px solid #BAE6FD',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Megaphone style={{ width: '15px', height: '15px', color: '#0284C7' }} />
+                      <span>What's New & Announcements</span>
+                    </div>
+                    <span style={{
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      background: '#0284C7',
+                      color: '#FFFFFF',
+                      padding: '2px 7px',
+                      borderRadius: '999px'
+                    }}>
+                      NEW
+                    </span>
+                  </button>
+                </div>
+
                 {/* Mobile Profile & Settings Quick Buttons */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--color-divider)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
                   <button
                     type="button"
                     onClick={() => {

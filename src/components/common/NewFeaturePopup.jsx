@@ -19,12 +19,49 @@ import { useApp } from '../../context/AppContext';
 export default function NewFeaturePopup() {
   const { user, token } = useApp();
   const [isOpen, setIsOpen] = useState(false);
+  const [isManual, setIsManual] = useState(false);
   const [countdown, setCountdown] = useState(5);
+  const [isPaused, setIsPaused] = useState(false);
   
   const showTimerRef = useRef(null);
   const hideTimerRef = useRef(null);
   const countdownIntervalRef = useRef(null);
+  const countdownRef = useRef(5);
 
+  // Listen for custom event to open announcement popup from profile dropdown or elsewhere
+  useEffect(() => {
+    const handleOpenAnnouncement = (event) => {
+      // Clear any pending automated timers
+      if (showTimerRef.current) clearTimeout(showTimerRef.current);
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+
+      const manual = event?.detail?.manual ?? true;
+      setIsManual(manual);
+      setIsOpen(true);
+
+      if (!manual) {
+        setCountdown(5);
+        countdownRef.current = 5;
+        // Automated countdown
+        countdownIntervalRef.current = setInterval(() => {
+          countdownRef.current -= 1;
+          setCountdown(Math.max(0, countdownRef.current));
+          if (countdownRef.current <= 0) {
+            clearInterval(countdownIntervalRef.current);
+            setIsOpen(false);
+          }
+        }, 1000);
+      }
+    };
+
+    window.addEventListener('open-jansahayak-announcement', handleOpenAnnouncement);
+    return () => {
+      window.removeEventListener('open-jansahayak-announcement', handleOpenAnnouncement);
+    };
+  }, []);
+
+  // Automated 1-minute timer after login (shows for 5s and automatically hides)
   useEffect(() => {
     // Only schedule popup when user is logged in
     if (!token && !user) return;
@@ -37,27 +74,24 @@ export default function NewFeaturePopup() {
 
     // Wait 1 minute (60,000ms) after login before displaying popup
     showTimerRef.current = setTimeout(() => {
+      setIsManual(false);
       setIsOpen(true);
       setCountdown(5);
+      countdownRef.current = 5;
 
       try {
         sessionStorage.setItem('jansahayak_workforce_popup_shown', 'true');
       } catch (e) {}
 
       // Countdown ticker every 1s
-      let timeLeft = 5;
       countdownIntervalRef.current = setInterval(() => {
-        timeLeft -= 1;
-        setCountdown(Math.max(0, timeLeft));
-        if (timeLeft <= 0) {
+        countdownRef.current -= 1;
+        setCountdown(Math.max(0, countdownRef.current));
+        if (countdownRef.current <= 0) {
           clearInterval(countdownIntervalRef.current);
+          setIsOpen(false);
         }
       }, 1000);
-
-      // Automatically hide after exactly 5 seconds (5000ms)
-      hideTimerRef.current = setTimeout(() => {
-        setIsOpen(false);
-      }, 5000);
 
     }, 60000); // 1 minute delay
 
@@ -289,7 +323,7 @@ export default function NewFeaturePopup() {
             </div>
           </div>
 
-          {/* Action Footer & 5s Auto-Dismiss Progress Bar */}
+          {/* Action Footer & Status / Countdown */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -299,38 +333,57 @@ export default function NewFeaturePopup() {
             borderTop: '1px solid #E2E8F0',
             flexWrap: 'wrap'
           }}>
-            {/* Countdown Badge & Live Progress Bar */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{
-                fontSize: '11.5px',
-                fontWeight: 700,
-                color: '#0284C7',
-                background: '#E0F2FE',
-                padding: '3px 10px',
-                borderRadius: '999px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px'
-              }}>
-                <Clock size={12} />
-                <span>Auto-closing in {countdown}s</span>
-              </span>
-              <div style={{
-                width: '60px',
-                height: '4px',
-                background: '#E2E8F0',
-                borderRadius: '999px',
-                overflow: 'hidden'
-              }}>
-                <div style={{
-                  width: `${(countdown / 5) * 100}%`,
-                  height: '100%',
-                  background: '#0284C7',
+            {!isManual ? (
+              /* Countdown Badge & Live Progress Bar for automated 5s popup */
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{
+                  fontSize: '11.5px',
+                  fontWeight: 700,
+                  color: '#0284C7',
+                  background: '#E0F2FE',
+                  padding: '3px 10px',
                   borderRadius: '999px',
-                  transition: 'width 1s linear'
-                }} />
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px'
+                }}>
+                  <Clock size={12} />
+                  <span>Auto-closing in {countdown}s</span>
+                </span>
+                <div style={{
+                  width: '60px',
+                  height: '4px',
+                  background: '#E2E8F0',
+                  borderRadius: '999px',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    width: `${(countdown / 5) * 100}%`,
+                    height: '100%',
+                    background: '#0284C7',
+                    borderRadius: '999px',
+                    transition: 'width 1s linear'
+                  }} />
+                </div>
               </div>
-            </div>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{
+                  fontSize: '11.5px',
+                  fontWeight: 700,
+                  color: '#059669',
+                  background: '#ECFDF5',
+                  padding: '3px 10px',
+                  borderRadius: '999px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px'
+                }}>
+                  <Sparkles size={12} />
+                  <span>Upcoming Q4 Feature Preview</span>
+                </span>
+              </div>
+            )}
 
             <button
               onClick={handleClose}
