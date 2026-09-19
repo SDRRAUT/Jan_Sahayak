@@ -109,6 +109,8 @@ export default function NewFeaturePopup() {
     setIsOpen(false);
   };
 
+  const [hoveredCard, setHoveredCard] = useState(null);
+
   if (!isOpen) return null;
 
   return (
@@ -119,296 +121,508 @@ export default function NewFeaturePopup() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '20px',
-      background: 'rgba(15, 23, 42, 0.45)',
-      backdropFilter: 'blur(8px)',
-      animation: 'fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+      padding: '24px 20px',
+      background: 'rgba(15, 23, 42, 0.55)',
+      backdropFilter: 'blur(10px)',
+      animation: 'fadeIn 0.25s ease-out'
     }}>
       <div style={{
         position: 'relative',
         width: '100%',
-        maxWidth: '560px',
+        maxWidth: '1020px',
+        maxHeight: '92vh',
+        display: 'flex',
+        flexDirection: 'column',
         background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
-        borderRadius: '24px',
+        borderRadius: '28px',
         border: '1.5px solid #E2E8F0',
-        boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.05)',
-        overflow: 'hidden',
+        boxShadow: '0 30px 80px -20px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(15, 23, 42, 0.06)',
+        overflowY: 'auto',
+        overflowX: 'hidden',
         fontFamily: 'var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif)',
         animation: 'scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
       }}>
-        {/* Top Gradient Banner */}
+        {/* Top Header Bar */}
         <div style={{
-          padding: '20px 24px',
-          background: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
+          padding: '24px 32px 20px 32px',
+          background: 'linear-gradient(135deg, #0284C7 0%, #0369A1 60%, #075985 100%)',
           color: '#FFFFFF',
           display: 'flex',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           justifyContent: 'space-between',
-          gap: '12px'
+          gap: '20px',
+          flexWrap: 'wrap'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: '1 1 400px' }}>
             <div style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '12px',
-              background: 'rgba(255, 255, 255, 0.2)',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
+              width: '52px',
+              height: '52px',
+              borderRadius: '16px',
+              background: 'rgba(255, 255, 255, 0.18)',
+              backdropFilter: 'blur(12px)',
+              border: '1.5px solid rgba(255, 255, 255, 0.35)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#FFFFFF',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
               flexShrink: 0
             }}>
-              <HeartHandshake size={22} />
+              <HeartHandshake size={28} />
             </div>
             <div>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(255, 255, 255, 0.2)', padding: '2px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 700, marginBottom: '4px' }}>
-                <Sparkles size={12} />
-                <span>UPCOMING FEATURE PREVIEW</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  background: 'rgba(255, 255, 255, 0.22)',
+                  padding: '3px 10px',
+                  borderRadius: '999px',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  letterSpacing: '0.04em',
+                  textTransform: 'uppercase'
+                }}>
+                  <Sparkles size={13} />
+                  <span>Upcoming Q4 Initiative</span>
+                </span>
+                <span style={{
+                  fontSize: '11.5px',
+                  color: '#BAE6FD',
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  <Zap size={13} style={{ color: '#FDE047' }} />
+                  Uber-Model for Civic Grievances
+                </span>
               </div>
-              <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, letterSpacing: '-0.01em' }}>
-                JanSahayak Civic Workforce
+              <h2 style={{ fontSize: '22px', fontWeight: 800, margin: 0, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                JanSahayak Civic Workforce Marketplace
               </h2>
-              <p style={{ fontSize: '12.5px', color: '#E0F2FE', margin: '2px 0 0 0' }}>
-                Connecting Local Workers with Civic Government Tasks
+              <p style={{ fontSize: '13.5px', color: '#E0F2FE', margin: '4px 0 0 0', fontWeight: 500 }}>
+                Connecting municipal departments with verified local workers to solve civic tasks faster
               </p>
             </div>
           </div>
 
           <button
             onClick={handleClose}
+            aria-label="Close modal"
             style={{
               background: 'rgba(255, 255, 255, 0.2)',
-              border: 'none',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
               borderRadius: '50%',
-              width: '32px',
-              height: '32px',
+              width: '38px',
+              height: '38px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#FFFFFF',
               cursor: 'pointer',
-              transition: 'background 0.2s ease',
+              transition: 'all 0.2s ease',
               flexShrink: 0
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.35)'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.38)';
+              e.currentTarget.style.transform = 'rotate(90deg)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+              e.currentTarget.style.transform = 'rotate(0deg)';
+            }}
           >
-            <X size={16} />
+            <X size={18} />
           </button>
         </div>
 
         {/* Content Body */}
-        <div style={{ padding: '22px 24px' }}>
-          {/* Concept Callout */}
+        <div style={{ padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+          
+          {/* Interactive How It Works Flow Ribbon */}
           <div style={{
-            padding: '14px 16px',
-            borderRadius: '14px',
-            background: '#F0F9FF',
+            padding: '16px 20px',
+            borderRadius: '18px',
+            background: 'linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)',
             border: '1.5px solid #BAE6FD',
-            marginBottom: '18px'
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '16px',
+            flexWrap: 'wrap'
           }}>
-            <p style={{ fontSize: '13.5px', color: '#0369A1', lineHeight: 1.5, margin: 0, fontWeight: 500 }}>
-              Similar to how ride platforms connect passengers with nearby drivers, <strong>JanSahayak</strong> will connect municipal departments with <strong>verified local workers & tradespeople</strong> available to resolve civic grievances.
-            </p>
-          </div>
-
-          {/* 3-Way Mutual Benefit Grid */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
-            {/* For Workers */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '12px',
-              padding: '12px 14px',
-              background: '#FFFFFF',
-              border: '1.5px solid #E2E8F0',
-              borderRadius: '14px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
-            }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{
                 width: '32px',
                 height: '32px',
                 borderRadius: '10px',
-                background: '#ECFDF5',
-                color: '#059669',
+                background: '#0284C7',
+                color: '#FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexShrink: 0,
-                marginTop: '2px'
+                fontWeight: 800,
+                fontSize: '14px',
+                flexShrink: 0
               }}>
-                <Briefcase size={16} />
+                1
               </div>
-              <div style={{ flex: 1 }}>
-                <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block', marginBottom: '2px' }}>
-                  For Local Workers & Skilled Trades:
-                </strong>
-                <span style={{ fontSize: '12px', color: '#475569', lineHeight: 1.45, display: 'block' }}>
-                  Get legitimate government project opportunities, guaranteed direct DBT payouts, and verified experience badges.
-                </span>
+              <div>
+                <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block' }}>Grievance Logged</strong>
+                <span style={{ fontSize: '12px', color: '#0369A1' }}>Citizen reports road/drain issue</span>
               </div>
             </div>
 
-            {/* For Government */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '12px',
-              padding: '12px 14px',
-              background: '#FFFFFF',
-              border: '1.5px solid #E2E8F0',
-              borderRadius: '14px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
-            }}>
+            <div style={{ color: '#0284C7', fontWeight: 800, fontSize: '18px', display: 'none', md: 'block' }}>➔</div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{
                 width: '32px',
                 height: '32px',
                 borderRadius: '10px',
-                background: '#EFF6FF',
-                color: '#2563EB',
+                background: '#059669',
+                color: '#FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexShrink: 0,
-                marginTop: '2px'
+                fontWeight: 800,
+                fontSize: '14px',
+                flexShrink: 0
               }}>
-                <Building2 size={16} />
+                2
               </div>
-              <div style={{ flex: 1 }}>
-                <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block', marginBottom: '2px' }}>
-                  For Government & Civic Officers:
-                </strong>
-                <span style={{ fontSize: '12px', color: '#475569', lineHeight: 1.45, display: 'block' }}>
-                  Instant access to verified local manpower for drainage repairs, road patch-ups, and waste clearance — beating SLA targets faster.
-                </span>
+              <div>
+                <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block' }}>Local Squad Mobilized</strong>
+                <span style={{ fontSize: '12px', color: '#047857' }}>Nearby tradespeople alerted & routed</span>
               </div>
             </div>
 
-            {/* For Citizens */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '12px',
-              padding: '12px 14px',
-              background: '#FFFFFF',
-              border: '1.5px solid #E2E8F0',
-              borderRadius: '14px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
-            }}>
+            <div style={{ color: '#0284C7', fontWeight: 800, fontSize: '18px', display: 'none', md: 'block' }}>➔</div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{
                 width: '32px',
                 height: '32px',
                 borderRadius: '10px',
-                background: '#F5F3FF',
-                color: '#7C3AED',
+                background: '#4338CA',
+                color: '#FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexShrink: 0,
-                marginTop: '2px'
+                fontWeight: 800,
+                fontSize: '14px',
+                flexShrink: 0
               }}>
-                <Users size={16} />
+                3
               </div>
-              <div style={{ flex: 1 }}>
-                <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block', marginBottom: '2px' }}>
-                  For Citizens & Neighborhoods:
-                </strong>
-                <span style={{ fontSize: '12px', color: '#475569', lineHeight: 1.45, display: 'block' }}>
-                  Complaints get fixed in hours instead of weeks, with local neighbors empowered to build better communities.
-                </span>
+              <div>
+                <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block' }}>Rapid Fix & Direct Payout</strong>
+                <span style={{ fontSize: '12px', color: '#3730A3' }}>Citizen verified + Instant DBT pay</span>
               </div>
             </div>
           </div>
 
-          {/* Action Footer & Status / Countdown */}
+          {/* 3-Column Horizontal Grid for Stakeholders */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '18px'
+          }}>
+            {/* Card 1: For Workers */}
+            <div
+              onMouseEnter={() => setHoveredCard('workers')}
+              onMouseLeave={() => setHoveredCard(null)}
+              style={{
+                padding: '22px 20px',
+                background: hoveredCard === 'workers' ? '#F0FDF4' : '#FFFFFF',
+                border: hoveredCard === 'workers' ? '2px solid #059669' : '1.5px solid #E2E8F0',
+                borderRadius: '20px',
+                boxShadow: hoveredCard === 'workers' 
+                  ? '0 16px 32px -8px rgba(5, 150, 105, 0.22), 0 4px 12px rgba(0,0,0,0.04)' 
+                  : '0 4px 14px rgba(15, 23, 42, 0.04)',
+                transform: hoveredCard === 'workers' ? 'translateY(-4px)' : 'translateY(0)',
+                transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'default'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+                <div style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '12px',
+                  background: '#ECFDF5',
+                  border: '1.5px solid #A7F3D0',
+                  color: '#059669',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 10px rgba(5, 150, 105, 0.12)'
+                }}>
+                  <Briefcase size={22} />
+                </div>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#059669', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                    FOR LOCAL WORKERS
+                  </span>
+                  <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: '2px 0 0 0' }}>
+                    Trades & Workforce
+                  </h3>
+                </div>
+              </div>
+
+              <p style={{ fontSize: '12.5px', color: '#475569', lineHeight: 1.5, margin: '0 0 14px 0', flex: 1 }}>
+                Plumbers, electricians, masons, and sanitation workers gain immediate access to paid municipal repair gigs in their own wards.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '12px', borderTop: '1px solid #E2E8F0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#065F46', fontWeight: 600 }}>
+                  <CheckCircle2 size={15} style={{ color: '#059669', flexShrink: 0 }} />
+                  <span>Guaranteed Direct DBT Payouts</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#065F46', fontWeight: 600 }}>
+                  <CheckCircle2 size={15} style={{ color: '#059669', flexShrink: 0 }} />
+                  <span>Verified Govt Experience Badge</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#065F46', fontWeight: 600 }}>
+                  <CheckCircle2 size={15} style={{ color: '#059669', flexShrink: 0 }} />
+                  <span>Hyperlocal Flexible Availability</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: For Government */}
+            <div
+              onMouseEnter={() => setHoveredCard('govt')}
+              onMouseLeave={() => setHoveredCard(null)}
+              style={{
+                padding: '22px 20px',
+                background: hoveredCard === 'govt' ? '#EFF6FF' : '#FFFFFF',
+                border: hoveredCard === 'govt' ? '2px solid #2563EB' : '1.5px solid #E2E8F0',
+                borderRadius: '20px',
+                boxShadow: hoveredCard === 'govt' 
+                  ? '0 16px 32px -8px rgba(37, 99, 235, 0.22), 0 4px 12px rgba(0,0,0,0.04)' 
+                  : '0 4px 14px rgba(15, 23, 42, 0.04)',
+                transform: hoveredCard === 'govt' ? 'translateY(-4px)' : 'translateY(0)',
+                transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'default'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+                <div style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '12px',
+                  background: '#EFF6FF',
+                  border: '1.5px solid #BFDBFE',
+                  color: '#2563EB',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 10px rgba(37, 99, 235, 0.12)'
+                }}>
+                  <Building2 size={22} />
+                </div>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#2563EB', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                    FOR MUNICIPAL GOVT
+                  </span>
+                  <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: '2px 0 0 0' }}>
+                    Officers & Engineers
+                  </h3>
+                </div>
+              </div>
+
+              <p style={{ fontSize: '12.5px', color: '#475569', lineHeight: 1.5, margin: '0 0 14px 0', flex: 1 }}>
+                Instantly deploy on-demand local squads for drainage clearance, pothole patching, and streetlight fixes without tendering bottlenecks.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '12px', borderTop: '1px solid #E2E8F0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#1E40AF', fontWeight: 600 }}>
+                  <CheckCircle2 size={15} style={{ color: '#2563EB', flexShrink: 0 }} />
+                  <span>Beat 48-Hour SLA Deadlines</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#1E40AF', fontWeight: 600 }}>
+                  <CheckCircle2 size={15} style={{ color: '#2563EB', flexShrink: 0 }} />
+                  <span>Automated GPS & Photo Milestones</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#1E40AF', fontWeight: 600 }}>
+                  <CheckCircle2 size={15} style={{ color: '#2563EB', flexShrink: 0 }} />
+                  <span>Transparent Budget Tracking</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 3: For Citizens */}
+            <div
+              onMouseEnter={() => setHoveredCard('citizens')}
+              onMouseLeave={() => setHoveredCard(null)}
+              style={{
+                padding: '22px 20px',
+                background: hoveredCard === 'citizens' ? '#F5F3FF' : '#FFFFFF',
+                border: hoveredCard === 'citizens' ? '2px solid #7C3AED' : '1.5px solid #E2E8F0',
+                borderRadius: '20px',
+                boxShadow: hoveredCard === 'citizens' 
+                  ? '0 16px 32px -8px rgba(124, 58, 237, 0.22), 0 4px 12px rgba(0,0,0,0.04)' 
+                  : '0 4px 14px rgba(15, 23, 42, 0.04)',
+                transform: hoveredCard === 'citizens' ? 'translateY(-4px)' : 'translateY(0)',
+                transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'default'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+                <div style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '12px',
+                  background: '#F5F3FF',
+                  border: '1.5px solid #DDD6FE',
+                  color: '#7C3AED',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 10px rgba(124, 58, 237, 0.12)'
+                }}>
+                  <Users size={22} />
+                </div>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#7C3AED', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                    FOR CITIZENS
+                  </span>
+                  <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: '2px 0 0 0' }}>
+                    Residents & Wards
+                  </h3>
+                </div>
+              </div>
+
+              <p style={{ fontSize: '12.5px', color: '#475569', lineHeight: 1.5, margin: '0 0 14px 0', flex: 1 }}>
+                Complaints get resolved in hours instead of weeks, with local community members empowered to fix neighborhood issues together.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '12px', borderTop: '1px solid #E2E8F0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#5B21B6', fontWeight: 600 }}>
+                  <CheckCircle2 size={15} style={{ color: '#7C3AED', flexShrink: 0 }} />
+                  <span>4x Faster Problem Resolution</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#5B21B6', fontWeight: 600 }}>
+                  <CheckCircle2 size={15} style={{ color: '#7C3AED', flexShrink: 0 }} />
+                  <span>Live Field Worker Status Tracking</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#5B21B6', fontWeight: 600 }}>
+                  <CheckCircle2 size={15} style={{ color: '#7C3AED', flexShrink: 0 }} />
+                  <span>Citizen Review & Rating System</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Footer & Countdown Bar */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '12px',
-            paddingTop: '16px',
-            borderTop: '1px solid #E2E8F0',
+            gap: '16px',
+            paddingTop: '18px',
+            borderTop: '1.5px solid #E2E8F0',
             flexWrap: 'wrap'
           }}>
-            {!isManual ? (
-              /* Countdown Badge & Live Progress Bar for automated 5s popup */
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{
-                  fontSize: '11.5px',
-                  fontWeight: 700,
-                  color: '#0284C7',
-                  background: '#E0F2FE',
-                  padding: '3px 10px',
-                  borderRadius: '999px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '5px'
-                }}>
-                  <Clock size={12} />
-                  <span>Auto-closing in {countdown}s</span>
-                </span>
-                <div style={{
-                  width: '60px',
-                  height: '4px',
-                  background: '#E2E8F0',
-                  borderRadius: '999px',
-                  overflow: 'hidden'
-                }}>
-                  <div style={{
-                    width: `${(countdown / 5) * 100}%`,
-                    height: '100%',
-                    background: '#0284C7',
+            {/* Left Status or Countdown */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+              {!isManual ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    color: '#0284C7',
+                    background: '#E0F2FE',
+                    padding: '5px 12px',
                     borderRadius: '999px',
-                    transition: 'width 1s linear'
-                  }} />
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <Clock size={13} />
+                    <span>Auto-closing in {countdown}s</span>
+                  </span>
+                  <div style={{
+                    width: '80px',
+                    height: '5px',
+                    background: '#E2E8F0',
+                    borderRadius: '999px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{
+                      width: `${(countdown / 5) * 100}%`,
+                      height: '100%',
+                      background: '#0284C7',
+                      borderRadius: '999px',
+                      transition: 'width 1s linear'
+                    }} />
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{
-                  fontSize: '11.5px',
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    color: '#059669',
+                    background: '#ECFDF5',
+                    border: '1px solid #A7F3D0',
+                    padding: '5px 12px',
+                    borderRadius: '999px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <Sparkles size={13} />
+                    <span>JanSahayak Civic Workforce • Q4 Roadmap</span>
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Right Buttons */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={handleClose}
+                style={{
+                  padding: '10px 22px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
+                  color: '#FFFFFF',
+                  border: 'none',
                   fontWeight: 700,
-                  color: '#059669',
-                  background: '#ECFDF5',
-                  padding: '3px 10px',
-                  borderRadius: '999px',
+                  fontSize: '13.5px',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 16px rgba(2, 132, 199, 0.35)',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '5px'
-                }}>
-                  <Sparkles size={12} />
-                  <span>Upcoming Q4 Feature Preview</span>
-                </span>
-              </div>
-            )}
-
-            <button
-              onClick={handleClose}
-              style={{
-                padding: '9px 20px',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
-                color: '#FFFFFF',
-                border: 'none',
-                fontWeight: 700,
-                fontSize: '13px',
-                cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(2, 132, 199, 0.3)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <span>Explore Platform</span>
-              <ArrowRight size={14} />
-            </button>
+                  gap: '8px',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(2, 132, 199, 0.45)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(2, 132, 199, 0.35)';
+                }}
+              >
+                <span>Explore Platform</span>
+                <ArrowRight size={15} />
+              </button>
+            </div>
           </div>
+
         </div>
       </div>
     </div>
