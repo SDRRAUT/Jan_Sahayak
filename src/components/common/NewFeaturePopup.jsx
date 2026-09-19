@@ -175,20 +175,21 @@ export default function NewFeaturePopup() {
                 <span style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '5px',
-                  background: 'rgba(255, 255, 255, 0.22)',
-                  padding: '3px 10px',
+                  gap: '6px',
+                  background: '#FFFFFF',
+                  color: '#0284C7',
+                  padding: '4px 12px',
                   borderRadius: '999px',
-                  fontSize: '11px',
+                  fontSize: '11.5px',
                   fontWeight: 800,
-                  letterSpacing: '0.04em',
-                  textTransform: 'uppercase'
+                  letterSpacing: '0.03em',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)'
                 }}>
-                  <Sparkles size={13} />
-                  <span>Upcoming Q4 Initiative</span>
+                  <Sparkles size={13} style={{ color: '#0284C7' }} />
+                  <span>WE ARE ADDING A NEW FEATURE SOON!</span>
                 </span>
                 <span style={{
-                  fontSize: '11.5px',
+                  fontSize: '12px',
                   color: '#BAE6FD',
                   fontWeight: 600,
                   display: 'inline-flex',
@@ -196,14 +197,14 @@ export default function NewFeaturePopup() {
                   gap: '4px'
                 }}>
                   <Zap size={13} style={{ color: '#FDE047' }} />
-                  Uber-Model for Civic Grievances
+                  Uber-Model for Civic Repairs
                 </span>
               </div>
-              <h2 style={{ fontSize: '22px', fontWeight: 800, margin: 0, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
-                JanSahayak Civic Workforce Marketplace
+              <h2 style={{ fontSize: '23px', fontWeight: 800, margin: 0, letterSpacing: '-0.02em', lineHeight: 1.25 }}>
+                Connecting Local Workers with Government & Citizens
               </h2>
-              <p style={{ fontSize: '13.5px', color: '#E0F2FE', margin: '4px 0 0 0', fontWeight: 500 }}>
-                Connecting municipal departments with verified local workers to solve civic tasks faster
+              <p style={{ fontSize: '13.5px', color: '#E0F2FE', margin: '4px 0 0 0', fontWeight: 500, lineHeight: 1.4 }}>
+                A direct marketplace linking municipal teams with verified local tradespeople (plumbers, masons, electricians) to resolve civic issues on demand.
               </p>
             </div>
           </div>
@@ -322,6 +323,35 @@ export default function NewFeaturePopup() {
                 <span style={{ fontSize: '12px', color: '#3730A3' }}>Citizen verified + Instant DBT pay</span>
               </div>
             </div>
+          </div>
+
+          {/* Plain Language Explainer Callout */}
+          <div style={{
+            padding: '14px 18px',
+            borderRadius: '16px',
+            background: '#F8FAFC',
+            border: '1.5px solid #E2E8F0',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px'
+          }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              background: '#E0F2FE',
+              color: '#0284C7',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '18px',
+              flexShrink: 0
+            }}>
+              💡
+            </div>
+            <p style={{ margin: 0, fontSize: '13px', color: '#334155', lineHeight: 1.55 }}>
+              <strong>The Goal:</strong> Just like ride apps connect passengers with nearby drivers, <strong>JanSahayak</strong> will connect municipal departments with <strong>verified local workers</strong> (electricians, plumbers, masons) to fix drainage, road, and civic problems faster, creating legitimate work and transparent payouts for everyone.
+            </p>
           </div>
 
           {/* 3-Column Horizontal Grid for Stakeholders */}
