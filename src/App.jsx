@@ -22,6 +22,7 @@ import SuperAdmin from './pages/SuperAdmin';
 import Onboarding from './pages/Onboarding';
 import JanSahayakAssistant from './components/assistant/JanSahayakAssistant';
 import NewFeaturePopup from './components/common/NewFeaturePopup';
+import MobileDesktopBanner from './components/common/MobileDesktopBanner';
 
 function RoleHome() {
   // Logged-in citizen or officer opening root sees the Home page with their authenticated profile
@@ -117,11 +118,19 @@ export default function App() {
     (location.pathname === '/' && (!token || !user) && !hasEnteredApp);
 
   if (isFullScreenOnboarding) {
-    return <Onboarding initialStep={isDirectLogin ? 4 : 1} skipSplash={isDirectLogin} />;
+    return (
+      <>
+        <MobileDesktopBanner />
+        <Onboarding initialStep={isDirectLogin ? 4 : 1} skipSplash={isDirectLogin} />
+      </>
+    );
   }
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Mobile → Desktop Mode prompt */}
+      <MobileDesktopBanner />
+
       {/* Docked Civic Navbar with RBAC Switcher */}
       <Navbar />
 
