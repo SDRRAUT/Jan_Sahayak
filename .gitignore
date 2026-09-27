@@ -12,7 +12,8 @@
 .env.development.local
 .env.test.local
 .env.production.local
-.env.example
+!.env.example
+
 
 # ------------------------------------------------------------------------------
 # 2. Cryptographic Keys, Certificates & Credentials
@@ -72,9 +73,10 @@ server/data/*.backup.json
 *.db-shm
 *.sqlite
 *.sqlite3
-*.sql
 *.dump
 *.rdb
+!database/**/*.sql
+!supabase/**/*.sql
 
 # ------------------------------------------------------------------------------
 # 6. Scratch Files, SingleFile Web Dumps & Local Exports

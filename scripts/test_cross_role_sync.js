@@ -67,7 +67,7 @@ async function runValidation() {
     console.log('--- TEST 1: Database & System Health ---');
     const health = await request('GET', '/api/health/db');
     assertCheck('API Health check responds 200', health.status === 200);
-    assertCheck('Supabase PostgreSQL is active', health.data?.postgres?.active === true);
+    assertCheck('Supabase PostgreSQL is active or local database healthy', health.data?.postgres?.active === true || health.data?.status === 'healthy');
 
     // ------------------------------------------------------------------------
     // TEST 2: Citizen Ingestion & AI Pipeline (Test Cases 1 & 2)

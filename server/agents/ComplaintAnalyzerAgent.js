@@ -77,6 +77,14 @@ Return JSON schema:
           keywords.push('contamination', 'pipeline', 'leakage');
           severity = 9;
           urgency = 9;
+        } else if (lower.includes('pressure') || lower.includes('leak') || lower.includes('leakage') || lower.includes('pipeline') || lower.includes('supply') || lower.includes('tap')) {
+          problem_type = 'water_supply_disruption';
+          category = 'Water Supply & Contamination';
+          subcategory = 'Pipeline Pressure Loss & Supply Interruption';
+          infrastructure.push('Potable Water Feeder Main', 'Distribution Valve');
+          keywords.push('water', 'pressure', 'supply', 'pipeline');
+          severity = 8;
+          urgency = 8;
         }
 
         if (lower.includes('rain') || lower.includes('rainfall')) temporal_signals.push('Post-rainfall storm surge');

@@ -329,7 +329,8 @@ export default function CitizenSubmit() {
           const data = await res.json();
           if (data.vision) {
             setVisionAnalysis(data.vision);
-            setPhotoTag(`Gemini Vision: ${data.vision.observed_hazard} (${Math.round(data.vision.confidence * 100)}% confidence)`);
+            const prefix = data.source === 'gemini' ? 'Gemini Vision' : 'Visual Feature Scan (Offline)';
+            setPhotoTag(`${prefix}: ${data.vision.observed_hazard} (${Math.round(data.vision.confidence * 100)}% confidence)`);
             if (data.vision.category && !manualCategory) {
               setManualCategory(data.vision.category);
             }
@@ -1313,7 +1314,7 @@ export default function CitizenSubmit() {
                         Live Grievance DNA™ & Authority Routing
                       </strong>
                       <span style={{ fontSize: '11.5px', color: '#64748B' }}>
-                        Automated multi-agent synthesis powered by Gemini 3.5
+                        Automated multi-agent synthesis (Gemini 2.5 Flash / Civic Rule Engine)
                       </span>
                     </div>
                   </div>

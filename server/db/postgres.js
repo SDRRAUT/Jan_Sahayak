@@ -1,29 +1,68 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import pg from 'pg';
 import { createClient } from '@supabase/supabase-js';
+import '../env.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const STORE_PATH = path.resolve(__dirname, '../data/store.json');
 
 const { Pool } = pg;
 
-// PostgreSQL connection string for Supabase
-const connectionString = 
-  process.env.DATABASE_URL || 
-  process.env.POSTGRES_URL || 
-  process.env.POSTGRES_PRISMA_URL || 
-  process.env.PG_CONNECTION_STRING ||
-  'postgres://jan_sahayak_app:JanSahayak_Secure_DB_2026!@db.epnfavpqweeybzoyoexq.supabase.co:5432/postgres';
+export function getConnectionString() {
+  return process.env.DATABASE_URL || 
+    process.env.POSTGRES_URL || 
+    process.env.POSTGRES_PRISMA_URL || 
+    process.env.PG_CONNECTION_STRING ||
+    null;
+}
 
-const supabaseUrl = process.env.SUPABASE_URL || 'https://epnfavpqweeybzoyoexq.supabase.co';
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwbmZhdnBxd2VleWJ6b3lvZXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0MTcxOTMsImV4cCI6MjEwMzk5MzE5M30.PIvlGuiavqRRnb1zTFIwdmizMh9AeSLxc5nW8YdhYHQ';
-const supabaseRestClient = createClient(supabaseUrl, supabaseAnonKey);
+export function getSupabaseUrl() {
+  return process.env.SUPABASE_URL || null;
+}
+
+export function getSupabaseAnonKey() {
+  return process.env.SUPABASE_ANON_KEY || null;
+}
+
+export function getSupabaseRestClient() {
+  const url = getSupabaseUrl();
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || getSupabaseAnonKey();
+  if (url && key) {
+    return createClient(url, key);
+  }
+  return null;
+}
+
+export function readLocalStore() {
+  try {
+    if (fs.existsSync(STORE_PATH)) {
+      return JSON.parse(fs.readFileSync(STORE_PATH, 'utf8'));
+    }
+  } catch (e) {}
+  return { complaints: [], civicIncidents: [], fieldActions: [], verifications: [], auditLogs: [], notifications: [] };
+}
+
+export function writeLocalStore(store) {
+  try {
+    fs.writeFileSync(STORE_PATH, JSON.stringify(store, null, 2), 'utf8');
+  } catch (e) {
+    console.error('Failed to write local store:', e.message);
+  }
+}
 
 let pool = null;
 let isConnected = false;
 
 export function getPool() {
-  if (!connectionString) return null;
+  const connStr = getConnectionString();
+  if (!connStr) return null;
   if (!pool) {
-    const isLocal = connectionString.includes('localhost') || connectionString.includes('127.0.0.1');
+    const isLocal = connStr.includes('localhost') || connStr.includes('127.0.0.1');
     pool = new Pool({
-      connectionString,
+      connectionString: connStr,
       ssl: isLocal ? false : { rejectUnauthorized: false },
       max: 15,
       idleTimeoutMillis: 30000,
@@ -55,7 +94,7 @@ export async function checkPostgresConnection() {
 }
 
 export function isPostgresActive() {
-  return Boolean(connectionString && isConnected);
+  return Boolean(getConnectionString() && isConnected);
 }
 
 /**
@@ -130,13 +169,15 @@ export const postgresDB = {
     }
 
     // High-Reliability Fallback: Supabase REST API (via HTTPS, works on Vercel)
-    try {
-      const { data, error } = await supabaseRestClient
-        .from('grievances')
-        .select('*')
-        .order('created_at', { ascending: false });
+    const restClient = getSupabaseRestClient();
+    if (restClient) {
+      try {
+        const { data, error } = await restClient
+          .from('grievances')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-      if (!error && data && data.length > 0) {
+        if (!error && data && data.length > 0) {
         return data.map(r => ({
           id: r.id,
           title: r.title,
@@ -181,26 +222,27 @@ export const postgresDB = {
     } catch (restErr) {
       console.warn('[Supabase REST] Error fetching grievances:', restErr.message);
     }
+  }
 
-    return [];
-  },
+  return [];
+},
 
   async getGrievanceById(id) {
     const p = getPool();
-    if (!p) return null;
-    try {
-      const res = await p.query(`
-        SELECT 
-          g.*,
-          extensions.ST_Y(g.geom::extensions.geometry) AS lat_val,
-          extensions.ST_X(g.geom::extensions.geometry) AS lng_val
-        FROM public.grievances g
-        WHERE g.id = $1
-      `, [id]);
+    if (p) {
+      try {
+        const res = await p.query(`
+          SELECT 
+            g.*,
+            extensions.ST_Y(g.geom::extensions.geometry) AS lat_val,
+            extensions.ST_X(g.geom::extensions.geometry) AS lng_val
+          FROM public.grievances g
+          WHERE g.id = $1
+        `, [id]);
 
-      if (!res.rows.length) return null;
-      const r = res.rows[0];
-      return {
+        if (res.rows.length) {
+          const r = res.rows[0];
+          return {
         id: r.id,
         title: r.title,
         descriptionRaw: r.description_raw,
@@ -239,11 +281,53 @@ export const postgresDB = {
         resolutionPhotoUrl: r.resolution_photo_url,
         citizenVerification: r.citizen_verification,
         timeline: r.timeline || []
-      };
-    } catch (err) {
-      console.error('PostgreSQL getGrievanceById error:', err.message);
-      return null;
+          };
+        }
+      } catch (err) {
+        console.warn('PostgreSQL getGrievanceById warning:', err.message);
+      }
     }
+
+    const restClient = getSupabaseRestClient();
+    if (restClient) {
+      try {
+        const { data, error } = await restClient
+          .from('grievances')
+          .select('*')
+          .eq('id', id)
+          .single();
+        if (!error && data) {
+          return {
+            id: data.id,
+            title: data.title,
+            descriptionRaw: data.description_raw,
+            category: data.category,
+            department: data.department,
+            status: data.status,
+            location: {
+              ward: data.location_ward,
+              area: data.location_area,
+              city: data.location_city || 'New Delhi',
+              pincode: data.location_pincode,
+              lat: data.lat || 28.7189,
+              lng: data.lng || 77.1265
+            },
+            timeline: data.timeline || []
+          };
+        }
+      } catch (_) {}
+    }
+
+    try {
+      if (fs.existsSync(STORE_PATH)) {
+        const raw = fs.readFileSync(STORE_PATH, 'utf-8');
+        const parsed = JSON.parse(raw);
+        const found = (parsed.complaints || []).find(c => c.id === id);
+        if (found) return found;
+      }
+    } catch (_) {}
+
+    return null;
   },
 
   async saveGrievance(g) {
@@ -621,12 +705,30 @@ export const postgresDB = {
   // --- Audit Logs ---
   async logAuditEvent(actor, action, targetId, details, metadata = {}) {
     const p = getPool();
-    if (!p) return false;
+    if (!p) {
+      const store = readLocalStore();
+      if (!store.auditLogs) store.auditLogs = [];
+      const item = {
+        id: `LOG-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
+        actor: actor || 'System AI Engine',
+        actor_name: actor || 'System AI Engine',
+        action: action || 'ACTION',
+        targetId: targetId || null,
+        target_id: targetId || null,
+        details: details || '',
+        metadata: metadata || {},
+        timestamp: new Date().toLocaleString(),
+        created_at: new Date().toISOString()
+      };
+      store.auditLogs.unshift(item);
+      writeLocalStore(store);
+      return true;
+    }
     try {
       await p.query(`
         INSERT INTO public.audit_logs (actor_name, actor_role, action, target_id, details, metadata, created_at)
         VALUES ($1, $2, $3, $4, $5, $6, NOW())
-      `, [actor || 'System AI Engine', 'SYSTEM', action, targetId, details, JSON.stringify(metadata)]);
+      `, [actor || 'System AI Engine', metadata?.role || 'SYSTEM', action, targetId, details, JSON.stringify(metadata)]);
       return true;
     } catch (err) {
       console.error('PostgreSQL logAuditEvent error:', err.message);
@@ -636,7 +738,18 @@ export const postgresDB = {
 
   async getAuditLogs(limit = 100) {
     const p = getPool();
-    if (!p) return [];
+    if (!p) {
+      const store = readLocalStore();
+      return (store.auditLogs || []).slice(0, limit).map(r => ({
+        id: r.id,
+        timestamp: r.timestamp || new Date(r.created_at || Date.now()).toLocaleString(),
+        actor: r.actor || r.actor_name,
+        action: r.action,
+        targetId: r.targetId || r.target_id,
+        details: r.details,
+        metadata: r.metadata
+      }));
+    }
     try {
       const res = await p.query('SELECT * FROM public.audit_logs ORDER BY created_at DESC LIMIT $1', [limit]);
       return res.rows.map(r => ({
@@ -650,33 +763,88 @@ export const postgresDB = {
       }));
     } catch (err) {
       console.error('PostgreSQL getAuditLogs error:', err.message);
-      return [];
+      const store = readLocalStore();
+      return (store.auditLogs || []).slice(0, limit);
     }
   },
 
   // --- Field Actions ---
-  async recordFieldAction({ incidentId, grievanceId, officerId, officerName, actionType, status, notes, evidenceUrl }) {
+  async recordFieldAction({ incidentId, grievanceId, officerId, officerName, actionType, status, notes, evidenceUrl, beforePhotoUrl, afterPhotoUrl, gpsLat, gpsLng, startedAt, completedAt }) {
     const p = getPool();
-    if (!p) return false;
+    if (!p) {
+      const store = readLocalStore();
+      if (!store.fieldActions) store.fieldActions = [];
+      const item = {
+        id: `FA-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
+        incidentId: incidentId || null,
+        grievanceId: grievanceId || null,
+        officerId: officerId || null,
+        officerName: officerName || 'Field Officer',
+        actionType: actionType || 'REPAIR',
+        status: status || 'COMPLETED',
+        notes: notes || '',
+        evidenceUrl: evidenceUrl || afterPhotoUrl || beforePhotoUrl || null,
+        beforePhotoUrl: beforePhotoUrl || null,
+        afterPhotoUrl: afterPhotoUrl || null,
+        gpsLat: gpsLat ? parseFloat(gpsLat) : null,
+        gpsLng: gpsLng ? parseFloat(gpsLng) : null,
+        startedAt: startedAt || new Date().toISOString(),
+        completedAt: completedAt || new Date().toISOString(),
+        createdAt: new Date().toISOString()
+      };
+      store.fieldActions.unshift(item);
+      writeLocalStore(store);
+      return true;
+    }
     try {
       let validOfficerId = null;
       if (officerId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(officerId)) {
         validOfficerId = officerId;
       }
+      const actualEvidence = evidenceUrl || afterPhotoUrl || beforePhotoUrl || null;
       try {
         await p.query(`
           INSERT INTO public.field_actions (
-            incident_id, grievance_id, officer_id, officer_name, action_type, status, notes, evidence_url, started_at, completed_at
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW() - INTERVAL '2 hours', NOW())
-        `, [incidentId || null, grievanceId || null, validOfficerId, officerName || 'Field Officer', actionType || 'REPAIR', status || 'COMPLETED', notes || '', evidenceUrl || null]);
+            incident_id, grievance_id, officer_id, officer_name, action_type, status, notes, evidence_url, before_photo_url, after_photo_url, gps_lat, gps_lng, started_at, completed_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, COALESCE($13, NOW() - INTERVAL '2 hours'), COALESCE($14, NOW()))
+        `, [
+          incidentId || null,
+          grievanceId || null,
+          validOfficerId,
+          officerName || 'Field Officer',
+          actionType || 'REPAIR',
+          status || 'COMPLETED',
+          notes || '',
+          actualEvidence,
+          beforePhotoUrl || null,
+          afterPhotoUrl || null,
+          gpsLat ? parseFloat(gpsLat) : null,
+          gpsLng ? parseFloat(gpsLng) : null,
+          startedAt || null,
+          completedAt || null
+        ]);
         return true;
       } catch (fkErr) {
         if (validOfficerId && fkErr.code === '23503') {
           await p.query(`
             INSERT INTO public.field_actions (
-              incident_id, grievance_id, officer_id, officer_name, action_type, status, notes, evidence_url, started_at, completed_at
-            ) VALUES ($1, $2, null, $3, $4, $5, $6, $7, NOW() - INTERVAL '2 hours', NOW())
-          `, [incidentId || null, grievanceId || null, officerName || 'Field Officer', actionType || 'REPAIR', status || 'COMPLETED', notes || '', evidenceUrl || null]);
+              incident_id, grievance_id, officer_id, officer_name, action_type, status, notes, evidence_url, before_photo_url, after_photo_url, gps_lat, gps_lng, started_at, completed_at
+            ) VALUES ($1, $2, null, $3, $4, $5, $6, $7, $8, $9, $10, $11, COALESCE($12, NOW() - INTERVAL '2 hours'), COALESCE($13, NOW()))
+          `, [
+            incidentId || null,
+            grievanceId || null,
+            officerName || 'Field Officer',
+            actionType || 'REPAIR',
+            status || 'COMPLETED',
+            notes || '',
+            actualEvidence,
+            beforePhotoUrl || null,
+            afterPhotoUrl || null,
+            gpsLat ? parseFloat(gpsLat) : null,
+            gpsLng ? parseFloat(gpsLng) : null,
+            startedAt || null,
+            completedAt || null
+          ]);
           return true;
         }
         throw fkErr;
@@ -684,6 +852,60 @@ export const postgresDB = {
     } catch (err) {
       console.error('PostgreSQL recordFieldAction error:', err.message);
       return false;
+    }
+  },
+
+  async getFieldActions({ incidentId, grievanceId, officerId } = {}) {
+    const p = getPool();
+    if (!p) {
+      const store = readLocalStore();
+      const list = store.fieldActions || [];
+      return list.filter(fa => {
+        if (incidentId && fa.incidentId !== incidentId) return false;
+        if (grievanceId && fa.grievanceId !== grievanceId) return false;
+        if (officerId && fa.officerId !== officerId) return false;
+        return true;
+      });
+    }
+    try {
+      let query = 'SELECT * FROM public.field_actions WHERE 1=1';
+      const params = [];
+      if (incidentId) {
+        params.push(incidentId);
+        query += ` AND incident_id = $${params.length}`;
+      }
+      if (grievanceId) {
+        params.push(grievanceId);
+        query += ` AND grievance_id = $${params.length}`;
+      }
+      if (officerId) {
+        params.push(officerId);
+        query += ` AND officer_id = $${params.length}`;
+      }
+      query += ' ORDER BY created_at DESC LIMIT 100';
+      const res = await p.query(query, params);
+      return res.rows.map(r => ({
+        id: r.id,
+        incidentId: r.incident_id,
+        grievanceId: r.grievance_id,
+        officerId: r.officer_id,
+        officerName: r.officer_name,
+        actionType: r.action_type,
+        status: r.status,
+        notes: r.notes,
+        evidenceUrl: r.evidence_url,
+        beforePhotoUrl: r.before_photo_url,
+        afterPhotoUrl: r.after_photo_url,
+        gpsLat: r.gps_lat,
+        gpsLng: r.gps_lng,
+        startedAt: r.started_at,
+        completedAt: r.completed_at,
+        createdAt: r.created_at
+      }));
+    } catch (err) {
+      console.error('PostgreSQL getFieldActions error:', err.message);
+      const store = readLocalStore();
+      return store.fieldActions || [];
     }
   },
 
@@ -707,7 +929,32 @@ export const postgresDB = {
   // --- Verification Records ---
   async recordVerification({ grievanceId, incidentId, citizenId, status, feedback, rating, photoUrl }) {
     const p = getPool();
-    if (!p) return false;
+    if (!p) {
+      const store = readLocalStore();
+      if (!store.verifications) store.verifications = [];
+      let normalizedStatus = 'PENDING';
+      const upperStatus = (status || '').toUpperCase();
+      if (['CONFIRMED', 'VERIFIED_SATISFIED', 'SATISFIED', 'VERIFIED', 'RESOLVED_CONFIRMED'].includes(upperStatus)) {
+        normalizedStatus = 'CONFIRMED';
+      } else if (['DISPUTED', 'DISPUTE_REOPENED', 'REOPENED'].includes(upperStatus)) {
+        normalizedStatus = 'DISPUTED';
+      }
+      const item = {
+        id: `VR-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
+        grievanceId: grievanceId || null,
+        incidentId: incidentId || null,
+        citizenId: citizenId || null,
+        status: normalizedStatus,
+        feedback: feedback || '',
+        rating: rating || 5,
+        photoUrl: photoUrl || null,
+        verifiedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString()
+      };
+      store.verifications.unshift(item);
+      writeLocalStore(store);
+      return true;
+    }
     try {
       let normalizedStatus = 'PENDING';
       const upperStatus = (status || '').toUpperCase();
@@ -746,7 +993,53 @@ export const postgresDB = {
     }
   },
 
-  // --- Evidence Records ---
+  async getVerifications({ grievanceId, incidentId, citizenId } = {}) {
+    const p = getPool();
+    if (!p) {
+      const store = readLocalStore();
+      const list = store.verifications || [];
+      return list.filter(v => {
+        if (grievanceId && v.grievanceId !== grievanceId) return false;
+        if (incidentId && v.incidentId !== incidentId) return false;
+        if (citizenId && v.citizenId !== citizenId) return false;
+        return true;
+      });
+    }
+    try {
+      let query = 'SELECT * FROM public.verification_records WHERE 1=1';
+      const params = [];
+      if (grievanceId) {
+        params.push(grievanceId);
+        query += ` AND grievance_id = $${params.length}`;
+      }
+      if (incidentId) {
+        params.push(incidentId);
+        query += ` AND incident_id = $${params.length}`;
+      }
+      if (citizenId) {
+        params.push(citizenId);
+        query += ` AND citizen_id = $${params.length}`;
+      }
+      query += ' ORDER BY verified_at DESC LIMIT 100';
+      const res = await p.query(query, params);
+      return res.rows.map(r => ({
+        id: r.id,
+        grievanceId: r.grievance_id,
+        incidentId: r.incident_id,
+        citizenId: r.citizen_id,
+        status: r.status,
+        feedback: r.feedback,
+        rating: r.rating,
+        photoUrl: r.photo_url,
+        verifiedAt: r.verified_at,
+        createdAt: r.created_at
+      }));
+    } catch (err) {
+      console.error('PostgreSQL getVerifications error:', err.message);
+      const store = readLocalStore();
+      return store.verifications || [];
+    }
+  },
   async saveEvidenceRecord({ complaintId, incidentId, uploadedBy, type, storagePath, fileUrl, mimeType, metadata }) {
     const p = getPool();
     if (!p) return false;
@@ -921,7 +1214,26 @@ export const postgresDB = {
   // --- Notifications ---
   async saveNotification({ userId, userRole, title, message, grievanceId, link, type }) {
     const p = getPool();
-    if (!p) return false;
+    if (!p) {
+      const store = readLocalStore();
+      if (!store.notifications) store.notifications = [];
+      const item = {
+        id: `NOTIF-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
+        userId: userId || null,
+        userRole: userRole || 'all',
+        title: title || 'Notification',
+        message: message || '',
+        grievanceId: grievanceId || null,
+        link: link || null,
+        type: type || 'GENERAL',
+        read: false,
+        createdAt: 'Just now',
+        timestamp: new Date().toISOString()
+      };
+      store.notifications.unshift(item);
+      writeLocalStore(store);
+      return true;
+    }
     try {
       await p.query(`
         INSERT INTO public.notifications (
@@ -938,7 +1250,21 @@ export const postgresDB = {
   // --- Update Grievance Status ---
   async updateGrievanceStatus(grievanceId, updates) {
     const p = getPool();
-    if (!p) return false;
+    if (!p) {
+      const store = readLocalStore();
+      if (!store.complaints) store.complaints = [];
+      const idx = store.complaints.findIndex(c => c.id === grievanceId);
+      if (idx >= 0) {
+        store.complaints[idx] = {
+          ...store.complaints[idx],
+          ...updates,
+          updatedAt: new Date().toISOString()
+        };
+        writeLocalStore(store);
+        return true;
+      }
+      return false;
+    }
     try {
       const setClauses = [];
       const values = [];
@@ -961,6 +1287,10 @@ export const postgresDB = {
         setClauses.push(`officer_id = $${idx++}`);
         values.push(updates.assignedTo);
       }
+      if (updates.timeline !== undefined) {
+        setClauses.push(`timeline = $${idx++}`);
+        values.push(JSON.stringify(updates.timeline));
+      }
 
       if (setClauses.length === 0) return false;
 
@@ -976,6 +1306,10 @@ export const postgresDB = {
       console.error('[PostgreSQL] updateGrievanceStatus error:', err.message);
       return false;
     }
+  },
+
+  async updateGrievance(grievanceId, updates) {
+    return this.updateGrievanceStatus(grievanceId, updates);
   },
 
   // --- Add Civic Memory from Resolved Complaint ---
@@ -1022,7 +1356,16 @@ export const postgresDB = {
   // --- Notifications: Fetch from Supabase ---
   async getNotifications(userId, userRole) {
     const p = getPool();
-    if (!p) return null;
+    if (!p) {
+      const store = readLocalStore();
+      const list = store.notifications || [];
+      return list.filter(n => {
+        if (userRole === 'super_admin') return true;
+        if (userId && n.userId === userId) return true;
+        if (userRole && (n.userRole === userRole || n.userRole === 'all')) return true;
+        return false;
+      });
+    }
     try {
       const isUUID = typeof userId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
       let result;

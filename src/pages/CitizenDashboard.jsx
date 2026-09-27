@@ -267,7 +267,7 @@ function GrievanceDetailPopup({ item, onClose, citizen, upvoteGrievance }) {
             <ThumbsUp style={{width:'14px',height:'14px'}}/> Upvote ({item.upvotes||1})
           </button>
           <Link to={`/citizen/complaints/${item.id}`} style={{flex:2,height:'44px',borderRadius:'999px',background:'#0F172A',color:'#FFFFFF',fontWeight:700,fontSize:'13px',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px',textDecoration:'none',boxShadow:'0 2px 8px rgba(15,23,42,0.15)'}}>
-            {item.status==='RESOLVED'?'Verify Resolution':'Full Investigation View'} <ArrowRight style={{width:'15px',height:'15px'}}/>
+            {(item.status==='RESOLVED'||item.status==='ACTION_COMPLETED'||item.status==='VERIFICATION_PENDING')?'Verify Resolution':'Full Investigation View'} <ArrowRight style={{width:'15px',height:'15px'}}/>
           </Link>
         </div>
       </div>
@@ -555,7 +555,7 @@ export default function CitizenDashboard() {
     (g.citizenName && citizen.name && g.citizenName.toLowerCase() === citizen.name.toLowerCase()) ||
     (citizen.name && g.citizenName && g.citizenName.includes('Aditya'))
   );
-  const pendingVerification = myReports.filter(g => g.status === 'RESOLVED');
+  const pendingVerification = myReports.filter(g => g.status === 'RESOLVED' || g.status === 'ACTION_COMPLETED' || g.status === 'VERIFICATION_PENDING');
   const citizenNotifications= dashboardData?.notifications || contextNotifs.filter(n => n.userRole === 'citizen' || n.userId === citizen.id);
   const activeWardIncident  = civicIncidents[0];
   const currentHour=new Date().getHours();
@@ -566,7 +566,7 @@ export default function CitizenDashboard() {
     const ok=!q||(g.title||'').toLowerCase().includes(q)||(g.descriptionRaw||'').toLowerCase().includes(q)||(g.id||'').toLowerCase().includes(q);
     if(!ok)return false;
     if(activeTab==='my')return g.citizenId===citizen.id||(g.citizenName&&citizen.name&&g.citizenName.toLowerCase()===citizen.name.toLowerCase())||(citizen.name&&g.citizenName&&g.citizenName.includes('Aditya'));
-    if(activeTab==='verification')return g.status==='RESOLVED'&&(g.citizenId===citizen.id||(g.citizenName&&citizen.name&&g.citizenName.toLowerCase()===citizen.name.toLowerCase()));
+    if(activeTab==='verification')return (g.status==='RESOLVED'||g.status==='ACTION_COMPLETED'||g.status==='VERIFICATION_PENDING')&&(g.citizenId===citizen.id||(g.citizenName&&citizen.name&&g.citizenName.toLowerCase()===citizen.name.toLowerCase()));
     if(activeTab==='active')return g.status!=='RESOLVED'&&g.status!=='RESOLVED_CONFIRMED';
     if(activeTab==='resolved')return g.status==='RESOLVED'||g.status==='RESOLVED_CONFIRMED';
     return true;

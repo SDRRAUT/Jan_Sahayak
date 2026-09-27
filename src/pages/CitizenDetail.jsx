@@ -172,7 +172,7 @@ export default function CitizenDetail() {
           <div style={{ gridColumn: 'span 7' }} className="hero-left-col">
             
             {/* Closed Loop Resolution Verification */}
-            {(item.status === 'RESOLVED' || item.status === 'RESOLVED_CONFIRMED' || item.status === 'DISPUTE_REOPENED') && (
+            {(item.status === 'RESOLVED' || item.status === 'RESOLVED_CONFIRMED' || item.status === 'ACTION_COMPLETED' || item.status === 'VERIFICATION_PENDING' || item.status === 'DISPUTE_REOPENED' || item.status === 'REOPENED') && (
               <div style={{ marginBottom: '24px' }}>
                 <ResolutionVerificationCard
                   grievance={item}

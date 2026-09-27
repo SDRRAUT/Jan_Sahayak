@@ -366,6 +366,17 @@ const INITIAL_STORE = {
       payload: { stage: 'GROWING', severity: 'CRITICAL' },
       createdAt: '2026-09-16T04:05:00.000Z'
     }
+  ],
+  fieldActions: [],
+  auditLogs: [
+    {
+      id: 'LOG-001',
+      timestamp: '10:45 AM',
+      actor: 'Super Admin',
+      action: 'SYSTEM_BOOT',
+      targetId: 'SYS',
+      details: 'Platform initialized with authoritative schema'
+    }
   ]
 };
 
@@ -412,6 +423,8 @@ class Database {
       if (fs.existsSync(DB_FILE)) {
         const raw = fs.readFileSync(DB_FILE, 'utf8');
         this.data = JSON.parse(raw);
+        if (!this.data.fieldActions) this.data.fieldActions = [];
+        if (!this.data.auditLogs) this.data.auditLogs = [];
       } else {
         this.data = JSON.parse(JSON.stringify(INITIAL_STORE));
         this.save();
@@ -431,13 +444,21 @@ class Database {
     }
   }
 
-  // --- Complaints ---
+  // --- Complaints / Grievances ---
   getComplaints() {
     return this.data.complaints || [];
   }
 
+  getGrievances() {
+    return this.getComplaints();
+  }
+
   getComplaintById(id) {
     return (this.data.complaints || []).find(c => c.id === id);
+  }
+
+  getGrievanceById(id) {
+    return this.getComplaintById(id);
   }
 
   saveComplaint(complaint) {
@@ -534,6 +555,177 @@ class Database {
       typeof event.payload === 'string' ? event.payload : JSON.stringify(event.payload || {})
     ).catch(() => {});
     return record;
+  }
+
+  // --- Field Actions ---
+  getFieldActions({ incidentId, grievanceId, officerId } = {}) {
+    const list = this.data.fieldActions || [];
+    return list.filter(fa => {
+      if (incidentId && fa.incidentId !== incidentId) return false;
+      if (grievanceId && fa.grievanceId !== grievanceId) return false;
+      if (officerId && fa.officerId !== officerId) return false;
+      return true;
+    });
+  }
+
+  saveFieldAction(action) {
+    if (!this.data.fieldActions) this.data.fieldActions = [];
+    const item = {
+      id: action.id || `FA-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
+      createdAt: action.createdAt || new Date().toISOString(),
+      ...action
+    };
+    const idx = this.data.fieldActions.findIndex(f => f.id === item.id);
+    if (idx >= 0) {
+      this.data.fieldActions[idx] = { ...this.data.fieldActions[idx], ...item };
+    } else {
+      this.data.fieldActions.unshift(item);
+    }
+    this.save();
+    return item;
+  }
+
+  // --- Verifications ---
+  getVerifications({ grievanceId, incidentId, citizenId } = {}) {
+    const list = this.data.verifications || [];
+    return list.filter(v => {
+      if (grievanceId && v.grievanceId !== grievanceId) return false;
+      if (incidentId && v.incidentId !== incidentId) return false;
+      if (citizenId && v.citizenId !== citizenId) return false;
+      return true;
+    });
+  }
+
+  saveVerification(ver) {
+    if (!this.data.verifications) this.data.verifications = [];
+    const item = {
+      id: ver.id || `VR-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
+      verifiedAt: ver.verifiedAt || new Date().toISOString(),
+      createdAt: ver.createdAt || new Date().toISOString(),
+      ...ver
+    };
+    const idx = this.data.verifications.findIndex(v => v.id === item.id);
+    if (idx >= 0) {
+      this.data.verifications[idx] = { ...this.data.verifications[idx], ...item };
+    } else {
+      this.data.verifications.unshift(item);
+    }
+    this.save();
+    return item;
+  }
+
+  // --- Audit Logs ---
+  getAuditLogs(limit = 100) {
+    const logs = this.data.auditLogs || [];
+    return logs.slice(0, limit);
+  }
+
+  saveAuditLog(log) {
+    if (!this.data.auditLogs) this.data.auditLogs = [];
+    const item = {
+      id: log.id || `LOG-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
+      timestamp: log.timestamp || new Date().toLocaleString(),
+      createdAt: new Date().toISOString(),
+      ...log
+    };
+    this.data.auditLogs.unshift(item);
+    this.save();
+    return item;
+  }
+
+  // --- Notifications ---
+  getNotifications(userId, userRole) {
+    const notifs = this.data.notifications || [];
+    if (!userId && !userRole) return notifs;
+    return notifs.filter(n => {
+      if (userRole === 'super_admin') return true;
+      if (userId && n.userId === userId) return true;
+      if (userRole && (n.userRole === userRole || n.userRole === 'all')) return true;
+      return false;
+    });
+  }
+
+  saveNotification(n) {
+    if (!this.data.notifications) this.data.notifications = [];
+    const item = {
+      id: n.id || `NOTIF-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
+      createdAt: n.createdAt || 'Just now',
+      timestamp: n.timestamp || new Date().toISOString(),
+      read: n.read || false,
+      ...n
+    };
+    this.data.notifications.unshift(item);
+    this.save();
+    return item;
+  }
+
+  markNotificationRead(id) {
+    if (!this.data.notifications) return false;
+    const n = this.data.notifications.find(item => item.id === id);
+    if (n) {
+      n.read = true;
+      this.save();
+      return true;
+    }
+    return false;
+  }
+
+  updateComplaint(idOrItem, updates = {}) {
+    if (!this.data.complaints) return null;
+    const id = typeof idOrItem === 'object' ? idOrItem.id : idOrItem;
+    const upd = typeof idOrItem === 'object' ? idOrItem : updates;
+    const idx = this.data.complaints.findIndex(c => c.id === id);
+    if (idx >= 0) {
+      this.data.complaints[idx] = { ...this.data.complaints[idx], ...upd };
+      this.save();
+      return this.data.complaints[idx];
+    }
+    return null;
+  }
+
+  updateGrievance(idOrItem, updates = {}) {
+    return this.updateComplaint(idOrItem, updates);
+  }
+
+  // --- Field Actions ---
+  getFieldActions({ incidentId, grievanceId, officerId } = {}) {
+    const list = this.data.fieldActions || [];
+    return list.filter(fa => {
+      if (incidentId && fa.incidentId !== incidentId) return false;
+      if (grievanceId && fa.grievanceId !== grievanceId) return false;
+      if (officerId && fa.officerId !== officerId) return false;
+      return true;
+    });
+  }
+
+  saveFieldAction(action) {
+    if (!this.data.fieldActions) this.data.fieldActions = [];
+    const item = {
+      id: action.id || `FA-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
+      createdAt: action.createdAt || new Date().toISOString(),
+      ...action
+    };
+    this.data.fieldActions.unshift(item);
+    this.save();
+    return item;
+  }
+
+  // --- Audit Logs ---
+  getAuditLogs() {
+    return this.data.auditLogs || [];
+  }
+
+  saveAuditLog(log) {
+    if (!this.data.auditLogs) this.data.auditLogs = [];
+    const item = {
+      id: log.id || `LOG-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
+      timestamp: log.timestamp || new Date().toLocaleTimeString(),
+      createdAt: log.createdAt || new Date().toISOString(),
+      ...log
+    };
+    this.data.auditLogs.unshift(item);
+    this.save();
+    return item;
   }
 
   // --- Registry & Warranties ---

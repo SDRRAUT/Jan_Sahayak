@@ -282,51 +282,8 @@ export function AppProvider({ children }) {
       console.warn('Supabase Realtime channel init failed:', e.message);
     }
 
-    // 2. Fallback / supplementary SSE listener for all canonical events
-    let eventSource = null;
-    try {
-      eventSource = new EventSource('/api/events');
-      const handleServerEvent = () => {
-        fetchCivicIntelligence();
-        fetchGrievances();
-        fetchNotifications();
-      };
-
-      const eventsToListen = [
-        'complaint_created',
-        'complaint_updated',
-        'complaint_analyzed',
-        'dna_generated',
-        'cluster_updated',
-        'incident_created',
-        'incident_updated',
-        'status_changed',
-        'investigation_started',
-        'field_action_started',
-        'field_action_completed',
-        'verification_requested',
-        'verification_submitted',
-        'incident_resolved',
-        'incident_reopened',
-        'notification_created'
-      ];
-
-      eventsToListen.forEach(evt => {
-        eventSource.addEventListener(evt, handleServerEvent);
-      });
-
-      eventSource.onerror = () => {
-        if (eventSource && eventSource.readyState === EventSource.CONNECTING) {
-          eventSource.close();
-        }
-      };
-    } catch (err) {
-      console.warn('SSE connection unavailable, using standard sync:', err);
-    }
-
     return () => {
       if (realtimeChannel) supabase.removeChannel(realtimeChannel);
-      if (eventSource) eventSource.close();
     };
   }, []);
 
@@ -403,16 +360,39 @@ export function AppProvider({ children }) {
     setNotifications(prev => [newN, ...prev]);
   };
 
-  // Real-Time EventSource connection to backend SSE
+  // Single Authoritative Real-Time EventSource connection to backend SSE
   useEffect(() => {
     let es = null;
     try {
-      es = new EventSource('/api/events');
-      
-      es.addEventListener('complaint_created', () => {
+      const sseUrl = token ? `/api/events?token=${encodeURIComponent(token)}` : '/api/events';
+      es = new EventSource(sseUrl);
+
+      const handleRefresh = () => {
+        fetchCivicIntelligence();
         fetchGrievances();
         fetchNotifications();
-        fetchCivicIntelligence();
+      };
+
+      const canonicalEvents = [
+        'complaint_created',
+        'complaint_updated',
+        'complaint_analyzed',
+        'dna_generated',
+        'cluster_updated',
+        'incident_created',
+        'incident_updated',
+        'investigation_started',
+        'field_action_started',
+        'field_action_completed',
+        'verification_requested',
+        'verification_submitted',
+        'incident_resolved',
+        'incident_reopened',
+        'notification_created'
+      ];
+
+      canonicalEvents.forEach(evtName => {
+        es.addEventListener(evtName, handleRefresh);
       });
 
       es.addEventListener('status_changed', (evt) => {
@@ -423,20 +403,13 @@ export function AppProvider({ children }) {
             setGrievances(prev => prev.map(g => g.id === payload.grievanceId ? { ...g, status: payload.newStatus } : g));
           }
         } catch (err) {}
-        fetchGrievances();
-        fetchNotifications();
-      });
-
-      es.addEventListener('incident_created', () => {
-        fetchCivicIntelligence();
-      });
-
-      es.addEventListener('complaint_analyzed', () => {
-        fetchGrievances();
+        handleRefresh();
       });
 
       es.onerror = () => {
-        // Browser automatically retries SSE connection
+        if (es && es.readyState === EventSource.CONNECTING) {
+          // Automatic browser reconnection in progress
+        }
       };
     } catch (e) {
       console.warn('[SSE] EventSource init note:', e.message);
@@ -577,7 +550,7 @@ export function AppProvider({ children }) {
     if (cred) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 1500);
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
         const res = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -662,7 +635,7 @@ export function AppProvider({ children }) {
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 600);
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
       const res = await fetch('/api/grievances', {
         method: 'POST',
         headers: {
