@@ -111,15 +111,25 @@ export class AIProvider {
                   }
                 },
                 {
-                  text: `Analyze this municipal/civic complaint evidence photo. Context: "${contextPrompt}".
+                  text: `You are an AI Civic Infrastructure Inspector for Jan Sahayak.
+Carefully examine this submitted photo. Context: "${contextPrompt}".
+
+FIRST, determine if this image depicts a REAL-WORLD PHYSICAL CIVIC/MUNICIPAL PROBLEM (such as: road potholes, broken asphalt, damaged footpath, water leakage, pipeline burst, contaminated tap water, sewer overflow, drainage waterlogging, overflowing garbage dump, open solid waste, dangling power cables, damaged streetlight pole, unhygienic public toilet, fallen tree/debris).
+
+If the image is a WEBSITE SCREENSHOT, SOFTWARE UI, APP INTERFACE, MEME, CARTOON, CELEBRITY/SELFIE, INDOOR ROOM/BEDROOM FURNITURE, INVOICE/DOCUMENT, OR UNRELATED OBJECT:
+Set "is_valid_civic_issue" to FALSE, and explain exactly what was detected in "rejection_reason".
+
 Respond ONLY with valid JSON with this exact structure:
 {
-  "observed_hazard": string (concise description of visible issue e.g. "Severe waterlogging with foul wastewater accumulation" or "Asphalt road cave-in with exposed debris"),
-  "category": string ("Water Supply & Contamination" | "Roads & Infrastructure" | "Sanitation & Solid Waste" | "Electricity & Power Grid"),
+  "is_valid_civic_issue": boolean,
+  "rejection_reason": string | null,
+  "observed_hazard": string (concise description of visible civic hazard if valid, or what was seen if invalid e.g. "Software interface screenshot / web mockup"),
+  "category": "Water Supply & Contamination" | "Roads & Infrastructure" | "Sanitation & Solid Waste" | "Electricity & Power Grid" | "Drainage & Waterlogging",
   "severity": "CRITICAL" | "HIGH" | "MEDIUM" | "LOW",
-  "confidence": number (between 0.70 and 0.99),
+  "confidence": number (between 0.50 and 0.99),
   "verification_required": boolean,
-  "features_detected": string[] (up to 4 visual characteristics observed in the image)
+  "features_detected": string[] (up to 4 visual characteristics observed),
+  "user_clarification_suggested": boolean
 }`
                 }
               ]
@@ -138,7 +148,15 @@ Respond ONLY with valid JSON with this exact structure:
             const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
             const parsed = JSON.parse(cleanText);
             return {
-              ...parsed,
+              is_valid_civic_issue: parsed.is_valid_civic_issue ?? true,
+              rejection_reason: parsed.rejection_reason || null,
+              observed_hazard: parsed.observed_hazard || 'Visual evidence scanned',
+              category: parsed.category || 'Roads & Infrastructure',
+              severity: parsed.severity || 'MEDIUM',
+              confidence: parsed.confidence || 0.88,
+              verification_required: parsed.verification_required ?? true,
+              features_detected: parsed.features_detected || [],
+              user_clarification_suggested: parsed.user_clarification_suggested ?? false,
               source: 'gemini',
               model: m
             };
@@ -150,10 +168,14 @@ Respond ONLY with valid JSON with this exact structure:
     }
 
     return {
-      observed_hazard: 'Visual evidence logged; field inspection requested',
-      confidence: 0.88,
+      is_valid_civic_issue: true,
+      rejection_reason: null,
+      observed_hazard: 'Visual evidence logged for field survey',
+      category: 'Roads & Infrastructure',
+      severity: 'MEDIUM',
+      confidence: 0.85,
       verification_required: true,
-      features_detected: ['Image evidence received'],
+      features_detected: ['Visual evidence logged for field survey'],
       source: 'deterministic_fallback',
       reason: apiKey ? 'Gemini Vision request failed' : 'GEMINI_API_KEY not configured'
     };

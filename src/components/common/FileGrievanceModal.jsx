@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../../context/AppContext';
+import LiveCameraCapture from './LiveCameraCapture';
 
 export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = '' }) {
   const navigate = useNavigate();
@@ -1149,125 +1150,45 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                 </div>
               )}
 
-              {/* STEP 2 */}
+              {/* STEP 2: LIVE CAMERA CAPTURE & AI HAZARD VERIFICATION */}
               {currentStep === 2 && (
                 <div>
                   <div style={{ textAlign: 'center', marginBottom: '14px' }}>
                     <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', margin: '0 0 4px 0' }}>
-                      Upload Ground Photo (Optional)
+                      Capture Ground Photo Evidence (Optional)
                     </h3>
                     <p style={{ fontSize: '12px', color: '#64748B', margin: 0 }}>
-                      Complaints with photos get resolved 2x faster by field engineers.
+                      Snap a live photo of the civic issue. AI will analyze authenticity and extract hazard details.
                     </p>
                   </div>
 
-                  {!photoPreview ? (
-                    <div 
-                      onClick={() => photoInputRef.current?.click()}
-                      style={{
-                        border: '2px dashed #94A3B8',
-                        borderRadius: '16px',
-                        padding: '28px 16px',
-                        textAlign: 'center',
-                        cursor: 'pointer',
-                        background: '#F8FAFC',
-                        marginBottom: '14px'
-                      }}
-                    >
-                      <div style={{
-                        width: '46px',
-                        height: '46px',
-                        borderRadius: '50%',
-                        background: '#EFF6FF',
-                        color: '#2563EB',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 10px auto'
-                      }}>
-                        <Camera style={{ width: '22px', height: '22px' }} />
-                      </div>
-                      <strong style={{ fontSize: '13px', color: '#1E2653', display: 'block', marginBottom: '3px' }}>
-                        Click to Take Photo or Upload Image
-                      </strong>
-                      <span style={{ fontSize: '11px', color: '#64748B' }}>
-                        Supports Camera capture or Gallery selection
-                      </span>
-                    </div>
-                  ) : (
+                  <LiveCameraCapture
+                    photoPreview={photoPreview}
+                    setPhotoPreview={setPhotoPreview}
+                    visionAnalysis={visionAnalysis}
+                    setVisionAnalysis={setVisionAnalysis}
+                    category={category}
+                    setCategory={setCategory}
+                    contextText={description || title}
+                    onDetailCorrection={(customText) => {
+                      if (customText && !description.includes(customText)) {
+                        setDescription(prev => prev ? `${prev} (Photo Note: ${customText})` : customText);
+                      }
+                    }}
+                  />
+
+                  {stepErrorMsg && (
                     <div style={{
-                      borderRadius: '14px',
-                      overflow: 'hidden',
-                      border: '1px solid #CBD5E1',
-                      background: '#0F172A',
-                      position: 'relative',
-                      marginBottom: '14px'
+                      marginBottom: '10px',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      background: '#FEF2F2',
+                      border: '1px solid #FECACA',
+                      color: '#DC2626',
+                      fontSize: '11.5px',
+                      fontWeight: 600
                     }}>
-                      <img 
-                        src={photoPreview} 
-                        alt="Evidence Preview" 
-                        style={{
-                          width: '100%',
-                          maxHeight: '210px',
-                          objectFit: 'cover',
-                          display: 'block'
-                        }} 
-                      />
-
-                      <button
-                        type="button"
-                        onClick={handleRemovePhoto}
-                        style={{
-                          position: 'absolute',
-                          top: '10px',
-                          right: '10px',
-                          background: 'rgba(0, 0, 0, 0.65)',
-                          color: '#FFFFFF',
-                          border: 'none',
-                          borderRadius: '50%',
-                          width: '32px',
-                          height: '32px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <Trash2 style={{ width: '15px', height: '15px' }} />
-                      </button>
-
-                      <div style={{
-                        padding: '8px 12px',
-                        background: '#FFFFFF',
-                        borderTop: '1px solid #E2E8F0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}>
-                        {isAnalyzingPhoto ? (
-                          <>
-                            <Loader2 className="animate-spin" style={{ width: '15px', height: '15px', color: '#2563EB' }} />
-                            <span style={{ fontSize: '11.5px', color: '#2563EB', fontWeight: 600 }}>
-                              Gemini Vision is scanning hazard features...
-                            </span>
-                          </>
-                        ) : visionAnalysis ? (
-                          <>
-                            <CheckCircle2 style={{ width: '15px', height: '15px', color: '#10B981', flexShrink: 0 }} />
-                            <div style={{ fontSize: '11.5px', color: '#334155' }}>
-                              <strong style={{ color: '#0F172A' }}>AI Hazard Identified: </strong>
-                              {visionAnalysis.observed_hazard} ({Math.round(visionAnalysis.confidence * 100)}% Match)
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle2 style={{ width: '15px', height: '15px', color: '#10B981' }} />
-                            <span style={{ fontSize: '11.5px', color: '#0F172A', fontWeight: 600 }}>
-                              Photo attached ({photoFile?.name})
-                            </span>
-                          </>
-                        )}
-                      </div>
+                      {stepErrorMsg}
                     </div>
                   )}
 
@@ -1279,7 +1200,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                     fontSize: '11.5px',
                     color: '#166534'
                   }}>
-                    💡 If you cannot take a photo right now, click "Skip Photo / Next" to proceed.
+                    💡 If you cannot take a photo right now, click <strong>"Skip Photo / Next"</strong> to proceed.
                   </div>
                 </div>
               )}
@@ -1612,6 +1533,10 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                 onClick={() => {
                   if (currentStep === 1 && !description.trim()) {
                     setStepErrorMsg('⚠️ Please enter or speak a description of the problem.');
+                    return;
+                  }
+                  if (currentStep === 2 && photoPreview && visionAnalysis && !visionAnalysis.isValidCivic) {
+                    setStepErrorMsg('⚠️ The attached photo is a non-civic/UI image. Please retake a ground photo or remove it to proceed.');
                     return;
                   }
                   setStepErrorMsg('');
