@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
+import RealMap from '../components/common/RealMap';
 
 export default function AdminHeatmap() {
   const { grievances, clusters, metrics } = useApp();
@@ -139,112 +140,62 @@ export default function AdminHeatmap() {
                 </span>
               </div>
 
-              {/* Graphical Ward Map Simulator */}
-              <div style={{
-                height: '360px',
-                borderRadius: 'var(--radius-md)',
-                background: '#0B1914',
-                position: 'relative',
-                overflow: 'hidden',
-                border: '1px solid rgba(255,255,255,0.12)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                {/* Background gridlines */}
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  backgroundImage: 'radial-gradient(rgba(16, 185, 129, 0.2) 1px, transparent 1px)',
-                  backgroundSize: '24px 24px'
-                }} />
-
-                {/* Simulated Ward Zones */}
-                {wardStats.map((w, idx) => {
-                  const positions = [
-                    { top: '25%', left: '30%' }, // Ward 14 Rohini
-                    { top: '65%', left: '60%' }, // Ward 8 Lajpat Nagar
-                    { top: '45%', left: '75%' }, // Ward 22 Mayur Vihar
-                    { top: '75%', left: '45%' }, // Ward 5 Kalkaji
-                    { top: '40%', left: '45%' }  // Ward 19 Karol Bagh
-                  ];
-                  const pos = positions[idx];
+              {/* Ward Quick Selector */}
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
+                {wardStats.map((w) => {
                   const isSelected = selectedWard.includes(w.ward.split(' ')[1]);
-
                   return (
                     <button
                       key={w.ward}
+                      type="button"
                       onClick={() => setSelectedWard(w.ward)}
                       style={{
-                        position: 'absolute',
-                        top: pos.top,
-                        left: pos.left,
-                        transform: 'translate(-50%, -50%)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '4px',
+                        padding: '6px 12px',
+                        borderRadius: '9999px',
+                        border: isSelected ? '2px solid var(--color-primary)' : '1px solid var(--color-border-medium)',
+                        background: isSelected ? 'var(--color-accent-tint)' : '#FFFFFF',
+                        color: isSelected ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+                        fontSize: '12px',
+                        fontWeight: 700,
                         cursor: 'pointer',
-                        zIndex: 10
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
                       }}
                     >
-                      {/* Pulse circle pin */}
-                      <div style={{
-                        width: isSelected ? '28px' : '22px',
-                        height: isSelected ? '28px' : '22px',
-                        borderRadius: '50%',
-                        background: w.critical > 0 ? '#EF4444' : (w.active > 10 ? '#F59E0B' : '#10B981'),
-                        border: '3px solid #FFFFFF',
-                        boxShadow: '0 0 16px rgba(16, 185, 129, 0.5)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: '#FFFFFF',
-                        fontSize: '10px',
-                        fontWeight: 800,
-                        transition: 'all 200ms ease'
-                      }}>
-                        {w.active}
-                      </div>
                       <span style={{
-                        fontSize: '11px',
-                        fontWeight: 700,
-                        color: isSelected ? '#10B981' : '#F8FAFC',
-                        background: 'rgba(11, 25, 20, 0.85)',
-                        padding: '2px 8px',
-                        borderRadius: '4px',
-                        border: '1px solid rgba(255,255,255,0.1)'
-                      }}>
-                        {w.ward}
-                      </span>
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        background: w.critical > 0 ? '#EF4444' : (w.active > 10 ? '#F59E0B' : '#10B981')
+                      }} />
+                      <span>{w.ward}</span>
+                      <span style={{ fontSize: '10px', background: '#F1F5F9', padding: '1px 5px', borderRadius: '4px' }}>{w.active}</span>
                     </button>
                   );
                 })}
+              </div>
 
-                {/* Map legend */}
-                <div style={{
-                  position: 'absolute',
-                  bottom: '12px',
-                  left: '12px',
-                  background: 'rgba(11, 25, 20, 0.9)',
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  fontSize: '11px',
-                  color: '#F8FAFC',
-                  display: 'flex',
-                  gap: '12px'
-                }}>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#EF4444' }} /> Critical Hazard
-                  </span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#F59E0B' }} /> Elevated Cluster
-                  </span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981' }} /> Normal Resolution
-                  </span>
-                </div>
+              {/* Real OpenStreetMap Leaflet Map */}
+              <div style={{ marginBottom: '12px' }}>
+                <RealMap
+                  latitude={
+                    selectedWard.includes('Rohini') ? 28.7189 :
+                    selectedWard.includes('Lajpat') ? 28.5684 :
+                    selectedWard.includes('Mayur') ? 28.6083 :
+                    selectedWard.includes('Kalkaji') ? 28.5385 :
+                    selectedWard.includes('Karol') ? 28.6517 : 28.6139
+                  }
+                  longitude={
+                    selectedWard.includes('Rohini') ? 77.1265 :
+                    selectedWard.includes('Lajpat') ? 77.2341 :
+                    selectedWard.includes('Mayur') ? 77.2965 :
+                    selectedWard.includes('Kalkaji') ? 77.2588 :
+                    selectedWard.includes('Karol') ? 77.1906 : 77.2090
+                  }
+                  height="340px"
+                  draggable={false}
+                />
               </div>
 
               {/* Ward breakdown list */}

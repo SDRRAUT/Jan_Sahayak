@@ -112,7 +112,42 @@ export default function CitizenDashboard() {
           </div>
         </div>
 
-        {/* Filter and Search Bar */}
+        {/* Civic Impact — Area Leaderboard Teaser (Section 8) */}
+        <div style={{
+          padding: '24px',
+          borderRadius: 'var(--radius-xl)',
+          background: 'linear-gradient(135deg, #F0FDF4 0%, #FFFFFF 100%)',
+          border: '1px solid #BBF7D0',
+          marginBottom: '32px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '20px'
+        }}>
+          <div>
+            <div className="category-pill" style={{ background: '#DCFCE7', color: '#166534', border: '1px solid #86EFAC', marginBottom: '8px' }}>
+              🏆 CIVIC IMPACT • WARD RESOLUTION METRICS
+            </div>
+            <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#14532D', margin: '0 0 6px 0' }}>
+              Civic Impact & Area Leaderboard
+            </h3>
+            <p style={{ fontSize: '13px', color: '#166534', margin: 0, maxWidth: '600px', lineHeight: 1.5 }}>
+              Track authentic, data-backed municipal performance across Delhi wards. See real-time resolution rates, average turnaround times, and verified repairs in {currentCitizen.ward}.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <Link
+              to="/citizen/leaderboard"
+              className="btn-primary"
+              style={{ minHeight: '44px', padding: '0 20px', fontWeight: 700 }}
+            >
+              <span>View Area Insights</span>
+              <ArrowRight style={{ width: '16px', height: '16px' }} />
+            </Link>
+          </div>
+        </div>
         <div style={{
           display: 'flex',
           alignItems: 'center',

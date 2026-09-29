@@ -13,6 +13,48 @@
  * - RAG Precedents & SLA Intelligence
  */
 
+import {
+  ComplaintAnalyzerAgent,
+  ComplaintDNAAgent,
+  SimilarityClusterAgent,
+  CivicIncidentAgent,
+  RootCauseAgent,
+  ResolutionAgent,
+  AuthorityRoutingAgent,
+  CivicMemoryAgent,
+  VerificationAgent,
+  complaintAnalyzer,
+  complaintDNA,
+  similarityCluster,
+  civicIncident,
+  rootCause,
+  resolution,
+  authorityRouting,
+  civicMemory,
+  verificationAgent
+} from './aiAgents/index.js';
+
+export {
+  ComplaintAnalyzerAgent,
+  ComplaintDNAAgent,
+  SimilarityClusterAgent,
+  CivicIncidentAgent,
+  RootCauseAgent,
+  ResolutionAgent,
+  AuthorityRoutingAgent,
+  CivicMemoryAgent,
+  VerificationAgent,
+  complaintAnalyzer,
+  complaintDNA,
+  similarityCluster,
+  civicIncident,
+  rootCause,
+  resolution,
+  authorityRouting,
+  civicMemory,
+  verificationAgent
+};
+
 export function analyzeGrievanceInput(text, options = {}) {
   const clean = (text || '').toLowerCase().trim();
   
@@ -291,6 +333,13 @@ export function analyzeGrievanceInput(text, options = {}) {
     duplicateCandidates,
     historicalCases,
     aiRecommendation,
+    aiCategoryDetection: {
+      category,
+      subcategory,
+      confidence: Number((confidence / 100).toFixed(2)),
+      reason: structuredSummary,
+      source: "deterministic_fallback"
+    },
     slaTargetHours: targetSlaHours,
     slaElapsedHours: elapsedHours,
     slaRemainingHours: remainingHours,

@@ -6,18 +6,26 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "node server/index.js",
+    "verify:syntax": "node --check server/index.js && node --check server/aiAgents.js",
+    "test": "node scripts/verify_all_9_agents.js && node scripts/test_cross_role_sync.js && node scripts/test_civic_reality.js && node scripts/test_complete_pipeline_flow.js && node scripts/test_realtime_stream.js && node scripts/test_auth_rbac.js && node scripts/test_voice_category_image_location_verification.js",
+    "test:pipeline": "node scripts/test_complete_pipeline_flow.js"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.475.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.2.0"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
     "@vitejs/plugin-react": "^4.3.4",
     "vite": "^6.2.0"
   }

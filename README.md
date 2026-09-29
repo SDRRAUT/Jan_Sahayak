@@ -199,16 +199,88 @@ Follow this scripted 10-minute demonstration flow:
 
 ---
 
-## 🔒 9. Security & Governance
+## 📱 11. Mobile Responsive Architecture & Standalone Android APK
+
+JanSahayk is engineered with a mobile-first responsive architecture supporting all modern viewports (360px, 390px, 412px, tablet, and desktop) with touch targets >= 44px, zero horizontal scrolling, and touch-optimized camera, microphone, and GPS geolocation workflows.
+
+### Standalone Android APK Generation
+Packaged as a native Android application using Capacitor:
+- **Application ID**: `in.gov.delhi.jansahayak`
+- **Application Name**: JanSahayak
+- **Permissions**: `RECORD_AUDIO`, `MODIFY_AUDIO_SETTINGS`, `CAMERA`, `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`, `READ_EXTERNAL_STORAGE`, `READ_MEDIA_IMAGES`
+- **Target Platform**: Android API 36 / Build-Tools 35 / Gradle 8.14.3
+- **Built APK Artifact**: `android/JanSahayak-debug.apk` (4.55 MB)
+
+To assemble the APK:
+```bash
+npx cap copy android
+cd android && ./gradlew assembleDebug
+```
+
+---
+
+## 📡 12. API Documentation & State Transitions
+
+### New Production Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/complaints/voice-transcribe` | Transcribes audio via Gemini or deterministic fallback | Optional |
+| `POST` | `/api/complaints/vision-analyze` | Validates civic defect image relevance and metadata | Optional |
+| `POST` | `/api/complaints/detect-category` | AI problem category detection from text, voice, image | Optional |
+| `POST` | `/api/location/reverse-geocode` | High-accuracy GPS reverse geocoding via OpenStreetMap Nominatim | Optional |
+| `GET` | `/api/citizen/leaderboard` | Real aggregated civic impact metrics by municipal ward | No |
+| `GET` | `/api/citizen/area-insights/:area` | Detailed statistics and resolved cases for a specific ward | No |
+| `POST` | `/api/grievances/:id/verify` | Citizen confirms satisfactory resolution within 4 days | Yes (Citizen) |
+| `POST` | `/api/grievances/:id/dispute` | Citizen disputes resolution within 4 days, reopening case | Yes (Citizen) |
+| `POST` | `/api/cron/verification-timeout` | Idempotent background job to auto-solve expired 4-day cases | Internal / Admin |
+| `GET` | `/api/realtime/stream` | Server-Sent Events (SSE) realtime broadcast channel | No |
+
+### Verification Lifecycle State Machine
+
+```
+Officer Resolves Issue
+        ↓
+VERIFICATION_PENDING (verification_deadline = started_at + 4 days)
+        ↓
+ ┌──────────────────────┬──────────────────────┐
+ │ [Within 4 Days]      │ [Within 4 Days]      │ [No Response > 4 Days]
+ ▼                      ▼                      ▼
+CONFIRM RESOLUTION     DISPUTE RESOLUTION     AUTOMATIC TIMEOUT
+(RESOLVED_CONFIRMED)   (DISPUTE_REOPENED)     (AUTO_RESOLVED)
+verified_by: citizen   reopened for officer   verified_by: system
+auto_closed: false     investigation          auto_closed: true
+```
+
+### Strict Image Validation State Machine
+
+```
+NO_IMAGE
+   ↓
+IMAGE_SELECTED
+   ↓
+ANALYZING [Next Step Gated / Hidden]
+   ↓
+ ┌──────────────────────┬──────────────────────┐
+ ▼                      ▼                      ▼
+VALID                  INVALID                ERROR
+Next Step Visible →    Next Step Hidden       Next Step Hidden
+                       Retake / Re-upload     Retry Verification
+```
+
+---
+
+## 🔒 13. Security & Governance
 
 - **Server-Side Authorization**: Every protected API route enforces `authenticateToken` and `requireRole(['officer', 'dept_admin', 'super_admin'])`.
-- **Untrusted Input Sanitization**: All citizen-submitted text, audio notes, and attachments are treated as untrusted inputs.
-- **Audit Trails**: Critical municipal events (triage, duplicate authorization, escalations, closures, SLA modifications) are stored in an append-only audit register.
+- **Citizen Ownership Guard**: Citizens can only verify or dispute complaints they filed (`citizen_id` match).
+- **Audit Trails**: Critical municipal events (triage, duplicate authorization, escalations, closures, SLA modifications, automatic 4-day timeouts) are stored in an append-only audit register.
 - **Privacy First**: Sensitive citizen telephone numbers and addresses are masked in public and officer views.
 
 ---
 
-## 📄 10. License
+## 📄 14. License
 
 JanSahayk is released under the **MIT License** for open civic innovation.
 Developed with pride for Indian Municipalities and Civic Governance.
+

@@ -16,6 +16,9 @@ import OfficerWorkspace from './pages/OfficerWorkspace';
 import AdminHeatmap from './pages/AdminHeatmap';
 import DeptAdmin from './pages/DeptAdmin';
 import SuperAdmin from './pages/SuperAdmin';
+import Leaderboard from './pages/Leaderboard';
+import Notifications from './pages/Notifications';
+import Onboarding from './pages/Onboarding';
 
 export default function App() {
   return (
@@ -28,7 +31,9 @@ export default function App() {
         <Routes>
           {/* Public Showcase & Information */}
           <Route path="/" element={<Home />} />
+          <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/platform" element={<Platform />} />
+          <Route path="/intelligence" element={<Platform />} />
           <Route path="/impact" element={<Impact />} />
           
           {/* Authentication Gateway */}
@@ -45,10 +50,42 @@ export default function App() {
             } 
           />
           <Route 
+            path="/citizen/complaints" 
+            element={
+              <ProtectedRoute allowedRoles={['citizen', 'super_admin']}>
+                <CitizenDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
             path="/citizen/submit" 
             element={
               <ProtectedRoute allowedRoles={['citizen', 'super_admin']}>
                 <CitizenSubmit />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/citizen/file-grievance" 
+            element={
+              <ProtectedRoute allowedRoles={['citizen', 'super_admin']}>
+                <CitizenSubmit />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/citizen/notifications" 
+            element={
+              <ProtectedRoute allowedRoles={['citizen', 'super_admin']}>
+                <Notifications />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/citizen/leaderboard" 
+            element={
+              <ProtectedRoute allowedRoles={['citizen', 'super_admin']}>
+                <Leaderboard />
               </ProtectedRoute>
             } 
           />
