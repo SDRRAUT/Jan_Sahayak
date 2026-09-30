@@ -403,69 +403,21 @@ export default function JanSahayakAssistant() {
 
   return (
     <>
-      {/* Modern Floating Trigger Button */}
+      {/* Modern Light-Themed Floating Trigger Button */}
       {!isOpen && (
         <button
           id="jansahayak-ai-launcher"
+          className="jansahayak-ai-launcher"
           onClick={() => setIsOpen(true)}
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            zIndex: 9990,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '12px 22px',
-            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)',
-            backdropFilter: 'blur(16px)',
-            color: '#FFFFFF',
-            border: `1.5px solid ${activeRoleConfig.badgeColor}`,
-            borderRadius: '999px',
-            boxShadow: `0 14px 35px rgba(0, 0, 0, 0.5), 0 0 25px ${activeRoleConfig.glow}`,
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            fontWeight: 700,
-            fontSize: '14px',
-            transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)';
-            e.currentTarget.style.boxShadow = `0 20px 45px rgba(0, 0, 0, 0.6), 0 0 35px ${activeRoleConfig.glow}`;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0) scale(1)';
-            e.currentTarget.style.boxShadow = `0 14px 35px rgba(0, 0, 0, 0.5), 0 0 25px ${activeRoleConfig.glow}`;
-          }}
+          aria-label="Open JanSahayak AI Assistant"
         >
-          <div style={{
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '34px',
-            height: '34px',
-            borderRadius: '50%',
-            background: `linear-gradient(135deg, ${activeRoleConfig.badgeColor} 0%, #0E5E3A 100%)`,
-            color: '#FFFFFF',
-            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)'
-          }}>
-            <Sparkles size={18} />
-            <span style={{
-              position: 'absolute',
-              top: '-2px',
-              right: '-2px',
-              width: '10px',
-              height: '10px',
-              borderRadius: '50%',
-              backgroundColor: '#22C55E',
-              border: '2px solid #0F172A',
-              boxShadow: '0 0 8px #22C55E'
-            }} />
+          <div className="jansahayak-ai-launcher-icon">
+            <Sparkles size={17} style={{ strokeWidth: 2.2 }} />
+            <span className="jansahayak-ai-online-dot" />
           </div>
-          <div style={{ textAlign: 'left' }}>
-            <div style={{ fontSize: '13.5px', fontWeight: 800, letterSpacing: '-0.01em' }}>JanSahayak AI</div>
-            <div style={{ fontSize: '11px', color: activeRoleConfig.badgeColor, fontWeight: 600 }}>
+          <div className="jansahayak-ai-launcher-text">
+            <div className="jansahayak-ai-title">JanSahayak AI</div>
+            <div className="jansahayak-ai-subtitle" style={{ color: activeRoleConfig.badgeColor }}>
               {activeRoleConfig.label}
             </div>
           </div>
