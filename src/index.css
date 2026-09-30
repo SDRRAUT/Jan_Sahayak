@@ -1068,8 +1068,9 @@ h6, .text-h6, .fluid-h6 {
 
 @media (max-width: 767px) {
   .citizen-bottom-sheet-overlay {
-    align-items: flex-end !important;
-    padding: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
   }
 }
 
@@ -1086,30 +1087,22 @@ h6, .text-h6, .fluid-h6 {
 
 @media (max-width: 767px) {
   .citizen-bottom-sheet-content {
-    max-width: 100% !important;
-    max-height: 92vh !important;
-    border-radius: 20px 20px 0 0 !important;
-    border-bottom: none !important;
-    padding-bottom: max(16px, env(safe-area-inset-bottom, 16px)) !important;
+    max-width: min(580px, calc(100% - 16px)) !important;
+    width: 100% !important;
+    max-height: min(88vh, calc(100dvh - 36px)) !important;
+    border-radius: 22px !important;
+    margin: auto !important;
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.35) !important;
+    animation: modalCenterScale 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
   }
 }
 
 .sheet-handle {
-  display: none;
+  display: none !important;
 }
 
-@media (max-width: 767px) {
-  .sheet-handle {
-    display: block;
-    width: 38px;
-    height: 4px;
-    border-radius: 999px;
-    background: #CBD5E1;
-    margin: 10px auto 6px auto;
-  }
-}
-
-/* File Grievance Modal Full-screen / Bottom-sheet on mobile */
+/* File Grievance Modal Centered Dialog on Mobile & Desktop */
 .file-modal-overlay {
   position: fixed;
   inset: 0;
@@ -1126,8 +1119,9 @@ h6, .text-h6, .fluid-h6 {
 
 @media (max-width: 767px) {
   .file-modal-overlay {
-    align-items: flex-end !important;
-    padding: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
   }
 }
 
@@ -1146,11 +1140,15 @@ h6, .text-h6, .fluid-h6 {
 
 @media (max-width: 767px) {
   .file-modal-card {
-    max-width: 100% !important;
-    height: 94vh !important;
-    max-height: 94vh !important;
-    border-radius: 20px 20px 0 0 !important;
-    border-bottom: none !important;
+    max-width: min(600px, calc(100% - 16px)) !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: min(90vh, calc(100dvh - 36px)) !important;
+    border-radius: 22px !important;
+    margin: auto !important;
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.35) !important;
+    animation: modalCenterScale 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
   }
 }
 
@@ -1676,29 +1674,24 @@ h6, .text-h6, .fluid-h6 {
 
 @media (max-width: 768px) {
   .user-profile-modal-overlay {
-    align-items: flex-end !important;
-    padding: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
   }
 
   .user-profile-modal-card {
-    max-width: 100% !important;
+    max-width: min(540px, calc(100% - 16px)) !important;
     width: 100% !important;
-    max-height: 90vh !important;
-    border-bottom-left-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-    border-top-left-radius: 24px !important;
-    border-top-right-radius: 24px !important;
-    animation: slideUpSheet 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    max-height: min(88vh, calc(100dvh - 36px)) !important;
+    border-radius: 22px !important;
+    margin: auto !important;
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.35) !important;
+    animation: modalCenterScale 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
   }
 
   .mobile-sheet-drag-handle {
-    display: block !important;
-    width: 44px;
-    height: 4px;
-    border-radius: 999px;
-    background: #CBD5E1;
-    margin: 8px auto 6px auto;
-    cursor: pointer;
+    display: none !important;
   }
 
   .user-profile-grid-2col {
@@ -1708,6 +1701,18 @@ h6, .text-h6, .fluid-h6 {
 
   .user-profile-modal-body {
     padding: 14px 16px !important;
+  }
+}
+
+/* Modal Center Scale Animation */
+@keyframes modalCenterScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -1796,12 +1801,12 @@ h6, .text-h6, .fluid-h6 {
    ========================================================================== */
 
 @media (max-width: 768px) {
-  /* Floating AI launcher: light, compact circular button, cleanly positioned above mobile bottom nav */
+  /* Floating AI launcher: light, compact circular button, cleanly positioned upside above mobile bottom nav */
   .jansahayak-ai-launcher,
   #jansahayak-ai-launcher,
   .jansahayak-ai-trigger {
-    bottom: calc(88px + env(safe-area-inset-bottom, 8px)) !important;
-    right: 14px !important;
+    bottom: calc(108px + env(safe-area-inset-bottom, 8px)) !important;
+    right: 16px !important;
     width: 44px !important;
     height: 44px !important;
     min-height: 44px !important;
@@ -1827,6 +1832,20 @@ h6, .text-h6, .fluid-h6 {
   .jansahayak-ai-launcher:active,
   #jansahayak-ai-launcher:active {
     transform: scale(0.92) !important;
+  }
+
+  /* Fixed responsive notification popover on mobile: stretches comfortably below header */
+  .notification-popover {
+    position: fixed !important;
+    top: 64px !important;
+    left: 14px !important;
+    right: 14px !important;
+    width: auto !important;
+    max-width: calc(100vw - 28px) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 16px 45px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(15, 23, 42, 0.08) !important;
+    max-height: min(460px, calc(100vh - 120px)) !important;
+    z-index: 1200 !important;
   }
 
   #jansahayak-ai-window.ai-mobile-drawer {
