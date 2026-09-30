@@ -476,12 +476,13 @@ export default function JanSahayakAssistant() {
       {isOpen && (
         <div
           id="jansahayak-ai-window"
+          className={`ai-mobile-drawer ${isMinimized ? 'minimized' : ''}`}
           style={{
             position: 'fixed',
             bottom: '16px',
             right: '16px',
             width: isMinimized ? '300px' : '440px',
-            maxWidth: 'calc(100vw - 24px)',
+            maxWidth: 'calc(100% - 24px)',
             height: isMinimized ? '52px' : 'min(550px, calc(100dvh - 32px))',
             maxHeight: 'calc(100dvh - 32px)',
             zIndex: 9999,
@@ -510,6 +511,22 @@ export default function JanSahayakAssistant() {
             boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
             flexShrink: 0
           }}>
+            {/* Mobile Drag Handle inside drawer */}
+            <div
+              className="mobile-sheet-drag-handle"
+              onClick={() => setIsMinimized(prev => !prev)}
+              style={{
+                width: '36px',
+                height: '4px',
+                background: 'rgba(255, 255, 255, 0.4)',
+                borderRadius: '999px',
+                position: 'absolute',
+                top: '5px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                cursor: 'pointer'
+              }}
+            />
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{
                 position: 'relative',
@@ -626,17 +643,22 @@ export default function JanSahayakAssistant() {
 
           {/* Chat Messages Viewport */}
           {!isMinimized && (
-            <div style={{
-              flex: 1,
-              overflowY: 'auto',
-              overflowX: 'hidden',
-              padding: '16px 14px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '14px',
-              background: 'transparent',
-              minHeight: 0
-            }}>
+            <div
+              className="ai-messages-container"
+              style={{
+                flex: 1,
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain',
+                padding: '16px 14px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '14px',
+                background: 'transparent',
+                minHeight: 0
+              }}
+            >
               {messages.map((msg) => {
                 const isUser = msg.sender === 'user';
                 return (
@@ -870,6 +892,7 @@ export default function JanSahayakAssistant() {
           {/* Modern Input Bar */}
           {!isMinimized && (
             <form
+              className="ai-input-form"
               onSubmit={(e) => {
                 e.preventDefault();
                 handleSendMessage();
@@ -887,6 +910,7 @@ export default function JanSahayakAssistant() {
               <input
                 ref={inputRef}
                 type="text"
+                className="ai-chat-input"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder={
@@ -949,6 +973,35 @@ export default function JanSahayakAssistant() {
           )}
         </div>
       )}
+
+      <style>{`
+        @media (max-width: 768px) {
+          #jansahayak-ai-window.ai-mobile-drawer {
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: min(90dvh, calc(100dvh - 64px)) !important;
+            max-height: 90dvh !important;
+            border-radius: 20px 20px 0 0 !important;
+            border-bottom: none !important;
+            border-left: none !important;
+            border-right: none !important;
+            box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.85) !important;
+          }
+          #jansahayak-ai-window.ai-mobile-drawer.minimized {
+            height: 54px !important;
+            border-radius: 16px 16px 0 0 !important;
+          }
+          .ai-chat-input {
+            font-size: 16px !important;
+          }
+          .ai-input-form {
+            padding-bottom: max(12px, env(safe-area-inset-bottom, 12px)) !important;
+          }
+        }
+      `}</style>
     </>
   );
 }

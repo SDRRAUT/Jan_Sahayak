@@ -12,7 +12,8 @@ import {
   RotateCcw,
   Compass,
   Radio,
-  Sparkles
+  Sparkles,
+  X
 } from 'lucide-react';
 
 export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
@@ -21,6 +22,7 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
   const [mapMode, setMapMode] = useState('dark'); // 'dark' | 'satellite'
   const [zoomLevel, setZoomLevel] = useState(1);
   const [hoveredPoint, setHoveredPoint] = useState(null);
+  const [mobileLegendOpen, setMobileLegendOpen] = useState(false);
 
   const dataPoints = spreadGeo.length > 0 ? spreadGeo : [
     { 
@@ -88,12 +90,15 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
       background: '#FFFFFF',
       borderRadius: 'var(--radius-lg, 16px)',
       border: '1px solid var(--color-border-subtle, #E2E8F0)',
-      padding: '20px',
+      padding: 'clamp(12px, 3vw, 20px)',
       boxShadow: 'var(--shadow-card, 0 4px 20px rgba(0,0,0,0.05))',
-      fontFamily: 'var(--font-sans, inherit)'
+      fontFamily: 'var(--font-sans, inherit)',
+      width: '100%',
+      maxWidth: '100%',
+      boxSizing: 'border-box'
     }}>
       {/* Top Header & Layer Toggles */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '16px', width: '100%' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ 
@@ -118,8 +123,8 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
           </h3>
         </div>
 
-        {/* Map Mode & Layer Switchers */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+        {/* Map Mode & Layer Switchers (Wrap gracefully into responsive pill rows on small screens) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', maxWidth: '100%' }}>
           {/* Basemap Switcher (Real Satellite vs Real Street GIS) */}
           <div style={{ 
             display: 'flex', 
@@ -128,15 +133,18 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
             background: '#F8FAFC', 
             padding: '3px', 
             borderRadius: '10px',
-            border: '1px solid #E2E8F0'
+            border: '1px solid #E2E8F0',
+            flexWrap: 'wrap'
           }}>
             <button
               type="button"
               onClick={() => setMapMode('dark')}
+              aria-label="GIS Street Map Basemap"
               style={{
                 fontSize: '11px',
                 fontWeight: mapMode === 'dark' ? 800 : 600,
-                padding: '4px 10px',
+                padding: '5px 10px',
+                minHeight: '36px',
                 borderRadius: '7px',
                 background: mapMode === 'dark' ? '#0F172A' : 'transparent',
                 color: mapMode === 'dark' ? '#FFFFFF' : '#64748B',
@@ -145,6 +153,7 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '5px',
+                touchAction: 'manipulation',
                 transition: 'all 150ms ease'
               }}
             >
@@ -153,10 +162,12 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
             <button
               type="button"
               onClick={() => setMapMode('satellite')}
+              aria-label="Real Satellite Basemap"
               style={{
                 fontSize: '11px',
                 fontWeight: mapMode === 'satellite' ? 800 : 600,
-                padding: '4px 10px',
+                padding: '5px 10px',
+                minHeight: '36px',
                 borderRadius: '7px',
                 background: mapMode === 'satellite' ? '#0F172A' : 'transparent',
                 color: mapMode === 'satellite' ? '#FFFFFF' : '#64748B',
@@ -165,6 +176,7 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '5px',
+                touchAction: 'manipulation',
                 transition: 'all 150ms ease'
               }}
             >
@@ -173,19 +185,30 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
           </div>
 
           {/* Layer Buttons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#F1F5F9', padding: '3px', borderRadius: '10px' }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '3px', 
+            background: '#F1F5F9', 
+            padding: '3px', 
+            borderRadius: '10px',
+            flexWrap: 'wrap'
+          }}>
             <button
               type="button"
               onClick={() => setActiveLayer('spread')}
+              aria-label="Temporal Spread Layer"
               style={{
                 fontSize: '11px',
                 fontWeight: activeLayer === 'spread' ? 700 : 500,
-                padding: '4px 10px',
+                padding: '5px 10px',
+                minHeight: '36px',
                 borderRadius: '7px',
                 background: activeLayer === 'spread' ? '#FFFFFF' : 'transparent',
                 color: activeLayer === 'spread' ? '#0E5E3A' : '#64748B',
                 border: 'none',
                 cursor: 'pointer',
+                touchAction: 'manipulation',
                 boxShadow: activeLayer === 'spread' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
               }}
             >
@@ -194,15 +217,18 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
             <button
               type="button"
               onClick={() => setActiveLayer('signals')}
+              aria-label="Citizen Signals Layer"
               style={{
                 fontSize: '11px',
                 fontWeight: activeLayer === 'signals' ? 700 : 500,
-                padding: '4px 10px',
+                padding: '5px 10px',
+                minHeight: '36px',
                 borderRadius: '7px',
                 background: activeLayer === 'signals' ? '#FFFFFF' : 'transparent',
                 color: activeLayer === 'signals' ? '#0E5E3A' : '#64748B',
                 border: 'none',
                 cursor: 'pointer',
+                touchAction: 'manipulation',
                 boxShadow: activeLayer === 'signals' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
               }}
             >
@@ -211,15 +237,18 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
             <button
               type="button"
               onClick={() => setActiveLayer('cluster')}
+              aria-label="Cluster Boundary Layer"
               style={{
                 fontSize: '11px',
                 fontWeight: activeLayer === 'cluster' ? 700 : 500,
-                padding: '4px 10px',
+                padding: '5px 10px',
+                minHeight: '36px',
                 borderRadius: '7px',
                 background: activeLayer === 'cluster' ? '#FFFFFF' : 'transparent',
                 color: activeLayer === 'cluster' ? '#0E5E3A' : '#64748B',
                 border: 'none',
                 cursor: 'pointer',
+                touchAction: 'manipulation',
                 boxShadow: activeLayer === 'cluster' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
               }}
             >
@@ -230,9 +259,9 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
       </div>
 
       {/* Interactive Time Progression Tabs */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '14px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '14px', width: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          <Clock style={{ width: '14px', height: '14px', color: 'var(--color-text-muted, #64748B)' }} />
+          <Clock style={{ width: '14px', height: '14px', color: 'var(--color-text-muted, #64748B)', flexShrink: 0 }} />
           <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--color-text-muted, #64748B)' }}>
             Temporal Progression:
           </span>
@@ -245,12 +274,14 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
                 style={{
                   fontSize: '11.5px',
                   fontWeight: selectedDay === idx ? 800 : 600,
-                  padding: '4px 12px',
+                  padding: '5px 12px',
+                  minHeight: '36px',
                   borderRadius: '999px',
                   background: selectedDay === idx ? dp.color : '#F8FAFC',
                   color: selectedDay === idx ? '#FFFFFF' : 'var(--color-text-secondary, #475569)',
                   border: `1.5px solid ${selectedDay === idx ? dp.color : '#E2E8F0'}`,
                   cursor: 'pointer',
+                  touchAction: 'manipulation',
                   boxShadow: selectedDay === idx ? `0 2px 8px ${dp.color}44` : 'none',
                   transition: 'all 150ms ease'
                 }}
@@ -268,26 +299,35 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
           color: currentPoint.color,
           background: `${currentPoint.color}18`,
           border: `1px solid ${currentPoint.color}44`,
-          padding: '3px 10px',
-          borderRadius: '999px'
+          padding: '4px 10px',
+          borderRadius: '999px',
+          maxWidth: '100%',
+          wordBreak: 'break-word'
         }}>
           ● {currentPoint.label}
         </span>
       </div>
 
       {/* Visual Canvas / Map Container with REAL MAP IMAGE */}
-      <div style={{
-        position: 'relative',
-        height: '380px',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        border: '1.5px solid #1E293B',
-        boxShadow: 'inset 0 0 20px rgba(0,0,0,0.6)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#0B1520'
-      }}>
+      <div 
+        className="gis-map-viewport"
+        style={{
+          position: 'relative',
+          height: 'clamp(320px, 48vh, 480px)',
+          width: '100%',
+          maxWidth: '100%',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          border: '1.5px solid #1E293B',
+          boxShadow: 'inset 0 0 20px rgba(0,0,0,0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#0B1520',
+          touchAction: 'pan-y',
+          overscrollBehavior: 'contain'
+        }}
+      >
         {/* REAL MAP IMAGE BASEMAP */}
         <div style={{
           position: 'absolute',
@@ -315,15 +355,19 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
         }} />
 
         {/* Subsoil Pipeline Corridor Vector & Road Corridor Overlay */}
-        <svg style={{ 
-          position: 'absolute', 
-          inset: 0, 
-          width: '100%', 
-          height: '100%', 
-          pointerEvents: 'none',
-          transform: `scale(${zoomLevel})`,
-          transition: 'transform 300ms cubic-bezier(0.16, 1, 0.3, 1)'
-        }}>
+        <svg 
+          viewBox="0 0 1000 400"
+          preserveAspectRatio="none"
+          style={{ 
+            position: 'absolute', 
+            inset: 0, 
+            width: '100%', 
+            height: '100%', 
+            pointerEvents: 'none',
+            transform: `scale(${zoomLevel})`,
+            transition: 'transform 300ms cubic-bezier(0.16, 1, 0.3, 1)'
+          }}
+        >
           {/* Main Pipeline Corridor Trace */}
           <path 
             d="M 270 190 Q 450 198 650 205" 
@@ -371,8 +415,10 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
               flexDirection: 'column',
               alignItems: 'center',
               cursor: 'pointer',
-              zIndex: 10
+              zIndex: 10,
+              touchAction: 'manipulation'
             }}
+            onClick={() => setHoveredPoint(hoveredPoint === dataPoints[0] ? null : dataPoints[0])}
             onMouseEnter={() => setHoveredPoint(dataPoints[0])}
             onMouseLeave={() => setHoveredPoint(null)}
           >
@@ -425,8 +471,10 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
                 flexDirection: 'column',
                 alignItems: 'center',
                 cursor: 'pointer',
-                zIndex: 9
+                zIndex: 9,
+                touchAction: 'manipulation'
               }}
+              onClick={() => setHoveredPoint(hoveredPoint === dataPoints[1] ? null : dataPoints[1])}
               onMouseEnter={() => setHoveredPoint(dataPoints[1])}
               onMouseLeave={() => setHoveredPoint(null)}
             >
@@ -480,8 +528,10 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
                 flexDirection: 'column',
                 alignItems: 'center',
                 cursor: 'pointer',
-                zIndex: 8
+                zIndex: 8,
+                touchAction: 'manipulation'
               }}
+              onClick={() => setHoveredPoint(hoveredPoint === dataPoints[2] ? null : dataPoints[2])}
               onMouseEnter={() => setHoveredPoint(dataPoints[2])}
               onMouseLeave={() => setHoveredPoint(null)}
             >
@@ -559,24 +609,47 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
           ))}
         </div>
 
-        {/* Hover Tooltip Card */}
+        {/* Hover / Tap Tooltip Card */}
         {hoveredPoint && (
           <div style={{
             position: 'absolute',
             top: '16px',
             left: '16px',
-            background: 'rgba(15, 23, 42, 0.92)',
+            background: 'rgba(15, 23, 42, 0.94)',
             backdropFilter: 'blur(10px)',
             border: `1.5px solid ${hoveredPoint.color}`,
             borderRadius: '10px',
             padding: '10px 14px',
             color: '#FFFFFF',
             zIndex: 30,
-            maxWidth: '280px',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.4)'
+            maxWidth: 'calc(100% - 32px)',
+            width: '280px',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.5)'
           }}>
-            <div style={{ fontSize: '11px', fontWeight: 800, color: hoveredPoint.color, marginBottom: '2px' }}>
-              {hoveredPoint.step}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 800, color: hoveredPoint.color }}>
+                {hoveredPoint.step}
+              </div>
+              <button
+                type="button"
+                onClick={() => setHoveredPoint(null)}
+                aria-label="Close tooltip"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#94A3B8',
+                  cursor: 'pointer',
+                  padding: '2px',
+                  minWidth: '24px',
+                  minHeight: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  touchAction: 'manipulation'
+                }}
+              >
+                <X style={{ width: '13px', height: '13px' }} />
+              </button>
             </div>
             <div style={{ fontSize: '12.5px', fontWeight: 700, marginBottom: '4px' }}>
               {hoveredPoint.ward}
@@ -584,7 +657,7 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
             <div style={{ fontSize: '11px', color: '#CBD5E1', lineHeight: 1.4 }}>
               {hoveredPoint.label}
             </div>
-            <div style={{ display: 'flex', gap: '8px', marginTop: '6px', fontSize: '10px', color: '#94A3B8' }}>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '6px', fontSize: '10px', color: '#94A3B8', flexWrap: 'wrap' }}>
               <span>Radius: <strong>{hoveredPoint.radiusMeters}m</strong></span>
               <span>•</span>
               <span>Signals: <strong>{hoveredPoint.signalCount} verified</strong></span>
@@ -592,25 +665,29 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
           </div>
         )}
 
-        {/* Zoom & Pan Overlay Controls */}
+        {/* Zoom & Pan Overlay Controls (Touch Targets >= 36px) */}
         <div style={{
           position: 'absolute',
           top: '12px',
           right: '12px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '4px',
-          zIndex: 20
+          gap: '6px',
+          zIndex: 22
         }}>
           <button
             type="button"
             onClick={() => handleZoom(0.2)}
             title="Zoom In"
+            aria-label="Zoom in map"
+            className="map-touch-btn"
             style={{
-              width: '32px',
-              height: '32px',
+              minWidth: '36px',
+              minHeight: '36px',
+              width: '36px',
+              height: '36px',
               borderRadius: '8px',
-              background: 'rgba(15, 23, 42, 0.85)',
+              background: 'rgba(15, 23, 42, 0.88)',
               backdropFilter: 'blur(6px)',
               border: '1px solid rgba(255, 255, 255, 0.2)',
               color: '#FFFFFF',
@@ -618,66 +695,79 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              fontSize: '15px'
+              touchAction: 'manipulation'
             }}
           >
-            <ZoomIn style={{ width: '15px', height: '15px' }} />
+            <ZoomIn style={{ width: '16px', height: '16px' }} />
           </button>
           <button
             type="button"
             onClick={() => handleZoom(-0.2)}
             title="Zoom Out"
+            aria-label="Zoom out map"
+            className="map-touch-btn"
             style={{
-              width: '32px',
-              height: '32px',
+              minWidth: '36px',
+              minHeight: '36px',
+              width: '36px',
+              height: '36px',
               borderRadius: '8px',
-              background: 'rgba(15, 23, 42, 0.85)',
+              background: 'rgba(15, 23, 42, 0.88)',
               backdropFilter: 'blur(6px)',
               border: '1px solid rgba(255, 255, 255, 0.2)',
               color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              touchAction: 'manipulation'
             }}
           >
-            <ZoomOut style={{ width: '15px', height: '15px' }} />
+            <ZoomOut style={{ width: '16px', height: '16px' }} />
           </button>
           <button
             type="button"
             onClick={resetZoom}
             title="Reset View"
+            aria-label="Reset map zoom"
+            className="map-touch-btn"
             style={{
-              width: '32px',
-              height: '32px',
+              minWidth: '36px',
+              minHeight: '36px',
+              width: '36px',
+              height: '36px',
               borderRadius: '8px',
-              background: 'rgba(15, 23, 42, 0.85)',
+              background: 'rgba(15, 23, 42, 0.88)',
               backdropFilter: 'blur(6px)',
               border: '1px solid rgba(255, 255, 255, 0.2)',
               color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              touchAction: 'manipulation'
             }}
           >
-            <RotateCcw style={{ width: '13px', height: '13px' }} />
+            <RotateCcw style={{ width: '14px', height: '14px' }} />
           </button>
         </div>
 
-        {/* Live GIS Telemetry Badge */}
-        <div style={{
-          position: 'absolute',
-          bottom: '12px',
-          right: '12px',
-          background: 'rgba(11, 21, 32, 0.92)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-          borderRadius: '10px',
-          padding: '8px 14px',
-          color: '#FFFFFF',
-          zIndex: 20
-        }}>
+        {/* Desktop Live GIS Telemetry Badge */}
+        <div 
+          className="desktop-only"
+          style={{
+            position: 'absolute',
+            bottom: '12px',
+            right: '12px',
+            background: 'rgba(11, 21, 32, 0.92)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            borderRadius: '10px',
+            padding: '8px 14px',
+            color: '#FFFFFF',
+            zIndex: 20
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', fontWeight: 800, marginBottom: '2px', color: '#38BDF8' }}>
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#38BDF8', animation: 'pulse 1.5s infinite' }} />
             <span>Active Viewport: {currentPoint.ward.split('(')[0]}</span>
@@ -691,23 +781,26 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
           </div>
         </div>
 
-        {/* Street & Ward Legend on bottom left */}
-        <div style={{
-          position: 'absolute',
-          bottom: '12px',
-          left: '12px',
-          background: 'rgba(11, 21, 32, 0.85)',
-          backdropFilter: 'blur(6px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '8px',
-          padding: '6px 10px',
-          color: '#CBD5E1',
-          fontSize: '10px',
-          zIndex: 20,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px'
-        }}>
+        {/* Desktop Street & Ward Legend on bottom left */}
+        <div 
+          className="desktop-only"
+          style={{
+            position: 'absolute',
+            bottom: '12px',
+            left: '12px',
+            background: 'rgba(11, 21, 32, 0.85)',
+            backdropFilter: 'blur(6px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '8px',
+            padding: '6px 10px',
+            color: '#CBD5E1',
+            fontSize: '10px',
+            zIndex: 20,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px'
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ width: '12px', height: '3px', background: '#38BDF8', display: 'inline-block' }} />
             <span>Feeder Pipeline</span>
@@ -721,6 +814,144 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
             <span>Origin Point</span>
           </div>
         </div>
+
+        {/* Mobile Compact Collapsible Legend & Telemetry Card (< 768px) */}
+        {!mobileLegendOpen ? (
+          <button
+            type="button"
+            onClick={() => setMobileLegendOpen(true)}
+            className="mobile-only-flex"
+            aria-label="Open GIS legend and corridor telemetry"
+            style={{
+              position: 'absolute',
+              bottom: '10px',
+              left: '10px',
+              zIndex: 22,
+              padding: '6px 12px',
+              minHeight: '36px',
+              borderRadius: '999px',
+              background: 'rgba(11, 21, 32, 0.92)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              color: '#F8FAFC',
+              fontSize: '11px',
+              fontWeight: 700,
+              alignItems: 'center',
+              gap: '6px',
+              cursor: 'pointer',
+              touchAction: 'manipulation',
+              boxShadow: '0 4px 14px rgba(0,0,0,0.5)'
+            }}
+          >
+            <Layers style={{ width: '13px', height: '13px', color: '#38BDF8' }} />
+            <span>Corridor Info & Legend ▴</span>
+          </button>
+        ) : (
+          <div
+            className="mobile-only bottom-sheet-slide"
+            style={{
+              position: 'absolute',
+              bottom: '8px',
+              left: '8px',
+              right: '8px',
+              background: 'rgba(11, 21, 32, 0.96)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255, 255, 255, 0.18)',
+              borderRadius: '12px',
+              padding: '12px 14px',
+              color: '#FFFFFF',
+              zIndex: 25,
+              boxShadow: '0 8px 24px rgba(0,0,0,0.65)'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#38BDF8', animation: 'pulse 1.5s infinite', flexShrink: 0 }} />
+                <strong style={{ fontSize: '11.5px', color: '#38BDF8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {currentPoint.ward.split('(')[0]}
+                </strong>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMobileLegendOpen(false)}
+                aria-label="Collapse corridor info"
+                style={{
+                  minWidth: '36px',
+                  minHeight: '36px',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.12)',
+                  border: 'none',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  touchAction: 'manipulation',
+                  flexShrink: 0
+                }}
+              >
+                <X style={{ width: '15px', height: '15px' }} />
+              </button>
+            </div>
+
+            {/* Compact Legend Row */}
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '6px 12px',
+              fontSize: '10px',
+              color: '#CBD5E1',
+              paddingBottom: '8px',
+              borderBottom: '1px solid rgba(255,255,255,0.1)',
+              marginBottom: '8px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ width: '10px', height: '3px', background: '#38BDF8', display: 'inline-block' }} />
+                <span>Feeder Line</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#EF4444', display: 'inline-block' }} />
+                <span>Corridor Impact</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
+                <span>Origin Point</span>
+              </div>
+              {activeLayer === 'signals' && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#38BDF8', display: 'inline-block' }} />
+                  <span>Citizen Signals</span>
+                </div>
+              )}
+            </div>
+
+            {/* Corridor Impact Info */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '6px',
+              textAlign: 'center',
+              background: 'rgba(255,255,255,0.05)',
+              padding: '6px',
+              borderRadius: '6px'
+            }}>
+              <div>
+                <span style={{ fontSize: '9px', color: '#94A3B8', display: 'block' }}>Radius</span>
+                <strong style={{ fontSize: '11px', color: '#F8FAFC' }}>{currentPoint.radiusMeters}m</strong>
+              </div>
+              <div>
+                <span style={{ fontSize: '9px', color: '#94A3B8', display: 'block' }}>Signals</span>
+                <strong style={{ fontSize: '11px', color: '#38BDF8' }}>{currentPoint.signalCount} verified</strong>
+              </div>
+              <div>
+                <span style={{ fontSize: '9px', color: '#94A3B8', display: 'block' }}>Zoom</span>
+                <strong style={{ fontSize: '11px', color: '#CBD5E1' }}>{Math.round(zoomLevel * 100)}%</strong>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Privacy Guarantee & GPS Coordinates Footer */}

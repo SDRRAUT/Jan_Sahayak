@@ -62,15 +62,18 @@ function GrievanceDetailPopup({ item, onClose, citizen, upvoteGrievance }) {
   const displayImage = item.evidence?.photoUrl || item.photoPreview || item.photoUrl || CATEGORY_IMAGES[catCfg.key] || CATEGORY_IMAGES['Other Civic Issue'];
 
   return (
-    <div style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(15,23,42,0.5)',backdropFilter:'blur(8px)',display:'flex',alignItems:'center',justifyContent:'center',padding:'16px'}} onClick={onClose}>
-      <div onClick={e=>e.stopPropagation()} style={{width:'100%',maxWidth:'580px',maxHeight:'90vh',overflowY:'auto',borderRadius:'26px',background:'#FFFFFF',border:'1px solid #E2E8F0',boxShadow:'0 25px 50px -12px rgba(15,23,42,0.25)'}}>
+    <div className="citizen-bottom-sheet-overlay" onClick={onClose}>
+      <div className="citizen-bottom-sheet-content" onClick={e=>e.stopPropagation()}>
+        {/* Pull handle on mobile */}
+        <div className="sheet-handle" />
+
         {/* Editorial Photo Header */}
         <div style={{position:'relative',height:'180px',width:'100%',overflow:'hidden',borderRadius:'26px 26px 0 0',background:'#F1F5F9'}}>
           <img src={displayImage} alt={item.title} style={{width:'100%',height:'100%',objectFit:'cover'}} />
           <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.65) 100%)',pointerEvents:'none'}} />
           
-          <button onClick={onClose} style={{position:'absolute',top:'16px',right:'16px',background:'rgba(255,255,255,0.9)',border:'none',borderRadius:'50%',width:'34px',height:'34px',cursor:'pointer',color:'#0F172A',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 2px 8px rgba(0,0,0,0.15)',zIndex:2}}>
-            <X style={{width:'16px',height:'16px'}}/>
+          <button onClick={onClose} aria-label="Close details" style={{position:'absolute',top:'16px',right:'16px',background:'rgba(255,255,255,0.9)',border:'none',borderRadius:'50%',width:'36px',height:'36px',cursor:'pointer',color:'#0F172A',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 2px 8px rgba(0,0,0,0.15)',zIndex:2}}>
+            <X style={{width:'18px',height:'18px'}}/>
           </button>
 
           {/* Floating Pill Badge */}
@@ -81,13 +84,13 @@ function GrievanceDetailPopup({ item, onClose, citizen, upvoteGrievance }) {
 
           <div style={{position:'absolute',bottom:'14px',left:'18px',right:'18px',color:'#FFFFFF'}}>
             <div style={{fontSize:'11px',fontWeight:700,opacity:0.85,fontFamily:'monospace',marginBottom:'2px'}}>#{item.id}</div>
-            <h2 style={{fontSize:'18px',fontWeight:800,margin:0,lineHeight:1.3,color:'#FFFFFF'}}>{item.title}</h2>
+            <h2 style={{fontSize:'clamp(16px, 4vw, 18px)',fontWeight:800,margin:0,lineHeight:1.3,color:'#FFFFFF'}}>{item.title}</h2>
           </div>
         </div>
 
         {/* Status Timeline */}
-        <div style={{padding:'22px 24px'}}>
-          <div style={{fontSize:'12px',fontWeight:800,color:'#64748B',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:'18px'}}>
+        <div style={{padding:'clamp(16px, 3vw, 22px) clamp(16px, 3vw, 24px)'}}>
+          <div style={{fontSize:'12px',fontWeight:800,color:'#64748B',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:'16px'}}>
             📦 Resolution Timeline
           </div>
           <div style={{position:'relative'}}>
@@ -96,15 +99,16 @@ function GrievanceDetailPopup({ item, onClose, citizen, upvoteGrievance }) {
             {STATUS_STEPS.map((step,idx)=>{
               const done=idx<=stepIdx, active=idx===stepIdx;
               return (
-                <div key={step.key} style={{display:'flex',alignItems:'flex-start',gap:'14px',marginBottom:idx<STATUS_STEPS.length-1?'20px':'0',position:'relative'}}>
+                <div key={step.key} style={{display:'flex',alignItems:'flex-start',gap:'14px',marginBottom:idx<STATUS_STEPS.length-1?'18px':'0',position:'relative'}}>
                   <div style={{width:'36px',height:'36px',borderRadius:'50%',flexShrink:0,background:active?'#2563EB':done?'#EFF6FF':'#F8FAFC',border:active?'3px solid #BFDBFE':done?'2px solid #2563EB':'2px solid #CBD5E1',color:active?'#FFFFFF':done?'#2563EB':'#94A3B8',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'15px',zIndex:1,transition:'all 0.2s'}}>
                     {done?(active?step.icon:'✓'):idx+1}
                   </div>
                   <div style={{paddingTop:'4px',flex:1}}>
-                    <div style={{fontSize:'13px',fontWeight:active?800:done?700:500,color:active?'#1D4ED8':done?'#0F172A':'#94A3B8'}}>
-                      {step.label}{active&&<span style={{marginLeft:'8px',fontSize:'10px',background:'#DBEAFE',color:'#1D4ED8',padding:'2px 8px',borderRadius:'999px',fontWeight:800}}>ACTIVE STAGE</span>}
+                    <div style={{fontSize:'13px',fontWeight:active?800:done?700:500,color:active?'#1D4ED8':done?'#0F172A':'#94A3B8',display:'flex',alignItems:'center',flexWrap:'wrap',gap:'6px'}}>
+                      <span>{step.label}</span>
+                      {active&&<span style={{fontSize:'10px',background:'#DBEAFE',color:'#1D4ED8',padding:'2px 8px',borderRadius:'999px',fontWeight:800}}>ACTIVE STAGE</span>}
                     </div>
-                    <div style={{fontSize:'12px',color:done?'#64748B':'#94A3B8',marginTop:'2px'}}>{step.desc}</div>
+                    <div style={{fontSize:'12px',color:done?'#64748B':'#94A3B8',marginTop:'2px',lineHeight:1.4}}>{step.desc}</div>
                     {active&&item.updatedAt&&<div style={{fontSize:'11px',color:'#2563EB',marginTop:'3px',fontWeight:600}}>Updated: {item.updatedAt}</div>}
                   </div>
                 </div>
@@ -114,13 +118,13 @@ function GrievanceDetailPopup({ item, onClose, citizen, upvoteGrievance }) {
         </div>
 
         {(item.descriptionRaw||item.description)&&(
-          <div style={{margin:'0 24px 16px',padding:'14px 16px',background:'#F8FAFC',borderRadius:'16px',border:'1px solid #E2E8F0'}}>
+          <div style={{margin:'0 clamp(16px, 3vw, 24px) 16px',padding:'14px 16px',background:'#F8FAFC',borderRadius:'16px',border:'1px solid #E2E8F0'}}>
             <div style={{fontSize:'11px',fontWeight:800,color:'#64748B',textTransform:'uppercase',marginBottom:'6px'}}>Citizen Complaint Statement</div>
-            <p style={{fontSize:'13px',color:'#334155',lineHeight:1.5,margin:0}}>"{(item.descriptionRaw||item.description||'').substring(0,300)}"</p>
+            <p style={{fontSize:'13px',color:'#334155',lineHeight:1.5,margin:0,wordBreak:'break-word'}}>"{(item.descriptionRaw||item.description||'').substring(0,300)}"</p>
           </div>
         )}
 
-        <div style={{margin:'0 24px 20px',display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}}>
+        <div style={{margin:'0 clamp(16px, 3vw, 24px) 20px',display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(130px, 1fr))',gap:'10px'}}>
           {[
             {label:'Department',   value:item.department||'Civic Services', col:'#1D4ED8', bg:'#EFF6FF'},
             {label:'SLA Target',   value:item.slaDeadline||'24–48 Hours',   col:'#B45309', bg:'#FFFBEB'},
@@ -129,16 +133,16 @@ function GrievanceDetailPopup({ item, onClose, citizen, upvoteGrievance }) {
           ].map(info=>(
             <div key={info.label} style={{padding:'12px 14px',background:info.bg,borderRadius:'12px',border:'1px solid rgba(0,0,0,0.04)'}}>
               <div style={{fontSize:'10.5px',fontWeight:700,color:info.col,textTransform:'uppercase',marginBottom:'3px'}}>{info.label}</div>
-              <div style={{fontSize:'13px',fontWeight:700,color:'#0F172A'}}>{info.value}</div>
+              <div style={{fontSize:'13px',fontWeight:700,color:'#0F172A',wordBreak:'break-word'}}>{info.value}</div>
             </div>
           ))}
         </div>
 
-        <div style={{padding:'0 24px 24px',display:'flex',gap:'10px'}}>
-          <button onClick={()=>upvoteGrievance(item.id)} style={{flex:1,height:'44px',borderRadius:'999px',border:'1px solid #E2E8F0',background:'#F8FAFC',cursor:'pointer',fontSize:'13px',fontWeight:700,color:'#334155',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}}>
+        <div style={{padding:'0 clamp(16px, 3vw, 24px) clamp(16px, 3vw, 24px)',display:'flex',gap:'10px',flexWrap:'wrap'}}>
+          <button onClick={()=>upvoteGrievance(item.id)} style={{flex:'1 1 120px',minHeight:'44px',height:'44px',borderRadius:'999px',border:'1px solid #E2E8F0',background:'#F8FAFC',cursor:'pointer',fontSize:'13px',fontWeight:700,color:'#334155',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}}>
             <ThumbsUp style={{width:'14px',height:'14px'}}/> Upvote ({item.upvotes||1})
           </button>
-          <Link to={`/citizen/complaints/${item.id}`} style={{flex:2,height:'44px',borderRadius:'999px',background:'#0F172A',color:'#FFFFFF',fontWeight:700,fontSize:'13px',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px',textDecoration:'none',boxShadow:'0 2px 8px rgba(15,23,42,0.15)'}}>
+          <Link to={`/citizen/complaints/${item.id}`} style={{flex:'2 1 180px',minHeight:'44px',height:'44px',borderRadius:'999px',background:'#0F172A',color:'#FFFFFF',fontWeight:700,fontSize:'13px',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px',textDecoration:'none',boxShadow:'0 2px 8px rgba(15,23,42,0.15)'}}>
             {item.status==='RESOLVED'?'Verify Resolution':'Full Investigation View'} <ArrowRight style={{width:'15px',height:'15px'}}/>
           </Link>
         </div>
@@ -189,7 +193,7 @@ function GrievanceCard({ item, citizen, onOpen }) {
       {/* ── Top Photo Header (Matching Reference 2 Card Visuals) ── */}
       <div style={{
         position: 'relative',
-        height: '185px',
+        height: 'clamp(155px, 45vw, 185px)',
         width: '100%',
         overflow: 'hidden',
         background: '#F1F5F9'
@@ -280,7 +284,7 @@ function GrievanceCard({ item, citizen, onOpen }) {
       </div>
 
       {/* ── Card Body (Inspired by Reference 2 Layout) ── */}
-      <div style={{ padding: '18px 20px 20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+      <div style={{ padding: 'clamp(14px, 3vw, 20px)', display: 'flex', flexDirection: 'column', flex: 1 }}>
         {/* Title */}
         <h3 style={{
           fontSize: '15.5px',
@@ -311,7 +315,7 @@ function GrievanceCard({ item, citizen, onOpen }) {
           {item.descriptionRaw || item.description || 'Civic issue logged in ward. Field team monitoring resolution.'}
         </p>
 
-        {/* Specs Row with Subtle Dividers (Directly from Reference 2) */}
+        {/* Specs Row with Subtle Dividers */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -321,9 +325,11 @@ function GrievanceCard({ item, citizen, onOpen }) {
           borderBottom: '1px solid #F1F5F9',
           marginBottom: '14px',
           fontSize: '11.5px',
-          color: '#475569'
+          color: '#475569',
+          flexWrap: 'wrap',
+          gap: '6px'
         }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '4px', maxWidth: '42%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '4px', maxWidth: '44%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             <MapPin style={{ width: '12px', height: '12px', color: '#94A3B8', flexShrink: 0 }} />
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.location?.area || item.location?.ward || 'Ward Area'}</span>
           </span>
@@ -360,13 +366,14 @@ function GrievanceCard({ item, citizen, onOpen }) {
           </div>
         </div>
 
-        {/* Dark Pill Action Button (Like "Start Cooking" / "View Details" in Reference 2) */}
+        {/* Dark Pill Action Button with 44px min-height */}
         <div style={{ marginTop: 'auto' }}>
           <button
             type="button"
             style={{
               width: '100%',
-              height: '42px',
+              height: '44px',
+              minHeight: '44px',
               borderRadius: '999px',
               background: '#0F172A',
               color: '#FFFFFF',
@@ -455,7 +462,7 @@ export default function CitizenDashboard() {
           background:'linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 50%, #EEF2FF 100%)',
           border:'1px solid #E2E8F0',
           boxShadow:'0 4px 20px -2px rgba(15, 23, 42, 0.05)',
-          padding:'32px',
+          padding:'clamp(18px, 4vw, 32px)',
           position:'relative',
           overflow:'hidden'
         }}>
@@ -469,7 +476,7 @@ export default function CitizenDashboard() {
           {/* Top greeting and action buttons */}
           <div style={{
             display:'flex', alignItems:'flex-start', justifyContent:'space-between',
-            flexWrap:'wrap', gap:'18px', marginBottom:'26px', position:'relative', zIndex:1
+            flexWrap:'wrap', gap:'16px', marginBottom:'24px', position:'relative', zIndex:1
           }}>
             <div>
               <div style={{
@@ -482,11 +489,11 @@ export default function CitizenDashboard() {
                   Citizen Access Portal
                 </span>
               </div>
-              <h1 style={{ fontSize:'28px', fontWeight:800, color:'#0F172A', margin:'0 0 6px', lineHeight:1.25 }}>
+              <h1 style={{ fontSize:'clamp(22px, 5vw, 28px)', fontWeight:800, color:'#0F172A', margin:'0 0 6px', lineHeight:1.25 }}>
                 {greeting}, {citizen.name?.split(' ')[0] || 'Citizen'} 👋
               </h1>
-              <div style={{ display:'flex', alignItems:'center', gap:'6px', color:'#475569', fontSize:'13px' }}>
-                <MapPin style={{ width:'14px', height:'14px', color:'#2563EB' }} />
+              <div style={{ display:'flex', alignItems:'center', gap:'6px', color:'#475569', fontSize:'13px', flexWrap:'wrap' }}>
+                <MapPin style={{ width:'14px', height:'14px', color:'#2563EB', flexShrink:0 }} />
                 <span>{citizen.ward || 'Ward 14'} · PIN {citizen.pincode || '110085'}</span>
               </div>
             </div>
@@ -495,7 +502,7 @@ export default function CitizenDashboard() {
               <button
                 onClick={() => { setFileModalCategory(''); setShowFileModal(true); }}
                 style={{
-                  height:'42px', padding:'0 18px', borderRadius:'12px',
+                  height:'42px', minHeight:'42px', padding:'0 18px', borderRadius:'12px',
                   background:'#2563EB', color:'#FFFFFF', border:'none',
                   fontWeight:700, fontSize:'13px', cursor:'pointer',
                   display:'flex', alignItems:'center', gap:'8px',
@@ -509,7 +516,7 @@ export default function CitizenDashboard() {
               <button
                 onClick={() => setShowSignalModal(true)}
                 style={{
-                  height:'42px', padding:'0 16px', borderRadius:'12px',
+                  height:'42px', minHeight:'42px', padding:'0 16px', borderRadius:'12px',
                   background:'#FFFFFF', color:'#334155', border:'1px solid #CBD5E1',
                   fontWeight:600, fontSize:'13px', cursor:'pointer',
                   display:'flex', alignItems:'center', gap:'8px',
@@ -523,11 +530,7 @@ export default function CitizenDashboard() {
           </div>
 
           {/* Light aesthetic KPI Stat Cards */}
-          <div style={{
-            display:'grid',
-            gridTemplateColumns:'repeat(auto-fit, minmax(150px, 1fr))',
-            gap:'12px', position:'relative', zIndex:1
-          }}>
+          <div className="citizen-kpi-grid">
             {[
               { label:'My Reports',        value:myReports.length,                                                                             col:'#2563EB', tab:'my' },
               { label:'Need Verification', value:pendingVerification.length,                                                                   col:'#D97706', tab:'verification' },
@@ -543,17 +546,17 @@ export default function CitizenDashboard() {
                     background:'#FFFFFF',
                     border: isSelected ? `2px solid ${s.col}` : '1px solid #E2E8F0',
                     borderRadius:'16px',
-                    padding:'16px 20px',
+                    padding:'14px 16px',
                     cursor:'pointer',
                     boxShadow: isSelected ? '0 4px 12px rgba(0,0,0,0.06)' : '0 1px 3px rgba(0,0,0,0.02)',
                     transition:'all 0.15s ease'
                   }}
                 >
-                  <div style={{ fontSize:'11.5px', color:'#64748B', fontWeight:600, marginBottom:'6px' }}>
+                  <div style={{ fontSize:'11px', color:'#64748B', fontWeight:600, marginBottom:'4px' }}>
                     {s.label}
                   </div>
                   <div style={{
-                    fontSize:'28px', fontWeight:800, color:s.col,
+                    fontSize:'clamp(22px, 5vw, 28px)', fontWeight:800, color:s.col,
                     lineHeight:1, fontFamily:'monospace'
                   }}>
                     {s.value}
@@ -570,14 +573,14 @@ export default function CitizenDashboard() {
         {pendingVerification.length > 0 && (
           <div style={{
             background:'#FFFBEB', border:'1px solid #FCD34D', borderRadius:'16px',
-            padding:'16px 20px', marginBottom:'20px',
+            padding:'14px 18px', marginBottom:'20px',
             display:'flex', alignItems:'center', justifyContent:'space-between',
             flexWrap:'wrap', gap:'12px'
           }}>
             <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
               <div style={{
                 width:'36px', height:'36px', borderRadius:'50%', background:'#FEF3C7',
-                color:'#B45309', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:700
+                color:'#B45309', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:700, flexShrink:0
               }}>
                 ⚠️
               </div>
@@ -594,7 +597,7 @@ export default function CitizenDashboard() {
               onClick={() => setActiveTab('verification')}
               style={{
                 padding:'8px 16px', borderRadius:'10px', background:'#D97706',
-                color:'#FFFFFF', border:'none', fontWeight:700, fontSize:'12.5px', cursor:'pointer'
+                color:'#FFFFFF', border:'none', fontWeight:700, fontSize:'12.5px', cursor:'pointer', minHeight:'38px'
               }}
             >
               Verify Fix →
@@ -632,7 +635,7 @@ export default function CitizenDashboard() {
         {/* Complaints */}
         <div>
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'18px',flexWrap:'wrap',gap:'12px'}}>
-            <div style={{display:'flex',gap:'6px',overflowX:'auto',paddingBottom:'2px',flexWrap:'wrap'}}>
+            <div style={{display:'flex',gap:'6px',overflowX:'auto',paddingBottom:'4px',flexWrap:'wrap'}}>
               {TABS.map(tab=>{
                 const isActive = activeTab === tab.key;
                 return (
@@ -646,6 +649,7 @@ export default function CitizenDashboard() {
                       background: isActive ? '#2563EB' : '#FFFFFF',
                       color: isActive ? '#FFFFFF' : '#475569',
                       cursor:'pointer', whiteSpace:'nowrap',
+                      minHeight:'36px',
                       boxShadow: isActive ? '0 2px 6px rgba(37,99,235,0.2)' : 'none',
                       transition:'all 0.15s ease'
                     }}
@@ -656,7 +660,7 @@ export default function CitizenDashboard() {
               })}
             </div>
             {activeTab!=='notifications'&&(
-              <div style={{position:'relative',minWidth:'220px'}}>
+              <div style={{position:'relative',minWidth:'180px',flex:'1 1 200px',maxWidth:'360px'}}>
                 <Search style={{position:'absolute',left:'12px',top:'50%',transform:'translateY(-50%)',width:'14px',height:'14px',color:'#94A3B8'}}/>
                 <input value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} placeholder="Search complaints..." style={{height:'38px',width:'100%',borderRadius:'999px',border:'1px solid #E2E8F0',paddingLeft:'34px',paddingRight:'14px',fontSize:'12.5px',background:'#FFFFFF',outline:'none',boxSizing:'border-box'}}/>
               </div>
@@ -677,13 +681,13 @@ export default function CitizenDashboard() {
               ))}
             </div>
           ):filteredGrievances.length===0?(
-            <div style={{textAlign:'center',padding:'60px',background:'#fff',borderRadius:'20px',border:'1px solid #E2E8F0'}}>
+            <div style={{textAlign:'center',padding:'60px 20px',background:'#fff',borderRadius:'20px',border:'1px solid #E2E8F0'}}>
               <FileText style={{width:'40px',height:'40px',color:'#CBD5E1',margin:'0 auto 14px'}}/>
               <p style={{color:'#64748B',fontSize:'15px',marginBottom:'16px'}}>No complaints found here.</p>
-              <button onClick={()=>setShowFileModal(true)} style={{padding:'10px 22px',background:'#2563EB',color:'#fff',borderRadius:'12px',border:'none',fontWeight:700,fontSize:'13.5px',cursor:'pointer',boxShadow:'0 2px 8px rgba(37,99,235,0.25)'}}>+ File Your First Complaint</button>
+              <button onClick={()=>setShowFileModal(true)} style={{padding:'10px 22px',background:'#2563EB',color:'#fff',borderRadius:'12px',border:'none',fontWeight:700,fontSize:'13.5px',cursor:'pointer',boxShadow:'0 2px 8px rgba(37,99,235,0.25)',minHeight:'44px'}}>+ File Your First Complaint</button>
             </div>
           ):(
-            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(330px,1fr))',gap:'24px'}}>
+            <div className="citizen-grievance-cards-grid">
               {filteredGrievances.map(item=>(
                 <GrievanceCard key={item.id} item={item} citizen={citizen} onOpen={setSelectedGrievance}/>
               ))}

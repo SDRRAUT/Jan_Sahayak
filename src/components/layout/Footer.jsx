@@ -7,6 +7,7 @@ export default function Footer() {
   const { user, role } = useApp();
   return (
     <footer
+      className="site-footer"
       style={{
         background: 'var(--color-surface-inset-dark)',
         padding: '80px 0 36px 0',

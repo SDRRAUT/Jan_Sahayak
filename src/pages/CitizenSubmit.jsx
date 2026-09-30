@@ -516,7 +516,7 @@ export default function CitizenSubmit() {
 
           {/* 1. MASTER CARD HEADER */}
           <div style={{
-            padding: '28px 32px 24px 32px',
+            padding: 'clamp(18px, 4vw, 28px) clamp(16px, 4vw, 32px) clamp(16px, 4vw, 24px) clamp(16px, 4vw, 32px)',
             borderBottom: '1px solid #F1F5F9',
             background: 'linear-gradient(180deg, #FAFCFB 0%, #FFFFFF 100%)'
           }}>
@@ -535,7 +535,7 @@ export default function CitizenSubmit() {
                   style={{ height: '36px', width: 'auto', objectFit: 'contain' }} 
                 />
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     <span style={{
                       fontSize: '11px',
                       fontWeight: 800,
@@ -554,7 +554,7 @@ export default function CitizenSubmit() {
                     </span>
                   </div>
                   <h1 style={{ 
-                    fontSize: '26px', 
+                    fontSize: 'clamp(20px, 5vw, 26px)', 
                     fontWeight: 800, 
                     color: 'var(--color-text-primary, #0F172A)', 
                     margin: '4px 0 0 0',
@@ -621,10 +621,7 @@ export default function CitizenSubmit() {
             </p>
 
             {/* Visual Process Stepper (All-in-one guide) */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: '8px',
+            <div className="submit-stepper-grid" style={{
               padding: '10px 14px',
               background: '#F8FAFC',
               borderRadius: '12px',
@@ -909,7 +906,7 @@ export default function CitizenSubmit() {
             /* ================================================================
                MAIN REPORTING WORKFLOW (ALL IN ONE)
                ================================================================ */
-            <form onSubmit={handleSubmit} style={{ padding: '28px 32px' }}>
+            <form onSubmit={handleSubmit} style={{ padding: 'clamp(16px, 4vw, 32px)' }}>
 
               {/* A. QUICK SITUATION PRESETS (Clickable Chips) */}
               <div style={{ marginBottom: '24px' }}>
@@ -1079,18 +1076,14 @@ export default function CitizenSubmit() {
               </div>
 
               {/* C. MULTIMODAL ACTION DOCK (4 Integrated Action Buttons) */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
-                gap: '10px',
-                marginBottom: '24px'
-              }}>
+              <div className="multimodal-action-dock">
                 {/* 1. Voice Record Button */}
                 <button
                   type="button"
                   onClick={handleStartVoice}
                   style={{
-                    padding: '10px 14px',
+                    padding: '12px 14px',
+                    minHeight: '48px',
                     borderRadius: '12px',
                     background: isRecording ? '#FEF2F2' : '#FFFFFF',
                     border: isRecording ? '1.5px solid #EF4444' : '1px solid #CBD5E1',
@@ -1125,7 +1118,8 @@ export default function CitizenSubmit() {
                   onClick={() => photoInputRef.current?.click()}
                   disabled={isAnalyzingImage}
                   style={{
-                    padding: '10px 14px',
+                    padding: '12px 14px',
+                    minHeight: '48px',
                     borderRadius: '12px',
                     background: photoPreview ? '#ECFDF5' : '#FFFFFF',
                     border: photoPreview ? '1.5px solid #059669' : '1px solid #CBD5E1',
@@ -1160,7 +1154,8 @@ export default function CitizenSubmit() {
                   onClick={handleDetectLocation}
                   disabled={isDetectingGps}
                   style={{
-                    padding: '10px 14px',
+                    padding: '12px 14px',
+                    minHeight: '48px',
                     borderRadius: '12px',
                     background: gpsCoordinates ? '#ECFDF5' : '#FFFFFF',
                     border: gpsCoordinates ? '1.5px solid #059669' : '1px solid #CBD5E1',
@@ -1194,7 +1189,8 @@ export default function CitizenSubmit() {
                   type="button"
                   onClick={() => documentInputRef.current?.click()}
                   style={{
-                    padding: '10px 14px',
+                    padding: '12px 14px',
+                    minHeight: '48px',
                     borderRadius: '12px',
                     background: documentFile ? '#F1F5F9' : '#FFFFFF',
                     border: documentFile ? '1.5px solid #64748B' : '1px solid #CBD5E1',
@@ -1237,7 +1233,7 @@ export default function CitizenSubmit() {
                   )}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 0.8fr', gap: '12px' }}>
+                <div className="jurisdiction-fields-grid">
                   <div>
                     <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#64748B', marginBottom: '4px' }}>
                       MUNICIPAL WARD
@@ -1247,7 +1243,8 @@ export default function CitizenSubmit() {
                       onChange={(e) => setWard(e.target.value)}
                       style={{
                         width: '100%',
-                        height: '40px',
+                        height: '44px',
+                        minHeight: '44px',
                         borderRadius: '8px',
                         border: '1px solid #CBD5E1',
                         padding: '0 10px',
@@ -1276,7 +1273,8 @@ export default function CitizenSubmit() {
                       placeholder="e.g. Pocket 2, Near Mother Dairy"
                       style={{
                         width: '100%',
-                        height: '40px',
+                        height: '44px',
+                        minHeight: '44px',
                         borderRadius: '8px',
                         border: '1px solid #CBD5E1',
                         padding: '0 12px',
@@ -1298,7 +1296,8 @@ export default function CitizenSubmit() {
                       placeholder="110085"
                       style={{
                         width: '100%',
-                        height: '40px',
+                        height: '44px',
+                        minHeight: '44px',
                         borderRadius: '8px',
                         border: '1px solid #CBD5E1',
                         padding: '0 12px',
@@ -1417,12 +1416,7 @@ export default function CitizenSubmit() {
                     </div>
 
                     {/* Root Cause & SOP */}
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 1fr',
-                      gap: '10px',
-                      fontSize: '12px'
-                    }}>
+                    <div className="citizen-sop-grid">
                       <div style={{ padding: '10px 12px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
                         <strong style={{ color: '#334155', display: 'block', marginBottom: '3px' }}>
                           🔍 Likely Root Cause:
@@ -1461,7 +1455,7 @@ export default function CitizenSubmit() {
                 paddingTop: '8px'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <ShieldCheck style={{ width: '16px', height: '16px', color: '#059669' }} />
+                  <ShieldCheck style={{ width: '16px', height: '16px', color: '#059669', flexShrink: 0 }} />
                   <span style={{ fontSize: '12.5px', color: '#475569' }}>
                     Direct dispatch to official Delhi Municipal ledger with immutable audit trail.
                   </span>
@@ -1470,12 +1464,8 @@ export default function CitizenSubmit() {
                 <button
                   type="submit"
                   disabled={!description.trim() || isSubmitting}
-                  className="btn-primary"
+                  className="btn-primary citizen-submit-btn"
                   style={{
-                    height: '50px',
-                    padding: '0 32px',
-                    fontSize: '15px',
-                    fontWeight: 700,
                     borderRadius: '12px',
                     background: 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)',
                     boxShadow: '0 4px 16px rgba(14, 94, 58, 0.32)',

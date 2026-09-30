@@ -233,14 +233,14 @@ export default function Navbar() {
 
   // Filter notifications strictly relevant to active role/user
   const relevantNotifications = notifications.filter(n => {
-    if (!user) return false;
+    if (!user) return n.userRole === 'citizen' || !n.userRole;
     if (user.role === 'super_admin') return true;
     if (n.userId && n.userId === user.id) return true;
     if (n.userRole && n.userRole === user.role) return true;
     if (user.role === 'dept_admin' && n.userRole === 'officer') return true;
     return false;
   });
-  const relevantUnreadCount = relevantNotifications.filter(n => !n.read).length;
+  const relevantUnreadCount = user ? relevantNotifications.filter(n => !n.read).length : 0;
 
   return (
     <>
@@ -253,17 +253,17 @@ export default function Navbar() {
               src="/logo.png" 
               alt="JanSahayak Logo" 
               style={{
-                height: '32px',
+                height: '30px',
                 width: 'auto',
                 objectFit: 'contain',
                 flexShrink: 0
               }} 
             />
-            <span style={{ fontWeight: 800, fontSize: '16.5px', letterSpacing: '-0.02em', color: '#0F172A' }}>
+            <span style={{ fontWeight: 800, fontSize: '16.5px', letterSpacing: '-0.02em', color: '#0F172A', whiteSpace: 'nowrap' }}>
               JanSahayak
             </span>
             {user && (
-              <span style={{
+              <span className="hidden-mobile" style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '4px',
@@ -472,6 +472,118 @@ export default function Navbar() {
               </button>
             )}
 
+            {/* Notifications Bell */}
+            <div ref={notificationRef} style={{ position: 'relative' }}>
+              <button
+                type="button"
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="notification-bell-btn"
+                style={{
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '50%',
+                  background: showNotifications ? '#F1F5F9' : '#F8FAFC',
+                  border: showNotifications ? '1px solid rgba(15, 23, 42, 0.16)' : '1px solid rgba(15, 23, 42, 0.10)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: showNotifications ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                  position: 'relative',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  transition: 'all 150ms ease'
+                }}
+                title="Notifications"
+                aria-label="Notifications"
+              >
+                <Bell style={{ width: '16px', height: '16px' }} />
+                {relevantUnreadCount > 0 && (
+                  <span style={{
+                    position: 'absolute',
+                    top: '5px',
+                    right: '5px',
+                    width: '7px',
+                    height: '7px',
+                    borderRadius: '50%',
+                    background: '#EF4444',
+                    boxShadow: '0 0 0 2px #FFFFFF'
+                  }} />
+                )}
+              </button>
+
+              {/* Notification Popover */}
+              {showNotifications && (
+                <div
+                  className="notification-popover"
+                  style={{
+                    position: 'absolute',
+                    top: '44px',
+                    right: 0,
+                    maxWidth: 'calc(100% - 24px)',
+                    width: 'min(340px, calc(100% - 24px))',
+                    maxHeight: '400px',
+                    overflowY: 'auto',
+                    background: '#FFFFFF',
+                    borderRadius: 'var(--radius-lg)',
+                    border: '1px solid var(--color-border-subtle)',
+                    boxShadow: 'var(--shadow-floating)',
+                    padding: '16px',
+                    zIndex: 1100
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
+                      Activity Notifications
+                    </span>
+                    {relevantUnreadCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => markAllNotificationsAsRead()}
+                        style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: 600 }}
+                      >
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
+                  {relevantNotifications.length === 0 ? (
+                    <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', textAlign: 'center', padding: '20px 0' }}>
+                      No notifications yet.
+                    </p>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {relevantNotifications.slice(0, 6).map((n) => (
+                        <div
+                          key={n.id}
+                          style={{
+                            padding: '10px 12px',
+                            borderRadius: 'var(--radius-md)',
+                            background: n.read ? '#FFFFFF' : '#F0FDF4',
+                            border: `1px solid ${n.read ? 'var(--color-border-subtle)' : '#BBF7D0'}`,
+                            fontSize: '12px',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => {
+                            markNotificationAsRead(n.id);
+                            if (n.link) navigate(n.link);
+                          }}
+                        >
+                          <div style={{ fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '2px' }}>
+                            {n.title}
+                          </div>
+                          <div style={{ color: 'var(--color-text-secondary)', fontSize: '11.5px', lineHeight: 1.4 }}>
+                            {n.message}
+                          </div>
+                          <div style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                            {n.timestamp || 'Just now'}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Quick AI Assistant Trigger in Navbar */}
             <button
               type="button"
@@ -479,11 +591,12 @@ export default function Navbar() {
                 const launcher = document.getElementById('jansahayak-ai-launcher');
                 if (launcher) launcher.click();
               }}
+              className="header-ai-pill"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '6px',
-                padding: '7px 13px',
+                gap: '5px',
+                padding: '5px 12px',
                 borderRadius: '999px',
                 background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
                 color: '#10B981',
@@ -492,127 +605,19 @@ export default function Navbar() {
                 fontSize: '12px',
                 fontWeight: 700,
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                flexShrink: 0
               }}
               title="Open JanSahayak Gemini AI Assistant"
+              aria-label="Open JanSahayak Gemini AI Assistant"
             >
-              <Sparkles style={{ width: '13px', height: '13px', color: '#10B981' }} />
-              <span style={{ color: '#FFFFFF' }}>AI Sahayak</span>
+              <Sparkles style={{ width: '13px', height: '13px', color: '#10B981', flexShrink: 0 }} />
+              <span className="header-ai-pill-label" style={{ color: '#FFFFFF', whiteSpace: 'nowrap' }}>AI Sahayak</span>
             </button>
 
-            {/* Notifications Bell */}
-            {user && (
-              <div ref={notificationRef} style={{ position: 'relative' }}>
-                <button
-                  type="button"
-                  onClick={() => setShowNotifications(!showNotifications)}
-                  style={{
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '50%',
-                    background: showNotifications ? '#F1F5F9' : '#F8FAFC',
-                    border: showNotifications ? '1px solid rgba(15, 23, 42, 0.16)' : '1px solid rgba(15, 23, 42, 0.10)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: showNotifications ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
-                    position: 'relative',
-                    cursor: 'pointer',
-                    flexShrink: 0,
-                    transition: 'all 150ms ease'
-                  }}
-                  title="Notifications"
-                >
-                  <Bell style={{ width: '16px', height: '16px' }} />
-                  {relevantUnreadCount > 0 && (
-                    <span style={{
-                      position: 'absolute',
-                      top: '6px',
-                      right: '6px',
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
-                      background: '#EF4444',
-                      boxShadow: '0 0 0 2px #FFFFFF'
-                    }} />
-                  )}
-                </button>
-
-                {/* Notification Popover */}
-                {showNotifications && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '46px',
-                      right: 0,
-                      width: '340px',
-                      maxHeight: '400px',
-                      overflowY: 'auto',
-                      background: '#FFFFFF',
-                      borderRadius: 'var(--radius-lg)',
-                      border: '1px solid var(--color-border-subtle)',
-                      boxShadow: 'var(--shadow-floating)',
-                      padding: '16px',
-                      zIndex: 100
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                        Activity Notifications
-                      </span>
-                      {relevantUnreadCount > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => markAllNotificationsAsRead()}
-                          style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: 600 }}
-                        >
-                          Mark all read
-                        </button>
-                      )}
-                    </div>
-                    {relevantNotifications.length === 0 ? (
-                      <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', textAlign: 'center', padding: '20px 0' }}>
-                        No notifications yet.
-                      </p>
-                    ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {relevantNotifications.slice(0, 6).map((n) => (
-                          <div
-                            key={n.id}
-                            style={{
-                              padding: '10px 12px',
-                              borderRadius: 'var(--radius-md)',
-                              background: n.read ? '#FFFFFF' : '#F0FDF4',
-                              border: `1px solid ${n.read ? 'var(--color-border-subtle)' : '#BBF7D0'}`,
-                              fontSize: '12px',
-                              cursor: 'pointer'
-                            }}
-                            onClick={() => {
-                              markNotificationAsRead(n.id);
-                              if (n.link) navigate(n.link);
-                            }}
-                          >
-                            <div style={{ fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '2px' }}>
-                              {n.title}
-                            </div>
-                            <div style={{ color: 'var(--color-text-secondary)', fontSize: '11.5px', lineHeight: 1.4 }}>
-                              {n.message}
-                            </div>
-                            <div style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                              {n.timestamp || 'Just now'}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Action 3: User Account / Persona Switcher */}
+            {/* Action 3: User Account / Persona Switcher (Desktop Only) */}
             {user ? (
-              <div ref={userMenuRef} style={{ position: 'relative' }}>
+              <div ref={userMenuRef} className="hidden-mobile" style={{ position: 'relative' }}>
                 <button
                   type="button"
                   onClick={() => setShowUserMenu(!showUserMenu)}
@@ -935,6 +940,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setShowLoginModal(true)}
+                className="hidden-mobile"
                 style={{
                   fontSize: '13.5px',
                   fontWeight: 600,
@@ -962,8 +968,8 @@ export default function Navbar() {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="nav-mobile-toggle"
               style={{
-                width: '36px',
-                height: '36px',
+                width: '34px',
+                height: '34px',
                 borderRadius: '50%',
                 display: 'none',
                 alignItems: 'center',
@@ -971,34 +977,44 @@ export default function Navbar() {
                 background: mobileMenuOpen ? '#F1F5F9' : '#F8FAFC',
                 border: '1px solid rgba(15, 23, 42, 0.10)',
                 color: 'var(--color-text-primary)',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                flexShrink: 0
               }}
               aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? <X style={{ width: '18px', height: '18px' }} /> : <Menu style={{ width: '18px', height: '18px' }} />}
+              {mobileMenuOpen ? <X style={{ width: '17px', height: '17px' }} /> : <Menu style={{ width: '17px', height: '17px' }} />}
             </button>
           </div>
         </div>
 
         {/* Responsive Mobile Drawer Menu */}
         {mobileMenuOpen && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '64px',
-              left: '4px',
-              right: '4px',
-              background: '#FFFFFF',
-              borderRadius: '20px',
-              border: '1px solid rgba(15, 23, 42, 0.08)',
-              boxShadow: '0 16px 40px rgba(15, 23, 42, 0.12)',
-              padding: '18px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
-              zIndex: 999
-            }}
-          >
+          <>
+            <div
+              className="mobile-drawer-backdrop"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-hidden="true"
+            />
+            <div
+              className="mobile-drawer-container"
+              style={{
+                position: 'absolute',
+                top: '58px',
+                left: '4px',
+                right: '4px',
+                background: '#FFFFFF',
+                borderRadius: '20px',
+                border: '1px solid rgba(15, 23, 42, 0.08)',
+                boxShadow: '0 16px 40px rgba(15, 23, 42, 0.12)',
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                zIndex: 999,
+                maxHeight: 'calc(100vh - 130px)',
+                overflowY: 'auto'
+              }}
+            >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {/* Citizen Mobile Links */}
               {user && role === 'citizen' && (
@@ -1406,8 +1422,9 @@ export default function Navbar() {
               </>
             )}
           </div>
-        )}
-      </header>
+        </>
+      )}
+    </header>
 
       {/* Track Grievance Quick Modal */}
       {showTrackModal && (

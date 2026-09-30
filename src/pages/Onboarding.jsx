@@ -92,21 +92,23 @@ export default function Onboarding() {
       {/* Floating Audio Guide Status Pill */}
       <div style={{
         position: 'fixed',
-        top: '20px',
-        right: '20px',
+        top: 'max(12px, env(safe-area-inset-top, 12px))',
+        right: '12px',
         zIndex: 9999,
         display: 'flex',
         alignItems: 'center',
         gap: '8px',
-        padding: '8px 16px',
+        padding: '6px 14px',
         borderRadius: '999px',
-        background: 'rgba(15, 23, 42, 0.88)',
+        background: 'rgba(15, 23, 42, 0.92)',
         border: '1px solid rgba(255, 255, 255, 0.16)',
         backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         color: '#FFFFFF',
         boxShadow: '0 10px 25px rgba(0, 0, 0, 0.3)',
-        fontSize: '12.5px',
-        fontWeight: 600
+        fontSize: '12px',
+        fontWeight: 600,
+        maxWidth: 'calc(100% - 24px)'
       }}>
         <button
           type="button"

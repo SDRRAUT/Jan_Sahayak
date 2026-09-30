@@ -216,12 +216,12 @@ export default function Home() {
             {/* Hero Narrative */}
             <div className="hero-left-col" style={{ width: '100%' }}>
               {/* Category Overline: Professional Public Civic Intelligence */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '20px', flexWrap: 'wrap', maxWidth: '100%' }}>
                 <img 
                   src="/logo.png" 
                   alt="JanSahayak Official Logo" 
                   style={{ 
-                    height: '52px', 
+                    height: 'clamp(38px, 8vw, 52px)', 
                     width: 'auto', 
                     objectFit: 'contain',
                     filter: 'drop-shadow(0 4px 12px rgba(14, 94, 58, 0.22))' 
@@ -236,37 +236,38 @@ export default function Home() {
                 </span>
               </div>
 
-              {/* Core Hero Headline */}
-              <h1 className="hero-headline" style={{ marginBottom: '20px', fontSize: '38px', lineHeight: 1.2 }}>
+              {/* Core Hero Headline with Responsive Typography */}
+              <h1 className="hero-headline" style={{ marginBottom: '20px', fontSize: 'clamp(26px, 6vw, 42px)', lineHeight: 1.2 }}>
                 Aapki Awaaz, Ab <span className="headline-accent">Samjhi</span> Jayegi.
               </h1>
 
               {/* Supporting Copy */}
               <p style={{
-                fontSize: '17px',
+                fontSize: 'clamp(14.5px, 2.8vw, 17px)',
                 lineHeight: 1.6,
                 color: 'var(--color-text-secondary)',
                 maxWidth: '640px',
-                margin: '0 auto 32px auto'
+                margin: '0 auto 28px auto',
+                padding: '0 8px'
               }}>
                 A public grievance intelligence platform that turns everyday citizen voices into structured insights, connected evidence, and actionable resolution recommendations.
               </p>
 
-              {/* Subtle Trust Indicators */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '28px', flexWrap: 'wrap', paddingTop: '18px', borderTop: '1px solid var(--color-divider)' }}>
-                <div>
-                  <strong style={{ fontSize: '16px', color: 'var(--color-text-primary)', display: 'block' }}>3.2 Days</strong>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Avg. Resolution SLA</span>
+              {/* Subtle Trust Indicators (Responsive on Mobile) */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'clamp(14px, 3vw, 28px)', flexWrap: 'wrap', paddingTop: '18px', borderTop: '1px solid var(--color-divider)' }}>
+                <div style={{ textAlign: 'center', minWidth: '95px' }}>
+                  <strong style={{ fontSize: 'clamp(15px, 3vw, 17px)', color: 'var(--color-text-primary)', display: 'block' }}>3.2 Days</strong>
+                  <span style={{ fontSize: '11.5px', color: 'var(--color-text-muted)' }}>Avg. SLA Resolution</span>
                 </div>
-                <div style={{ width: '1px', height: '24px', background: 'var(--color-divider)' }} />
-                <div>
-                  <strong style={{ fontSize: '16px', color: 'var(--color-text-primary)', display: 'block' }}>94.8%</strong>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>First-Time Routing Accuracy</span>
+                <div className="hidden-mobile" style={{ width: '1px', height: '24px', background: 'var(--color-divider)' }} />
+                <div style={{ textAlign: 'center', minWidth: '95px' }}>
+                  <strong style={{ fontSize: 'clamp(15px, 3vw, 17px)', color: 'var(--color-text-primary)', display: 'block' }}>94.8%</strong>
+                  <span style={{ fontSize: '11.5px', color: 'var(--color-text-muted)' }}>Routing Accuracy</span>
                 </div>
-                <div style={{ width: '1px', height: '24px', background: 'var(--color-divider)' }} />
-                <div>
-                  <strong style={{ fontSize: '16px', color: 'var(--color-text-primary)', display: 'block' }}>22 Languages</strong>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Multilingual Voice Intake</span>
+                <div className="hidden-mobile" style={{ width: '1px', height: '24px', background: 'var(--color-divider)' }} />
+                <div style={{ textAlign: 'center', minWidth: '95px' }}>
+                  <strong style={{ fontSize: 'clamp(15px, 3vw, 17px)', color: 'var(--color-text-primary)', display: 'block' }}>22 Languages</strong>
+                  <span style={{ fontSize: '11.5px', color: 'var(--color-text-muted)' }}>Multilingual Intake</span>
                 </div>
               </div>
             </div>
@@ -405,59 +406,59 @@ export default function Home() {
               <div
                 className="card"
                 style={{
-                  padding: '36px',
+                  padding: 'clamp(18px, 4vw, 36px)',
                   background: 'linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%)',
                   borderRadius: 'var(--radius-xl)',
                   maxWidth: '1000px',
                   margin: '0 auto'
                 }}
               >
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '32px', alignItems: 'center' }}>
+                <div className="civic-example-grid">
                   {/* Left Column: Citizen Voice */}
-                  <div style={{ gridColumn: 'span 5' }}>
+                  <div className="civic-example-col-voice" style={{ gridColumn: 'span 5' }}>
                     <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '8px' }}>
                       Citizen Speech / Text ({currentEx.dialect})
                     </span>
                     <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#FFFFFF', border: '1px solid var(--color-border-subtle)', marginBottom: '14px' }}>
-                      <p style={{ fontSize: '14px', fontStyle: 'italic', lineHeight: 1.6, color: 'var(--color-text-primary)' }}>
+                      <p style={{ fontSize: '14px', fontStyle: 'italic', lineHeight: 1.6, color: 'var(--color-text-primary)', wordBreak: 'break-word', margin: 0 }}>
                         "{currentEx.citizenQuote}"
                       </p>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--color-primary)', fontWeight: 600 }}>
-                      <Building2 style={{ width: '14px', height: '14px' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--color-primary)', fontWeight: 600, flexWrap: 'wrap' }}>
+                      <Building2 style={{ width: '14px', height: '14px', flexShrink: 0 }} />
                       <span>Assigned Department: {currentEx.dept}</span>
                     </div>
                   </div>
 
                   {/* Arrow Divider */}
-                  <div style={{ gridColumn: 'span 1', textAlign: 'center' }}>
+                  <div className="civic-example-col-arrow" style={{ gridColumn: 'span 1', textAlign: 'center' }}>
                     <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--color-primary)', color: '#FFFFFF', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
                       <ArrowRight style={{ width: '16px', height: '16px' }} />
                     </div>
                   </div>
 
                   {/* Right Column: AI Understanding & Action */}
-                  <div style={{ gridColumn: 'span 6' }}>
+                  <div className="civic-example-col-action" style={{ gridColumn: 'span 6' }}>
                     <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-primary)', display: 'block', marginBottom: '8px' }}>
                       JanSahayak Understanding & Recommended Action
                     </span>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: '12px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px', marginBottom: '12px' }}>
                       <div style={{ padding: '8px 10px', borderRadius: 'var(--radius-sm)', background: '#FFFFFF', border: '1px solid var(--color-border-subtle)' }}>
                         <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'block' }}>Category</span>
-                        <strong style={{ fontSize: '12px', color: 'var(--color-text-primary)' }}>{currentEx.understands.category}</strong>
+                        <strong style={{ fontSize: '12px', color: 'var(--color-text-primary)', display: 'block', wordBreak: 'break-word' }}>{currentEx.understands.category}</strong>
                       </div>
                       <div style={{ padding: '8px 10px', borderRadius: 'var(--radius-sm)', background: '#FFFFFF', border: '1px solid var(--color-border-subtle)' }}>
                         <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'block' }}>Location</span>
-                        <strong style={{ fontSize: '12px', color: 'var(--color-text-primary)' }}>{currentEx.understands.location}</strong>
+                        <strong style={{ fontSize: '12px', color: 'var(--color-text-primary)', display: 'block', wordBreak: 'break-word' }}>{currentEx.understands.location}</strong>
                       </div>
                       <div style={{ padding: '8px 10px', borderRadius: 'var(--radius-sm)', background: '#FFFFFF', border: '1px solid var(--color-border-subtle)' }}>
                         <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'block' }}>Severity</span>
-                        <strong style={{ fontSize: '12px', color: '#991B1B' }}>{currentEx.understands.severity}</strong>
+                        <strong style={{ fontSize: '12px', color: '#991B1B', display: 'block', wordBreak: 'break-word' }}>{currentEx.understands.severity}</strong>
                       </div>
                       <div style={{ padding: '8px 10px', borderRadius: 'var(--radius-sm)', background: '#FFFFFF', border: '1px solid var(--color-border-subtle)' }}>
                         <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'block' }}>Pattern Alert</span>
-                        <strong style={{ fontSize: '12px', color: '#B45309' }}>{currentEx.pattern}</strong>
+                        <strong style={{ fontSize: '12px', color: '#B45309', display: 'block', wordBreak: 'break-word' }}>{currentEx.pattern}</strong>
                       </div>
                     </div>
 
@@ -465,7 +466,7 @@ export default function Home() {
                       <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#065F46', display: 'block', marginBottom: '2px' }}>
                         Action for Public Officials
                       </span>
-                      <p style={{ fontSize: '12px', color: '#065F46', fontWeight: 600, margin: 0 }}>
+                      <p style={{ fontSize: '12px', color: '#065F46', fontWeight: 600, margin: 0, wordBreak: 'break-word', lineHeight: 1.5 }}>
                         {currentEx.action}
                       </p>
                     </div>
@@ -486,22 +487,16 @@ export default function Home() {
             <span className="category-pill" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10B981', borderColor: 'rgba(16, 185, 129, 0.3)', marginBottom: '12px' }}>
               SYSTEMIC CIVIC INTELLIGENCE
             </span>
-            <h2 style={{ fontSize: '38px', color: '#FFFFFF', marginBottom: '14px', letterSpacing: '-0.02em' }}>
+            <h2 style={{ fontSize: 'clamp(24px, 5vw, 38px)', color: '#FFFFFF', marginBottom: '14px', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
               One Complaint is a Case.<br />A Pattern is a Warning.
             </h2>
-            <p style={{ color: 'var(--color-text-inverse-muted)', fontSize: '16px', lineHeight: 1.6 }}>
+            <p style={{ color: 'var(--color-text-inverse-muted)', fontSize: 'clamp(14px, 2.5vw, 16px)', lineHeight: 1.6 }}>
               Legacy portals close repeated complaints as isolated tickets. JanSahayak correlates micro-reports into macro infrastructure diagnoses.
             </p>
           </div>
 
-          {/* Transformation Visual Diagram */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(5, 1fr)',
-            gap: '14px',
-            alignItems: 'center',
-            marginBottom: '40px'
-          }}>
+          {/* Transformation Visual Diagram - Responsive Stacked on Mobile */}
+          <div className="civic-story-grid">
             {/* Box 1 */}
             <div style={{ background: 'var(--color-surface-inset-card)', padding: '20px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-dark)', textAlign: 'center' }}>
               <span style={{ fontSize: '11px', color: 'var(--color-accent)', textTransform: 'uppercase', fontWeight: 700 }}>Trigger</span>
@@ -509,7 +504,7 @@ export default function Home() {
               <p style={{ fontSize: '11px', color: 'var(--color-text-inverse-muted)', marginTop: '4px' }}>Resident notes foul water</p>
             </div>
 
-            <div style={{ textAlign: 'center', color: 'var(--color-accent)' }}>→</div>
+            <div className="civic-story-arrow" style={{ textAlign: 'center', color: 'var(--color-accent)', fontSize: '20px' }}>→</div>
 
             {/* Box 2 */}
             <div style={{ background: 'var(--color-surface-inset-card)', padding: '20px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-dark)', textAlign: 'center' }}>
@@ -518,7 +513,7 @@ export default function Home() {
               <p style={{ fontSize: '11px', color: 'var(--color-text-inverse-muted)', marginTop: '4px' }}>Across 3 adjacent lanes</p>
             </div>
 
-            <div style={{ textAlign: 'center', color: 'var(--color-accent)' }}>→</div>
+            <div className="civic-story-arrow" style={{ textAlign: 'center', color: 'var(--color-accent)', fontSize: '20px' }}>→</div>
 
             {/* Box 3 */}
             <div style={{ background: 'rgba(239, 68, 68, 0.15)', padding: '20px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(239, 68, 68, 0.3)', textAlign: 'center' }}>
@@ -573,25 +568,20 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Interactive Map Visual Container */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(12, 1fr)',
-            gap: '24px',
-            alignItems: 'start'
-          }}>
+          {/* Interactive Map Visual Container - Responsive Grid */}
+          <div className="civic-map-grid">
             {/* Left Column (8 Cols): Simulated Ward Hotspot Canvas */}
             <div
-              className="card"
+              className="card civic-map-left"
               style={{
                 gridColumn: 'span 8',
-                padding: '28px',
+                padding: 'clamp(16px, 3vw, 28px)',
                 background: '#FFFFFF',
                 borderRadius: 'var(--radius-xl)',
                 position: 'relative'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '8px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <MapPin style={{ width: '18px', height: '18px', color: 'var(--color-primary)' }} />
                   <strong style={{ fontSize: '14px', color: 'var(--color-text-primary)' }}>
@@ -603,19 +593,14 @@ export default function Home() {
                 </span>
               </div>
 
-              {/* Interactive Ward Grid Pins */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '12px',
-                marginBottom: '20px'
-              }}>
+              {/* Interactive Ward Grid Pins - Responsive 2-col to 1-col */}
+              <div className="ward-pins-grid">
                 {filteredMapWards.map((w, idx) => (
                   <div
                     key={w.ward}
                     onClick={() => setActiveWardIndex(idx)}
                     style={{
-                      padding: '16px',
+                      padding: '14px 16px',
                       borderRadius: 'var(--radius-md)',
                       background: activeWardIndex === idx ? '#F0FDF4' : '#F8F9FA',
                       border: activeWardIndex === idx ? '2px solid var(--color-primary)' : '1px solid var(--color-border-subtle)',
@@ -642,7 +627,7 @@ export default function Home() {
                     <strong style={{ fontSize: '13px', display: 'block', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
                       {w.ward}
                     </strong>
-                    <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', display: 'block' }}>
+                    <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', display: 'block', lineHeight: 1.4 }}>
                       {w.hotspotName}
                     </span>
 
@@ -658,7 +643,7 @@ export default function Home() {
                 ))}
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '12px', borderTop: '1px solid var(--color-divider)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '12px', borderTop: '1px solid var(--color-divider)', flexWrap: 'wrap', gap: '8px' }}>
                 <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
                   Click any ward to inspect live root-cause diagnosis.
                 </span>
@@ -671,10 +656,10 @@ export default function Home() {
 
             {/* Right Column (4 Cols): Selected Ward Detail Panel */}
             <div
-              className="card"
+              className="card civic-map-right"
               style={{
                 gridColumn: 'span 4',
-                padding: '24px',
+                padding: 'clamp(16px, 3vw, 24px)',
                 background: '#FFFFFF',
                 borderRadius: 'var(--radius-xl)'
               }}
@@ -693,7 +678,7 @@ export default function Home() {
                 <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '4px' }}>
                   Required Municipal Intervention:
                 </span>
-                <strong style={{ fontSize: '13px', color: 'var(--color-primary)' }}>
+                <strong style={{ fontSize: '13px', color: 'var(--color-primary)', display: 'block', lineHeight: 1.4 }}>
                   {activeWard.actionRequired}
                 </strong>
               </div>
@@ -713,7 +698,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <Link to={`/officer/complaints/DL-2026-W14-0892`} className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+              <Link to={`/officer/complaints/DL-2026-W14-0892`} className="btn-primary" style={{ width: '100%', justifyContent: 'center', minHeight: '44px' }}>
                 <span>Inspect Work Order</span>
                 <ArrowRight style={{ width: '14px', height: '14px' }} />
               </Link>
@@ -879,17 +864,12 @@ export default function Home() {
                 </span>
               </div>
 
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '16px',
-                marginBottom: '20px'
-              }}>
+              <div className="verification-compare-grid">
                 <div style={{ padding: '14px', borderRadius: 'var(--radius-md)', background: '#F8F9FA', border: '1px solid var(--color-border-subtle)' }}>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
                     1. Original Citizen Problem
                   </span>
-                  <p style={{ fontSize: '13px', color: 'var(--color-text-primary)', fontStyle: 'italic', margin: 0 }}>
+                  <p style={{ fontSize: '13px', color: 'var(--color-text-primary)', fontStyle: 'italic', margin: 0, wordBreak: 'break-word', lineHeight: 1.5 }}>
                     "Bhai pichle 3 din se ganda badbudaar paani supply mein mix hoke aa raha hai near Mother Dairy..."
                   </p>
                 </div>
@@ -898,7 +878,7 @@ export default function Home() {
                   <span style={{ fontSize: '11px', fontWeight: 700, color: '#065F46', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
                     2. Field Crew Resolution Evidence
                   </span>
-                  <p style={{ fontSize: '13px', color: '#065F46', fontWeight: 500, margin: 0 }}>
+                  <p style={{ fontSize: '13px', color: '#065F46', fontWeight: 500, margin: 0, wordBreak: 'break-word', lineHeight: 1.5 }}>
                     "Repair team excavated junction, replaced fractured 100mm cast-iron valve clamp, flushed line and chlorine levels tested normal."
                   </p>
                 </div>
@@ -906,18 +886,18 @@ export default function Home() {
 
               {/* Action Buttons */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '16px', borderTop: '1px solid rgba(15,23,42,0.06)', flexWrap: 'wrap', gap: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <Link to="/citizen/complaints/DL-2026-W14-0892" className="btn-primary btn-sm" style={{ background: '#10B981', color: '#FFFFFF' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', width: '100%' }}>
+                  <Link to="/citizen/complaints/DL-2026-W14-0892" className="btn-primary btn-sm" style={{ background: '#10B981', color: '#FFFFFF', minHeight: '44px' }}>
                     <CheckCircle2 style={{ width: '14px', height: '14px' }} />
                     <span>Yes, It's Fixed</span>
                   </Link>
 
-                  <Link to="/citizen/complaints/DL-2026-W14-0892" className="btn-secondary btn-sm" style={{ color: '#991B1B', borderColor: '#FCA5A5' }}>
+                  <Link to="/citizen/complaints/DL-2026-W14-0892" className="btn-secondary btn-sm" style={{ color: '#991B1B', borderColor: '#FCA5A5', minHeight: '44px' }}>
                     <span>No, The Problem Remains</span>
                   </Link>
                 </div>
 
-                <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>
                   If disputed, the ticket automatically escalates to the Superintending Engineer.
                 </span>
               </div>
@@ -932,7 +912,7 @@ export default function Home() {
       <section className="section-spacing" style={{ background: '#FFFFFF', borderTop: '1px solid var(--color-divider)' }}>
         <div className="container">
           <div className="section-header center">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
               <span className="category-pill">VALIDATED IMPACT</span>
               <span className="pilot-tag">Pilot Demonstration Dataset</span>
             </div>
@@ -945,54 +925,54 @@ export default function Home() {
           {/* 4 Metric Cards */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '24px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
+            gap: '16px',
             marginBottom: '48px'
           }}>
-            <div className="card" style={{ padding: '28px', textAlign: 'center' }}>
+            <div className="card" style={{ padding: 'clamp(18px, 3vw, 28px)', textAlign: 'center' }}>
               <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
                 Avg. Resolution Window
               </span>
-              <div style={{ fontSize: '42px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-primary)', margin: '6px 0' }}>
+              <div style={{ fontSize: 'clamp(32px, 6vw, 42px)', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-primary)', margin: '6px 0' }}>
                 3.2 Days
               </div>
-              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>
                 Down from <strong>18.4 Days</strong> baseline on legacy citizen portals.
               </p>
             </div>
 
-            <div className="card" style={{ padding: '28px', textAlign: 'center' }}>
+            <div className="card" style={{ padding: 'clamp(18px, 3vw, 28px)', textAlign: 'center' }}>
               <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
                 Duplicate Work Reduction
               </span>
-              <div style={{ fontSize: '42px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', margin: '6px 0' }}>
+              <div style={{ fontSize: 'clamp(32px, 6vw, 42px)', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', margin: '6px 0' }}>
                 64.2%
               </div>
-              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>
                 Eliminates repetitive ticket logging for the same municipal breakdown.
               </p>
             </div>
 
-            <div className="card" style={{ padding: '28px', textAlign: 'center' }}>
+            <div className="card" style={{ padding: 'clamp(18px, 3vw, 28px)', textAlign: 'center' }}>
               <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
                 Routing Precision
               </span>
-              <div style={{ fontSize: '42px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-primary)', margin: '6px 0' }}>
+              <div style={{ fontSize: 'clamp(32px, 6vw, 42px)', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-primary)', margin: '6px 0' }}>
                 94.8%
               </div>
-              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>
                 Direct departmental assignment without manual desk-to-desk transfers.
               </p>
             </div>
 
-            <div className="card" style={{ padding: '28px', textAlign: 'center' }}>
+            <div className="card" style={{ padding: 'clamp(18px, 3vw, 28px)', textAlign: 'center' }}>
               <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
                 Citizen Confirmation Rate
               </span>
-              <div style={{ fontSize: '42px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#059669', margin: '6px 0' }}>
+              <div style={{ fontSize: 'clamp(32px, 6vw, 42px)', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#059669', margin: '6px 0' }}>
                 91.6%
               </div>
-              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>
                 Residents verified closure without requiring dispute reopening.
               </p>
             </div>
@@ -1009,7 +989,7 @@ export default function Home() {
             style={{
               background: 'var(--color-surface-inset-dark)',
               borderRadius: 'var(--radius-2xl)',
-              padding: '64px 36px',
+              padding: 'clamp(36px, 6vw, 64px) clamp(16px, 4vw, 36px)',
               textAlign: 'center',
               color: '#FFFFFF',
               border: '1px solid var(--color-border-dark)'
@@ -1018,20 +998,20 @@ export default function Home() {
             <span className="category-pill" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10B981', borderColor: 'rgba(16, 185, 129, 0.3)', marginBottom: '16px' }}>
               PUBLIC SERVICE ACCESS
             </span>
-            <h2 style={{ fontSize: '36px', color: '#FFFFFF', marginBottom: '14px' }}>
+            <h2 style={{ fontSize: 'clamp(24px, 5vw, 36px)', color: '#FFFFFF', marginBottom: '14px', lineHeight: 1.25 }}>
               Have a Public Grievance to Report?
             </h2>
-            <p style={{ color: 'var(--color-text-inverse-muted)', fontSize: '16px', maxWidth: '540px', margin: '0 auto 32px auto', lineHeight: 1.6 }}>
+            <p style={{ color: 'var(--color-text-inverse-muted)', fontSize: 'clamp(14px, 2.5vw, 16px)', maxWidth: '540px', margin: '0 auto 32px auto', lineHeight: 1.6 }}>
               Speak or write in your local language. JanSahayak will structure it, connect it to ward evidence, and keep you informed until resolution is verified.
             </p>
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
-              <Link to="/citizen/submit" className="btn-primary" style={{ background: 'var(--color-accent)', color: '#0B1914', fontWeight: 700 }}>
+              <Link to="/citizen/submit" className="btn-primary" style={{ background: 'var(--color-accent)', color: '#0B1914', fontWeight: 700, minHeight: '48px' }}>
                 <span>Report a Problem Now</span>
                 <ArrowRight className="btn-arrow" style={{ width: '16px', height: '16px' }} />
               </Link>
 
-              <Link to="/officer" className="btn-secondary" style={{ background: 'rgba(255,255,255,0.08)', color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.18)' }}>
+              <Link to="/officer" className="btn-secondary" style={{ background: 'rgba(255,255,255,0.08)', color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.18)', minHeight: '48px' }}>
                 <span>Explore Officer Workspace</span>
                 <ArrowUpRight style={{ width: '16px', height: '16px' }} />
               </Link>

@@ -46,7 +46,7 @@ export default function Register() {
           <p>Direct citizen grievance submission and transparent municipal tracking.</p>
         </div>
 
-        <form onSubmit={handleRegister} className="card" style={{ padding: '32px' }}>
+        <form onSubmit={handleRegister} className="card register-form-card">
           {error && (
             <div style={{ padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px' }}>
               <AlertCircle style={{ width: '14px', height: '14px' }} />
@@ -63,12 +63,13 @@ export default function Register() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Ramesh Kumar"
-              style={{ width: '100%', height: '44px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-medium)', padding: '0 14px', fontSize: '13px' }}
+              className="register-input"
+              style={{ width: '100%', height: '46px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-medium)', padding: '0 14px', fontSize: '14px' }}
               required
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '16px' }}>
+          <div className="register-field-grid" style={{ marginBottom: '16px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
                 Email Address
@@ -78,7 +79,8 @@ export default function Register() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="ramesh@gmail.com"
-                style={{ width: '100%', height: '44px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-medium)', padding: '0 14px', fontSize: '13px' }}
+                className="register-input"
+                style={{ width: '100%', height: '46px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-medium)', padding: '0 14px', fontSize: '14px' }}
                 required
               />
             </div>
@@ -91,13 +93,14 @@ export default function Register() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+91 98111-XXXXX"
-                style={{ width: '100%', height: '44px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-medium)', padding: '0 14px', fontSize: '13px' }}
+                className="register-input"
+                style={{ width: '100%', height: '46px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-medium)', padding: '0 14px', fontSize: '14px' }}
                 required
               />
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 0.6fr', gap: '14px', marginBottom: '16px' }}>
+          <div className="register-field-grid ward-grid" style={{ marginBottom: '16px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
                 Municipal Ward
@@ -105,7 +108,8 @@ export default function Register() {
               <select
                 value={ward}
                 onChange={(e) => setWard(e.target.value)}
-                style={{ width: '100%', height: '44px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-medium)', padding: '0 10px', fontSize: '13px', background: '#FFFFFF' }}
+                className="register-input"
+                style={{ width: '100%', height: '46px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-medium)', padding: '0 10px', fontSize: '14px', background: '#FFFFFF' }}
               >
                 <option value="Ward 14 (Rohini Sector 14)">Ward 14 (Rohini Sector 14)</option>
                 <option value="Ward 8 (Lajpat Nagar / Moolchand)">Ward 8 (Lajpat Nagar / Moolchand)</option>
@@ -123,7 +127,8 @@ export default function Register() {
                 value={pincode}
                 onChange={(e) => setPincode(e.target.value)}
                 placeholder="110085"
-                style={{ width: '100%', height: '44px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-medium)', padding: '0 12px', fontSize: '13px' }}
+                className="register-input"
+                style={{ width: '100%', height: '46px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-medium)', padding: '0 12px', fontSize: '14px' }}
                 required
               />
             </div>
@@ -138,7 +143,8 @@ export default function Register() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Minimum 6 characters"
-              style={{ width: '100%', height: '44px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-medium)', padding: '0 14px', fontSize: '13px' }}
+              className="register-input"
+              style={{ width: '100%', height: '46px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-medium)', padding: '0 14px', fontSize: '14px' }}
               required
             />
           </div>
@@ -147,7 +153,7 @@ export default function Register() {
             type="submit"
             disabled={isLoadingAuth}
             className="btn-primary"
-            style={{ width: '100%', height: '48px', fontSize: '14px' }}
+            style={{ width: '100%', height: '48px', minHeight: '48px', fontSize: '15px', fontWeight: 700 }}
           >
             {isLoadingAuth ? 'Registering Citizen Account...' : 'Complete Registration & Open Dashboard'}
           </button>
@@ -159,6 +165,33 @@ export default function Register() {
             </Link>
           </div>
         </form>
+
+        <style>{`
+          .register-form-card {
+            padding: 32px;
+          }
+          .register-field-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+          }
+          .register-field-grid.ward-grid {
+            grid-template-columns: 1.4fr 0.6fr;
+          }
+          @media (max-width: 640px) {
+            .register-form-card {
+              padding: 20px 16px !important;
+            }
+            .register-field-grid,
+            .register-field-grid.ward-grid {
+              grid-template-columns: 1fr !important;
+              gap: 14px !important;
+            }
+            .register-input {
+              font-size: 16px !important;
+            }
+          }
+        `}</style>
       </div>
     </div>
   );

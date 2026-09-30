@@ -160,13 +160,8 @@ export default function DeptAdmin() {
         </div>
 
         {/* 4 Summary Stat Cards */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '16px',
-          marginBottom: '32px'
-        }}>
-          <div className="card" style={{ padding: '20px' }}>
+        <div className="officer-kpi-grid" style={{ marginBottom: '32px' }}>
+          <div className="card officer-kpi-card" style={{ padding: '20px' }}>
             <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
               Department Active Queue
             </span>
@@ -176,7 +171,7 @@ export default function DeptAdmin() {
             <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>Distributed across 4 sub-divisions</span>
           </div>
 
-          <div className="card" style={{ padding: '20px' }}>
+          <div className="card officer-kpi-card" style={{ padding: '20px' }}>
             <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
               Critical Hazard Cases
             </span>
@@ -186,7 +181,7 @@ export default function DeptAdmin() {
             <span style={{ fontSize: '11px', color: '#EF4444' }}>Biological / Contamination priority</span>
           </div>
 
-          <div className="card" style={{ padding: '20px' }}>
+          <div className="card officer-kpi-card" style={{ padding: '20px' }}>
             <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
               Citizen Satisfaction Score
             </span>
@@ -196,7 +191,7 @@ export default function DeptAdmin() {
             <span style={{ fontSize: '11px', color: '#059669' }}>Based on {totalRatingCount} verified citizen ratings</span>
           </div>
 
-          <div className="card" style={{ padding: '20px' }}>
+          <div className="card officer-kpi-card" style={{ padding: '20px' }}>
             <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
               Disputed Reopened Cases
             </span>
@@ -207,8 +202,8 @@ export default function DeptAdmin() {
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', borderBottom: '1px solid var(--color-divider)', paddingBottom: '12px', flexWrap: 'wrap' }}>
+        {/* Tab Navigation (Touch-Scrollable Pill Strip) */}
+        <div className="horizontal-scroll-pills" style={{ marginBottom: '24px', borderBottom: '1px solid var(--color-divider)', paddingBottom: '12px' }}>
           {[
             { id: 'overview', label: 'Officer Workload & Roster' },
             { id: 'grievances', label: `Department Grievances (${deptGrievances.length})` },
@@ -227,7 +222,9 @@ export default function DeptAdmin() {
                 background: selectedTab === tab.id ? 'var(--color-primary)' : '#F1F5F9',
                 color: selectedTab === tab.id ? '#FFFFFF' : 'var(--color-text-secondary)',
                 border: 'none',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                flexShrink: 0
               }}
             >
               {tab.label}
@@ -237,23 +234,24 @@ export default function DeptAdmin() {
 
         {/* TAB 1: Officer Workload Table */}
         {selectedTab === 'overview' && (
-          <div className="card" style={{ padding: '28px', marginBottom: '32px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+          <div className="card" style={{ padding: '24px', marginBottom: '32px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
               <h3 style={{ fontSize: '18px' }}>
                 Sub-Divisional Officer Workload & Shift Allocation
               </h3>
               <button
                 type="button"
                 onClick={() => setShowAddOfficerModal(true)}
-                className="btn-primary btn-sm"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                className="btn-primary btn-sm mobile-full-width-btn"
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', minHeight: '40px' }}
               >
                 <Plus style={{ width: '14px', height: '14px' }} />
                 <span>Add Officer to Roster</span>
               </button>
             </div>
 
-            <div style={{ overflowX: 'auto' }}>
+            {/* Desktop Table View */}
+            <div className="desktop-only-table" style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
                 <thead>
                   <tr style={{ borderBottom: '2px solid var(--color-border-medium)' }}>
@@ -310,6 +308,82 @@ export default function DeptAdmin() {
                 </tbody>
               </table>
             </div>
+
+            {/* Mobile Card List View */}
+            <div className="mobile-only-cards" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {officerRoster.map((off, i) => (
+                <div
+                  key={i}
+                  style={{
+                    background: '#F8FAFC',
+                    border: '1px solid var(--color-border-subtle)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: '14px 16px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
+                    <div>
+                      <strong style={{ fontSize: '15px', color: 'var(--color-text-primary)', display: 'block' }}>
+                        {off.name}
+                      </strong>
+                      <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                        {off.designation}
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#D97706' }}>
+                      ★ {off.rating}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', textAlign: 'center', background: '#FFFFFF', padding: '8px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-subtle)' }}>
+                    <div>
+                      <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'block', textTransform: 'uppercase' }}>Active</span>
+                      <strong style={{ fontSize: '13px', color: off.activeCases > 5 ? '#EF4444' : 'var(--color-text-primary)' }}>
+                        {off.activeCases}
+                      </strong>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'block', textTransform: 'uppercase' }}>Resolved</span>
+                      <strong style={{ fontSize: '13px', color: 'var(--color-text-primary)' }}>
+                        {off.resolvedThisMonth}
+                      </strong>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'block', textTransform: 'uppercase' }}>Avg Speed</span>
+                      <strong style={{ fontSize: '13px', color: '#059669', fontFamily: 'var(--font-mono)' }}>
+                        {off.avgResolutionHours}
+                      </strong>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => toggleOfficerStatus(i)}
+                    className="mobile-full-width-btn"
+                    style={{
+                      minHeight: '44px',
+                      borderRadius: 'var(--radius-md)',
+                      background: off.status === 'ON_DUTY' ? '#ECFDF5' : '#FFFBEB',
+                      color: off.status === 'ON_DUTY' ? '#065F46' : '#92400E',
+                      border: '1px solid currentColor',
+                      fontWeight: 700,
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    <span>● Status: {off.status}</span>
+                    <span style={{ fontSize: '11px', opacity: 0.75 }}>(Tap to toggle)</span>
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -338,7 +412,7 @@ export default function DeptAdmin() {
 
         {/* TAB 2: Category & Geographic Trends */}
         {selectedTab === 'trends' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
+          <div className="responsive-two-col" style={{ gap: '24px', marginBottom: '32px' }}>
             
             {/* Category Breakdown */}
             <div className="card" style={{ padding: '24px' }}>

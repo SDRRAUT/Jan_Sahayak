@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, 
   User, 
@@ -27,6 +27,23 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  // Mobile touch gesture for easy bottom-sheet dismiss
+  const touchStartY = useRef(null);
+
+  const handleTouchStart = (e) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartY.current !== null) {
+      const deltaY = e.changedTouches[0].clientY - touchStartY.current;
+      if (deltaY > 50) {
+        onClose();
+      }
+      touchStartY.current = null;
+    }
+  };
 
   // Fallback profile based on role
   const currentRole = user?.role || role || 'citizen';
@@ -181,18 +198,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      zIndex: 9999,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '16px',
-      backgroundColor: 'rgba(15, 23, 42, 0.65)',
-      backdropFilter: 'blur(6px)',
-      WebkitBackdropFilter: 'blur(6px)'
-    }}>
+    <div className="user-profile-modal-overlay">
       {/* Click outside to close backdrop */}
       <div 
         onClick={onClose} 
@@ -204,27 +210,28 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
         role="dialog"
         aria-modal="true"
         aria-labelledby="profile-modal-title"
-        style={{
-          position: 'relative',
-          background: '#FFFFFF',
-          borderRadius: '20px',
-          width: '100%',
-          maxWidth: '540px',
-          maxHeight: '90vh',
-          display: 'flex',
-          flexDirection: 'column',
-          boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.08)',
-          overflow: 'hidden',
-          zIndex: 1
-        }}
+        className="user-profile-modal-card"
       >
         {/* Top Header with Aesthetic Gradient Banner */}
-        <div style={{
-          background: `linear-gradient(135deg, ${roleMeta.badgeBg} 0%, #FFFFFF 100%)`,
-          padding: '18px 20px 14px 20px',
-          borderBottom: `1px solid ${roleMeta.border}`,
-          position: 'relative'
-        }}>
+        <div 
+          className="user-profile-modal-header"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          style={{
+            background: `linear-gradient(135deg, ${roleMeta.badgeBg} 0%, #FFFFFF 100%)`,
+            padding: '12px 20px 14px 20px',
+            borderBottom: `1px solid ${roleMeta.border}`,
+            position: 'relative'
+          }}
+        >
+          {/* Mobile Touch Drag Handle */}
+          <div 
+            className="mobile-sheet-drag-handle" 
+            onClick={onClose} 
+            title="Swipe or tap down to close"
+            aria-label="Dismiss sheet"
+          />
+
           {/* Close button */}
           <button
             type="button"
@@ -385,7 +392,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
 
         {/* Scrollable Form Content */}
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1 }}>
-          <div style={{ padding: '16px 20px', overflowY: 'auto', flex: 1 }}>
+          <div className="user-profile-modal-body" style={{ flex: 1, overflowY: 'auto' }}>
             
             {/* Feedback Banners */}
             {saveSuccess && (
@@ -474,7 +481,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
                 </div>
 
                 {/* Phone & Alternate Contact Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div className="user-profile-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div>
                     <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '5px' }}>
                       Primary Mobile Contact
@@ -526,7 +533,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
                   {/* Citizen Fields */}
                   {currentRole === 'citizen' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '10px' }}>
+                      <div className="user-profile-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '10px' }}>
                         <div>
                           <label style={{ fontSize: '10.5px', fontWeight: 600, color: '#64748B', display: 'block', marginBottom: '3px' }}>Assigned Ward</label>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: '8px', padding: '6px 10px' }}>
@@ -569,7 +576,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
                   {/* Civic Officer Fields */}
                   {(currentRole === 'civic_officer' || currentRole === 'officer' || currentRole === 'dept_admin') && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '10px' }}>
+                      <div className="user-profile-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '10px' }}>
                         <div>
                           <label style={{ fontSize: '10.5px', fontWeight: 600, color: '#64748B', display: 'block', marginBottom: '3px' }}>Government Department</label>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: '8px', padding: '6px 10px' }}>
@@ -596,7 +603,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
                         </div>
                       </div>
 
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                      <div className="user-profile-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                         <div>
                           <label style={{ fontSize: '10.5px', fontWeight: 600, color: '#64748B', display: 'block', marginBottom: '3px' }}>Official Designation</label>
                           <input 
@@ -625,7 +632,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
                   {/* Super Admin Fields */}
                   {currentRole === 'super_admin' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '10px' }}>
+                      <div className="user-profile-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '10px' }}>
                         <div>
                           <label style={{ fontSize: '10.5px', fontWeight: 600, color: '#64748B', display: 'block', marginBottom: '3px' }}>Administrative Rank</label>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: '8px', padding: '6px 10px' }}>
@@ -786,7 +793,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
                     <span style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A' }}>Language & Voice Assistance</span>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '10px' }}>
+                  <div className="user-profile-grid-2col" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 1fr))', gap: '8px', marginBottom: '10px' }}>
                     {[
                       { key: 'hi', label: 'हिन्दी (Hindi)' },
                       { key: 'en', label: 'English' },
@@ -854,15 +861,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
           </div>
 
           {/* Modal Footer with Actions */}
-          <div style={{
-            padding: '12px 20px',
-            borderTop: '1px solid #E2E8F0',
-            background: '#FFFFFF',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '10px'
-          }}>
+          <div className="user-profile-modal-footer">
             <button
               type="button"
               onClick={onClose}

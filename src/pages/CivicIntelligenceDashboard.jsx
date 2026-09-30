@@ -73,7 +73,7 @@ export default function CivicIntelligenceDashboard() {
             <button
               type="button"
               onClick={() => setShowSignalModal(true)}
-              className="btn-primary"
+              className="btn-primary mobile-full-width-btn"
               style={{
                 height: '42px',
                 fontSize: '13px',
@@ -81,6 +81,7 @@ export default function CivicIntelligenceDashboard() {
                 borderRadius: 'var(--radius-full)',
                 display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '8px'
               }}
             >
@@ -91,13 +92,8 @@ export default function CivicIntelligenceDashboard() {
         </div>
 
         {/* 4 Metric Intelligence Cards */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '16px',
-          marginBottom: '28px'
-        }}>
-          <div style={{
+        <div className="officer-kpi-grid" style={{ marginBottom: '28px' }}>
+          <div className="officer-kpi-card" style={{
             padding: '16px',
             borderRadius: 'var(--radius-lg)',
             background: '#FFFFFF',
@@ -120,7 +116,7 @@ export default function CivicIntelligenceDashboard() {
             </span>
           </div>
 
-          <div style={{
+          <div className="officer-kpi-card" style={{
             padding: '16px',
             borderRadius: 'var(--radius-lg)',
             background: '#FFFFFF',
@@ -143,7 +139,7 @@ export default function CivicIntelligenceDashboard() {
             </span>
           </div>
 
-          <div style={{
+          <div className="officer-kpi-card" style={{
             padding: '16px',
             borderRadius: 'var(--radius-lg)',
             background: '#FFFFFF',
@@ -166,7 +162,7 @@ export default function CivicIntelligenceDashboard() {
             </span>
           </div>
 
-          <div style={{
+          <div className="officer-kpi-card" style={{
             padding: '16px',
             borderRadius: 'var(--radius-lg)',
             background: '#FFFFFF',
@@ -269,7 +265,7 @@ export default function CivicIntelligenceDashboard() {
                     </h3>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div className="mobile-action-bar" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                     <div style={{ textAlign: 'right' }}>
                       <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', display: 'block' }}>Connected Signals</span>
                       <strong style={{ fontSize: '16px', color: 'var(--color-text-primary)' }}>
@@ -279,14 +275,15 @@ export default function CivicIntelligenceDashboard() {
 
                     <Link
                       to={`/intelligence/incidents/${incident.id}`}
-                      className="btn-primary"
+                      className="btn-primary mobile-full-width-btn"
                       style={{
-                        height: '38px',
+                        minHeight: '40px',
                         fontSize: '12.5px',
                         padding: '0 16px',
                         borderRadius: 'var(--radius-full)',
                         display: 'inline-flex',
                         alignItems: 'center',
+                        justifyContent: 'center',
                         gap: '6px'
                       }}
                     >
@@ -363,7 +360,7 @@ export default function CivicIntelligenceDashboard() {
         </div>
 
         {/* Section: Cross-Department Matrix & Civic Memory */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px', marginBottom: '40px' }}>
+        <div className="responsive-side-by-side" style={{ marginBottom: '40px' }}>
           <CrossDepartmentMatrix crossDeptData={civicIncidents[0]?.crossDepartmentImpact} />
           <CivicMemoryCard memories={civicIncidents[0]?.civicMemory} />
         </div>

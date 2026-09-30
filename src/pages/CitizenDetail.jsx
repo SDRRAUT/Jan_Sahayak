@@ -49,7 +49,7 @@ export default function CitizenDetail() {
     <div className="section-spacing" style={{ paddingTop: '24px' }}>
       <div className="container">
         {/* Navigation back bar */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
           <Link
             to="/citizen"
             style={{
@@ -58,23 +58,24 @@ export default function CitizenDetail() {
               gap: '6px',
               fontSize: '13px',
               fontWeight: 600,
-              color: 'var(--color-primary)'
+              color: 'var(--color-primary)',
+              minHeight: '44px'
             }}
           >
             <ArrowLeft style={{ width: '16px', height: '16px' }} />
             <span>Back to Citizen Portal</span>
           </Link>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span className="font-mono-numbers" style={{ fontSize: '12px', padding: '4px 12px', borderRadius: 'var(--radius-full)', background: '#F1F5F9', color: 'var(--color-text-secondary)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <span className="font-mono-numbers" style={{ fontSize: '12px', padding: '6px 12px', borderRadius: 'var(--radius-full)', background: '#F1F5F9', color: 'var(--color-text-secondary)' }}>
               Ticket: {item.id}
             </span>
             <button
               onClick={() => upvoteGrievance(item.id)}
               className="btn-secondary btn-sm"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', minHeight: '44px' }}
             >
-              <ThumbsUp style={{ width: '13px', height: '13px' }} />
+              <ThumbsUp style={{ width: '14px', height: '14px' }} />
               <span>Upvote ({item.upvotes || 1})</span>
             </button>
           </div>
@@ -99,14 +100,9 @@ export default function CitizenDetail() {
         </div>
 
         {/* Main Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(12, 1fr)',
-          gap: '32px',
-          alignItems: 'start'
-        }}>
+        <div className="citizen-detail-grid">
           {/* Left Column (7 Cols): Grievance Detail & Actions */}
-          <div style={{ gridColumn: 'span 7' }} className="hero-left-col">
+          <div style={{ gridColumn: 'span 7' }} className="citizen-detail-left">
             
             {/* Closed Loop Resolution Verification (Section 20 & 26) */}
             {(item.status === 'RESOLVED' || item.status === 'RESOLVED_CONFIRMED' || item.status === 'DISPUTE_REOPENED') && (
@@ -130,7 +126,7 @@ export default function CitizenDetail() {
             )}
 
             {/* Main Grievance Information Card */}
-            <div className="card" style={{ padding: '32px', marginBottom: '24px' }}>
+            <div className="card" style={{ padding: 'clamp(16px, 4vw, 32px)', marginBottom: '24px' }}>
               {/* Header Tags & Priority */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
                 <span className="category-pill">{item.department}</span>
@@ -158,7 +154,7 @@ export default function CitizenDetail() {
               </div>
 
               {/* Title */}
-              <h1 style={{ fontSize: '24px', lineHeight: 1.3, marginBottom: '16px', color: 'var(--color-text-primary)' }}>
+              <h1 style={{ fontSize: 'clamp(18px, 4vw, 24px)', lineHeight: 1.3, marginBottom: '16px', color: 'var(--color-text-primary)' }}>
                 {item.title}
               </h1>
 
@@ -192,18 +188,13 @@ export default function CitizenDetail() {
 
               {/* Real Evidence Section (Citizen Photo + Field Completion Photo) */}
               {(item.evidence?.photoUrl || item.resolutionPhotoUrl) && (
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: item.evidence?.photoUrl && item.resolutionPhotoUrl ? '1fr 1fr' : '1fr',
-                  gap: '16px',
-                  marginBottom: '16px'
-                }}>
+                <div className="citizen-evidence-grid">
                   {item.evidence?.photoUrl && (
                     <div style={{ border: '1px solid var(--color-border-subtle)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
                       <span style={{ display: 'block', padding: '6px 10px', background: '#F1F5F9', fontSize: '11px', fontWeight: 700, color: 'var(--color-text-secondary)' }}>
                         Original Problem Evidence
                       </span>
-                      <img src={item.evidence.photoUrl} alt="Reported problem" style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
+                      <img src={item.evidence.photoUrl} alt="Reported problem" style={{ width: '100%', height: 'clamp(140px, 45vw, 180px)', objectFit: 'cover', display: 'block' }} />
                     </div>
                   )}
                   {item.resolutionPhotoUrl && (
@@ -211,7 +202,7 @@ export default function CitizenDetail() {
                       <span style={{ display: 'block', padding: '6px 10px', background: '#F0FDF4', fontSize: '11px', fontWeight: 700, color: '#166534' }}>
                         Officer Field Completion Photo
                       </span>
-                      <img src={item.resolutionPhotoUrl} alt="Resolution work" style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
+                      <img src={item.resolutionPhotoUrl} alt="Resolution work" style={{ width: '100%', height: 'clamp(140px, 45vw, 180px)', objectFit: 'cover', display: 'block' }} />
                     </div>
                   )}
                 </div>
@@ -277,15 +268,16 @@ export default function CitizenDetail() {
                         <strong>Your Reply: </strong> {req.response} ({req.answeredAt})
                       </div>
                     ) : (
-                      <div style={{ display: 'flex', gap: '8px' }}>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         <input
                           type="text"
                           value={citizenReply}
                           onChange={(e) => setCitizenReply(e.target.value)}
                           placeholder="Type your clarification for the officer..."
                           style={{
-                            flex: 1,
-                            height: '40px',
+                            flex: '1 1 200px',
+                            minHeight: '44px',
+                            height: '44px',
                             borderRadius: 'var(--radius-sm)',
                             border: '1px solid #FCD34D',
                             padding: '0 12px',
@@ -297,7 +289,7 @@ export default function CitizenDetail() {
                           type="button"
                           onClick={() => handleSendClarification(req.id)}
                           className="btn-primary btn-sm"
-                          style={{ height: '40px', background: '#B45309' }}
+                          style={{ minHeight: '44px', height: '44px', background: '#B45309', padding: '0 16px' }}
                         >
                           <Send style={{ width: '13px', height: '13px' }} />
                           <span>Reply</span>
@@ -310,7 +302,7 @@ export default function CitizenDetail() {
             )}
 
             {/* WhatsApp/SMS Broadcast Feed */}
-            <div className="card" style={{ padding: '24px' }}>
+            <div className="card" style={{ padding: 'clamp(16px, 4vw, 24px)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
                 <div className="icon-squircle" style={{ width: '32px', height: '32px' }}>
                   <MessageSquare style={{ width: '16px', height: '16px' }} />
@@ -356,7 +348,7 @@ export default function CitizenDetail() {
           </div>
 
           {/* Right Column (5 Cols): Grievance DNA & Assigned Officer */}
-          <div style={{ gridColumn: 'span 5' }} className="hero-right-col">
+          <div style={{ gridColumn: 'span 5' }} className="citizen-detail-right">
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               {/* Grievance DNA Component with Progressive Disclosure */}
               <div>
@@ -367,7 +359,7 @@ export default function CitizenDetail() {
               </div>
 
               {/* Assigned Public Authority Card */}
-              <div className="card" style={{ padding: '24px' }}>
+              <div className="card" style={{ padding: 'clamp(16px, 4vw, 24px)' }}>
                 <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-text-muted)', display: 'block', marginBottom: '12px' }}>
                   Assigned Public Authority
                 </span>
@@ -383,7 +375,8 @@ export default function CitizenDetail() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontWeight: 700,
-                    fontSize: '15px'
+                    fontSize: '15px',
+                    flexShrink: 0
                   }}>
                     {item.officerName ? item.officerName.substring(3, 5) : 'EE'}
                   </div>
@@ -411,7 +404,7 @@ export default function CitizenDetail() {
                   <Link
                     to={`/officer/complaints/${item.id}`}
                     className="btn-secondary btn-sm"
-                    style={{ width: '100%', justifyContent: 'center' }}
+                    style={{ width: '100%', justifyContent: 'center', minHeight: '44px', display: 'inline-flex', alignItems: 'center' }}
                   >
                     View in Officer Workspace
                   </Link>

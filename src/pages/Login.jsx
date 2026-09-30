@@ -188,7 +188,7 @@ export default function Login() {
 
       <div className="container" style={{ maxWidth: '980px' }}>
         {/* Onboarding Tour Banner */}
-        <div style={{
+        <div className="login-tour-banner" style={{
           marginBottom: '28px',
           padding: '16px 22px',
           borderRadius: 'var(--radius-lg)',
@@ -217,6 +217,7 @@ export default function Login() {
 
           <Link
             to="/onboarding"
+            className="login-tour-btn"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -262,7 +263,7 @@ export default function Login() {
             Select Persona to Access Portal (Prototype Environment):
           </span>
 
-          <div style={{
+          <div className="login-roles-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
             gap: '16px'
@@ -271,7 +272,7 @@ export default function Login() {
             <button
               type="button"
               onClick={() => handleQuickDemoLogin('citizen')}
-              className="card card-interactive"
+              className="card card-interactive login-role-card"
               style={{
                 padding: '18px',
                 textAlign: 'left',
@@ -297,7 +298,7 @@ export default function Login() {
             <button
               type="button"
               onClick={() => handleQuickDemoLogin('civic_officer')}
-              className="card card-interactive"
+              className="card card-interactive login-role-card"
               style={{
                 padding: '18px',
                 textAlign: 'left',
@@ -323,7 +324,7 @@ export default function Login() {
             <button
               type="button"
               onClick={() => handleQuickDemoLogin('super_admin')}
-              className="card card-interactive"
+              className="card card-interactive login-role-card"
               style={{
                 padding: '18px',
                 textAlign: 'left',
@@ -349,7 +350,7 @@ export default function Login() {
 
         {/* Credentials Form Box */}
         <div style={{ maxWidth: '480px', margin: '0 auto' }}>
-          <form onSubmit={handleSubmit} className="card" style={{ padding: '32px' }}>
+          <form onSubmit={handleSubmit} className="card login-form-card">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
               <h3 style={{ fontSize: '18px' }}>Sign In to Portal</h3>
               <button
@@ -380,14 +381,15 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="e.g. aditya@citizen.in or sanjay.sharma@djb.gov.in"
+                  className="login-input"
                   style={{
                     width: '100%',
-                    height: '44px',
+                    height: '46px',
                     borderRadius: 'var(--radius-md)',
                     border: '1px solid var(--color-border-medium)',
                     paddingLeft: '38px',
                     paddingRight: '12px',
-                    fontSize: '13px',
+                    fontSize: '13.5px',
                     background: '#FFFFFF'
                   }}
                   required
@@ -408,14 +410,15 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password..."
+                    className="login-input"
                     style={{
                       width: '100%',
-                      height: '44px',
+                      height: '46px',
                       borderRadius: 'var(--radius-md)',
                       border: '1px solid var(--color-border-medium)',
                       paddingLeft: '38px',
                       paddingRight: '12px',
-                      fontSize: '13px',
+                      fontSize: '13.5px',
                       background: '#FFFFFF'
                     }}
                     required
@@ -433,9 +436,10 @@ export default function Login() {
                     value={otpCode}
                     onChange={(e) => setOtpCode(e.target.value)}
                     placeholder="e.g. 948201"
+                    className="login-input"
                     style={{
                       flex: 1,
-                      height: '44px',
+                      height: '46px',
                       borderRadius: 'var(--radius-md)',
                       border: '1px solid var(--color-border-medium)',
                       padding: '0 12px',
@@ -450,6 +454,7 @@ export default function Login() {
                       setOtpCode('948201');
                     }}
                     className="btn-secondary btn-sm"
+                    style={{ height: '46px', padding: '0 16px', minWidth: '90px' }}
                   >
                     {otpSent ? 'Resend' : 'Send OTP'}
                   </button>
@@ -465,8 +470,8 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoadingAuth}
-              className="btn-primary"
-              style={{ width: '100%', height: '48px', fontSize: '14px' }}
+              className="btn-primary login-submit-btn"
+              style={{ width: '100%', height: '48px', minHeight: '48px', fontSize: '15px', fontWeight: 700 }}
             >
               {isLoadingAuth ? 'Authenticating...' : 'Sign In with Secure Clearance'}
             </button>
@@ -480,6 +485,42 @@ export default function Login() {
           </form>
         </div>
       </div>
+
+      <style>{`
+        .login-roles-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 16px;
+        }
+        .login-form-card {
+          padding: 32px;
+        }
+        @media (max-width: 768px) {
+          .login-tour-banner {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            padding: 14px 16px !important;
+          }
+          .login-tour-btn {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          .login-roles-grid {
+            grid-template-columns: 1fr !important;
+            gap: 10px !important;
+          }
+          .login-role-card {
+            padding: 14px 16px !important;
+            min-height: 52px !important;
+          }
+          .login-form-card {
+            padding: 20px 16px !important;
+          }
+          .login-input {
+            font-size: 16px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
