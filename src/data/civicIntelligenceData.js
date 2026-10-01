@@ -15,6 +15,42 @@
 
 export const CIVIC_SIGNALS = [
   {
+    id: "SIG-WAG-001",
+    incidentId: "INC-2026-PUNE-WAGHOLI-01",
+    citizenName: "Santosh Gawade",
+    ward: "Wagholi Ward 28 (Baif Road Market)",
+    channel: "VOICE_NOTE",
+    rawInput: "Baif Road market junction par kachra 5 din se pada hai, badbu aa rahi hai.",
+    translatedText: "Garbage has been lying at Baif Road market junction for 5 days, terrible foul smell.",
+    category: "Sanitation & Solid Waste",
+    inferredAsset: "PMC Waste Collection Point",
+    hasPhoto: true,
+    photoUrl: "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80",
+    lat: 18.5815,
+    lng: 73.9840,
+    timestamp: "2026-10-01 07:45 AM",
+    status: "CLUSTERED",
+    confidence: "High (97%)"
+  },
+  {
+    id: "SIG-WAG-002",
+    incidentId: "INC-2026-PUNE-WAGHOLI-02",
+    citizenName: "Priyanka Jadhav",
+    ward: "Wagholi Ward 29 (Ivy Estate & Kesnand Rd)",
+    channel: "PHOTO_UPLOAD",
+    rawInput: "Ivy estate road pipeline burst, paani sadak par beh raha hai.",
+    translatedText: "Ivy Estate road water pipeline burst, water flowing on road.",
+    category: "Water Supply & Contamination",
+    inferredAsset: "200mm HDPE Feeder Line",
+    hasPhoto: true,
+    photoUrl: "https://images.unsplash.com/photo-1584467735815-f778f274e296?w=600&auto=format&fit=crop&q=80",
+    lat: 18.5760,
+    lng: 73.9810,
+    timestamp: "2026-10-01 08:10 AM",
+    status: "CLUSTERED",
+    confidence: "High (98%)"
+  },
+  {
     id: "SIG-2026-001",
     incidentId: "INC-2026-DEL-01",
     citizenName: "Pooja Malhotra",

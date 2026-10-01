@@ -108,15 +108,50 @@ const createSignalIcon = () => {
   });
 };
 
+export const WAGHOLI_SPREAD_POINTS = [
+  {
+    step: 'Day 1 (Oct 1)',
+    ward: 'Wagholi Ward 28 (Baif Road Market)',
+    lat: 18.5815,
+    lng: 73.9840,
+    radiusMeters: 180,
+    signalCount: 4,
+    label: 'Open dump yard accumulation at Baif Road market junction',
+    color: '#EF4444'
+  },
+  {
+    step: 'Day 3 (Oct 3)',
+    ward: 'Wagholi Ward 29 (Ivy Estate & Kesnand Rd)',
+    lat: 18.5760,
+    lng: 73.9810,
+    radiusMeters: 450,
+    signalCount: 18,
+    label: 'Feeder pipe rupture under Kesnand Road; water pressure collapse',
+    color: '#F59E0B'
+  },
+  {
+    step: 'Day 5 (Oct 5)',
+    ward: 'Wagholi Ward 27 (Nagar Road Corridor)',
+    lat: 18.5780,
+    lng: 73.9790,
+    radiusMeters: 850,
+    signalCount: 32,
+    label: 'Highway asphalt cratering & waterlogging near Lexicon School',
+    color: '#10B981'
+  }
+];
+
 export default function LeafletSpreadMap({
   dataPoints = [],
   selectedDay = 0,
   activeLayer = 'spread',
   mapMode = 'dark',
-  height = '420px'
+  height = '420px',
+  region = 'wagholi'
 }) {
-  const currentPoint = dataPoints[selectedDay] || dataPoints[0];
-  const centerCoord = currentPoint ? [currentPoint.lat, currentPoint.lng] : [28.7175, 77.1248];
+  const points = dataPoints && dataPoints.length > 0 ? dataPoints : WAGHOLI_SPREAD_POINTS;
+  const currentPoint = points[selectedDay] || points[0];
+  const centerCoord = currentPoint ? [currentPoint.lat, currentPoint.lng] : [18.5793, 73.9820];
 
   // Pipeline path coordinates along Rohini Sec 14 & Pitampura corridor
   const pipelinePath = [
@@ -197,7 +232,7 @@ export default function LeafletSpreadMap({
         )}
 
         {/* Epicenter Data Points */}
-        {dataPoints.map((pt, idx) => {
+        {points.map((pt, idx) => {
           const isCurrent = idx === selectedDay;
           return (
             <Marker

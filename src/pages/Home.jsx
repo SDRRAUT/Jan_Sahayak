@@ -108,6 +108,7 @@ export default function Home() {
   const [systemicViewMode, setSystemicViewMode] = useState('compare'); // 'compare' (default) | 'steps'
   const [activeStoryStep, setActiveStoryStep] = useState(1);
   const [mapBasemap, setMapBasemap] = useState('dark'); // 'dark' | 'satellite'
+  const [mapRegion, setMapRegion] = useState('wagholi'); // 'wagholi' | 'delhi'
   const [mapZoom, setMapZoom] = useState(1);
   const [hoveredHotspot, setHoveredHotspot] = useState(null);
   const [simulatedSignals, setSimulatedSignals] = useState({});
@@ -1602,6 +1603,7 @@ export default function Home() {
               <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 1 }}>
                 <LeafletSpreadMap
                   defaultTile={mapBasemap === 'satellite' ? 'satellite' : 'dark'}
+                  region={mapRegion}
                   height="100%"
                 />
               </div>
@@ -1642,11 +1644,56 @@ export default function Home() {
                   fontWeight: 600
                 }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', display: 'inline-block', boxShadow: '0 0 8px #10B981' }} />
-                  <span>Delhi NCT Municipal Grid • Live GIS Feed</span>
+                  <span>📍 {mapRegion === 'wagholi' ? 'Wagholi, Pune Grid (PMC)' : 'Delhi NCT Grid'} • Live GIS Feed</span>
                 </div>
 
-                {/* Basemap Switcher & Zoom Tools */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {/* Region Selector & Basemap Switcher & Zoom Tools */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  {/* Region Switcher */}
+                  <div style={{
+                    display: 'flex',
+                    background: 'rgba(15, 23, 42, 0.75)',
+                    backdropFilter: 'blur(8px)',
+                    padding: '3px',
+                    borderRadius: '10px',
+                    border: '1px solid rgba(255, 255, 255, 0.15)'
+                  }}>
+                    <button
+                      type="button"
+                      onClick={() => setMapRegion('wagholi')}
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: mapRegion === 'wagholi' ? 700 : 500,
+                        padding: '4px 10px',
+                        borderRadius: '7px',
+                        background: mapRegion === 'wagholi' ? '#0284C7' : 'transparent',
+                        color: mapRegion === 'wagholi' ? '#FFFFFF' : '#CBD5E1',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'all 150ms ease'
+                      }}
+                    >
+                      🚩 Wagholi, Pune
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMapRegion('delhi')}
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: mapRegion === 'delhi' ? 700 : 500,
+                        padding: '4px 10px',
+                        borderRadius: '7px',
+                        background: mapRegion === 'delhi' ? '#0284C7' : 'transparent',
+                        color: mapRegion === 'delhi' ? '#FFFFFF' : '#CBD5E1',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'all 150ms ease'
+                      }}
+                    >
+                      🏛️ Delhi NCT
+                    </button>
+                  </div>
+
                   <div style={{
                     display: 'flex',
                     background: 'rgba(15, 23, 42, 0.75)',

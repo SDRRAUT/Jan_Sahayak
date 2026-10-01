@@ -1,5 +1,151 @@
 export const INITIAL_GRIEVANCES = [
   {
+    id: "PN-2026-WAG-0101",
+    title: "Massive Overflowing Garbage Pile & Foul Smell at Baif Road Junction",
+    descriptionRaw: "Baif Road junction near Wagholi market mein kachra 5 din se pada hai. Overflowing dump yard, stray animals spreading trash, foul smell reaching nearby shops.",
+    languageDetected: "Hinglish / Marathi (Confidence 99%)",
+    category: "Sanitation & Solid Waste",
+    department: "Pune Municipal Corporation (PMC)",
+    officerName: "Er. Ramesh Shinde",
+    officerDesignation: "PMC Sanitation Inspector (Wagholi Zone)",
+    location: {
+      ward: "Wagholi Ward 28 (Baif Road Market)",
+      area: "Baif Road Junction, Near Vegetable Market",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5815,
+      lng: 73.9840
+    },
+    urgency: "CRITICAL",
+    urgencyScore: 95,
+    status: "IN_PROGRESS",
+    createdAt: "2026-10-01 07:45 AM",
+    slaDeadline: "2026-10-01 06:00 PM",
+    slaHoursLeft: 6,
+    clusterId: "CL-WAG-GARBAGE-01",
+    clusterTitle: "Wagholi Baif Road Sanitation & Illegal Dumping Cluster",
+    clusterCount: 18,
+    upvotes: 62,
+    citizenName: "Santosh Gawade",
+    citizenPhone: "+91 98220-44102",
+    evidence: {
+      photoUrl: "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80",
+      confidenceScore: 0.97,
+      detectedIssue: "Overflowing Solid Waste & Uncollected Trash Dump"
+    },
+    photoUrl: "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80",
+    grievanceDna: {
+      dnaId: "DNA-WAG-412207-01",
+      departmentConfidence: 98.6,
+      urgencyScore: 95,
+      sentimentScore: -0.92,
+      sentimentLabel: "Severe Sanitation Hazard & Odor Nuisance",
+      healthRiskLevel: "HIGH",
+      extractedEntities: [
+        { label: "Infrastructure", val: "PMC Garbage Feeder Ramp" },
+        { label: "Landmark", val: "Baif Road Vegetable Market Junction" },
+        { label: "Waste Volume", val: "~4.2 Tons Uncollected Solid Waste" },
+        { label: "Affected Residents", val: "850+ Households & Market Vendors" }
+      ],
+      ragMatches: [
+        {
+          caseId: "PMC-SWM-2025-441",
+          summary: "Compactor truck deployment & lime disinfectant spray.",
+          similarity: 0.95,
+          resolutionTime: "3 hours"
+        }
+      ]
+    },
+    aiOfficerBrief: [
+      "Accumulated waste blocking 1 lane of Baif Road near vegetable market.",
+      "PMC compactor truck vehicle route missed for 5 consecutive days.",
+      "High disease risk; immediate compactor dispatch & disinfectant spray required."
+    ],
+    recommendedResolution: {
+      primaryAction: "Dispatch Heavy PMC Compactor Truck & Sanitize Yard",
+      standardOperatingProcedure: "PMC-SOP-SWM-CLEARANCE-V2",
+      estimatedFixTime: "3 Hours",
+      equipmentRequired: ["PMC Compactor Van", "JCB Front Loader", "Bleaching Powder Spray Unit"],
+      citizenDraftHindi: "प्रिय नागरिक, वाघोली बैफ रोड कचरा समस्या (PN-2026-WAG-0101) पर पीएमसी टीम रवाना हो चुकी है। शाम तक कचरा उठाकर जगह सैनिटाइज कर दी जाएगी।",
+      citizenDraftEnglish: "Dear Citizen, PMC sanitation team is en route to Baif Road, Wagholi to clear the uncollected waste and disinfect the market junction."
+    },
+    timeline: [
+      { stage: "Submitted", time: "Oct 1, 07:45 AM", detail: "Citizen logged waste dump report with photo", status: "completed" },
+      { stage: "AI Triage & DNA Generated", time: "Oct 1, 07:46 AM", detail: "Classified as CRITICAL Solid Waste Hazard (Score 95)", status: "completed" },
+      { stage: "Cluster Linked", time: "Oct 1, 07:50 AM", detail: "Merged with 18 complaints along Baif Road", status: "completed" },
+      { stage: "Officer Assigned", time: "Oct 1, 08:30 AM", detail: "Assigned to Er. Ramesh Shinde; crew dispatched", status: "completed" },
+      { stage: "Field Repair Active", time: "Oct 1, 09:15 AM", detail: "PMC JCB loader active at site", status: "in_progress" }
+    ]
+  },
+  {
+    id: "PN-2026-WAG-0102",
+    title: "Major Water Pipe Leakage & Pressure Collapse on Kesnand Road",
+    descriptionRaw: "Ivy Estate and Kesnand Road water supply pipeline underground rupture. Clean drinking water wasting on road while 400 households rely on private tankers.",
+    languageDetected: "Hinglish / English (Confidence 98%)",
+    category: "Water Supply & Contamination",
+    department: "PMC Water Supply Department",
+    officerName: "Er. Sachin Patil",
+    officerDesignation: "PMC Water Executive Engineer",
+    location: {
+      ward: "Wagholi Ward 29 (Ivy Estate & Kesnand Rd)",
+      area: "Kesnand Road, Near Ivy Estate Entrance",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5760,
+      lng: 73.9810
+    },
+    urgency: "CRITICAL",
+    urgencyScore: 94,
+    status: "IN_PROGRESS",
+    createdAt: "2026-10-01 08:10 AM",
+    slaDeadline: "2026-10-01 05:00 PM",
+    slaHoursLeft: 5,
+    clusterId: "CL-WAG-WATER-02",
+    clusterTitle: "Wagholi Kesnand Road Water Main Fracture",
+    clusterCount: 24,
+    upvotes: 78,
+    citizenName: "Priyanka Jadhav",
+    citizenPhone: "+91 97631-11029",
+    evidence: {
+      photoUrl: "https://images.unsplash.com/photo-1584467735815-f778f274e296?w=600&auto=format&fit=crop&q=80",
+      confidenceScore: 0.98,
+      detectedIssue: "Feeder Line Rupture & Potable Water Leakage"
+    },
+    photoUrl: "https://images.unsplash.com/photo-1584467735815-f778f274e296?w=600&auto=format&fit=crop&q=80",
+    grievanceDna: {
+      dnaId: "DNA-WAG-412207-02",
+      departmentConfidence: 99.1,
+      urgencyScore: 94,
+      sentimentScore: -0.88,
+      sentimentLabel: "Severe Water Shortage & Tanker Dependency",
+      healthRiskLevel: "HIGH",
+      extractedEntities: [
+        { label: "Infrastructure", val: "200mm HDPE Water Distribution Feeder" },
+        { label: "Landmark", val: "Ivy Estate Gate 2, Kesnand Road" },
+        { label: "Wastage Rate", val: "~4,500 Litres/Hour Potable Water" }
+      ],
+      ragMatches: []
+    },
+    aiOfficerBrief: [
+      "Feeder line ruptured under road base; gushing clean water into storm channel.",
+      "400+ society flats facing zero municipal water pressure.",
+      "Valve isolation required at Wagholi ESR (Elevated Storage Reservoir)."
+    ],
+    recommendedResolution: {
+      primaryAction: "Isolate Wagholi ESR Gate Valve & Fit Electrofusion Sleeve",
+      standardOperatingProcedure: "PMC-SOP-WATER-REPAIR-V4",
+      estimatedFixTime: "4 Hours",
+      equipmentRequired: ["Electrofusion Welding Machine", "Submersible Pump", "JCB Excavator"],
+      citizenDraftHindi: "प्रिय नागरिक, वाघोली केसनंद रोड पानी पाइपलाइन मरम्मत कार्य (PN-2026-WAG-0102) जारी है। शाम 5 बजे तक पानी आपूर्ति बहाल हो जाएगी।",
+      citizenDraftEnglish: "Dear Citizen, PMC water works team is repairing the ruptured pipeline near Ivy Estate, Wagholi. Supply will be restored by 5:00 PM."
+    },
+    timeline: [
+      { stage: "Submitted", time: "Oct 1, 08:10 AM", detail: "Citizen logged water leakage report", status: "completed" },
+      { stage: "AI Triage & DNA Generated", time: "Oct 1, 08:11 AM", detail: "Classified as CRITICAL Water Supply Hazard (Score 94)", status: "completed" },
+      { stage: "Officer Assigned", time: "Oct 1, 08:45 AM", detail: "Assigned to Er. Sachin Patil", status: "completed" }
+    ]
+  },
+  {
     id: "DL-2026-W14-0892",
     title: "Main Drinking Water Pipeline Burst & Gushing on Market Street",
     descriptionRaw: "Bhai pichle 3 din se hamare Sector 14, Main Market ke samne drinking water pipe phat gaya hai aur bohot tez paani bah raha hai. Sadak par paani bhar gaya hai aur pure area mein drinking water ki supply band hai.",

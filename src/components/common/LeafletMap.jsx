@@ -116,28 +116,84 @@ const createWardIcon = (ward, isSelected) => {
   });
 };
 
+export const WAGHOLI_PUNE_WARDS = [
+  {
+    id: 'wagholi-28',
+    ward: 'Wagholi Ward 28 (Baif Road Market)',
+    lat: 18.5815,
+    lng: 73.9840,
+    active: 18,
+    resolved: 42,
+    critical: 1,
+    issue: 'Garbage Dumping & Trash Overflow at Baif Road Market'
+  },
+  {
+    id: 'wagholi-29',
+    ward: 'Wagholi Ward 29 (Ivy Estate & Kesnand Rd)',
+    lat: 18.5760,
+    lng: 73.9810,
+    active: 24,
+    resolved: 38,
+    critical: 1,
+    issue: 'Water Pipeline Ruptures & Tanker Dependency'
+  },
+  {
+    id: 'wagholi-27',
+    ward: 'Wagholi Ward 27 (Nagar Road Corridor)',
+    lat: 18.5780,
+    lng: 73.9790,
+    active: 14,
+    resolved: 51,
+    critical: 0,
+    issue: 'Deep Asphalt Potholes on Nagar Road Highway'
+  },
+  {
+    id: 'wagholi-30',
+    ward: 'Wagholi Ward 30 (Ubale Nagar)',
+    lat: 18.5830,
+    lng: 73.9860,
+    active: 9,
+    resolved: 29,
+    critical: 0,
+    issue: 'Stormwater Drain Overflow & Sewage Waterlogging'
+  }
+];
+
 export default function LeafletMap({
   wards = [],
   selectedWard = '',
   onSelectWard = () => {},
   height = '520px',
-  initialLayer = 'osm' // 'osm' | 'dark' | 'satellite'
+  initialLayer = 'dark', // 'osm' | 'dark' | 'satellite'
+  defaultRegion = 'wagholi' // 'wagholi' | 'delhi'
 }) {
   const [activeLayer, setActiveLayer] = useState(initialLayer);
   const [resetCount, setResetCount] = useState(0);
+  const [region, setRegion] = useState(defaultRegion);
 
-  // Delhi center coordinates
-  const defaultCenter = [28.6400, 77.2000];
-  const defaultZoom = 11;
+  // Region center coordinates
+  const regionCenters = {
+    wagholi: { center: [18.5793, 73.9820], zoom: 13.5, name: 'Wagholi, Pune' },
+    delhi: { center: [28.6400, 77.2000], zoom: 11, name: 'Delhi NCT' }
+  };
+
+  const currentRegionConfig = regionCenters[region] || regionCenters.wagholi;
+  const defaultCenter = currentRegionConfig.center;
+  const defaultZoom = currentRegionConfig.zoom;
+
+  const displayWards = useMemo(() => {
+    if (wards && wards.length > 0) return wards;
+    return region === 'wagholi' ? WAGHOLI_PUNE_WARDS : [];
+  }, [wards, region]);
 
   // Find coordinates of currently selected ward
   const selectedWardCoord = useMemo(() => {
     if (!selectedWard) return null;
-    const ward = wards.find(w => selectedWard.includes(w.ward.split(' ')[1]));
+    const ward = displayWards.find(w => selectedWard.includes(w.ward.split(' ')[1]) || selectedWard === w.ward);
     return ward && ward.lat && ward.lng ? { lat: ward.lat, lng: ward.lng } : null;
-  }, [selectedWard, wards]);
+  }, [selectedWard, displayWards]);
 
-  const currentTile = TILE_LAYERS[activeLayer] || TILE_LAYERS.osm;
+  const currentTile = TILE_LAYERS[activeLayer] || TILE_LAYERS.dark;
 
   return (
     <div style={{
@@ -174,10 +230,10 @@ export default function LeafletMap({
         />
 
         {/* Real Wards Geo Markers and Coverage Radii */}
-        {wards.map((w) => {
+        {displayWards.map((w) => {
           if (!w.lat || !w.lng) return null;
 
-          const isSelected = selectedWard.includes(w.ward.split(' ')[1]);
+          const isSelected = selectedWard && (selectedWard.includes(w.ward.split(' ')[1]) || selectedWard === w.ward);
           const isCritical = w.critical > 0;
           const color = isCritical ? '#EF4444' : w.active > 10 ? '#F59E0B' : '#10B981';
           const icon = createWardIcon(w, isSelected);
