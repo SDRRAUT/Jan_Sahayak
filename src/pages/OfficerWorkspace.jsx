@@ -62,6 +62,8 @@ import CrossDepartmentMatrix from '../components/intelligence/CrossDepartmentMat
 import ActionSimulationCard from '../components/intelligence/ActionSimulationCard';
 import LiveComplaintLinkageSection from '../components/intelligence/LiveComplaintLinkageSection';
 import EditorialComplaintCard, { ComplaintDetailModal } from '../components/common/EditorialComplaintCard';
+import TerritoryProblemModal from '../components/officer/TerritoryProblemModal';
+import JanSuchnaModal from '../components/officer/JanSuchnaModal';
 
 export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
   const { id } = useParams();
@@ -78,9 +80,14 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
     actionRecommendation, 
     transitionStatus,
     handleDuplicateAction,
+    calculateOfficerGrade,
+    janSuchnaList = [],
     user,
     can 
   } = useApp();
+
+  const [showTerritoryModal, setShowTerritoryModal] = useState(false);
+  const [showJanSuchnaModal, setShowJanSuchnaModal] = useState(false);
   
   // Unified Civic Officer Profile (combines field engineer + department admin credentials)
   const currentOfficer = (user && user.role !== 'citizen') ? user : {
@@ -517,42 +524,48 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
             background: 'linear-gradient(90deg, #059669 0%, #2563EB 50%, #7C3AED 100%)'
           }} />
 
+          {/* Top Row: Officer Identity & Civic Grade */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             flexWrap: 'wrap',
-            gap: '16px'
+            gap: '16px',
+            marginBottom: '18px'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
               <div style={{
-                width: '54px',
-                height: '54px',
+                width: '56px',
+                height: '56px',
                 borderRadius: '16px',
-                background: 'linear-gradient(135deg, #0E5E3A 0%, #059669 100%)',
+                background: activeSection === 'operations'
+                  ? 'linear-gradient(135deg, #312E81 0%, #4338CA 100%)'
+                  : 'linear-gradient(135deg, #0E5E3A 0%, #059669 100%)',
                 color: '#FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '24px',
-                boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)',
+                fontSize: '26px',
+                boxShadow: activeSection === 'operations'
+                  ? '0 4px 14px rgba(67, 56, 202, 0.3)'
+                  : '0 4px 14px rgba(5, 150, 105, 0.25)',
                 flexShrink: 0
               }}>
-                👷
+                {activeSection === 'operations' ? '👷' : '🛠️'}
               </div>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
                   <span style={{
                     fontSize: '11px',
-                    fontWeight: 700,
-                    background: '#ECFDF5',
-                    color: '#065F46',
-                    border: '1px solid #A7F3D0',
+                    fontWeight: 800,
+                    background: activeSection === 'operations' ? '#EEF2FF' : '#ECFDF5',
+                    color: activeSection === 'operations' ? '#3730A3' : '#065F46',
+                    border: `1px solid ${activeSection === 'operations' ? '#C7D2FE' : '#A7F3D0'}`,
                     padding: '2px 9px',
                     borderRadius: '9999px',
                     letterSpacing: '0.02em'
                   }}>
-                    🏛️ Government Officer Hub
+                    {activeSection === 'operations' ? '👷 FIELD OPERATIONS & ROSTER HUB' : '🛠️ CASE INVESTIGATION & RESOLUTION HUB'}
                   </span>
                   <span style={{
                     fontSize: '11px',
@@ -561,27 +574,157 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                     border: '1px solid #BFDBFE',
                     padding: '2px 8px',
                     borderRadius: '9999px',
-                    fontWeight: 600
+                    fontWeight: 700
                   }}>
-                    Delhi Water & Pipeline Team
+                    {currentOfficer.department || 'Delhi Jal Board (DJB)'}
                   </span>
                 </div>
                 <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', margin: 0, lineHeight: 1.2 }}>
-                  {currentOfficer.name}
+                  {activeSection === 'operations' ? 'Workforce & Field Squad Control' : currentOfficer.name}
                 </h1>
-                <p style={{ fontSize: '13px', color: '#64748B', marginTop: '4px', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <MapPin style={{ width: '13px', height: '13px', color: '#059669' }} />
-                  <span>Area: <strong>Rohini & North-West Delhi</strong></span>
+                <p style={{ fontSize: '13px', color: '#64748B', marginTop: '4px', margin: 0, display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                  <MapPin style={{ width: '13px', height: '13px', color: activeSection === 'operations' ? '#4338CA' : '#059669' }} />
+                  <span>Territory: <strong>Rohini Sec 14 & Wagholi Sub-Division</strong></span>
                   <span>•</span>
-                  <span>Job: <strong>Fix city complaints and approve worker repairs</strong></span>
+                  <span>Focus: <strong>{activeSection === 'operations' ? 'Staff shifts, duty status & squad dispatch' : 'Solve city complaints & verify repairs'}</strong></span>
                 </p>
               </div>
             </div>
 
+            {/* ⭐ Civic Intelligence Performance Grade & Reward Card */}
+            {(() => {
+              const gradeInfo = calculateOfficerGrade ? calculateOfficerGrade(currentOfficer) : {
+                score: '94.8',
+                letterGrade: 'A+',
+                honorTitle: 'Executive Civic Champion',
+                shieldTier: 'Platinum Civic Champion Shield'
+              };
+
+              return (
+                <div style={{
+                  padding: '12px 18px',
+                  borderRadius: '16px',
+                  background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
+                  border: '1.5px solid #818CF8',
+                  boxShadow: '0 4px 14px rgba(79, 70, 229, 0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '14px',
+                  flexShrink: 0
+                }}>
+                  <div style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '12px',
+                    background: '#4338CA',
+                    color: '#FFFFFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '20px',
+                    boxShadow: '0 2px 8px rgba(67, 56, 202, 0.3)'
+                  }}>
+                    🏅
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', color: '#4338CA', letterSpacing: '0.04em' }}>
+                        Civic Intelligence Grade
+                      </span>
+                      <span style={{
+                        fontSize: '10px',
+                        fontWeight: 800,
+                        background: '#4338CA',
+                        color: '#FFFFFF',
+                        padding: '1px 6px',
+                        borderRadius: '4px'
+                      }}>
+                        TOP TIER
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                      <span style={{ fontSize: '20px', fontWeight: 900, color: '#1E1B4B' }}>
+                        {gradeInfo.letterGrade} ({gradeInfo.score}/100)
+                      </span>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669' }}>
+                        {gradeInfo.shieldTier}
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '11px', color: '#4338CA', display: 'block' }}>
+                      96% SLA Speed • 4.9★ Citizen Trust • 92% Repeat Prevention
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Bottom Action Bar: Territory Explorer + Jan Suchna + Map */}
+          <div style={{
+            paddingTop: '16px',
+            borderTop: '1px solid #F1F5F9',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '10px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              {/* Button 1: Territory Problem Explorer Modal Trigger */}
+              <button
+                type="button"
+                onClick={() => setShowTerritoryModal(true)}
+                style={{
+                  height: '38px',
+                  padding: '0 16px',
+                  borderRadius: '999px',
+                  background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+                  color: '#FFFFFF',
+                  fontSize: '12.5px',
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.15)',
+                  transition: 'all 150ms ease'
+                }}
+              >
+                <Compass style={{ width: '14px', height: '14px', color: '#38BDF8' }} />
+                <span>🗺️ Territory Problem Explorer (Today, Pending, Solved)</span>
+              </button>
+
+              {/* Button 2: Jan Suchna Broadcast Trigger */}
+              <button
+                type="button"
+                onClick={() => setShowJanSuchnaModal(true)}
+                style={{
+                  height: '38px',
+                  padding: '0 16px',
+                  borderRadius: '999px',
+                  background: 'linear-gradient(135deg, #1E1B4B 0%, #4338CA 100%)',
+                  color: '#FFFFFF',
+                  fontSize: '12.5px',
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 2px 8px rgba(67, 56, 202, 0.25)',
+                  transition: 'all 150ms ease'
+                }}
+              >
+                <Radio style={{ width: '14px', height: '14px', color: '#F59E0B' }} />
+                <span>📢 Create Jan Suchna Broadcast</span>
+              </button>
+            </div>
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               <div style={{
-                padding: '7px 14px',
-                borderRadius: '9999px',
+                padding: '6px 12px',
+                borderRadius: '999px',
                 background: slaStatus === 'AT_RISK' ? '#FFFBEB' : (slaStatus === 'OVERDUE' ? '#FEF2F2' : '#ECFDF5'),
                 border: `1px solid ${slaStatus === 'AT_RISK' ? '#FDE68A' : (slaStatus === 'OVERDUE' ? '#FECACA' : '#A7F3D0')}`,
                 color: slaStatus === 'AT_RISK' ? '#B45309' : (slaStatus === 'OVERDUE' ? '#991B1B' : '#065F46'),
@@ -599,13 +742,13 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 type="button"
                 onClick={handleExportReport}
                 className="btn-secondary btn-sm"
-                style={{ borderRadius: '9999px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                style={{ borderRadius: '999px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
                 <Download style={{ width: '13px', height: '13px' }} />
                 <span>{reportExported ? 'Report Downloaded ✓' : 'Download Report'}</span>
               </button>
 
-              <Link to="/admin" className="btn-secondary btn-sm" style={{ borderRadius: '9999px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Link to="/admin" className="btn-secondary btn-sm" style={{ borderRadius: '999px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                 <MapPin style={{ width: '13px', height: '13px' }} />
                 <span>City Problem Map</span>
               </Link>
@@ -647,16 +790,22 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
         {/* 2. THE 7 WORKSPACE TABS (Horizontally Scrollable Pill Container) */}
         <div className="officer-tabs-scroll-container">
           {[
-            { id: 'dashboard', label: '📊 Overview', icon: Activity, badge: null },
-            { id: 'my_work', label: '📌 My Tasks', icon: CheckSquare, badge: myWorkGrievances.length },
-            { id: 'operations', label: '👷 Team & Workers', icon: SlidersHorizontal, badge: filteredGrievances.length },
-            { id: 'intelligence', label: '🤖 AI Problem Helper', icon: Sparkles, badge: 'AI' },
-            { id: 'investigation', label: '🔍 Check Problem', icon: Eye, badge: `#${activeItem?.id?.slice(-4) || 'CASE'}` },
-            { id: 'coordination', label: '🤝 Other Depts', icon: Network, badge: null },
-            { id: 'reports', label: '📈 Work Results', icon: BarChart3, badge: null }
+            { id: 'dashboard', label: '📊 Case Overview', icon: Activity, badge: null, group: 'workspace' },
+            { id: 'my_work', label: '📌 My Tasks', icon: CheckSquare, badge: myWorkGrievances.length, group: 'workspace' },
+            { id: 'investigation', label: '🔍 Case Investigation', icon: Eye, badge: `#${activeItem?.id?.slice(-4) || 'CASE'}`, group: 'workspace' },
+            { id: 'intelligence', label: '🤖 AI SOP Helper', icon: Sparkles, badge: 'AI', group: 'workspace' },
+            { id: 'coordination', label: '🤝 Inter-Dept Linkage', icon: Network, badge: null, group: 'workspace' },
+            { id: 'reports', label: '📈 Resolution Reports', icon: BarChart3, badge: null, group: 'workspace' },
+            { id: 'operations', label: '👷 Field Operations & Roster', icon: SlidersHorizontal, badge: `${officerRoster.length} Staff`, group: 'operations' }
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeSection === tab.id;
+            const isOpsTab = tab.group === 'operations';
+            const bgGrad = isActive
+              ? (isOpsTab ? 'linear-gradient(135deg, #312E81 0%, #4338CA 100%)' : 'linear-gradient(135deg, #0E5E3A 0%, #059669 100%)')
+              : (isOpsTab ? '#EEF2FF' : 'transparent');
+            const textColor = isActive ? '#FFFFFF' : (isOpsTab ? '#3730A3' : '#475569');
+
             return (
               <button
                 key={tab.id}
@@ -667,11 +816,11 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   padding: '8px 16px',
                   borderRadius: '12px',
                   fontSize: '13px',
-                  fontWeight: isActive ? 700 : 500,
-                  background: isActive ? 'linear-gradient(135deg, #0E5E3A 0%, #059669 100%)' : 'transparent',
-                  color: isActive ? '#FFFFFF' : '#475569',
-                  boxShadow: isActive ? '0 2px 8px rgba(14, 94, 58, 0.28)' : 'none',
-                  border: 'none',
+                  fontWeight: isActive ? 700 : 600,
+                  background: bgGrad,
+                  color: textColor,
+                  boxShadow: isActive ? (isOpsTab ? '0 2px 8px rgba(67, 56, 202, 0.3)' : '0 2px 8px rgba(14, 94, 58, 0.28)') : 'none',
+                  border: isOpsTab && !isActive ? '1px solid #C7D2FE' : 'none',
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -2970,6 +3119,19 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
             }}
           />
         )}
+
+        {/* Territory Problem Explorer Modal (Today's, Pending, Solved + Mapped vs Unique) */}
+        <TerritoryProblemModal
+          isOpen={showTerritoryModal}
+          onClose={() => setShowTerritoryModal(false)}
+          selectedWard="Ward 14 (Rohini Sector 14 & Wagholi Sub-Division)"
+        />
+
+        {/* Jan Suchna (जन सूचना) Broadcast Modal */}
+        <JanSuchnaModal
+          isOpen={showJanSuchnaModal}
+          onClose={() => setShowJanSuchnaModal(false)}
+        />
 
       </div>
     </div>

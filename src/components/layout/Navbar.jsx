@@ -357,13 +357,13 @@ export default function Navbar() {
                   to="/officer"
                   className={`site-nav-link ${location.pathname === '/officer' && !location.search.includes('operations') ? 'active' : ''}`}
                 >
-                  Workspace
+                  🛠️ Workspace
                 </Link>
                 <Link
                   to="/officer?section=operations"
                   className={`site-nav-link ${location.search.includes('operations') || location.pathname === '/admin/department' ? 'active' : ''}`}
                 >
-                  Operations & Roster
+                  👷 Operations & Roster
                 </Link>
                 <Link
                   to="/admin"
@@ -534,14 +534,16 @@ export default function Navbar() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                      Activity Notifications
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', color: '#0F172A' }}>
+                        📢 जन सूचना & Notifications
+                      </span>
+                    </div>
                     {relevantUnreadCount > 0 && (
                       <button
                         type="button"
                         onClick={() => markAllNotificationsAsRead()}
-                        style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: 600 }}
+                        style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer' }}
                       >
                         Mark all read
                       </button>
@@ -553,33 +555,52 @@ export default function Navbar() {
                     </p>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {relevantNotifications.slice(0, 6).map((n) => (
-                        <div
-                          key={n.id}
-                          style={{
-                            padding: '10px 12px',
-                            borderRadius: 'var(--radius-md)',
-                            background: n.read ? '#FFFFFF' : '#F0FDF4',
-                            border: `1px solid ${n.read ? 'var(--color-border-subtle)' : '#BBF7D0'}`,
-                            fontSize: '12px',
-                            cursor: 'pointer'
-                          }}
-                          onClick={() => {
-                            markNotificationAsRead(n.id);
-                            if (n.link) navigate(n.link);
-                          }}
-                        >
-                          <div style={{ fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '2px' }}>
-                            {n.title}
+                      {relevantNotifications.slice(0, 8).map((n) => {
+                        const isJanSuchna = n.type === 'JAN_SUCHNA' || n.title?.includes('जन सूचना');
+
+                        return (
+                          <div
+                            key={n.id}
+                            style={{
+                              padding: '10px 12px',
+                              borderRadius: '12px',
+                              background: isJanSuchna ? '#FEF3C7' : (n.read ? '#FFFFFF' : '#F0FDF4'),
+                              border: isJanSuchna ? '1.5px solid #FCD34D' : `1px solid ${n.read ? '#E2E8F0' : '#BBF7D0'}`,
+                              fontSize: '12px',
+                              cursor: 'pointer',
+                              transition: 'all 150ms ease'
+                            }}
+                            onClick={() => {
+                              markNotificationAsRead(n.id);
+                              if (n.link) navigate(n.link);
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3px' }}>
+                              <div style={{ fontWeight: 700, color: isJanSuchna ? '#92400E' : '#0F172A', fontSize: '12.5px' }}>
+                                {n.title}
+                              </div>
+                              {isJanSuchna && (
+                                <span style={{
+                                  fontSize: '9.5px',
+                                  fontWeight: 800,
+                                  background: '#D97706',
+                                  color: '#FFFFFF',
+                                  padding: '1px 6px',
+                                  borderRadius: '999px'
+                                }}>
+                                  ADVISORY
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ color: isJanSuchna ? '#78350F' : '#475569', fontSize: '11.5px', lineHeight: 1.4 }}>
+                              {n.message}
+                            </div>
+                            <div style={{ fontSize: '10px', color: isJanSuchna ? '#B45309' : '#94A3B8', marginTop: '4px' }}>
+                              {n.timestamp || 'Just now'}
+                            </div>
                           </div>
-                          <div style={{ color: 'var(--color-text-secondary)', fontSize: '11.5px', lineHeight: 1.4 }}>
-                            {n.message}
-                          </div>
-                          <div style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                            {n.timestamp || 'Just now'}
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>
