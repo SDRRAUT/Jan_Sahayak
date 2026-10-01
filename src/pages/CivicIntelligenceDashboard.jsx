@@ -329,9 +329,9 @@ export default function CivicIntelligenceDashboard() {
           background: '#FFFFFF',
           padding: '6px',
           borderRadius: '16px',
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)',
-          marginBottom: '24px',
+          border: '1px solid #CBD5E1',
+          boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+          marginBottom: '20px',
           overflowX: 'auto',
           WebkitOverflowScrolling: 'touch'
         }}>
@@ -351,10 +351,11 @@ export default function CivicIntelligenceDashboard() {
                   padding: '9px 18px',
                   borderRadius: '12px',
                   fontSize: '13px',
-                  fontWeight: isActive ? 700 : 500,
-                  background: isActive ? '#0F172A' : 'transparent',
+                  fontWeight: isActive ? 800 : 600,
+                  background: isActive ? '#090D16' : 'transparent',
                   color: isActive ? '#FFFFFF' : '#475569',
-                  border: 'none',
+                  border: isActive ? '1px solid #000000' : 'none',
+                  boxShadow: isActive ? '0 3px 10px rgba(0, 0, 0, 0.25)' : 'none',
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -371,8 +372,9 @@ export default function CivicIntelligenceDashboard() {
                     fontWeight: 700,
                     padding: '2px 7px',
                     borderRadius: '999px',
-                    background: isActive ? 'rgba(255, 255, 255, 0.2)' : '#F1F5F9',
-                    color: isActive ? '#FFFFFF' : '#475569'
+                    background: isActive ? '#1E293B' : '#F1F5F9',
+                    color: isActive ? '#38BDF8' : '#475569',
+                    border: isActive ? '1px solid #334155' : 'none'
                   }}>
                     {tab.badge}
                   </span>
@@ -381,6 +383,9 @@ export default function CivicIntelligenceDashboard() {
             );
           })}
         </div>
+
+        {/* Dark prominent divider line under navigation */}
+        <div style={{ height: '2px', background: '#334155', borderRadius: '999px', marginBottom: '24px', opacity: 0.85 }} />
 
         {/* ══════════════════════════════════════════════════════════
             TAB 1: ACTIVE INCIDENTS & RADAR
@@ -430,6 +435,7 @@ export default function CivicIntelligenceDashboard() {
                   ))}
                 </div>
 
+                {/* Light styled search box */}
                 <div style={{ position: 'relative' }}>
                   <input
                     type="text"
@@ -439,19 +445,29 @@ export default function CivicIntelligenceDashboard() {
                     style={{
                       height: '36px',
                       borderRadius: '999px',
-                      border: '1px solid #CBD5E1',
+                      border: '1.5px solid #BAE6FD',
                       padding: '0 14px 0 32px',
                       fontSize: '12.5px',
-                      background: '#FFFFFF',
-                      color: '#0F172A',
-                      width: '200px'
+                      background: '#F0F9FF',
+                      color: '#0369A1',
+                      fontWeight: 500,
+                      width: '210px',
+                      boxShadow: '0 1px 3px rgba(2, 132, 199, 0.08)'
                     }}
                   />
-                  <Search style={{ position: 'absolute', left: '10px', top: '10px', width: '14px', height: '14px', color: '#94A3B8' }} />
+                  <Search style={{ position: 'absolute', left: '11px', top: '11px', width: '14px', height: '14px', color: '#0284C7' }} />
                 </div>
 
-                {/* View Mode Toggles */}
-                <div style={{ display: 'flex', background: '#FFFFFF', padding: '3px', borderRadius: '10px', border: '1px solid #E2E8F0', gap: '2px' }}>
+                {/* Light styled View Mode Toggles */}
+                <div style={{
+                  display: 'flex',
+                  background: '#F8FAFC',
+                  padding: '3px',
+                  borderRadius: '10px',
+                  border: '1.5px solid #E2E8F0',
+                  gap: '3px',
+                  boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)'
+                }}>
                   {[
                     { id: 'detail',  Icon: AlignJustify, title: 'Detail View' },
                     { id: 'compact', Icon: LayoutList,   title: 'Compact View' },
@@ -468,8 +484,9 @@ export default function CivicIntelligenceDashboard() {
                         width: '30px', height: '30px',
                         borderRadius: '7px',
                         border: 'none',
-                        background: viewMode === id ? '#0F172A' : 'transparent',
-                        color: viewMode === id ? '#FFFFFF' : '#94A3B8',
+                        background: viewMode === id ? '#FFFFFF' : 'transparent',
+                        color: viewMode === id ? '#0284C7' : '#64748B',
+                        boxShadow: viewMode === id ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         cursor: 'pointer', transition: 'all 120ms ease'
                       }}
@@ -500,8 +517,23 @@ export default function CivicIntelligenceDashboard() {
                           </div>
                           <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: 0, lineHeight: 1.3 }}>{incident.title}</h3>
                         </div>
-                        <Link to={`/intelligence/incidents/${incident.id}`} style={{ height: '42px', padding: '0 18px', borderRadius: '999px', background: '#0F172A', color: '#FFFFFF', fontSize: '13px', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', boxShadow: '0 2px 8px rgba(15,23,42,0.18)' }}>
-                          <span>Investigate Action Plan</span><ArrowRight style={{ width: '14px', height: '14px' }} />
+                        {/* Green Investigate Action Plan Button */}
+                        <Link to={`/intelligence/incidents/${incident.id}`} style={{
+                          height: '42px',
+                          padding: '0 20px',
+                          borderRadius: '999px',
+                          background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                          color: '#FFFFFF',
+                          fontSize: '13px',
+                          fontWeight: 700,
+                          textDecoration: 'none',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)',
+                          transition: 'all 150ms ease'
+                        }}>
+                          <span>Investigate Action Plan</span><ArrowRight style={{ width: '15px', height: '15px' }} />
                         </Link>
                       </div>
                       <p style={{ fontSize: '13.5px', color: '#334155', lineHeight: 1.5, marginBottom: '16px', background: '#F8FAFC', padding: '12px 16px', borderRadius: '12px', border: '1px solid #E2E8F0' }}><strong>Problem Summary: </strong>{incident.summary}</p>
@@ -535,7 +567,7 @@ export default function CivicIntelligenceDashboard() {
                       <span style={{ fontSize: '11px', color: '#64748B', flexShrink: 0 }}>{incident.affectedArea?.split('(')[0]?.trim() || 'Ward 29'}</span>
                       <span style={{ fontSize: '11px', fontWeight: 700, color: '#475569', flexShrink: 0 }}>{incident.leadDepartment?.split('(')[0]?.trim() || 'PMC'}</span>
                       <span style={{ fontSize: '11px', fontWeight: 700, color: incident.slaHoursLeft < 6 ? '#EF4444' : '#059669', background: incident.slaHoursLeft < 6 ? '#FEF2F2' : '#ECFDF5', padding: '2px 8px', borderRadius: '6px', flexShrink: 0 }}>{incident.slaHoursLeft ? `${incident.slaHoursLeft}h` : '24h'} SLA</span>
-                      <Link to={`/intelligence/incidents/${incident.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '30px', height: '30px', borderRadius: '8px', background: '#0F172A', color: '#FFFFFF', textDecoration: 'none', flexShrink: 0 }}><ArrowRight style={{ width: '13px', height: '13px' }} /></Link>
+                      <Link to={`/intelligence/incidents/${incident.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: '8px', background: '#059669', color: '#FFFFFF', textDecoration: 'none', flexShrink: 0, boxShadow: '0 2px 6px rgba(5, 150, 105, 0.3)' }}><ArrowRight style={{ width: '14px', height: '14px' }} /></Link>
                     </div>
                   );
                 })}
@@ -560,7 +592,7 @@ export default function CivicIntelligenceDashboard() {
                         <span style={{ fontSize: '11px', color: '#0369A1', background: '#F0F9FF', padding: '2px 8px', borderRadius: '6px', border: '1px solid #BAE6FD' }}>📍 {incident.affectedArea?.split('(')[0]?.trim() || 'Ward 29'}</span>
                         <span style={{ fontSize: '11px', color: '#92400E', background: '#FEF3C7', padding: '2px 8px', borderRadius: '6px', border: '1px solid #FDE68A' }}>⏱️ {incident.slaHoursLeft ? `${incident.slaHoursLeft}h` : '24h'}</span>
                       </div>
-                      <Link to={`/intelligence/incidents/${incident.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', height: '36px', borderRadius: '8px', background: '#0F172A', color: '#FFFFFF', fontSize: '12px', fontWeight: 700, textDecoration: 'none' }}>Investigate <ArrowRight style={{ width: '12px', height: '12px' }} /></Link>
+                      <Link to={`/intelligence/incidents/${incident.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', height: '36px', borderRadius: '8px', background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)', color: '#FFFFFF', fontSize: '12px', fontWeight: 700, textDecoration: 'none', boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)' }}>Investigate <ArrowRight style={{ width: '13px', height: '13px' }} /></Link>
                     </div>
                   );
                 })}
@@ -591,7 +623,7 @@ export default function CivicIntelligenceDashboard() {
                           <td style={{ padding: '10px 14px', color: '#475569' }}>{incident.leadDepartment?.split('(')[0]?.trim() || 'PMC'}</td>
                           <td style={{ padding: '10px 14px', color: '#0F172A', fontWeight: 700, textAlign: 'center' }}>{incident.signalCount || incident.complaintCount || 1}</td>
                           <td style={{ padding: '10px 14px' }}><span style={{ fontWeight: 700, color: incident.slaHoursLeft < 6 ? '#EF4444' : '#059669' }}>{incident.slaHoursLeft ? `${incident.slaHoursLeft}h` : '24h'}</span></td>
-                          <td style={{ padding: '10px 14px' }}><Link to={`/intelligence/incidents/${incident.id}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', height: '28px', padding: '0 10px', borderRadius: '6px', background: '#0F172A', color: '#FFFFFF', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>View <ArrowRight style={{ width: '11px', height: '11px' }} /></Link></td>
+                          <td style={{ padding: '10px 14px' }}><Link to={`/intelligence/incidents/${incident.id}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', height: '28px', padding: '0 10px', borderRadius: '6px', background: '#059669', color: '#FFFFFF', fontSize: '11px', fontWeight: 700, textDecoration: 'none', boxShadow: '0 1px 4px rgba(5, 150, 105, 0.25)' }}>View <ArrowRight style={{ width: '11px', height: '11px' }} /></Link></td>
                         </tr>
                       );
                     })}
