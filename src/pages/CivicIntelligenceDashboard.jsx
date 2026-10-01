@@ -188,32 +188,6 @@ export default function CivicIntelligenceDashboard() {
               <Radio style={{ width: '14px', height: '14px', color: '#D97706' }} />
               <span>📢 Create Jan Suchna Broadcast</span>
             </button>
-
-            {/* Button 3: Report Early Warning Signal */}
-            <button
-              type="button"
-              onClick={() => setShowSignalModal(true)}
-              style={{
-                height: '40px',
-                fontSize: '12.5px',
-                fontWeight: 700,
-                padding: '0 18px',
-                borderRadius: '999px',
-                background: '#F8FAFC',
-                color: '#475569',
-                border: '1.5px solid #E2E8F0',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '7px',
-                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)',
-                transition: 'all 150ms ease'
-              }}
-            >
-              <Radio style={{ width: '14px', height: '14px', color: '#059669' }} />
-              <span>+ Report Signal</span>
-            </button>
           </div>
         </div>
 
