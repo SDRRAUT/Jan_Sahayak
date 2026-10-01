@@ -22,14 +22,14 @@ import { CIVIC_INCIDENTS, CIVIC_SIGNALS } from '../data/civicIntelligenceData';
 export const ComplaintDNAService = {
   generateDNA: (input, metadata = {}) => {
     const text = (input || '').toLowerCase();
-    const ward = metadata.ward || 'Ward 14 (Rohini Sector 14)';
+    const ward = metadata.ward || 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)';
 
     let issueType = 'General Civic Amenities';
     let subIssue = 'Municipal Asset Maintenance Deficit';
     let service = 'Public Works & Civic Convenience';
     let asset = 'Public Infrastructure Corridor';
-    let department = 'Municipal Corporation of Delhi (MCD)';
-    let subDepartment = 'General Civil Works';
+    let department = 'PMC Solid Waste Management';
+    let subDepartment = 'Wagholi Division';
     let severity = 'MEDIUM';
     let urgency = 'MEDIUM';
 
@@ -44,27 +44,27 @@ export const ComplaintDNAService = {
         ? 'Pipeline Fracture & Negative Pressure Contamination' 
         : 'Subsurface Feeder Leakage & Pressure Loss';
       service = 'Potable Municipal Water Distribution';
-      asset = '100mm Cast-Iron Feeder Main';
-      department = 'Delhi Jal Board (DJB)';
-      subDepartment = 'North-West Maintenance Division';
+      asset = '100mm Feeder Main';
+      department = 'PMC Water Supply Department';
+      subDepartment = 'Wagholi Zone Division';
       severity = text.includes('bimaar') || text.includes('sick') || text.includes('smell') ? 'CRITICAL' : 'HIGH';
       urgency = 'HIGH';
       symptoms.push('Intermittent line pressure loss', 'Water discolored with brown tint', 'Sewage backflow odor');
-      entities.push('Mother Dairy Booth #441', 'Pocket 2 Main Feeder Junction');
-      possibleCauses.push('Corrosion in cast-iron joint exceeding lifespan', 'Cross-siphonage with adjacent storm drain');
+      entities.push('Raisoni Chowk Booster Valve', 'Kesnand Road Feeder Junction');
+      possibleCauses.push('Corrosion in pipe joint', 'Cross-siphonage with adjacent storm drain');
     } 
     // Roads detection
     else if (text.includes('road') || text.includes('gaddha') || text.includes('pothole') || text.includes('flyover') || text.includes('accident')) {
       issueType = 'Roads & Structural Infrastructure';
-      subIssue = text.includes('flyover') ? 'Underpass Culvert Cavity & Slip Way Erosion' : 'Bituminous Pothole & Carriageway Deformation';
+      subIssue = text.includes('highway') ? 'Highway Slip Road Cavity & Surface Wear' : 'Bituminous Pothole & Carriageway Deformation';
       service = 'Arterial Road Network';
-      asset = 'Outer Ring Road Carriageway';
-      department = 'Public Works Department (PWD)';
-      subDepartment = 'South-East Road Division';
+      asset = 'Wagholi-Nagar Road Highway Carriageway';
+      department = 'PWD Pune / PMRDA';
+      subDepartment = 'East Pune Infrastructure Division';
       severity = text.includes('accident') || text.includes('scooter') ? 'CRITICAL' : 'HIGH';
       urgency = 'CRITICAL';
       symptoms.push('Deep 40cm asphalt cavity', 'Two-wheeler skid hazard', 'Water stagnation on carriageway');
-      entities.push('Moolchand Underpass Entry', 'Flyover Pillar #12');
+      entities.push('Raisoni College Highway Junction', 'Bakori Road Chowk');
       possibleCauses.push('Subsoil liquefaction from broken storm drain', 'Heavy vehicular compaction failure');
     }
     // Electricity detection
@@ -73,12 +73,12 @@ export const ComplaintDNAService = {
       subIssue = 'Distribution Transformer Arc Flash & Thermal Overload';
       service = 'Low-Voltage Urban Power Grid';
       asset = '400kVA Distribution Transformer (TR-05)';
-      department = 'BSES Rajdhani Power Limited';
-      subDepartment = 'Kalkaji Division';
+      department = 'MSEDCL Wagholi Sub-Division';
+      subDepartment = 'Wagholi Sub-Division';
       severity = 'CRITICAL';
       urgency = 'CRITICAL';
       symptoms.push('Continuous buzzing electrical hum', 'Visible oil leaking from bushings', 'Sparks flying onto street');
-      entities.push('Main Market Kalkaji Gol Chakkar', '11kV Feeder 4');
+      entities.push('Domkhel Road Feeder 4', 'Ivy Estate Substation');
       possibleCauses.push('Dielectric oil breakdown', 'Severe commercial AC peak cooling overload');
     }
 
@@ -110,9 +110,9 @@ export const ComplaintDNAService = {
 export const EvidenceFusionService = {
   fuseSignal: ({ text = '', audioBlob = null, photoUrl = null, location = null, timestamp = null }) => {
     const fusedTimestamp = timestamp || new Date().toLocaleString();
-    const lat = location?.lat || 28.7170;
-    const lng = location?.lng || 77.1250;
-    const ward = location?.ward || 'Ward 14 (Rohini Sector 14)';
+    const lat = location?.lat || 18.5793;
+    const lng = location?.lng || 73.9785;
+    const ward = location?.ward || 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)';
 
     const dna = ComplaintDNAService.generateDNA(text, { ward });
 
@@ -226,7 +226,7 @@ export const ActionSimulationService = {
     return {
       ...selected,
       simulatedAt: new Date().toLocaleTimeString(),
-      confidenceNote: 'Scenario estimated from 14 similar municipal repair precedents in Delhi GIS records.'
+      confidenceNote: 'Scenario estimated from 14 similar municipal repair precedents in Pune GIS records.'
     };
   }
 };

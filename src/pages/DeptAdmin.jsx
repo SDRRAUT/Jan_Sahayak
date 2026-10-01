@@ -30,16 +30,16 @@ export default function DeptAdmin() {
   const [reportExported, setReportExported] = useState(false);
   const [showAddOfficerModal, setShowAddOfficerModal] = useState(false);
 
-  const deptName = user?.department || 'Delhi Jal Board (DJB)';
-  const deptGrievances = grievances.filter(g => !user?.department || g.department === deptName || g.department.includes('Delhi Jal Board'));
+  const deptName = user?.department || 'PMC Water Supply Department';
+  const deptGrievances = grievances.filter(g => !user?.department || g.department === deptName || g.department.includes('Water'));
   const criticalCases = deptGrievances.filter(g => g.urgency === 'CRITICAL' && g.status !== 'RESOLVED');
   const disputes = deptGrievances.filter(g => g.status === 'DISPUTE_REOPENED');
 
   const [officerRoster, setOfficerRoster] = useState([
-    { name: 'Er. Sanjay Sharma', designation: 'AEE (Rohini Zone)', activeCases: 4, resolvedThisMonth: 38, avgResolutionHours: '14.2h', rating: 4.8, status: 'ON_DUTY' },
-    { name: 'Er. Vivek Nambiar', designation: 'AEE (Civil Lines)', activeCases: 6, resolvedThisMonth: 44, avgResolutionHours: '18.1h', rating: 4.6, status: 'ON_DUTY' },
-    { name: 'Er. Meenakshi Roy', designation: 'AEE (South Zone)', activeCases: 3, resolvedThisMonth: 52, avgResolutionHours: '12.4h', rating: 4.9, status: 'ON_DUTY' },
-    { name: 'Er. Tariq Ahmad', designation: 'AEE (East Zone)', activeCases: 5, resolvedThisMonth: 31, avgResolutionHours: '19.5h', rating: 4.4, status: 'FIELD_INSPECTION' }
+    { name: 'Er. Sanjay Sharma', designation: 'Executive Engineer (Wagholi Water)', activeCases: 4, resolvedThisMonth: 38, avgResolutionHours: '14.2h', rating: 4.8, status: 'ON_DUTY' },
+    { name: 'Er. Ramesh Shinde', designation: 'Sanitation Inspector (Baif Road)', activeCases: 6, resolvedThisMonth: 44, avgResolutionHours: '18.1h', rating: 4.6, status: 'ON_DUTY' },
+    { name: 'Er. Sachin Patil', designation: 'Assistant Engineer (PWD Pune)', activeCases: 3, resolvedThisMonth: 52, avgResolutionHours: '12.4h', rating: 4.9, status: 'ON_DUTY' },
+    { name: 'Er. Neha Singh', designation: 'Sub-Div Engineer (MSEDCL Wagholi)', activeCases: 5, resolvedThisMonth: 31, avgResolutionHours: '19.5h', rating: 4.4, status: 'FIELD_INSPECTION' }
   ]);
 
   const [newOfficerName, setNewOfficerName] = useState('');
@@ -55,16 +55,16 @@ export default function DeptAdmin() {
 
   // Recurring hotspots data
   const recurringHotspots = [
-    { ward: 'Ward 14 (Rohini Sector 14)', issues: 18, primaryCause: '1988 Cast-Iron Supply Main degraded; capex replacement recommended', riskLevel: 'HIGH' },
-    { ward: 'Ward 8 (Lajpat Nagar Ring Road)', issues: 9, primaryCause: 'Monsoon drainage backflow into secondary feeder', riskLevel: 'MEDIUM' },
-    { ward: 'Ward 22 (Mayur Vihar Ph-1)', issues: 7, primaryCause: 'Commercial unauthorized suction pumps creating negative pressure', riskLevel: 'MEDIUM' }
+    { ward: 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)', issues: 24, primaryCause: 'High-pressure surge along Kesnand feeder main; electrofusion realignment recommended', riskLevel: 'HIGH' },
+    { ward: 'Wagholi Ward 28 (Baif Road Market Yard)', issues: 18, primaryCause: 'Market waste dumping into storm culvert; closed hook-loader bin needed', riskLevel: 'HIGH' },
+    { ward: 'Wagholi Ward 27 (Nagar Road Highway)', issues: 12, primaryCause: 'Heavy commercial vehicle axle load degrading asphalt sub-base', riskLevel: 'MEDIUM' }
   ];
 
   // Citizen feedback records
   const feedbackRecords = [
-    { citizen: 'Aditya Verma', ward: 'Ward 14', rating: 5, comment: 'Quick emergency clamp response within 4 hours. Water chlorine test verified before restoring flow.', date: 'Today' },
-    { citizen: 'Pooja Malhotra', ward: 'Ward 8', rating: 5, comment: 'Officer Sanjay Sharma called personally on WhatsApp with progress photos. Very transparent.', date: 'Yesterday' },
-    { citizen: 'Harish Bansal', ward: 'Ward 14', rating: 4, comment: 'Repaired the leak fast, but trench filling on the road took an extra day.', date: '2 days ago' }
+    { citizen: 'Santosh Gawade', ward: 'Wagholi Ward 29', rating: 5, comment: 'Quick emergency clamp response within 4 hours. Water chlorine test verified before restoring flow.', date: 'Today' },
+    { citizen: 'Priyanka Jadhav', ward: 'Wagholi Ward 28', rating: 5, comment: 'Officer Sanjay Sharma called personally on WhatsApp with progress photos. Very transparent.', date: 'Yesterday' },
+    { citizen: 'Anand Rathi', ward: 'Wagholi Ward 29', rating: 4, comment: 'Repaired the leak fast, but trench filling on the road took an extra day.', date: '2 days ago' }
   ];
 
   // Dynamic citizen feedback from live grievances combined with baseline
@@ -141,7 +141,7 @@ export default function DeptAdmin() {
               {deptName}
             </h1>
             <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
-              Logged in as: <strong>{user?.name || 'Er. Rajiv Malhotra'}</strong> ({user?.designation || 'Chief Engineer & Dept Admin'})
+              Logged in as: <strong>{user?.name || 'Er. Sachin Patil'}</strong> ({user?.designation || 'Superintending Engineer & Dept Admin'})
             </p>
           </div>
 
@@ -581,7 +581,7 @@ export default function DeptAdmin() {
                   type="text"
                   value={newOfficerZone}
                   onChange={(e) => setNewOfficerZone(e.target.value)}
-                  placeholder="e.g. West Delhi Sub-Division 4"
+                  placeholder="e.g. Wagholi Sub-Division (Wards 27-31, Pune)"
                   style={{ width: '100%', height: '38px', borderRadius: '4px', border: '1px solid var(--color-border-medium)', padding: '0 8px', fontSize: '13px' }}
                   required
                 />

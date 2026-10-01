@@ -110,7 +110,7 @@ export default function Home() {
   const [systemicViewMode, setSystemicViewMode] = useState('compare'); // 'compare' (default) | 'steps'
   const [activeStoryStep, setActiveStoryStep] = useState(1);
   const [mapBasemap, setMapBasemap] = useState('dark'); // 'dark' | 'satellite'
-  const [mapRegion, setMapRegion] = useState('wagholi'); // 'wagholi' | 'delhi'
+  const [mapRegion, setMapRegion] = useState('wagholi');
   const [mapZoom, setMapZoom] = useState(1);
   const [hoveredHotspot, setHoveredHotspot] = useState(null);
   const [simulatedSignals, setSimulatedSignals] = useState({});
@@ -121,66 +121,66 @@ export default function Home() {
     {
       domain: 'Water Supply',
       icon: '💧',
-      dept: 'Delhi Jal Board (DJB)',
-      citizenQuote: 'Bhai pichle 3 din se hamare Sector 14, Pocket 2 mein naali ka ganda badbudaar paani supply mein mix hoke aa raha hai. Bacche bimaar pad rahe hain please jaldi theek karwao near Mother Dairy.',
-      dialect: 'Hinglish (Colloquial)',
+      dept: 'PMC Water Supply Department',
+      citizenQuote: 'Pichle 3 din se hamare Ivy Estate, Kesnand Road mein pipeline rupture se paani sadak par beh raha hai aur taps mein ganda paani aa raha hai. Please repair soon.',
+      dialect: 'Hinglish / Marathi',
       understands: {
-        category: 'Water Contamination Hazard',
-        location: 'Rohini Sector 14, Pocket 2',
+        category: 'Water Contamination & Leakage',
+        location: 'Ivy Estate, Kesnand Road, Wagholi',
         duration: '3 Days Unresolved',
         severity: 'CRITICAL (Biohazard Risk)',
-        households: '~450 Families'
+        households: '~1,100 Families'
       },
-      pattern: '17 related reports within 400m radius in 72 hours',
-      action: 'Mobilize DJB Quick-Response Squad #4 with 100mm valve repair clamp & chlorine test'
+      pattern: '24 related reports along Kesnand corridor in 48 hours',
+      action: 'Mobilize PMC Water Quick-Response Squad with 200mm electrofusion sleeve clamp'
     },
     {
       domain: 'Roads & Cavities',
       icon: '🛣️',
-      dept: 'Public Works Department (PWD)',
-      citizenQuote: 'School ke paas Lajpat Nagar wali road pe bohot bada gaddha ho gaya hai barish ke baad. 2 scooter gir chuke hain aaj subah, accident ho rahe hain bar bar!',
-      dialect: 'Hinglish / Hindi',
+      dept: 'PWD Pune / PMRDA',
+      citizenQuote: 'Raisoni College chowk road pe heavy dumper traffic se bohot gehra crater ban gaya hai. 2 scooter slip ho chuke hain, dangerous traffic hazard hai.',
+      dialect: 'Hinglish / Marathi',
       understands: {
-        category: 'Arterial Road Cavity',
-        location: 'Ring Road, Moolchand Underpass Entry',
-        duration: '12 Hours (Rapid Decay)',
-        severity: 'HIGH (Traffic Safety Hazard)',
-        households: 'School Transit Zone'
+        category: 'Arterial Highway Cavity',
+        location: 'Pune-Nagar Highway, Raisoni Chowk',
+        duration: '24 Hours (Rapid Decay)',
+        severity: 'HIGH (Highway Safety Hazard)',
+        households: 'Transit Highway Corridor'
       },
-      pattern: '4 incident reports within 200m; 2 minor collisions reported',
-      action: 'Immediate PWD emergency barricading + cold-mix asphalt dispatch before evening rush'
+      pattern: '8 incident reports within 200m; 2 minor skids recorded',
+      action: 'Immediate PWD emergency barricading + heavy bituminous cold-mix compaction'
     },
     {
-      domain: 'Street Lighting',
+      domain: 'Street Lighting & Grid',
       icon: '💡',
-      dept: 'BSES Rajdhani Power',
-      citizenQuote: 'Do hafte se poori main market gali ki streetlights band padi hain. Raat ko bohot darkness rehti hai, ladies aur elderly ke liye safe nahi hai.',
+      dept: 'MSEDCL Wagholi Sub-Division',
+      citizenQuote: 'Baif Road market line ke pole transformer se sparks nikal rahe hain aur saari streetlights band hain. Raat ko bohot darkness rehti hai.',
       dialect: 'Hindi / English',
       understands: {
-        category: 'Feeder Pillar Blackout',
-        location: 'Kalkaji Market Block B',
-        duration: '14 Days Unresolved',
-        severity: 'MEDIUM (Night Pedestrian Safety)',
-        households: '120 Retail Shops'
+        category: 'Distribution Transformer Sparking',
+        location: 'Baif Road Market Yard',
+        duration: '2 Days Unresolved',
+        severity: 'HIGH (Electrical Safety)',
+        households: '140 Retail Outlets'
       },
-      pattern: '8 complaints on the same secondary distribution circuit',
-      action: 'BSES lineman dispatch to replace burnt MCB switchboard at Feeder Pillar #7'
+      pattern: '9 complaints on the same 11kV distribution transformer loop',
+      action: 'MSEDCL lineman patrol to swap burnt HT bushing & isolate Phase B'
     },
     {
       domain: 'Sanitation',
       icon: '🗑️',
-      dept: 'Municipal Corporation (MCD)',
-      citizenQuote: 'Sector 6 DDA Market ke saamne open kude ka dher hai, 5 din se MCD dumper nahi aaya. Kal raat kisi ne aag laga di jisse bohot toxic smoke fail raha hai.',
-      dialect: 'Hinglish',
+      dept: 'PMC Solid Waste Management',
+      citizenQuote: 'Baif Road vegetable market corner pe kachra 5 din se pada hai, PMC compactor nahi aaya. Rotten smell se dukaandaron aur customers ko dikkat ho rahi hai.',
+      dialect: 'Hinglish / Marathi',
       understands: {
-        category: 'Solid Waste Combustion',
-        location: 'Mayur Vihar Phase 1, Sector 6',
+        category: 'Solid Waste Accumulation',
+        location: 'Baif Road Market Yard, Wagholi',
         duration: '5 Days (Uncollected)',
-        severity: 'HIGH (Air Pollution Violation)',
-        households: '300 Resident Flats'
+        severity: 'HIGH (Sanitation Hazard)',
+        households: '850 Households & Market Vendors'
       },
-      pattern: 'Cluster of 11 complaints across 3 adjacent societies',
-      action: 'Deploy two 12MT MCD hydraulic dumpers + lime-wash sanitation treatment'
+      pattern: 'Cluster of 18 complaints across Baif Road market stretch',
+      action: 'Deploy dual 12MT PMC hydraulic compactor trucks + lime-wash disinfectant treatment'
     }
   ];
 
@@ -190,8 +190,8 @@ export default function Home() {
       id: 'water',
       title: 'Dirty Tap Water',
       icon: '🚰',
-      dept: 'Delhi Jal Board (DJB)',
-      location: 'Rohini Sector 14, Pocket 2',
+      dept: 'PMC Water Supply Department',
+      location: 'Ivy Estate / Kesnand Road (Wagholi Ward 29)',
       steps: [
         {
           stepNumber: 1,
@@ -199,7 +199,7 @@ export default function Home() {
           badgeColor: '#10B981',
           title: '1 Home Reports Bad Water',
           icon: '🏠',
-          simpleText: 'A resident turns on the kitchen tap and finds brown, bad-smelling water. They submit a quick 15-second voice note on JanSahayak.',
+          simpleText: 'A resident turns on the kitchen tap and finds low-pressure, foul water. They submit a quick 15-second voice note on JanSahayak.',
           detailStat: '1 House Affected',
           detailNote: 'Reported at 07:30 AM',
           whatOldWayDid: 'Old portals treat this as an isolated tap issue and send 1 plumber.'
@@ -208,21 +208,21 @@ export default function Home() {
           stepNumber: 2,
           badge: 'AI Connects The Dots',
           badgeColor: '#F59E0B',
-          title: 'JanSahayak Spots 12 Nearby Reports',
+          title: 'JanSahayak Spots 18 Nearby Reports',
           icon: '🏘️',
-          simpleText: 'Within 4 hours, 12 neighboring homes report the exact same dirty water along 3 streets. JanSahayak links them together immediately.',
-          detailStat: '12 Connected Homes',
-          detailNote: 'Across a 350m street radius',
-          whatOldWayDid: 'Old portals would book 12 separate appointments across 2 weeks.'
+          simpleText: 'Within 4 hours, 18 neighboring apartments report the exact same water pressure loss along Kesnand Road. JanSahayak links them together immediately.',
+          detailStat: '18 Connected Societies',
+          detailNote: 'Across a 400m feeder radius',
+          whatOldWayDid: 'Old portals would book 18 separate appointments across 2 weeks.'
         },
         {
           stepNumber: 3,
           badge: 'Root Cause Solved Forever',
           badgeColor: '#6366F1',
-          title: 'Fix The Cracked Main Street Pipe',
+          title: 'Fix The Cracked Main HDPE Pipe',
           icon: '🛠️',
-          simpleText: 'Instead of visiting 12 individual home taps, the city dispatches 1 repair truck with valve clamps directly to the cracked underground pipe.',
-          detailStat: '450 Families Protected',
+          simpleText: 'Instead of visiting 18 individual home taps, PMC dispatches 1 repair truck with electrofusion welding directly to the cracked underground feeder.',
+          detailStat: '1,100 Families Protected',
           detailNote: 'Clean water restored in 4 hours',
           whatOldWayDid: 'Permanent fix executed with zero repeat complaints.'
         }
@@ -232,37 +232,37 @@ export default function Home() {
         icon: '❌',
         subtitle: 'Treating individual taps, ignoring the broken pipe',
         bulletPoints: [
-          '12 separate complaints filed over several days',
-          '12 different plumbers sent to check individual household taps',
-          'Underground broken main pipe is completely missed',
+          '18 separate complaints filed over several days',
+          'Multiple plumbers sent to check individual household taps',
+          'Underground broken main feeder is completely missed',
           'Dirty water returns every single morning'
         ],
-        consequence: 'Weeks wasted, city tax money burnt, and children get sick.'
+        consequence: 'Weeks wasted, city tax money burnt, and citizens rely on private tankers.'
       },
       newWay: {
         title: 'The JanSahayak Way',
         icon: '✅',
         subtitle: 'Fixing the underground pipe break once for everyone',
         bulletPoints: [
-          'AI groups 12 complaints automatically in under 4 hours',
-          'Identifies the underground main pipeline as the single source',
-          '1 repair team sent with proper heavy pipe clamps',
+          'AI groups 18 complaints automatically in under 4 hours',
+          'Identifies the underground 200mm HDPE line as single source',
+          '1 repair team sent with electrofusion equipment',
           'Water safety tested and verified for the whole neighborhood'
         ],
-        consequence: 'Fixed in 1 trip for all 450 families. 70% cheaper and permanent.'
+        consequence: 'Fixed in 1 trip for all 1,100 families. 70% cheaper and permanent.'
       },
       metrics: [
         { label: 'Time to Fix', old: '14 Days', smart: '4 Hours', highlight: '95% Faster' },
-        { label: 'Plumber Trips', old: '12 Visits', smart: '1 Targeted Fix', highlight: 'Saves Fuel & Manpower' },
-        { label: 'Families Helped', old: '1 Tap at a time', smart: '450 Households', highlight: 'Whole Ward Safe' }
+        { label: 'Plumber Trips', old: '18 Visits', smart: '1 Targeted Fix', highlight: 'Saves Fuel & Manpower' },
+        { label: 'Families Helped', old: '1 Tap at a time', smart: '1,100 Households', highlight: 'Whole Ward Safe' }
       ]
     },
     {
       id: 'roads',
       title: 'Road Potholes',
       icon: '🛣️',
-      dept: 'Public Works Department (PWD)',
-      location: 'Lajpat Nagar Ring Road',
+      dept: 'PWD Pune / PMRDA',
+      location: 'Pune-Nagar Highway (Raisoni Chowk)',
       steps: [
         {
           stepNumber: 1,
@@ -270,18 +270,18 @@ export default function Home() {
           badgeColor: '#10B981',
           title: '1 Scooter Slips on a Pothole',
           icon: '🛵',
-          simpleText: 'A commuter almost crashes on a deep road hole near the school bus stop and uploads a quick photo.',
+          simpleText: 'A commuter almost crashes on a deep road crater near Raisoni College and uploads a quick photo.',
           detailStat: '1 Deep Crater',
           detailNote: 'Reported after heavy rain',
-          whatOldWayDid: 'Road workers throw a bucket of loose stones in the hole.'
+          whatOldWayDid: 'Road workers throw a bucket of loose gravel in the hole.'
         },
         {
           stepNumber: 2,
           badge: 'AI Connects The Dots',
           badgeColor: '#F59E0B',
-          title: '8 Potholes Form on Same 400m Road',
+          title: '8 Potholes Form on Same 400m Stretch',
           icon: '⚠️',
-          simpleText: 'JanSahayak detects that 8 different potholes appeared along the exact same stretch. The underlying cause: a blocked underground drain is leaking water into the road base.',
+          simpleText: 'JanSahayak detects that 8 different potholes appeared along the same highway section. The cause: a blocked roadside storm drain is softening the asphalt subgrade.',
           detailStat: '8 Sinking Spots',
           detailNote: 'Water pooling beneath asphalt',
           whatOldWayDid: 'Old portals patch each hole separately, only for all 8 to reopen next week.'
@@ -292,8 +292,8 @@ export default function Home() {
           badgeColor: '#6366F1',
           title: 'Unblock Drain & Resurface Road Base',
           icon: '🚜',
-          simpleText: 'PWD cleans out the underground stormwater drain first so water stops weakening the asphalt, then lays down smooth, solid asphalt.',
-          detailStat: '500m Road Section',
+          simpleText: 'PWD cleans out the storm channel first so water stops weakening the base, then lays down heavy-duty bitumen.',
+          detailStat: '500m Highway Section',
           detailNote: 'Smooth for years with zero sinking',
           whatOldWayDid: 'Thousands of daily riders travel safely with zero accidents.'
         }
@@ -313,14 +313,14 @@ export default function Home() {
       newWay: {
         title: 'The JanSahayak Way',
         icon: '✅',
-        subtitle: 'Fixing the underground water leak first',
+        subtitle: 'Fixing the underlying drainage failure first',
         bulletPoints: [
           'JanSahayak detects underground drainage overflow causing asphalt collapse',
           'Drainage clearance crew cleans blocked storm channel',
           'Heavy roller machine levels and seals 500m of road base',
-          'Road stays solid throughout the entire rainy season'
+          'Road stays solid throughout the entire season'
         ],
-        consequence: 'Completely stops repetitive pothole formation and keeps traffic safe.'
+        consequence: 'Completely stops repetitive pothole formation and keeps highway traffic safe.'
       },
       metrics: [
         { label: 'Repair Longevity', old: '5 Days', smart: '3+ Years', highlight: 'Stays Smooth' },
@@ -330,10 +330,10 @@ export default function Home() {
     },
     {
       id: 'lights',
-      title: 'Dark Streetlights',
+      title: 'Dark Streetlights & Grid',
       icon: '💡',
-      dept: 'BSES Power Utility',
-      location: 'Kalkaji Main Market',
+      dept: 'MSEDCL Wagholi Sub-Division',
+      location: 'Baif Road Market Yard',
       steps: [
         {
           stepNumber: 1,
@@ -341,30 +341,30 @@ export default function Home() {
           badgeColor: '#10B981',
           title: '1 Dark Lamp Post Outside a Shop',
           icon: '🔦',
-          simpleText: 'A woman leaving her shop notices the street pole outside is dark and files a report so customers feel safe.',
+          simpleText: 'A shopkeeper notices the pole light is dead and sparking and files a report.',
           detailStat: '1 Dark Pole',
           detailNote: 'Reported at 08:15 PM',
-          whatOldWayDid: 'Electrician scheduled to check bulb #1 on Monday.'
+          whatOldWayDid: 'Electrician scheduled to check bulb #1 next week.'
         },
         {
           stepNumber: 2,
           badge: 'AI Connects The Dots',
           badgeColor: '#F59E0B',
-          title: '14 Streetlights Out on Same Block',
+          title: '14 Streetlights Out on Same Market Loop',
           icon: '🔌',
-          simpleText: 'JanSahayak spots 14 reports in 90 minutes. It maps the power line and finds all 14 dark poles are linked to the same feeder pillar.',
+          simpleText: 'JanSahayak spots 14 reports in 90 minutes. It maps the power line and finds all 14 dark poles are linked to Transformer TR-WAG-04.',
           detailStat: '14 Dark Poles',
-          detailNote: 'Shared electrical distribution circuit',
+          detailNote: 'Shared electrical distribution transformer',
           whatOldWayDid: 'Old portals send a technician to inspect 14 poles one by one over 3 nights.'
         },
         {
           stepNumber: 3,
           badge: 'Root Cause Solved Forever',
           badgeColor: '#6366F1',
-          title: 'Replace Master Switch in Feeder Box #7',
+          title: 'Replace Master Switch in Transformer Box #4',
           icon: '⚡',
-          simpleText: 'The lineman skips testing 14 individual bulbs and goes straight to Feeder Box #7 to replace the tripped master switch.',
-          detailStat: 'Full Street Lit',
+          simpleText: 'The lineman goes straight to Transformer Box #4 to replace the damaged phase bushing.',
+          detailStat: 'Full Market Lit',
           detailNote: 'Restored in 35 minutes',
           whatOldWayDid: 'All 14 lights turn on at once and the market is brightly lit.'
         }
@@ -376,8 +376,8 @@ export default function Home() {
         bulletPoints: [
           'Technician climbs pole #1 with ladder to test bulb',
           'Market stays pitch dark for 3 consecutive nights',
-          'High fear of theft and safety hazards for women',
-          'Root cause (tripped circuit box) remains undiscovered'
+          'High fear of theft and safety hazards',
+          'Root cause (tripped transformer breaker) remains undiscovered'
         ],
         consequence: 'Days of scary dark streets while checking bulbs that aren’t even broken.'
       },
@@ -386,7 +386,7 @@ export default function Home() {
         icon: '✅',
         subtitle: 'Replacing the central master fuse in 35 minutes',
         bulletPoints: [
-          'AI correlates 14 reports to Feeder Box #7 instantly',
+          'AI correlates 14 reports to Transformer Box #4 instantly',
           'Lineman dispatched with right heavy-duty breaker switch',
           'Master switch swapped in 35 minutes',
           'Entire shopping alley lights up simultaneously'
@@ -395,7 +395,7 @@ export default function Home() {
       },
       metrics: [
         { label: 'Outage Time', old: '3 Nights Dark', smart: '35 Minutes', highlight: 'Fast Restoration' },
-        { label: 'Poles Checked', old: '14 Individual Poles', smart: '1 Central Feeder Box', highlight: 'Direct Diagnosis' },
+        { label: 'Poles Checked', old: '14 Individual Poles', smart: '1 Central Transformer Box', highlight: 'Direct Diagnosis' },
         { label: 'Safety Impact', old: 'Unsafe Walkways', smart: '100% Bright & Safe', highlight: 'Protected Market' }
       ]
     }
@@ -404,91 +404,91 @@ export default function Home() {
   // Map Wards Data (Section 07 - Geospatial Intelligence)
   const mapWards = [
     {
-      id: 'ward14',
-      ward: 'Ward 14 (Rohini Sector 14)',
-      shortName: 'Rohini Sector 14',
-      zone: 'North-West Delhi',
+      id: 'ward29',
+      ward: 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',
+      shortName: 'Ivy Estate / Kesnand Rd',
+      zone: 'Wagholi Sub-Division, Pune',
       category: 'Water Supply',
       icon: '💧',
-      dept: 'Delhi Jal Board (DJB)',
+      dept: 'PMC Water Supply Department',
       severity: 'CRITICAL',
       color: '#EF4444',
-      reports: 18 + (simulatedSignals['ward14'] || 0),
-      hotspotName: 'Main Pipeline Fracture Cluster',
-      actionRequired: 'Replace 100mm cast-iron valve clamp & chlorine test',
-      trend: '+4 reports today',
+      reports: 24 + (simulatedSignals['ward29'] || 0),
+      hotspotName: 'Main Potable Feeder Fracture',
+      actionRequired: 'Fit 200mm electrofusion sleeve clamp & pressure test',
+      trend: '+6 reports today',
       status: 'EMERGING_HOTSPOT',
       posX: 29, // % from left
       posY: 24, // % from top
-      dispatchedUnit: 'DJB Quick-Response Squad #4',
-      eta: '24 Mins',
-      peopleImpacted: '~450 Families',
-      radiusMeters: '400m Radius'
+      dispatchedUnit: 'PMC Water Emergency Squad #2',
+      eta: '20 Mins',
+      peopleImpacted: '~1,100 Families',
+      radiusMeters: '450m Radius'
     },
     {
-      id: 'ward8',
-      ward: 'Ward 8 (Lajpat Nagar / Moolchand)',
-      shortName: 'Lajpat Nagar Ring Road',
-      zone: 'South-Central Delhi',
+      id: 'ward27',
+      ward: 'Wagholi Ward 27 (Nagar Road Highway & Raisoni Chowk)',
+      shortName: 'Nagar Road / Raisoni Chowk',
+      zone: 'Wagholi Sub-Division, Pune',
       category: 'Roads',
       icon: '🛣️',
-      dept: 'Public Works Department (PWD)',
+      dept: 'PWD Pune / PMRDA',
       severity: 'HIGH',
       color: '#F59E0B',
-      reports: 7 + (simulatedSignals['ward8'] || 0),
-      hotspotName: 'Underpass Cavity & Drainage Backup',
-      actionRequired: 'Asphalt resurfacing & storm drain clearance',
-      trend: 'Steady (Rainfall)',
+      reports: 15 + (simulatedSignals['ward27'] || 0),
+      hotspotName: 'Highway Cavity & Storm Grate Collapse',
+      actionRequired: 'Bituminous cold-mix compaction & culvert clearance',
+      trend: 'Heavy traffic stress',
       status: 'UNDER_INSPECTION',
       posX: 61,
       posY: 63,
-      dispatchedUnit: 'PWD Road Repair Squad #2',
-      eta: '18 Mins',
-      peopleImpacted: '~2,500 Commuters',
-      radiusMeters: '300m Radius'
+      dispatchedUnit: 'PWD Pune Highway Squad #1',
+      eta: '15 Mins',
+      peopleImpacted: '~4,500 Commuters',
+      radiusMeters: '350m Radius'
     },
     {
-      id: 'ward22',
-      ward: 'Ward 22 (Mayur Vihar Ph-1)',
-      shortName: 'Mayur Vihar Pocket 1',
-      zone: 'East Delhi',
+      id: 'ward28',
+      ward: 'Wagholi Ward 28 (Baif Road Market Yard)',
+      shortName: 'Baif Road Market',
+      zone: 'Wagholi Sub-Division, Pune',
       category: 'Sanitation',
       icon: '🗑️',
-      dept: 'Municipal Corporation (MCD)',
+      dept: 'PMC Solid Waste Management',
       severity: 'HIGH',
       color: '#10B981',
-      reports: 11 + (simulatedSignals['ward22'] || 0),
-      hotspotName: 'Market Dumper Overflow',
+      reports: 18 + (simulatedSignals['ward28'] || 0),
+      hotspotName: 'Market Waste Overflow & Drain Spill',
       actionRequired: 'Deploy dual 12MT hydraulic dumpers + lime-wash',
-      trend: '-6 reports (Improving)',
+      trend: '-4 reports (Improving)',
       status: 'RESOLVING',
       posX: 76,
       posY: 47,
-      dispatchedUnit: 'MCD Heavy Fleet #12',
+      dispatchedUnit: 'PMC SWM Compactor Fleet #4',
       eta: 'En Route',
-      peopleImpacted: '~800 Residents',
+      peopleImpacted: '~850 Residents',
       radiusMeters: '500m Radius'
     },
     {
-      id: 'ward5',
-      ward: 'Ward 5 (Kalkaji / Nehru Place)',
-      shortName: 'Kalkaji Market',
-      zone: 'South-East Delhi',
+      id: 'ward30',
+      ward: 'Wagholi Ward 30 (Domkhel Road & Ubale Nagar)',
+      shortName: 'Domkhel Road',
+      zone: 'Wagholi Sub-Division, Pune',
       category: 'Electricity',
       icon: '⚡',
-      dept: 'BSES Power Utility',
+      dept: 'MSEDCL Wagholi Sub-Division',
       severity: 'MEDIUM',
       color: '#3B82F6',
-      reports: 9 + (simulatedSignals['ward5'] || 0),
-      hotspotName: 'Feeder Pillar 7 Tripping',
-      actionRequired: 'Replace burnt MCB fuse at feeder station',
+      reports: 9 + (simulatedSignals['ward30'] || 0),
+      hotspotName: '11kV Feeder Transformer Arcing',
+      actionRequired: 'Replace burnt HT bushing at transformer yard',
       trend: '+2 reports today',
       status: 'EMERGING_HOTSPOT',
       posX: 66,
       posY: 75,
-      dispatchedUnit: 'BSES Lineman Patrol #7',
-      eta: '35 Mins',
-      peopleImpacted: '~120 Retail Shops',
+      dispatchedUnit: 'MSEDCL Lineman Patrol #2',
+      eta: '25 Mins',
+      peopleImpacted: '~140 Retail Shops',
       radiusMeters: '250m Radius'
     }
   ];
@@ -1533,7 +1533,7 @@ export default function Home() {
     </section>
 
       {/* ==========================================================================
-          07. CIVIC INTELLIGENCE MAP PREVIEW (Interactive Delhi GIS Radar)
+          07. CIVIC INTELLIGENCE MAP PREVIEW (Interactive Wagholi Pune GIS Radar)
           ========================================================================== */}
       <section className="section-spacing" style={{ background: '#F8F9FA' }}>
         <div className="container">
@@ -1543,7 +1543,7 @@ export default function Home() {
               🛰️ GEOSPATIAL CLUSTER RADAR
             </span>
             <h2 style={{ marginTop: '4px', fontSize: '36px', letterSpacing: '-0.02em', color: '#0F172A', marginBottom: '10px', lineHeight: 1.2 }}>
-              Where Are Problems Happening Across Delhi?
+              Where Are Problems Happening Across Wagholi, Pune?
             </h2>
             <p style={{ color: '#64748B', fontSize: '16px', lineHeight: 1.6, maxWidth: '680px', margin: '0 auto 22px auto' }}>
               Click any hotspot on the live satellite radar to see real-time cluster density, root cause diagnosis, and dispatched municipal response teams.
@@ -1587,7 +1587,7 @@ export default function Home() {
 
           {/* Interactive Map Visual Container */}
           <div className="map-radar-grid">
-            {/* Left Column: Interactive Delhi GIS Radar Canvas */}
+            {/* Left Column: Interactive Wagholi Pune GIS Radar Canvas */}
             <div
               style={{
                 position: 'relative',
@@ -1646,7 +1646,7 @@ export default function Home() {
                   fontWeight: 600
                 }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', display: 'inline-block', boxShadow: '0 0 8px #10B981' }} />
-                  <span>📍 {mapRegion === 'wagholi' ? 'Wagholi, Pune Grid (PMC)' : 'Delhi NCT Grid'} • Live GIS Feed</span>
+                  <span>📍 Wagholi, Pune Grid (PMC Wards 27-31) • Live GIS Feed</span>
                 </div>
 
                 {/* Region Selector & Basemap Switcher & Zoom Tools */}
@@ -1665,34 +1665,16 @@ export default function Home() {
                       onClick={() => setMapRegion('wagholi')}
                       style={{
                         fontSize: '11px',
-                        fontWeight: mapRegion === 'wagholi' ? 700 : 500,
+                        fontWeight: '700',
                         padding: '4px 10px',
                         borderRadius: '7px',
-                        background: mapRegion === 'wagholi' ? '#0284C7' : 'transparent',
-                        color: mapRegion === 'wagholi' ? '#FFFFFF' : '#CBD5E1',
+                        background: '#0284C7',
+                        color: '#FFFFFF',
                         border: 'none',
-                        cursor: 'pointer',
-                        transition: 'all 150ms ease'
+                        cursor: 'pointer'
                       }}
                     >
-                      🚩 Wagholi, Pune
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMapRegion('delhi')}
-                      style={{
-                        fontSize: '11px',
-                        fontWeight: mapRegion === 'delhi' ? 700 : 500,
-                        padding: '4px 10px',
-                        borderRadius: '7px',
-                        background: mapRegion === 'delhi' ? '#0284C7' : 'transparent',
-                        color: mapRegion === 'delhi' ? '#FFFFFF' : '#CBD5E1',
-                        border: 'none',
-                        cursor: 'pointer',
-                        transition: 'all 150ms ease'
-                      }}
-                    >
-                      🏛️ Delhi NCT
+                      🚩 Wagholi, Pune (PMC)
                     </button>
                   </div>
 
@@ -2037,7 +2019,7 @@ export default function Home() {
               {/* Action Buttons */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <Link
-                  to={`/officer/complaints/DL-2026-W14-0892`}
+                  to={`/officer/complaints/PN-2026-WAG-0102`}
                   className="btn-primary"
                   style={{ width: '100%', justifyContent: 'center', padding: '12px 18px', borderRadius: '12px' }}
                 >

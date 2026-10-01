@@ -34,45 +34,45 @@ const QUICK_PRESETS = [
   {
     label: '💧 Contaminated Water',
     hindiLabel: 'दूषित पेयजल',
-    text: 'Pichle 3 din se hamare Sector 14 mein supply ka paani ganda aur badbudaar aa raha hai. Bacche bimaar pad rahe hain, urgent pipeline inspection required near Mother Dairy.',
+    text: 'Pichle 3 din se hamare Wagholi Kesnand Road area mein tap water brown aur foul smelling aa raha hai. Pipeline leak suspected near Raisoni Chowk booster valve.',
     category: 'Water Supply & Contamination',
-    department: 'Delhi Jal Board (DJB)',
+    department: 'PMC Water Supply Department',
     severity: 'CRITICAL',
     badgeColor: '#0284C7'
   },
   {
     label: '🚧 Road Pothole / Crater',
     hindiLabel: 'सड़क पर गहरा गड्ढा',
-    text: 'Main road outer ring road flyover ke neeche bohot bada dangerous gaddha ho gaya hai. Kal raat 2 do-pahiya vahan slip hue. Severe accident hazard and traffic disruption.',
+    text: 'Wagholi-Nagar Road Highway near Raisoni College road pe heavy deep craters pad gaye hain. Two-wheelers slipping and massive traffic jam during rush hours.',
     category: 'Roads & Infrastructure',
-    department: 'Public Works Department (PWD)',
+    department: 'PWD Pune / PMRDA',
     severity: 'HIGH',
     badgeColor: '#D97706'
   },
   {
     label: '🗑️ Garbage Dump & Stench',
     hindiLabel: 'कचरे का ढेर व दुर्गंध',
-    text: 'Main market corner pe kude ka bohot bada dher laga hua hai, 4 din se koi sanitation truck nahi aaya. Animals spreading garbage and toxic stench everywhere.',
+    text: 'Wagholi Baif Road market yard corner pe garbage open dump 4 din se uncollected pada hai. Animals scattering waste and foul smell spreading.',
     category: 'Sanitation & Solid Waste',
-    department: 'Municipal Corporation of Delhi (MCD)',
+    department: 'PMC Solid Waste Management',
     severity: 'MEDIUM',
     badgeColor: '#059669'
   },
   {
     label: '⚡ Transformer Sparking',
     hindiLabel: 'ट्रांसफॉर्मर चिंगारी व खतरा',
-    text: 'Gali number 4 ke corner pe electric transformer se spark nikal raha hai aur blast hone ka khatra hai. Poori residential line trip ho rahi hai. Immediate repair needed.',
+    text: 'Domkhel Road corner distribution transformer se heavy sparks and buzzing sound aa rahi hai. Frequent phase drop and power outage risk.',
     category: 'Electricity & Power Grid',
-    department: 'BSES Rajdhani Power Limited',
+    department: 'MSEDCL Wagholi Sub-Division',
     severity: 'CRITICAL',
     badgeColor: '#7C3AED'
   },
   {
     label: '🌊 Sewage / Drain Overflow',
     hindiLabel: 'सीवर व नाली ओवरफ्लो',
-    text: 'Open stormwater drain chocked ho gaya hai aur ganda naali ka paani sadak pe bhar raha hai. Pedestrians cannot walk and dengue mosquito breeding risk.',
+    text: 'Bakori Road storm drain blocked hone se dirty drain water road pe flow kar raha hai near Wagheshwar Temple. Severe dengue mosquito breeding hazard.',
     category: 'Drainage & Waterlogging',
-    department: 'Municipal Corporation of Delhi (MCD)',
+    department: 'PMC Drainage & Sewerage Department',
     severity: 'HIGH',
     badgeColor: '#0891B2'
   }
@@ -83,10 +83,10 @@ export default function CitizenSubmit() {
   const { submitGrievance, user, switchDemoRole } = useApp();
 
   const citizenInfo = user || {
-    name: 'Aditya Verma',
-    phone: '+91 98712-88210',
-    ward: 'Ward 14 (Rohini Sector 14)',
-    pincode: '110085'
+    name: 'Rahul Raut',
+    phone: '+91 98230-12345',
+    ward: 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',
+    pincode: '412207'
   };
 
   // Accessibility / Saral (Easy Voice) Mode
@@ -95,9 +95,9 @@ export default function CitizenSubmit() {
   // Form State
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [ward, setWard] = useState(citizenInfo.ward || 'Ward 14 (Rohini Sector 14)');
-  const [area, setArea] = useState('Sector 14 Pocket 2');
-  const [pincode, setPincode] = useState(citizenInfo.pincode || '110085');
+  const [ward, setWard] = useState(citizenInfo.ward || 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)');
+  const [area, setArea] = useState('Ivy Estate, Kesnand Road');
+  const [pincode, setPincode] = useState(citizenInfo.pincode || '412207');
   const [manualCategory, setManualCategory] = useState('');
   const [severityLevel, setSeverityLevel] = useState('HIGH');
 
@@ -416,10 +416,10 @@ export default function CitizenSubmit() {
         location: {
           ward,
           area,
-          city: 'New Delhi',
+          city: 'Pune, Maharashtra',
           pincode,
-          lat: gpsCoordinates?.lat || 28.7185,
-          lng: gpsCoordinates?.lng || 77.1250
+          lat: gpsCoordinates?.lat || 18.5793,
+          lng: gpsCoordinates?.lng || 73.9785
         },
         evidence: {
           hasPhoto: !!photoPreview || !!photoStorageUrl,
@@ -547,7 +547,7 @@ export default function CitizenSubmit() {
                       Official Redressal Portal
                     </span>
                     <span style={{ fontSize: '11px', color: 'var(--color-text-muted, #64748B)', fontWeight: 600 }}>
-                      NCT of Delhi
+                      Pune Municipal Corporation (PMC)
                     </span>
                   </div>
                   <h1 style={{ 
@@ -782,7 +782,7 @@ export default function CitizenSubmit() {
                       Assigned Department
                     </span>
                     <strong style={{ fontSize: '14px', color: '#0E5E3A', display: 'block', marginTop: '2px' }}>
-                      {createdTicket.department || 'Municipal Corporation of Delhi'}
+                      {createdTicket.department || 'Pune Municipal Corporation (PMC)'}
                     </strong>
                   </div>
 
@@ -1254,11 +1254,11 @@ export default function CitizenSubmit() {
                         fontWeight: 600
                       }}
                     >
-                      <option value="Ward 14 (Rohini Sector 14)">Ward 14 (Rohini Sector 14)</option>
-                      <option value="Ward 8 (Lajpat Nagar / Moolchand)">Ward 8 (Lajpat Nagar / Moolchand)</option>
-                      <option value="Ward 22 (Mayur Vihar Ph-1)">Ward 22 (Mayur Vihar Ph-1)</option>
-                      <option value="Ward 5 (Kalkaji / South)">Ward 5 (Kalkaji / South)</option>
-                      <option value="Ward 19 (Karol Bagh)">Ward 19 (Karol Bagh)</option>
+                      <option value="Wagholi Ward 27 (Nagar Road Highway & Raisoni Chowk)">Wagholi Ward 27 (Nagar Road Highway & Raisoni Chowk)</option>
+                      <option value="Wagholi Ward 28 (Baif Road & Market Yard)">Wagholi Ward 28 (Baif Road & Market Yard)</option>
+                      <option value="Wagholi Ward 29 (Ivy Estate & Kesnand Road)">Wagholi Ward 29 (Ivy Estate & Kesnand Road)</option>
+                      <option value="Wagholi Ward 30 (Domkhel & Ubale Nagar)">Wagholi Ward 30 (Domkhel & Ubale Nagar)</option>
+                      <option value="Wagholi Ward 31 (Bakori Road & Wagheshwar)">Wagholi Ward 31 (Bakori Road & Wagheshwar)</option>
                     </select>
                   </div>
 
@@ -1270,7 +1270,7 @@ export default function CitizenSubmit() {
                       type="text"
                       value={area}
                       onChange={(e) => setArea(e.target.value)}
-                      placeholder="e.g. Pocket 2, Near Mother Dairy"
+                      placeholder="e.g. Ivy Estate, Near Raisoni Chowk"
                       style={{
                         width: '100%',
                         height: '44px',
@@ -1401,7 +1401,7 @@ export default function CitizenSubmit() {
                         </span>
                         <strong style={{ fontSize: '13px', color: '#0E5E3A', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
                           <Building2 style={{ width: '14px', height: '14px' }} />
-                          <span>{liveUnderstanding.department || 'Municipal Corporation of Delhi'}</span>
+                          <span>{liveUnderstanding.department || 'Pune Municipal Corporation (PMC)'}</span>
                         </strong>
                       </div>
 
@@ -1439,7 +1439,7 @@ export default function CitizenSubmit() {
                 ) : (
                   <div style={{ padding: '18px', textAlign: 'center', color: '#64748B' }}>
                     <p style={{ fontSize: '13px', margin: 0 }}>
-                      💡 Start typing your problem, speaking into the microphone, or click a quick scenario above. The AI engine will instantly classify the issue, route it to the exact Delhi municipal department, and preview the resolution plan here.
+                      💡 Start typing your problem, speaking into the microphone, or click a quick scenario above. The AI engine will instantly classify the issue, route it to the exact Pune municipal department (PMC / PWD / MSEDCL), and preview the resolution plan here.
                     </p>
                   </div>
                 )}
@@ -1457,7 +1457,7 @@ export default function CitizenSubmit() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <ShieldCheck style={{ width: '16px', height: '16px', color: '#059669', flexShrink: 0 }} />
                   <span style={{ fontSize: '12.5px', color: '#475569' }}>
-                    Direct dispatch to official Delhi Municipal ledger with immutable audit trail.
+                    Direct dispatch to official PMC Municipal ledger with immutable audit trail.
                   </span>
                 </div>
 

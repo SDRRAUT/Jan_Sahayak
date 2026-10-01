@@ -10,8 +10,8 @@ export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('+91 ');
-  const [ward, setWard] = useState('Ward 14 (Rohini Sector 14)');
-  const [pincode, setPincode] = useState('110085');
+  const [ward, setWard] = useState('Wagholi Ward 29 (Ivy Estate & Kesnand Road)');
+  const [pincode, setPincode] = useState('412207');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
@@ -111,11 +111,11 @@ export default function Register() {
                 className="register-input"
                 style={{ width: '100%', height: '46px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-medium)', padding: '0 10px', fontSize: '14px', background: '#FFFFFF' }}
               >
-                <option value="Ward 14 (Rohini Sector 14)">Ward 14 (Rohini Sector 14)</option>
-                <option value="Ward 8 (Lajpat Nagar / Moolchand)">Ward 8 (Lajpat Nagar / Moolchand)</option>
-                <option value="Ward 22 (Mayur Vihar Ph-1)">Ward 22 (Mayur Vihar Ph-1)</option>
-                <option value="Ward 5 (Kalkaji / South)">Ward 5 (Kalkaji / South)</option>
-                <option value="Ward 19 (Karol Bagh)">Ward 19 (Karol Bagh)</option>
+                <option value="Wagholi Ward 27 (Nagar Road Highway & Raisoni Chowk)">Wagholi Ward 27 (Nagar Road Highway & Raisoni Chowk)</option>
+                <option value="Wagholi Ward 28 (Baif Road & Market Yard)">Wagholi Ward 28 (Baif Road & Market Yard)</option>
+                <option value="Wagholi Ward 29 (Ivy Estate & Kesnand Road)">Wagholi Ward 29 (Ivy Estate & Kesnand Road)</option>
+                <option value="Wagholi Ward 30 (Domkhel & Ubale Nagar)">Wagholi Ward 30 (Domkhel & Ubale Nagar)</option>
+                <option value="Wagholi Ward 31 (Bakori Road & Wagheshwar)">Wagholi Ward 31 (Bakori Road & Wagheshwar)</option>
               </select>
             </div>
             <div>
@@ -126,7 +126,7 @@ export default function Register() {
                 type="text"
                 value={pincode}
                 onChange={(e) => setPincode(e.target.value)}
-                placeholder="110085"
+                placeholder="412207"
                 className="register-input"
                 style={{ width: '100%', height: '46px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-medium)', padding: '0 12px', fontSize: '14px' }}
                 required

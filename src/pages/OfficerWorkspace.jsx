@@ -93,8 +93,8 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
   const currentOfficer = (user && user.role !== 'citizen') ? user : {
     name: 'Er. Sanjay Sharma',
     designation: 'Executive Engineer & Department Administrator',
-    department: 'Delhi Jal Board (DJB)',
-    zone: 'Zone North-West (Rohini)',
+    department: 'PMC Water Supply Department',
+    zone: 'Zone East (Wagholi Sub-Division, Pune)',
     role: 'civic_officer'
   };
 
@@ -122,7 +122,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
   };
 
   // Selected grievance for deep workspace inspection
-  const [selectedId, setSelectedId] = useState(id || queryCaseId || grievances[0]?.id || 'DL-2026-W14-0892');
+  const [selectedId, setSelectedId] = useState(id || queryCaseId || grievances[0]?.id || 'PN-2026-WAG-0102');
 
   useEffect(() => {
     if (queryCaseId && queryCaseId !== selectedId) {
@@ -146,12 +146,12 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
   const [resolutionNotes, setResolutionNotes] = useState('Replacement clamp installed, line pressure normalized to 3.2 bar, and water quality chlorine test verified.');
 
   const [showReassignModal, setShowReassignModal] = useState(false);
-  const [reassignOfficer, setReassignOfficer] = useState('Er. Vivek Nambiar (AEE Civil Lines)');
-  const [reassignDepartment, setReassignDepartment] = useState(currentOfficer.department || 'Delhi Jal Board (DJB)');
+  const [reassignOfficer, setReassignOfficer] = useState('Er. Sachin Patil (EE PWD Pune)');
+  const [reassignDepartment, setReassignDepartment] = useState(currentOfficer.department || 'PMC Water Supply Department');
   const [reassignReason, setReassignReason] = useState('Jurisdiction realignment for faster field arrival.');
 
   const [showEscalateModal, setShowEscalateModal] = useState(false);
-  const [escalateReason, setEscalateReason] = useState('High-risk water contamination affecting pediatric ward proximity.');
+  const [escalateReason, setEscalateReason] = useState('High-risk water contamination affecting school proximity.');
 
   const [showModifyModal, setShowModifyModal] = useState(false);
   const [modifiedSopText, setModifiedSopText] = useState('');
@@ -170,10 +170,10 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
   const [newOfficerName, setNewOfficerName] = useState('');
   const [newOfficerZone, setNewOfficerZone] = useState('');
   const [officerRoster, setOfficerRoster] = useState([
-    { name: 'Er. Sanjay Sharma', designation: 'Executive Engineer (Rohini)', activeCases: 4, resolvedThisMonth: 38, avgResolutionHours: '14.2h', rating: 4.8, status: 'ON_DUTY' },
-    { name: 'Er. Vivek Nambiar', designation: 'AEE (Civil Lines)', activeCases: 6, resolvedThisMonth: 44, avgResolutionHours: '18.1h', rating: 4.6, status: 'ON_DUTY' },
-    { name: 'Er. Meenakshi Roy', designation: 'AEE (South Zone)', activeCases: 3, resolvedThisMonth: 52, avgResolutionHours: '12.4h', rating: 4.9, status: 'ON_DUTY' },
-    { name: 'Er. Tariq Ahmad', designation: 'AEE (East Zone)', activeCases: 5, resolvedThisMonth: 31, avgResolutionHours: '19.5h', rating: 4.4, status: 'FIELD_INSPECTION' }
+    { name: 'Er. Sanjay Sharma', designation: 'Executive Engineer (Wagholi Water)', activeCases: 4, resolvedThisMonth: 38, avgResolutionHours: '14.2h', rating: 4.8, status: 'ON_DUTY' },
+    { name: 'Er. Ramesh Shinde', designation: 'Sanitation Inspector (Baif Road)', activeCases: 6, resolvedThisMonth: 44, avgResolutionHours: '18.1h', rating: 4.6, status: 'ON_DUTY' },
+    { name: 'Er. Sachin Patil', designation: 'Assistant Engineer (PWD Pune)', activeCases: 3, resolvedThisMonth: 52, avgResolutionHours: '12.4h', rating: 4.9, status: 'ON_DUTY' },
+    { name: 'Er. Neha Singh', designation: 'Sub-Div Engineer (MSEDCL Wagholi)', activeCases: 5, resolvedThisMonth: 31, avgResolutionHours: '19.5h', rating: 4.4, status: 'FIELD_INSPECTION' }
   ]);
 
   // Live stats from Supabase via /api/stats/officer
@@ -207,10 +207,11 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
 
 
   // Emerging Problems Radar Data (Simple English with Real Civic Images)
+  // Emerging Problems Radar Data (Simple English with Real Civic Images)
   const emergingIssues = [
     {
       id: 'ISSUE-01',
-      title: 'Main Drinking Water Pipe Burst & Gushing',
+      title: 'Main Potable Water Pipe Burst & Pressure Collapse',
       category: 'Water Supply',
       image: '/civic-problems/water_pipe_leak.jpg',
       status: 'EMERGING',
@@ -218,13 +219,13 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
       badgeColor: '#DC2626',
       badgeBg: '#FEF2F2',
       badgeBorder: '#FECACA',
-      wardsCount: 4,
-      wards: 'Ward 14 (Rohini Sector 14)',
-      grievancesCount: 14,
+      wardsCount: 2,
+      wards: 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',
+      grievancesCount: 24,
       trend: '+68% new reports in last 2 days',
-      hypothesis: 'Water main joint burst under street surface near Shree Ganesh Medicals.',
-      recommendedAction: 'Send team to isolate Sector 14 gate valve and install 150mm sleeve clamp.',
-      targetGrievanceId: 'DL-2026-W14-0892'
+      hypothesis: 'Water main joint burst under street surface near Ivy Estate Entrance.',
+      recommendedAction: 'Send team to isolate Wagholi ESR gate valve and install 200mm electrofusion sleeve clamp.',
+      targetGrievanceId: 'PN-2026-WAG-0102'
     },
     {
       id: 'ISSUE-02',
@@ -236,17 +237,17 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
       badgeColor: '#D97706',
       badgeBg: '#FFFBEB',
       badgeBorder: '#FDE68A',
-      wardsCount: 3,
-      wards: 'Ward 8 (Kothrud / Paud Road)',
+      wardsCount: 2,
+      wards: 'Wagholi Ward 27 (Nagar Road Highway & Raisoni Chowk)',
       grievancesCount: 15,
       trend: '+34% reports this week',
-      hypothesis: 'Heavy monsoon runoff washed subsoil; storm drain grate collapsed under traffic.',
-      recommendedAction: 'Dispatch rapid patching truck with cast iron grate replacement and cold asphalt.',
-      targetGrievanceId: 'MH-2026-W08-0419'
+      hypothesis: 'Heavy highway traffic runoff washed subsoil; storm drain grate collapsed under truck weight.',
+      recommendedAction: 'Dispatch PWD rapid patching truck with cast iron grate replacement and cold asphalt.',
+      targetGrievanceId: 'PN-2026-WAG-0105'
     },
     {
       id: 'ISSUE-03',
-      title: 'Huge Roadside Garbage Heap & Trash Bags',
+      title: 'Massive Roadside Garbage Dump & Market Trash',
       category: 'Sanitation',
       image: '/civic-problems/roadside_garbage_heap.jpg',
       status: 'IMPROVING',
@@ -255,16 +256,16 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
       badgeBg: '#EFF6FF',
       badgeBorder: '#BFDBFE',
       wardsCount: 1,
-      wards: 'Ward 22 (Mayur Vihar Ph-1)',
-      grievancesCount: 16,
+      wards: 'Wagholi Ward 28 (Baif Road Market Yard)',
+      grievancesCount: 18,
       trend: 'Complaints down 40% after sending extra compactor',
-      hypothesis: 'Commercial market garbage backlog on carriageway; compactor clearing volume.',
+      hypothesis: 'Baif Road vegetable market garbage backlog on carriageway; compactor clearing volume.',
       recommendedAction: 'Deploy 12MT compactor truck and apply disinfectant lime wash along market street.',
-      targetGrievanceId: 'DL-2026-W22-0112'
+      targetGrievanceId: 'PN-2026-WAG-0101'
     },
     {
       id: 'ISSUE-04',
-      title: 'Severe Monsoon Inundation & Submerged Drain',
+      title: 'Severe Stormwater Drain Clogging & Road Flooding',
       category: 'Drainage & Waterlogging',
       image: '/civic-problems/monsoon_waterlogging_flood.jpg',
       status: 'RESOLVED',
@@ -273,12 +274,12 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
       badgeBg: '#ECFDF5',
       badgeBorder: '#A7F3D0',
       wardsCount: 1,
-      wards: 'Ward 3 (Karol Bagh Junction)',
+      wards: 'Wagholi Ward 30 (Domkhel Road & Ubale Nagar)',
       grievancesCount: 19,
-      trend: '50HP dewatering pump deployed on site',
+      trend: 'PMC super-sucker unit deployed on site',
       hypothesis: 'Blocked underground culvert combined with open storm drain causing knee-deep flooding.',
       recommendedAction: 'Operate dewatering pump and install high-visibility warning barricades.',
-      targetGrievanceId: 'DL-2026-W03-0667'
+      targetGrievanceId: 'PN-2026-WAG-0103'
     }
   ];
 
@@ -291,15 +292,15 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
   ];
 
   const recurringHotspots = [
-    { ward: 'Ward 14 (Rohini Sector 14)', issues: 18, primaryCause: '1988 Cast-Iron Supply Main degraded; capex replacement recommended', riskLevel: 'HIGH' },
-    { ward: 'Ward 8 (Lajpat Nagar Ring Road)', issues: 9, primaryCause: 'Monsoon drainage backflow into secondary feeder', riskLevel: 'MEDIUM' },
-    { ward: 'Ward 22 (Mayur Vihar Ph-1)', issues: 7, primaryCause: 'Commercial unauthorized suction pumps creating negative pressure', riskLevel: 'MEDIUM' }
+    { ward: 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)', issues: 24, primaryCause: 'High-pressure surge along Kesnand feeder main; electrofusion realignment recommended', riskLevel: 'HIGH' },
+    { ward: 'Wagholi Ward 28 (Baif Road Market Yard)', issues: 18, primaryCause: 'Market waste dumping into storm culvert; closed hook-loader bin needed', riskLevel: 'HIGH' },
+    { ward: 'Wagholi Ward 27 (Nagar Road Highway)', issues: 12, primaryCause: 'Heavy commercial vehicle axle load degrading asphalt sub-base', riskLevel: 'MEDIUM' }
   ];
 
   const feedbackRecords = [
-    { citizen: 'Aditya Verma', ward: 'Ward 14', rating: 5, comment: 'Quick emergency clamp response within 4 hours. Water chlorine test verified before restoring flow.', date: 'Today' },
-    { citizen: 'Pooja Malhotra', ward: 'Ward 8', rating: 5, comment: 'Officer Sanjay Sharma called personally on WhatsApp with progress photos. Very transparent.', date: 'Yesterday' },
-    { citizen: 'Harish Bansal', ward: 'Ward 14', rating: 4, comment: 'Repaired the leak fast, but trench filling on the road took an extra day.', date: '2 days ago' }
+    { citizen: 'Santosh Gawade', ward: 'Wagholi Ward 29', rating: 5, comment: 'Quick emergency clamp response within 4 hours. Water chlorine test verified before restoring flow.', date: 'Today' },
+    { citizen: 'Priyanka Jadhav', ward: 'Wagholi Ward 28', rating: 5, comment: 'Officer Sanjay Sharma called personally on WhatsApp with progress photos. Very transparent.', date: 'Yesterday' },
+    { citizen: 'Anand Rathi', ward: 'Wagholi Ward 29', rating: 4, comment: 'Repaired the leak fast, but trench filling on the road took an extra day.', date: '2 days ago' }
   ];
 
   // Filtering Queues (Guaranteed newest submissions & targeted cases at the absolute top)
@@ -331,7 +332,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
       if (queryCaseId && g.id === queryCaseId) return true;
       if (g.createdAt === 'Just now') return true;
       if (!g.officerName) return true;
-      return g.officerName.includes('Sanjay') || g.officerName.includes('AEE') || g.status === 'IN_PROGRESS' || g.urgency === 'CRITICAL';
+      return g.officerName.includes('Sanjay') || g.officerName.includes('EE') || g.status === 'IN_PROGRESS' || g.urgency === 'CRITICAL';
     });
 
     return [...list].sort((a, b) => {
@@ -344,16 +345,16 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
   }, [grievances, queryCaseId]);
 
   const activeItem = grievances.find(g => g.id === selectedId) || filteredGrievances[0] || grievances[0] || {
-    id: 'DL-2026-W14-0892',
-    title: 'Contaminated Drinking Water & Main Supply Pipe Leakage',
+    id: 'PN-2026-WAG-0102',
+    title: 'Major Water Pipe Leakage & Pressure Collapse on Kesnand Road',
     category: 'Water Supply & Contamination',
     urgency: 'CRITICAL',
     urgencyScore: 94,
     status: 'IN_PROGRESS',
-    department: 'Delhi Jal Board (DJB)',
-    location: { ward: 'Ward 14 (Rohini Sector 14)' },
-    citizenName: 'Aditya Verma',
-    citizenPhone: '+91 98712-XXXXX'
+    department: 'PMC Water Supply Department',
+    location: { ward: 'Wagholi Ward 29 (Ivy Estate & Kesnand Rd)', city: 'Pune' },
+    citizenName: 'Santosh Gawade',
+    citizenPhone: '+91 98220-XXXXX'
   };
 
   // Dynamic deep AI analysis of active case
@@ -576,7 +577,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                     borderRadius: '6px',
                     fontWeight: 700
                   }}>
-                    {currentOfficer.department || 'Delhi Jal Board (DJB)'}
+                    {currentOfficer.department || 'PMC Water Supply Department'}
                   </span>
                 </div>
                 <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A', margin: 0, lineHeight: 1.25 }}>
@@ -584,7 +585,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 </h1>
                 <div style={{ fontSize: '12.5px', color: '#64748B', marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                   <MapPin style={{ width: '13px', height: '13px', color: activeSection === 'operations' ? '#4338CA' : '#059669' }} />
-                  <span>Territory: <strong style={{ color: '#1E293B' }}>Rohini Sec 14 & Wagholi Sub-Division</strong></span>
+                  <span>Territory: <strong style={{ color: '#1E293B' }}>Wagholi Sub-Division (Wards 27-31, Pune)</strong></span>
                   <span style={{ opacity: 0.5 }}>•</span>
                   <span>Focus: <strong style={{ color: '#1E293B' }}>{activeSection === 'operations' ? 'Staff shifts, duty status & squad dispatch' : 'Solve city complaints & verify repairs'}</strong></span>
                 </div>
@@ -1306,7 +1307,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   Water Supply & Pipe Bursts
                 </strong>
                 <p style={{ fontSize: '12px', color: '#64748B', margin: 0, lineHeight: 1.4 }}>
-                  Main pipeline burst & contamination in Rohini Sector 14 under emergency repair.
+                  Main feeder line burst & pressure drop in Wagholi Ward 29 under emergency repair.
                 </p>
               </div>
 
@@ -1315,7 +1316,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   2. Where is it Happening?
                 </span>
                 <strong style={{ fontSize: '16px', color: '#2563EB', display: 'block', marginBottom: '4px' }}>
-                  Rohini, Kothrud & Mayur Vihar
+                  Ivy Estate, Baif Road & Nagar Highway
                 </strong>
                 <p style={{ fontSize: '12px', color: '#64748B', margin: 0, lineHeight: 1.4 }}>
                   High density clusters active with field squads and excavators on ground.
@@ -1327,10 +1328,10 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   3. Root Cause Found
                 </span>
                 <strong style={{ fontSize: '16px', color: '#D97706', display: 'block', marginBottom: '4px' }}>
-                  Underground Pipe Fracture & Blocked Nullah
+                  Underground Pipe Fracture & Blocked Culvert
                 </strong>
                 <p style={{ fontSize: '12px', color: '#64748B', margin: 0, lineHeight: 1.4 }}>
-                  150mm main pipe joint rupture and monsoon drain blockage diagnosed by AI DNA.
+                  200mm HDPE joint rupture and market storm drain blockage diagnosed by AI DNA.
                 </p>
               </div>
 
@@ -1342,7 +1343,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   Instant Fix Actions Dispatched
                 </strong>
                 <p style={{ fontSize: '12px', color: '#64748B', margin: 0, lineHeight: 1.4 }}>
-                  High-strength pipe clamp, compactor truck, and dewatering pumps active.
+                  Electrofusion pipe clamp, compactor truck, and dewatering pumps active.
                 </p>
               </div>
             </div>
@@ -1398,7 +1399,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button
                   type="button"
-                  onClick={() => openInspectionForCase(myWorkGrievances[0]?.id || 'DL-2026-W14-0892')}
+                  onClick={() => openInspectionForCase(myWorkGrievances[0]?.id || 'PN-2026-WAG-0102')}
                   className="btn-primary btn-sm"
                   style={{ borderRadius: '9999px' }}
                 >
@@ -2411,7 +2412,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                         </div>
                         <div style={{ padding: '10px', fontSize: '11px' }}>
                           <strong>Intake Photo: Leaking Main Pipe</strong>
-                          <div style={{ color: 'var(--color-text-muted)', marginTop: '2px' }}>Uploaded by citizen • Lat: 28.7189, Lng: 77.1265</div>
+                          <div style={{ color: 'var(--color-text-muted)', marginTop: '2px' }}>Uploaded by citizen • Lat: 18.5793, Lng: 73.9785</div>
                         </div>
                       </div>
 
@@ -2630,7 +2631,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
             <div>
               <h2 style={{ fontSize: '20px', margin: 0 }}>Inter-Agency & Cross-Department Coordination</h2>
               <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '4px 0 0 0' }}>
-                Manage interdependencies between Delhi Jal Board (DJB), Public Works (PWD), MCD, and Traffic Police.
+                Manage interdependencies between PMC Water Supply Department, PWD Pune, PMC Solid Waste, and MSEDCL.
               </p>
             </div>
 
@@ -3155,7 +3156,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   type="text"
                   value={newOfficerZone}
                   onChange={(e) => setNewOfficerZone(e.target.value)}
-                  placeholder="e.g. West Delhi Sub-Division 4"
+                  placeholder="e.g. Wagholi Sub-Division (Wards 27-31, Pune)"
                   style={{ width: '100%', height: '38px', borderRadius: '4px', border: '1px solid var(--color-border-medium)', padding: '0 8px', fontSize: '13px' }}
                   required
                 />

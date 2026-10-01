@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
-export default function JanSuchnaBanner({ citizenWard = 'Ward 14 (Rohini Sector 14)' }) {
+export default function JanSuchnaBanner({ citizenWard = 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)' }) {
   const { janSuchnaList = [] } = useApp();
   const [dismissedIds, setDismissedIds] = useState([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -26,7 +26,7 @@ export default function JanSuchnaBanner({ citizenWard = 'Ward 14 (Rohini Sector 
     if (s.status !== 'ACTIVE') return false;
     const sWard = (s.ward || '').toLowerCase();
     const cWard = (citizenWard || '').toLowerCase();
-    return sWard.includes('all') || sWard.includes('wagholi') || sWard.includes('rohini') || cWard.includes(sWard.split('(')[0].trim());
+    return sWard.includes('all') || sWard.includes('wagholi') || cWard.includes(sWard.split('(')[0].trim());
   });
 
   if (activeAdvisories.length === 0) return null;

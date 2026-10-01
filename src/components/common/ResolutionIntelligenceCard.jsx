@@ -31,16 +31,16 @@ export default function ResolutionIntelligenceCard({
   standardOperatingProcedure = "Official Repair Rule #4B",
   estimatedDuration = "6 Hours",
   whyPoints = [
-    "12 neighbors from Ward 18 reported the exact same dirty water problem",
-    "Dirty water is leaking underground towards the Mother Dairy junction",
-    "Same repair worked in 14 hours last year under Emergency Rule #14",
+    "14 neighbors from Wagholi Ward 29 reported the exact same dirty water problem",
+    "Dirty water is leaking underground near Kesnand Road Junction",
+    "Same repair worked in 14 hours last year under PMC Emergency Rule #14",
     "Fix can be completed in 6 hours, well within the 12-hour deadline"
   ],
   supportingEvidence = [
-    { label: "12 Neighbor Reports", tag: "Ward 18 (Rohini)" },
-    { label: "Government Rulebook", tag: "SOP Sec-4B" },
-    { label: "Past Fix Succeeded", tag: "Case #JS-0891" },
-    { label: "Water Leak Map", tag: "Mother Dairy Junction" }
+    { label: "14 Neighbor Reports", tag: "Wagholi Ward 29 (Ivy Estate)" },
+    { label: "PMC Rulebook", tag: "SOP Sec-4B" },
+    { label: "Past Fix Succeeded", tag: "Case #PMC-HIST-2025-081" },
+    { label: "Water Leak Map", tag: "Kesnand Road Junction" }
   ],
   engineeringReasoning = "Fixing the pipe first stops dirty water from leaking and saves the new road from breaking again.",
   potentialSlaRisk = "Safe to dispatch. Work will finish 6 hours before the 12-hour citizen deadline.",

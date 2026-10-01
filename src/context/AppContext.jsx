@@ -15,50 +15,50 @@ const AppContext = createContext();
 
 // Pre-seeded credentials for instant 1-click persona switching (3 Primary Roles)
 export const DEMO_CREDENTIALS = {
-  citizen: { email: 'aditya@citizen.in', password: 'citizen123', label: 'Citizen (Aditya Verma)' },
-  civic_officer: { email: 'civic.officer@djb.gov.in', password: 'civicofficer123', label: 'Civic Officer (Er. Sanjay Sharma - DJB)' },
-  super_admin: { email: 'superadmin@delhi.gov.in', password: 'superadmin123', label: 'Super Admin (Dr. Meenakshi Sundaram, IAS)' },
+  citizen: { email: 'santosh@citizen.in', password: 'citizen123', label: 'Citizen (Santosh Gawade)' },
+  civic_officer: { email: 'civic.officer@pmc.punecorp.gov.in', password: 'civicofficer123', label: 'Civic Officer (Er. Sanjay Sharma - PMC Water)' },
+  super_admin: { email: 'superadmin@pmc.pune.gov.in', password: 'superadmin123', label: 'Super Admin (Dr. Suhas Diwase, IAS)' },
   // Backward-compatible aliases for legacy credentials
-  officer: { email: 'civic.officer@djb.gov.in', password: 'civicofficer123', label: 'Civic Officer (Field Engineering Lead)' },
-  dept_admin: { email: 'civic.officer@djb.gov.in', password: 'civicofficer123', label: 'Civic Officer (Department Operations Lead)' }
+  officer: { email: 'civic.officer@pmc.punecorp.gov.in', password: 'civicofficer123', label: 'Civic Officer (Field Engineering Lead)' },
+  dept_admin: { email: 'civic.officer@pmc.punecorp.gov.in', password: 'civicofficer123', label: 'Civic Officer (Department Operations Lead)' }
 };
 
 // Pre-seeded Jan Suchna (जन सूचना) Public Advisories
 export const INITIAL_JAN_SUCHNA = [
   {
     id: 'JS-2026-001',
-    title: '⚡ 4-Hour Scheduled Electricity Grid Maintenance — Wagholi & Ward 14',
+    title: '⚡ 4-Hour Scheduled Electricity Grid Maintenance — Wagholi Sub-Division',
     category: 'Electricity / Power Grid',
-    ward: 'Wagholi (Ward 14 / Sector 14)',
-    affectedAreas: ['Wagholi Sub-Division', 'Pocket 2', 'Main Market', 'Sector 14'],
+    ward: 'Wagholi Sub-Division (Wards 27-31, Pune)',
+    affectedAreas: ['Wagholi Sub-Division', 'Ivy Estate', 'Baif Road Market', 'Kesnand Road'],
     startTime: 'Today, 10:00 AM',
     endTime: '02:00 PM',
     duration: '4 Hours',
     status: 'ACTIVE',
     severity: 'HIGH',
-    department: 'BSES & Maharashtra State Electricity Board (MSEB)',
+    department: 'MSEDCL Wagholi Sub-Division',
     officerName: 'Er. Sanjay Sharma',
     officerDesignation: 'Executive Engineer',
     instructions: 'Sub-station transformer upgrade underway. High-voltage backup systems active for medical centers. Please keep essential devices charged.',
-    helpline: '1800-11-2222 / +91 98111-90021',
+    helpline: '1912 / 1800-233-3435 (MSEDCL 24x7 Helpline)',
     createdAt: new Date().toISOString()
   },
   {
     id: 'JS-2026-002',
-    title: '💧 Drinking Water Trunkline Hydro-Testing & Chlorination',
+    title: '💧 Potable Water Trunkline Electrofusion Coupling & Pressure Testing',
     category: 'Water Supply',
-    ward: 'Ward 14 (Rohini Sector 14)',
-    affectedAreas: ['Pocket 1', 'Pocket 2', 'Arterial Road 14'],
+    ward: 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',
+    affectedAreas: ['Ivy Estate Gate 1 & 2', 'Kesnand Road', 'Lexicon School Lane'],
     startTime: 'Tomorrow, 06:00 AM',
     endTime: '09:00 AM',
     duration: '3 Hours',
     status: 'SCHEDULED',
     severity: 'MEDIUM',
-    department: 'Delhi Jal Board (DJB)',
+    department: 'PMC Water Supply Department',
     officerName: 'Er. Sanjay Sharma',
-    officerDesignation: 'AEE (Civil & Water Works)',
-    instructions: 'Water supply will be regulated for 3 hours to perform pressure stabilization. Complimentary water tankers dispatched on standby.',
-    helpline: '1916 (DJB Citizen Helpline)',
+    officerDesignation: 'Executive Engineer (Water Works)',
+    instructions: 'Water supply will be regulated for 3 hours to perform pressure stabilization. Complimentary PMC water tankers dispatched on standby.',
+    helpline: '020-25501000 / 1800-1030-222 (PMC Citizen Care)',
     createdAt: new Date(Date.now() - 3600000).toISOString()
   }
 ];
@@ -67,50 +67,51 @@ export const INITIAL_JAN_SUCHNA = [
 export const DEMO_USERS = {
   citizen: {
     id: 'USR-CITIZEN-01',
-    name: 'Aditya Verma',
-    email: 'aditya@citizen.in',
+    name: 'Santosh Gawade',
+    email: 'santosh@citizen.in',
     role: 'citizen',
-    phone: '+91 98712-88210',
-    ward: 'Ward 14 (Rohini Sector 14)',
-    pincode: '110085',
+    phone: '+91 98220-44102',
+    ward: 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',
+    pincode: '412207',
+    address: 'Ivy Estate, Kesnand Road, Wagholi, Pune',
     verified: true
   },
   civic_officer: {
     id: 'USR-CIVICOFFICER-01',
     name: 'Er. Sanjay Sharma',
-    email: 'officer.djb@delhi.gov.in',
+    email: 'officer.pmc@pune.gov.in',
     role: 'civic_officer',
-    department: 'Delhi Jal Board (DJB)',
-    designation: 'Government Officer & Assistant Executive Engineer',
-    zone: 'Zone North-West (Rohini)',
-    phone: '+91 98111-90021'
+    department: 'PMC Water Supply Department',
+    designation: 'Executive Engineer (Wagholi Sub-Division)',
+    zone: 'Zone East (Wagholi Sub-Division, Pune)',
+    phone: '+91 98221-90021'
   },
   officer: {
     id: 'USR-OFFICER-01',
     name: 'Er. Sanjay Sharma',
-    email: 'sanjay.sharma@djb.gov.in',
+    email: 'sanjay.sharma@pmc.gov.in',
     role: 'civic_officer',
-    department: 'Delhi Jal Board (DJB)',
-    designation: 'Civic Officer & Assistant Executive Engineer',
-    zone: 'Zone North-West (Rohini)',
-    phone: '+91 98111-90021'
+    department: 'PMC Water Supply Department',
+    designation: 'Executive Engineer (Wagholi Sub-Division)',
+    zone: 'Zone East (Wagholi Sub-Division, Pune)',
+    phone: '+91 98221-90021'
   },
   dept_admin: {
     id: 'USR-DEPTADMIN-01',
-    name: 'Er. Rajiv Malhotra',
-    email: 'admin.djb@delhi.gov.in',
+    name: 'Er. Sachin Patil',
+    email: 'admin.water@pune.gov.in',
     role: 'civic_officer',
-    department: 'Delhi Jal Board (DJB)',
-    designation: 'Civic Officer & Chief Engineer',
-    phone: '+91 99100-11223'
+    department: 'PMC Water Supply Department',
+    designation: 'Superintending Engineer (Water Works)',
+    phone: '+91 98220-11223'
   },
   super_admin: {
     id: 'USR-SUPERADMIN-01',
-    name: 'Dr. Meenakshi Sundaram, IAS',
-    email: 'superadmin@delhi.gov.in',
+    name: 'Dr. Suhas Diwase, IAS',
+    email: 'commissioner@pmc.gov.in',
     role: 'super_admin',
-    designation: 'Principal Secretary (IT & Public Grievance)',
-    phone: '+91 11-2339-2000'
+    designation: 'Municipal Commissioner (PMC Pune)',
+    phone: '+91 020-2550-1000'
   }
 };
 
@@ -129,71 +130,93 @@ export function AppProvider({ children }) {
 
   const [grievances, setGrievances] = useState(() => {
     try {
+      localStorage.removeItem('jansahayk_grievances_v6');
       localStorage.removeItem('jansahayk_grievances_v5');
       localStorage.removeItem('jansahayk_grievances_v4');
       localStorage.removeItem('jansahayk_grievances');
     } catch (e) {}
-    const saved = localStorage.getItem('jansahayk_grievances_v6');
+    const saved = localStorage.getItem('jansahayk_grievances_v7');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        const hasJunk = Array.isArray(parsed) && parsed.some(g => !g.id || g.id.startsWith('TEST-') || g.title === 'adsdasdda' || g.title === 'हेलो');
+        const hasJunk = Array.isArray(parsed) && parsed.some(g => !g.id || g.id.startsWith('TEST-') || g.title === 'adsdasdda' || g.title === 'हेलो' || g.id.includes('DL-2026'));
         if (Array.isArray(parsed) && !hasJunk && parsed.length >= INITIAL_GRIEVANCES.length) {
           return parsed;
         }
       } catch (e) {}
     }
-    localStorage.setItem('jansahayk_grievances_v6', JSON.stringify(INITIAL_GRIEVANCES));
+    localStorage.setItem('jansahayk_grievances_v7', JSON.stringify(INITIAL_GRIEVANCES));
     return INITIAL_GRIEVANCES;
   });
 
   const [clusters, setClusters] = useState(() => {
     try {
+      localStorage.removeItem('jansahayk_clusters_v6');
       localStorage.removeItem('jansahayk_clusters_v5');
       localStorage.removeItem('jansahayk_clusters_v4');
       localStorage.removeItem('jansahayk_clusters');
     } catch (e) {}
-    const saved = localStorage.getItem('jansahayk_clusters_v6');
+    const saved = localStorage.getItem('jansahayk_clusters_v7');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length >= MOCK_CLUSTERS.length) return parsed;
+        const hasLegacy = Array.isArray(parsed) && parsed.some(c => c.id && c.id.includes('DEL'));
+        if (Array.isArray(parsed) && !hasLegacy && parsed.length >= MOCK_CLUSTERS.length) return parsed;
       } catch (e) {}
     }
-    localStorage.setItem('jansahayk_clusters_v6', JSON.stringify(MOCK_CLUSTERS));
+    localStorage.setItem('jansahayk_clusters_v7', JSON.stringify(MOCK_CLUSTERS));
     return MOCK_CLUSTERS;
   });
 
   const [civicIncidents, setCivicIncidents] = useState(() => {
     try {
-      const saved = localStorage.getItem('jansahayk_incidents');
-      return saved ? JSON.parse(saved) : CIVIC_INCIDENTS;
-    } catch (e) {
-      return CIVIC_INCIDENTS;
+      localStorage.removeItem('jansahayk_incidents');
+    } catch (e) {}
+    const saved = localStorage.getItem('jansahayk_incidents_v7');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const hasLegacy = Array.isArray(parsed) && parsed.some(inc => inc.id && inc.id.includes('DEL'));
+        if (Array.isArray(parsed) && !hasLegacy) return parsed;
+      } catch (e) {}
     }
+    localStorage.setItem('jansahayk_incidents_v7', JSON.stringify(CIVIC_INCIDENTS));
+    return CIVIC_INCIDENTS;
   });
 
   const [civicSignals, setCivicSignals] = useState(() => {
     try {
-      const saved = localStorage.getItem('jansahayk_signals');
-      return saved ? JSON.parse(saved) : CIVIC_SIGNALS;
-    } catch (e) {
-      return CIVIC_SIGNALS;
+      localStorage.removeItem('jansahayk_signals');
+    } catch (e) {}
+    const saved = localStorage.getItem('jansahayk_signals_v7');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const hasLegacy = Array.isArray(parsed) && parsed.some(sig => sig.id && sig.id.includes('2026-00'));
+        if (Array.isArray(parsed) && !hasLegacy) return parsed;
+      } catch (e) {}
     }
+    localStorage.setItem('jansahayk_signals_v7', JSON.stringify(CIVIC_SIGNALS));
+    return CIVIC_SIGNALS;
   });
 
   const [notifications, setNotifications] = useState(() => {
     try {
-      const saved = localStorage.getItem('jansahayk_notifications');
-      return saved ? JSON.parse(saved) : INITIAL_NOTIFICATIONS;
-    } catch (e) {
-      return INITIAL_NOTIFICATIONS;
-    }
+      const saved = localStorage.getItem('jansahayk_notifications_v7');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && !parsed.some(n => n.grievanceId && n.grievanceId.includes('DL-'))) {
+          return parsed;
+        }
+      }
+    } catch (e) {}
+    localStorage.setItem('jansahayk_notifications_v7', JSON.stringify(INITIAL_NOTIFICATIONS));
+    return INITIAL_NOTIFICATIONS;
   });
 
   const [janSuchnaList, setJanSuchnaList] = useState(() => {
     try {
-      const saved = localStorage.getItem('jansahayk_jan_suchna');
+      const saved = localStorage.getItem('jansahayk_jan_suchna_v7');
       return saved ? JSON.parse(saved) : INITIAL_JAN_SUCHNA;
     } catch (e) {
       return INITIAL_JAN_SUCHNA;
@@ -201,7 +224,7 @@ export function AppProvider({ children }) {
   });
 
   useEffect(() => {
-    localStorage.setItem('jansahayk_jan_suchna', JSON.stringify(janSuchnaList));
+    localStorage.setItem('jansahayk_jan_suchna_v7', JSON.stringify(janSuchnaList));
   }, [janSuchnaList]);
 
   const [auditLogs, setAuditLogs] = useState([]);
@@ -244,20 +267,24 @@ export function AppProvider({ children }) {
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem('jansahayk_grievances_v6', JSON.stringify(grievances));
+    localStorage.setItem('jansahayk_grievances_v7', JSON.stringify(grievances));
   }, [grievances]);
 
   useEffect(() => {
-    localStorage.setItem('jansahayk_clusters_v6', JSON.stringify(clusters));
+    localStorage.setItem('jansahayk_clusters_v7', JSON.stringify(clusters));
   }, [clusters]);
 
   useEffect(() => {
-    localStorage.setItem('jansahayk_incidents', JSON.stringify(civicIncidents));
+    localStorage.setItem('jansahayk_incidents_v7', JSON.stringify(civicIncidents));
   }, [civicIncidents]);
 
   useEffect(() => {
-    localStorage.setItem('jansahayk_signals', JSON.stringify(civicSignals));
+    localStorage.setItem('jansahayk_signals_v7', JSON.stringify(civicSignals));
   }, [civicSignals]);
+
+  useEffect(() => {
+    localStorage.setItem('jansahayk_notifications_v7', JSON.stringify(notifications));
+  }, [notifications]);
 
   useEffect(() => {
     localStorage.setItem('jansahayk_notifications', JSON.stringify(notifications));
@@ -659,13 +686,15 @@ export function AppProvider({ children }) {
     const analysis = analyzeGrievanceInput(formData.description, { ward: formData.ward || activeUser?.ward });
     
     // Assign appropriate municipal field officer based on department
-    const assignedOfficer = analysis.department.includes('Jal Board') || analysis.department.includes('DJB')
-      ? 'Er. Sanjay Sharma (AEE DJB)'
-      : analysis.department.includes('PWD')
-      ? 'Er. Amit Khurana (EE PWD)'
-      : analysis.department.includes('BSES')
-      ? 'Er. Neha Singh (BSES Power)'
-      : 'Er. Rajesh Gupta (AE MCD)';
+    const assignedOfficer = analysis.department.includes('Water') || analysis.department.includes('PMC Water')
+      ? 'Er. Sanjay Sharma (EE PMC Water Works)'
+      : analysis.department.includes('Solid Waste') || analysis.department.includes('Sanitation')
+      ? 'Er. Ramesh Shinde (PMC Sanitation Inspector)'
+      : analysis.department.includes('PWD') || analysis.department.includes('Road')
+      ? 'Er. Sachin Patil (PWD Pune)'
+      : analysis.department.includes('Electricity') || analysis.department.includes('Power') || analysis.department.includes('MSEDCL')
+      ? 'Er. Neha Singh (MSEDCL Wagholi)'
+      : 'Er. Ramesh Shinde (PMC Wagholi)';
 
     const newGrievance = {
       title: formData.title || `${analysis.category} Issue in ${formData.ward || activeUser?.ward}`,
@@ -673,12 +702,12 @@ export function AppProvider({ children }) {
       category: analysis.category,
       department: analysis.department,
       officerName: assignedOfficer,
-      officerDesignation: 'Assistant Executive Engineer',
+      officerDesignation: 'Executive Engineer (Wagholi Sub-Division)',
       location: {
-        ward: formData.ward || activeUser?.ward || 'Ward 14 (Rohini Sector 14)',
-        area: formData.area || 'Pocket 2, Near Market',
-        city: 'New Delhi',
-        pincode: formData.pincode || activeUser?.pincode || '110085'
+        ward: formData.ward || activeUser?.ward || 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',
+        area: formData.area || 'Ivy Estate / Kesnand Road',
+        city: 'Pune',
+        pincode: formData.pincode || activeUser?.pincode || '412207'
       },
       urgency: analysis.urgency,
       urgencyScore: analysis.urgencyScore,
@@ -1380,13 +1409,13 @@ export function AppProvider({ children }) {
       civicIncidents
     );
 
-    const targetIncidentId = match?.matched ? match.incidentId : (civicIncidents[0]?.id || 'INC-2026-DEL-01');
+    const targetIncidentId = match?.matched ? match.incidentId : (civicIncidents[0]?.id || 'INC-2026-PUNE-WAG-01');
 
     const newSignal = {
       id: `SIG-${Date.now().toString().slice(-6)}`,
       incidentId: targetIncidentId,
-      citizenName: signalData.citizenName || user?.name || 'Anonymous Resident',
-      ward: signalData.ward || user?.ward || 'Ward 14 (Rohini Sector 14)',
+      citizenName: signalData.citizenName || user?.name || 'Santosh Gawade',
+      ward: signalData.ward || user?.ward || 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',
       channel: signalData.channel || 'QUICK_TEXT',
       rawInput,
       translatedText: rawInput,
@@ -1394,11 +1423,11 @@ export function AppProvider({ children }) {
       inferredAsset: dna.asset,
       hasPhoto: !!signalData.photoUrl,
       photoUrl: signalData.photoUrl || null,
-      lat: signalData.lat || 28.7180,
-      lng: signalData.lng || 77.1260,
+      lat: signalData.lat || 18.5760,
+      lng: signalData.lng || 73.9810,
       timestamp: new Date().toLocaleString(),
       status: 'CLUSTERED',
-      confidence: 'High (92%)',
+      confidence: 'High (94%)',
       complaintDna: dna
     };
 
@@ -1579,14 +1608,14 @@ export function AppProvider({ children }) {
   const calculateOfficerGrade = (officer = user) => {
     const defaultOfficer = {
       name: officer?.name || 'Er. Sanjay Sharma',
-      department: officer?.department || 'Delhi Jal Board (DJB)',
-      zone: officer?.zone || 'Zone North-West (Rohini & Wagholi)'
+      department: officer?.department || 'PMC Water Supply Department',
+      zone: officer?.zone || 'Zone East (Wagholi Sub-Division, Pune)'
     };
 
     const slaScore = 96; // 96% resolved before target SLA
     const citizenSatisfactionScore = 95; // 4.9/5 star citizen rating
     const recurrencePreventionScore = 92; // 92% zero recurrence rate
-    const crossDeptTeamworkScore = 95; // Joint PWD + DJB + MCD coordination
+    const crossDeptTeamworkScore = 95; // Joint PWD + PMC Water + PMC SWM coordination
     const janSuchnaProactivenessScore = (janSuchnaList && janSuchnaList.length > 0) ? 98 : 92; // Proactive notices
 
     const compositeScore = Math.round(
@@ -1604,23 +1633,23 @@ export function AppProvider({ children }) {
       honorTitle: 'Executive Civic Champion',
       shieldTier: 'Platinum Civic Champion Shield',
       shieldColor: '#4F46E5',
-      awardedBy: 'Chief Municipal Commissioner & Urban Governance Council',
+      awardedBy: 'Chief Municipal Commissioner & Urban Governance Council (Pune)',
       aspects: [
         { key: 'sla', label: '⏱️ SLA Fix Velocity', score: slaScore, detail: '96% on-time resolution turnaround' },
         { key: 'trust', label: '👥 Citizen Trust & Feedback', score: citizenSatisfactionScore, detail: '4.9 ★ verified satisfaction score' },
         { key: 'prevention', label: '🧬 Root-Cause Prevention', score: recurrencePreventionScore, detail: '92% zero-repeat infrastructure fix' },
-        { key: 'coordination', label: '🤝 Cross-Dept Teamwork', score: crossDeptTeamworkScore, detail: 'DJB + PWD + MCD joint operations' },
+        { key: 'coordination', label: '🤝 Cross-Dept Teamwork', score: crossDeptTeamworkScore, detail: 'PMC Water + PWD Pune + PMC SWM joint operations' },
         { key: 'advisory', label: '📢 Jan Suchna Proactiveness', score: janSuchnaProactivenessScore, detail: `${janSuchnaList.length} proactive public advisories issued` }
       ]
     };
   };
 
   // Territory Problem Explorer Aggregator (Today's, Pending, Solved, Mapped vs Unique)
-  const getTerritoryProblemBreakdown = (targetWard = 'Ward 14 (Rohini Sector 14)') => {
+  const getTerritoryProblemBreakdown = (targetWard = 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)') => {
     const territoryComplaints = grievances.filter(g => {
       const gWard = (g.location?.ward || '').toLowerCase();
       const target = (targetWard || '').toLowerCase().split('(')[0].trim();
-      return !target || gWard.includes(target) || gWard.includes('rohini') || gWard.includes('wagholi');
+      return !target || gWard.includes(target) || gWard.includes('wagholi');
     });
 
     const today = territoryComplaints.filter(g => {
@@ -1646,21 +1675,21 @@ export function AppProvider({ children }) {
     const priorityZones = [
       {
         id: 'PZ-01',
-        pocket: 'Pocket 2 & Main Trunkline Corridor (Wagholi / Rohini)',
+        pocket: 'Ivy Estate & Kesnand Road Water Trunkline (Wagholi)',
         severity: 'CRITICAL',
         issue: 'Underground pipeline joint leakage near school',
         complaintCount: 14,
-        leadDept: 'Delhi Jal Board (DJB)',
+        leadDept: 'PMC Water Supply Department',
         status: 'EMERGENCY_REPAIR',
         urgency: 'Immediate Action Needed'
       },
       {
         id: 'PZ-02',
-        pocket: 'Main Market Sector 14 / Wagholi Plaza',
+        pocket: 'Baif Road Vegetable Market Yard',
         severity: 'HIGH',
         issue: 'Stormwater drain siltation causing backflow during peak hours',
         complaintCount: 5,
-        leadDept: 'MCD / Municipal Works',
+        leadDept: 'PMC Solid Waste Management',
         status: 'DESILTING_SQUAD_DEPLOYED',
         urgency: 'High Priority'
       }
@@ -1685,12 +1714,12 @@ export function AppProvider({ children }) {
         user,
         currentCitizen: (user && user.role === 'citizen') ? user : {
           id: 'USR-CITIZEN-01',
-          name: 'Aditya Verma',
-          email: 'aditya@citizen.in',
+          name: 'Santosh Gawade',
+          email: 'santosh@citizen.in',
           role: 'citizen',
-          phone: '+91 98712-88210',
-          ward: 'Ward 14 (Rohini Sector 14)',
-          pincode: '110085'
+          phone: '+91 98220-44102',
+          ward: 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',
+          pincode: '412207'
         },
         role: user?.role || null,
         login,

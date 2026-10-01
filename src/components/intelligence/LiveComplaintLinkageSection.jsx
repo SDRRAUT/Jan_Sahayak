@@ -21,84 +21,84 @@ const INITIAL_SIGNALS = [
   {
     id: 'SIG-2026-001',
     time: '12 Sept 08:15',
-    citizen: 'Sunita Mehra (Pocket 2)',
+    citizen: 'Sunita Mehra (Ivy Estate)',
     channel: '🎙 Voice Note',
     type: 'water',
     icon: '💧',
     text: 'Water pressure very low this morning, slight brown tint in kitchen tap.',
-    ward: 'Ward 12',
-    lat: 28.7185,
-    lng: 77.1245,
+    ward: 'Ward 29',
+    lat: 18.5740,
+    lng: 73.9920,
     matchScore: 98,
     linkedTo: 'INC-CORE-1'
   },
   {
     id: 'SIG-2026-002',
     time: '12 Sept 11:30',
-    citizen: 'Rajesh Gupta (Near Mother Dairy)',
+    citizen: 'Rajesh Gupta (Near Raisoni Chowk)',
     channel: '📷 Geo-Photo',
     type: 'road',
     icon: '🛣️',
-    text: 'Water trickling continuously from under road asphalt near booth #441.',
-    ward: 'Ward 12',
-    lat: 28.7192,
-    lng: 77.1252,
+    text: 'Water trickling continuously from under road asphalt near Raisoni booster valve.',
+    ward: 'Ward 27',
+    lat: 18.5793,
+    lng: 73.9785,
     matchScore: 95,
     linkedTo: 'INC-CORE-1'
   },
   {
     id: 'SIG-2026-003',
     time: '13 Sept 07:45',
-    citizen: 'Kavita Roy (Pocket 3)',
+    citizen: 'Kavita Roy (Kesnand Road)',
     channel: '✍ Text',
     type: 'water',
     icon: '💧',
     text: 'Zero water pressure on 1st floor. Pump drawing air only.',
-    ward: 'Ward 14',
-    lat: 28.7205,
-    lng: 77.1268,
+    ward: 'Ward 29',
+    lat: 18.5755,
+    lng: 73.9910,
     matchScore: 92,
     linkedTo: 'INC-CORE-1'
   },
   {
     id: 'SIG-2026-004',
     time: '13 Sept 16:10',
-    citizen: 'Mohd. Tariq (Sector 14 Arterial)',
+    citizen: 'Mohd. Tariq (Wagholi Highway Arterial)',
     channel: '📷 Geo-Photo',
     type: 'road',
     icon: '🛣️',
     text: 'Depression forming in left lane of road. Surface is spongy and wet.',
-    ward: 'Ward 14',
-    lat: 28.7212,
-    lng: 77.1275,
+    ward: 'Ward 27',
+    lat: 18.5805,
+    lng: 73.9800,
     matchScore: 89,
     linkedTo: 'INC-CORE-1'
   },
   {
     id: 'SIG-2026-005',
     time: '14 Sept 08:00',
-    citizen: 'Dr. Alok Verma (Pocket 2)',
+    citizen: 'Dr. Alok Verma (Baif Road)',
     channel: '🎙 Voice Note',
     type: 'water',
     icon: '💧',
     text: 'Pungent drainage smell coming from municipal drinking supply. Severe hazard.',
-    ward: 'Ward 14',
-    lat: 28.7201,
-    lng: 77.1260,
+    ward: 'Ward 28',
+    lat: 18.5835,
+    lng: 73.9840,
     matchScore: 97,
     linkedTo: 'INC-CORE-1'
   },
   {
     id: 'SIG-2026-006',
     time: '14 Sept 14:20',
-    citizen: 'Vikas Sharma (Govt Primary School #2)',
+    citizen: 'Vikas Sharma (Wagholi Primary School)',
     channel: '✍ Text',
     type: 'sanitation',
     icon: '⚠️',
     text: 'School washroom tap water is yellowish with sewer odor. Children sent home.',
-    ward: 'Ward 14',
-    lat: 28.7218,
-    lng: 77.1282,
+    ward: 'Ward 29',
+    lat: 18.5760,
+    lng: 73.9935,
     matchScore: 96,
     linkedTo: 'INC-CORE-1'
   }
@@ -107,12 +107,12 @@ const INITIAL_SIGNALS = [
 const SIMULATED_STREAM_POOL = [
   {
     id: 'SIG-2026-007',
-    citizen: 'Pooja Anand (Pocket 4)',
+    citizen: 'Pooja Anand (Ivy Estate Sector B)',
     channel: '🎙 Voice Note',
     type: 'water',
     icon: '💧',
     text: 'Turbid dark water flowing in tap after morning supply resumed.',
-    ward: 'Ward 14',
+    ward: 'Ward 29',
     matchScore: 94
   },
   {
@@ -205,10 +205,10 @@ export default function LiveComplaintLinkageSection() {
           citizen: nextTemplate.citizen,
           channel: nextTemplate.channel,
           text: nextTemplate.text,
-          ward: nextTemplate.ward || 'Ward 14 (Rohini)',
+          ward: nextTemplate.ward || 'Ward 29 (Ivy Estate, Wagholi)',
           category: nextTemplate.type === 'water' ? 'Water Supply & Contamination' : 'Roads & Infrastructure',
-          lat: 28.7180 + (Math.random() - 0.5) * 0.006,
-          lng: 77.1260 + (Math.random() - 0.5) * 0.006
+          lat: 18.5793 + (Math.random() - 0.5) * 0.006,
+          lng: 73.9785 + (Math.random() - 0.5) * 0.006
         })
       });
 
@@ -611,7 +611,7 @@ export default function LiveComplaintLinkageSection() {
             Inter-Agency Interlock
           </span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', flexWrap: 'wrap' }}>
-            {(coreIncident?.participatingDepartments || ['Delhi Jal Board (DJB)', 'Public Works Department (PWD)']).map((dept, i) => (
+            {(coreIncident?.participatingDepartments || ['PMC Water Supply Department', 'PWD Pune / PMRDA']).map((dept, i) => (
               <span key={dept} style={{
                 fontSize: '11px',
                 fontWeight: 700,
@@ -759,7 +759,7 @@ export default function LiveComplaintLinkageSection() {
                 </div>
                 <div>
                   <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '10px' }}>LOCATION:</span>
-                  <strong>{activeSignal.ward} (Rohini Sector 14)</strong>
+                  <strong>{activeSignal.ward} (Wagholi Sub-Division)</strong>
                 </div>
               </div>
 

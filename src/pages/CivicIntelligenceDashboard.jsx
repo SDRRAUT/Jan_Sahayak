@@ -291,7 +291,7 @@ export default function CivicIntelligenceDashboard() {
                 2
               </span>
               <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#92400E', background: '#FEF3C7', padding: '1px 6px', borderRadius: '6px' }}>
-                DJB + PWD + MCD
+                PMC + PWD + MSEDCL
               </span>
             </div>
             <span style={{ fontSize: '11.5px', color: '#64748B', marginTop: '4px', display: 'block' }}>
@@ -535,7 +535,7 @@ export default function CivicIntelligenceDashboard() {
                             borderRadius: '6px',
                             border: '1px solid #BAE6FD'
                           }}>
-                            📍 {incident.affectedArea || 'Ward 14 (Rohini)'}
+                            📍 {incident.affectedArea || 'Ward 29 (Ivy Estate, Wagholi)'}
                           </span>
                         </div>
 
@@ -622,7 +622,7 @@ export default function CivicIntelligenceDashboard() {
                           🏛️ Lead Municipal Agency
                         </span>
                         <strong style={{ fontSize: '14px', color: '#064E3B' }}>
-                          {incident.leadDepartment || 'Delhi Jal Board (DJB)'}
+                          {incident.leadDepartment || 'PMC Water Supply Department'}
                         </strong>
                       </div>
 
@@ -675,10 +675,10 @@ export default function CivicIntelligenceDashboard() {
                     }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                         <span style={{ color: '#64748B', fontWeight: 700 }}>Coordinating Agencies:</span>
-                        {(incident.departments || (incident.participatingDepartments || [incident.leadDepartment || 'DJB', 'PWD', 'MCD']).map(d => ({
+                        {(incident.departments || (incident.participatingDepartments || [incident.leadDepartment || 'PMC', 'PWD Pune', 'MSEDCL']).map(d => ({
                           name: typeof d === 'string' ? d : (d?.name || 'Department'),
                           cases: incident.complaintCount || 1,
-                          lead: typeof d === 'string' ? d.includes(incident.leadDepartment?.split(' ')[0] || 'DJB') : !!d?.lead
+                          lead: typeof d === 'string' ? d.includes(incident.leadDepartment?.split(' ')[0] || 'PMC') : !!d?.lead
                         }))).map((d) => (
                           <span
                             key={d.name}

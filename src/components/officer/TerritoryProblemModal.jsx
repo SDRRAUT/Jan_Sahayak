@@ -354,13 +354,12 @@ export default function TerritoryProblemModal({ isOpen, onClose, selectedWard = 
                 paddingRight: '2px'
               }}
             >
-              <option value="ALL">🚩 All Wagholi & Ward 14</option>
-              <option value="baif">🗑️ Baif Road Market</option>
-              <option value="kesnand">💧 Ivy Estate / Kesnand Rd</option>
-              <option value="nagar">🛣️ Nagar Road Highway</option>
-              <option value="ubale">🌊 Ubale Nagar</option>
-              <option value="domkhel">🎓 Raisoni / Domkhel</option>
-              <option value="sector 14">🏛️ Rohini Sector 14</option>
+              <option value="ALL">🚩 All Wagholi Wards</option>
+              <option value="baif">🗑️ Baif Road Market (Ward 28)</option>
+              <option value="kesnand">💧 Ivy Estate / Kesnand Rd (Ward 29)</option>
+              <option value="nagar">🛣️ Nagar Road Highway (Ward 27)</option>
+              <option value="ubale">🌊 Ubale Nagar & Domkhel (Ward 30)</option>
+              <option value="bakori">⚡ Bakori Road & Wagheshwar (Ward 31)</option>
             </select>
           </div>
         </div>

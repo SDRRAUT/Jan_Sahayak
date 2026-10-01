@@ -52,7 +52,7 @@ export default function Login() {
     setIsVerifying(true);
     setVerifyRole(roleKey || 'portal');
     setVerifyProgress(15);
-    setVerifyMessage('Checking credentials with Delhi Municipal Directory...');
+    setVerifyMessage('Checking credentials with Pune Municipal Directory...');
     setLocalError('');
 
     const t1 = setTimeout(() => {
@@ -100,7 +100,7 @@ export default function Login() {
     setLocalError('');
     // Infer role from email or default to citizen
     let inferredRole = 'citizen';
-    if (email.includes('djb') || email.includes('officer') || email.includes('civic') || email.includes('admin.djb') || email.includes('dept')) inferredRole = 'civic_officer';
+    if (email.includes('pmc') || email.includes('officer') || email.includes('civic') || email.includes('admin.pmc') || email.includes('dept') || email.includes('msedcl') || email.includes('pwd')) inferredRole = 'civic_officer';
     if (email.includes('superadmin') || email.includes('ias')) inferredRole = 'super_admin';
 
     execute3SecondLogin(inferredRole, email, password);
@@ -180,7 +180,7 @@ export default function Login() {
             </div>
 
             <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-              Simulating Delhi Municipal Directory Authorization ({verifyProgress}%)
+              Simulating Pune Municipal Directory Authorization ({verifyProgress}%)
             </span>
           </div>
         </div>
@@ -380,7 +380,7 @@ export default function Login() {
                   type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="e.g. aditya@citizen.in or sanjay.sharma@djb.gov.in"
+                  placeholder="e.g. rahul.raut@citizen.in or sanjay.sharma@punecorporation.gov.in"
                   className="login-input"
                   style={{
                     width: '100%',

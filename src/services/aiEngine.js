@@ -34,40 +34,40 @@ export function analyzeGrievanceInput(text, options = {}) {
   // 2. English Translation (if non-English input)
   let translatedText = text;
   if (clean.includes("ganda") && clean.includes("paani")) {
-    translatedText = "For the past 3 days in Sector 14, Pocket 2, foul-smelling contaminated drainage water is mixing into the municipal supply. Children are falling sick, please repair immediately near Mother Dairy.";
-  } else if (clean.includes("gaddha") || (clean.includes("road") && clean.includes("moolchand"))) {
-    translatedText = "Under Moolchand flyover on Lajpat Nagar road, a large hazardous cave-in / pothole has formed following rainfall. Two scooters fell this morning with repeated accidents occurring.";
+    translatedText = "For the past 3 days in Wagholi Ward 29 (Ivy Estate & Kesnand Road), foul-smelling contaminated drainage water is mixing into the municipal supply. Children are falling sick, please repair immediately near Raisoni Chowk booster valve.";
+  } else if (clean.includes("gaddha") || (clean.includes("road") && (clean.includes("raisoni") || clean.includes("nagar")))) {
+    translatedText = "Near Raisoni College on Wagholi-Nagar Road Highway, a large hazardous pothole/crater has formed following rainfall. Repeated two-wheeler accidents occurring.";
   } else if (clean.includes("transformer") || clean.includes("chingariyan")) {
-    translatedText = "In Street No. 3, Main Market Kalkaji, sparks and flames are shooting from the electrical transformer with high explosion risk. Power is out across the entire street.";
+    translatedText = "At Domkhel Road corner near Ivy Estate feeder, sparks and flames are shooting from the electrical transformer with high explosion risk. Power is out across the area.";
   } else if (clean.includes("kude") || clean.includes("garbage") || clean.includes("dumper")) {
-    translatedText = "Open garbage dump opposite Sector 6 main market; MCD dumper has not collected waste for 5 days. Someone set it on fire last night producing dense toxic smoke.";
+    translatedText = "Open garbage dump on Wagholi Baif Road market yard; PMC dumper has not collected waste for 4 days. Foul smell and smoke hazard.";
   } else if (isHinglish || isHindi) {
     translatedText = "Citizen reports an urgent civic maintenance breakdown requiring municipal department intervention.";
   }
 
   // 3. Department, Category & Subcategory Classification
-  let department = "Municipal Corporation of Delhi (MCD)";
+  let department = "PMC Solid Waste Management";
   let category = "Civic & General Amenities";
   let subcategory = "General Public Hazard";
   let confidence = 92.5;
 
   if (clean.includes("water") || clean.includes("paani") || clean.includes("pipeline") || clean.includes("sewer") || clean.includes("jal") || clean.includes("tank") || clean.includes("tap") || clean.includes("naali") || clean.includes("leakage")) {
-    department = "Delhi Jal Board (DJB)";
+    department = "PMC Water Supply Department";
     category = "Water Supply & Contamination";
     subcategory = clean.includes("ganda") || clean.includes("naali") || clean.includes("contam") ? "Cross-Contamination with Sewer Line" : "Main Pipe Fracture & Pressure Deficit";
     confidence = 98.4;
   } else if (clean.includes("road") || clean.includes("gaddha") || clean.includes("pothole") || clean.includes("flyover") || clean.includes("sadak") || clean.includes("asphalt") || clean.includes("bridge") || clean.includes("footpath")) {
-    department = "Public Works Department (PWD)";
+    department = "PWD Pune / PMRDA";
     category = "Roads & Structural Infrastructure";
-    subcategory = clean.includes("flyover") ? "Arterial Flyover Slip-Road Cavity" : "Pothole & Surface Wear";
+    subcategory = clean.includes("highway") || clean.includes("flyover") ? "Arterial Highway Slip-Road Cavity" : "Pothole & Surface Wear";
     confidence = 97.8;
   } else if (clean.includes("kooda") || clean.includes("garbage") || clean.includes("waste") || clean.includes("safai") || clean.includes("dustbin") || clean.includes("dumper") || clean.includes("smoke") || clean.includes("douse")) {
-    department = "Municipal Corporation of Delhi (MCD)";
+    department = "PMC Solid Waste Management";
     category = "Sanitation & Solid Waste";
     subcategory = clean.includes("aag") || clean.includes("smoke") || clean.includes("fire") ? "Illegal Open Waste Combustion" : "Overflowing Dhalao / Dump Site";
     confidence = 99.1;
   } else if (clean.includes("bijli") || clean.includes("power") || clean.includes("electric") || clean.includes("transformer") || clean.includes("spark") || clean.includes("blackout") || clean.includes("wire") || clean.includes("voltage")) {
-    department = "BSES Rajdhani Power Limited";
+    department = "MSEDCL Wagholi Sub-Division";
     category = "Electricity & Power Grid";
     subcategory = clean.includes("transformer") ? "Distribution Transformer Arc & Fire Hazard" : "Low Hanging 11kV Cables";
     confidence = 99.6;
@@ -117,22 +117,25 @@ export function analyzeGrievanceInput(text, options = {}) {
 
   // 6. Entity & Location Extraction
   const extractedEntities = [];
-  let extractedWard = options.ward || "Ward 14 (Rohini Sector 14)";
-  if (clean.includes("lajpat") || clean.includes("moolchand")) {
-    extractedWard = "Ward 8 (Lajpat Nagar / Moolchand)";
-  } else if (clean.includes("mayur vihar") || clean.includes("phase 1")) {
-    extractedWard = "Ward 22 (Mayur Vihar Ph-1)";
-  } else if (clean.includes("kalka") || clean.includes("nehru place")) {
-    extractedWard = "Ward 5 (Kalkaji / South)";
+  let extractedWard = options.ward || "Wagholi Ward 29 (Ivy Estate & Kesnand Road)";
+  if (clean.includes("nagar road") || clean.includes("raisoni")) {
+    extractedWard = "Wagholi Ward 27 (Nagar Road Highway & Raisoni Chowk)";
+  } else if (clean.includes("baif") || clean.includes("market")) {
+    extractedWard = "Wagholi Ward 28 (Baif Road & Market Yard)";
+  } else if (clean.includes("domkhel") || clean.includes("ubale")) {
+    extractedWard = "Wagholi Ward 30 (Domkhel & Ubale Nagar)";
+  } else if (clean.includes("bakori") || clean.includes("wagheshwar")) {
+    extractedWard = "Wagholi Ward 31 (Bakori Road & Wagheshwar)";
   }
 
   extractedEntities.push({ label: "Administrative Ward", val: extractedWard });
 
   // Landmarks & Assets
-  let landmark = "Mother Dairy Booth #441";
-  if (clean.includes("flyover") || clean.includes("underpass")) landmark = "Moolchand Underpass Entry";
-  else if (clean.includes("market kalka") || clean.includes("gali no 3")) landmark = "Gali No 3, Main Market Kalkaji";
-  else if (clean.includes("sector 6")) landmark = "Sector 6 DDA Market Complex";
+  let landmark = "Raisoni Chowk Booster Valve";
+  if (clean.includes("highway") || clean.includes("nagar road")) landmark = "Wagholi-Nagar Road Highway Junction";
+  else if (clean.includes("ivy") || clean.includes("kesnand")) landmark = "Ivy Estate Main Gate, Kesnand Road";
+  else if (clean.includes("baif") || clean.includes("market")) landmark = "Baif Road Vegetable Market Yard";
+  else if (clean.includes("bakori") || clean.includes("wagheshwar")) landmark = "Bakori Road near Wagheshwar Temple";
   extractedEntities.push({ label: "Key Landmark", val: landmark });
 
   let physicalAsset = "100mm Cast-Iron Water Feeder Valve";
@@ -176,7 +179,7 @@ export function analyzeGrievanceInput(text, options = {}) {
   // 9. Duplicate Candidate Classification
   const duplicateCandidates = [
     {
-      id: "DL-2026-W14-0895",
+      id: "PN-2026-WAG-0103",
       citizenName: "Kavita Saxena",
       ward: extractedWard,
       title: "Dirty badbudaar paani coming in taps since 2 days",
@@ -188,7 +191,7 @@ export function analyzeGrievanceInput(text, options = {}) {
       reason: "Same pipeline branch, identical sewer odor symptom, submitted within 300m and 2 hours."
     },
     {
-      id: "DL-2026-W14-0901",
+      id: "PN-2026-WAG-0104",
       citizenName: "Ramesh Chawla",
       ward: extractedWard,
       title: "Low water pressure and yellowish water in Pocket 3",
@@ -197,10 +200,10 @@ export function analyzeGrievanceInput(text, options = {}) {
       matchClassification: "RELATED_COMPLAINT",
       matchBadge: "Related Downstream Incident (89% Match)",
       badgeColor: "#D97706",
-      reason: "Connected downstream to the same Sector 14 feeder; caused by pressure loss at main valve."
+      reason: "Connected downstream to the same Wagholi Kesnand feeder; caused by pressure loss at main valve."
     },
     {
-      id: "DL-2026-W14-0912",
+      id: "PN-2026-WAG-0115",
       citizenName: "Harish Bansal",
       ward: extractedWard,
       title: "Water pipeline leakage near park gate",
@@ -209,27 +212,27 @@ export function analyzeGrievanceInput(text, options = {}) {
       matchClassification: "SIMILAR_COMPLAINT",
       matchBadge: "Similar Complaint (78% Match)",
       badgeColor: "#2563EB",
-      reason: "Similar asset category in adjacent sector; separate distribution loop."
+      reason: "Similar asset category in adjacent ward; separate distribution loop."
     }
   ];
 
   // 10. Historical Cases (RAG Precedents)
   const historicalCases = [
     {
-      caseId: "DJB-HIST-2025-081",
+      caseId: "PMC-HIST-2025-081",
       dateResolved: "14 June 2025",
-      title: "100mm Cast-Iron Main Fracture in Pocket 1",
-      sopUsed: "SOP-DJB-CONTAM-V4 (Emergency Clamp Isolation)",
+      title: "100mm Cast-Iron Main Fracture near Raisoni Chowk",
+      sopUsed: "SOP-PMC-CONTAM-V4 (Emergency Clamp Isolation)",
       resolutionSummary: "Excavated 1.4m depth, installed stainless steel split-sleeve clamp, performed sodium hypochlorite chlorination flush.",
       fixDurationHours: "5.5 Hours",
       chlorineResidualTest: "0.4 ppm (Within Safe Potable Limit)",
       officer: "Er. Sanjay Sharma"
     },
     {
-      caseId: "DJB-HIST-2024-412",
+      caseId: "PMC-HIST-2024-412",
       dateResolved: "22 March 2024",
-      title: "Sewer Line Infiltration at Mother Dairy Junction",
-      sopUsed: "SOP-DJB-CROSS-DRAIN-ISOLATION",
+      title: "Sewer Line Infiltration at Baif Road Junction",
+      sopUsed: "SOP-PMC-CROSS-DRAIN-ISOLATION",
       resolutionSummary: "Replaced 4-meter corroded ductile segment and sealed storm drain barrier with high-density concrete.",
       fixDurationHours: "9.2 Hours",
       chlorineResidualTest: "0.5 ppm (Verified)",
@@ -247,23 +250,23 @@ export function analyzeGrievanceInput(text, options = {}) {
     recommendedAction: category === "Water Supply & Contamination" 
       ? "Dispatch Rapid Emergency Isolation Unit & Install 100mm Split-Sleeve Repair Clamp"
       : "Deploy Emergency Road Cordon & Rapid Cold-Mix Bituminous Patch Truck",
-    reasoning: "Corrosion in 1988 cast-iron distribution line has caused joint cavitation under negative pressure. Cross-siphonage with adjacent municipal drain creates acute biological risk.",
+    reasoning: "Corrosion in distribution line has caused joint cavitation under negative pressure. Cross-siphonage with adjacent municipal drain creates acute biological risk.",
     supportingEvidence: [
       "Computer Vision: Pipe fracture with sludge discharge confirmed",
-      "Corroborating Reports: 18 citizen complaints clustered within 300m radius",
+      "Corroborating Reports: 18 citizen complaints clustered within 300m radius in Wagholi",
       "SCADA Telemetry: Local pressure drop from 3.2 bar to 0.8 bar at 08:15 AM"
     ],
     confidenceScore: confidence,
-    standardOperatingProcedure: "SOP-DJB-CONTAM-V4 (Hazard Protocol)",
+    standardOperatingProcedure: "SOP-PMC-CONTAM-V4 (Hazard Protocol)",
     equipmentRequired: [
       "100mm Split-Sleeve Stainless Steel Repair Clamp",
       "Hydraulic Sludge Extraction Unit",
       "Sodium Hypochlorite Dosing Kit (Chlorine Flush)",
       "Digital Turbidity & Chlorine Residual Sensor"
     ],
-    potentialSlaImplications: "Mandated 12-hour resolution window. If valve isolation is delayed beyond 2.5 hours, backflow will contaminate Sector 14-C secondary loops, triggering automatic Level-2 Secretary Escalation.",
-    citizenDraftHindi: "प्रिय नागरिक, आपकी शिकायत पर तुरंत कार्रवाई शुरू कर दी गई है। जल बोर्ड की आपातकालीन टीम वाल्व सील करने के लिए स्थल पर रवाना हो चुकी है।",
-    citizenDraftEnglish: "Dear Citizen, emergency action has been initiated for your grievance. DJB rapid repair unit is on route to isolate and repair the supply line."
+    potentialSlaImplications: "Mandated 12-hour resolution window. If valve isolation is delayed beyond 2.5 hours, backflow will contaminate Wagholi secondary loops, triggering automatic Level-2 Secretary Escalation.",
+    citizenDraftHindi: "प्रिय नागरिक, आपकी शिकायत पर तुरंत कार्रवाई शुरू कर दी गई है। पीएमसी जल आपूर्ति विभाग की आपातकालीन टीम वाल्व सील करने के लिए स्थल पर रवाना हो चुकी है।",
+    citizenDraftEnglish: "Dear Citizen, emergency action has been initiated for your grievance. PMC rapid repair unit is on route to isolate and repair the supply line."
   };
 
   const dnaId = `DNA-${Math.floor(10000 + Math.random() * 90000)}-${extractedWard.substring(0, 3).toUpperCase()}`;

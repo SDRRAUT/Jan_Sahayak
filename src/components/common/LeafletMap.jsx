@@ -165,7 +165,7 @@ export default function LeafletMap({
   onSelectWard = () => {},
   height = '520px',
   initialLayer = 'dark', // 'osm' | 'dark' | 'satellite'
-  defaultRegion = 'wagholi' // 'wagholi' | 'delhi'
+  defaultRegion = 'wagholi' // 'wagholi'
 }) {
   const [activeLayer, setActiveLayer] = useState(initialLayer);
   const [resetCount, setResetCount] = useState(0);
@@ -173,8 +173,7 @@ export default function LeafletMap({
 
   // Region center coordinates
   const regionCenters = {
-    wagholi: { center: [18.5793, 73.9820], zoom: 13.5, name: 'Wagholi, Pune' },
-    delhi: { center: [28.6400, 77.2000], zoom: 11, name: 'Delhi NCT' }
+    wagholi: { center: [18.5793, 73.9820], zoom: 13.5, name: 'Wagholi, Pune' }
   };
 
   const currentRegionConfig = regionCenters[region] || regionCenters.wagholi;
@@ -400,8 +399,8 @@ export default function LeafletMap({
         <button
           type="button"
           onClick={() => setResetCount(prev => prev + 1)}
-          title="Reset to Delhi View"
-          aria-label="Reset to Delhi view"
+          title="Reset to Wagholi View"
+          aria-label="Reset to Wagholi view"
           style={{
             minWidth: '36px',
             minHeight: '36px',
@@ -443,7 +442,7 @@ export default function LeafletMap({
         pointerEvents: 'none'
       }}>
         <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
-        <span>LIVE LEAFLET / OSM • DELHI GIS</span>
+        <span>LIVE LEAFLET / OSM • WAGHOLI PUNE GIS</span>
       </div>
     </div>
   );

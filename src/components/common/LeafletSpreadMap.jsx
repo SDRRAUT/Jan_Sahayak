@@ -153,23 +153,23 @@ export default function LeafletSpreadMap({
   const currentPoint = points[selectedDay] || points[0];
   const centerCoord = currentPoint ? [currentPoint.lat, currentPoint.lng] : [18.5793, 73.9820];
 
-  // Pipeline path coordinates along Rohini Sec 14 & Pitampura corridor
+  // Pipeline path coordinates along Wagholi Kesnand Road & Raisoni Chowk corridor
   const pipelinePath = [
-    [28.7160, 77.1230],
-    [28.7175, 77.1248],
-    [28.7190, 77.1270]
+    [18.5793, 73.9785],
+    [18.5760, 73.9810],
+    [18.5740, 73.9920]
   ];
 
-  // Derived citizen signal GPS locations distributed along the corridor
+  // Derived citizen signal GPS locations distributed along the Wagholi corridor
   const signalCoords = [
-    { id: 'SIG-1', pos: [28.7158, 77.1228], title: 'Low pressure & chlorine smell', time: 'Day 1' },
-    { id: 'SIG-2', pos: [28.7163, 77.1234], title: 'Valve pit seeping water', time: 'Day 1' },
-    { id: 'SIG-3', pos: [28.7169, 77.1240], title: 'Road dampness on Katju Marg', time: 'Day 2' },
-    { id: 'SIG-4', pos: [28.7176, 77.1249], title: 'Turbid tap water in Pocket 1', time: 'Day 3' },
-    { id: 'SIG-5', pos: [28.7180, 77.1256], title: 'Drain backflow near community center', time: 'Day 3' },
-    { id: 'SIG-6', pos: [28.7185, 77.1262], title: 'Water puddle on arterial road', time: 'Day 4' },
-    { id: 'SIG-7', pos: [28.7189, 77.1268], title: 'Contaminated supply in school zone', time: 'Day 5' },
-    { id: 'SIG-8', pos: [28.7194, 77.1275], title: 'Road cavity under bus corridor', time: 'Day 5' }
+    { id: 'SIG-1', pos: [18.5790, 73.9780], title: 'Low pressure & chlorine smell', time: 'Day 1' },
+    { id: 'SIG-2', pos: [18.5795, 73.9788], title: 'Valve pit seeping water', time: 'Day 1' },
+    { id: 'SIG-3', pos: [18.5780, 73.9795], title: 'Road dampness on Nagar Road Highway', time: 'Day 2' },
+    { id: 'SIG-4', pos: [18.5765, 73.9815], title: 'Turbid tap water in Ivy Estate', time: 'Day 3' },
+    { id: 'SIG-5', pos: [18.5755, 73.9830], title: 'Drain backflow near community center', time: 'Day 3' },
+    { id: 'SIG-6', pos: [18.5748, 73.9860], title: 'Water puddle on Kesnand road', time: 'Day 4' },
+    { id: 'SIG-7', pos: [18.5742, 73.9900], title: 'Contaminated supply in school zone', time: 'Day 5' },
+    { id: 'SIG-8', pos: [18.5738, 73.9930], title: 'Road cavity near Wagheshwar chowk', time: 'Day 5' }
   ];
 
   const tile = SPREAD_TILES[mapMode] || SPREAD_TILES.dark;

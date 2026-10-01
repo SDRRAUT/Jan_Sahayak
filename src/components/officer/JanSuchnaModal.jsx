@@ -49,7 +49,7 @@ export default function JanSuchnaModal({ isOpen, onClose }) {
       helpline,
       officerName: user?.name || 'Er. Sanjay Sharma',
       officerDesignation: user?.designation || 'Government Officer & Executive Engineer',
-      department: user?.department || 'Delhi Jal Board & Municipal Corporation'
+      department: user?.department || 'PMC Water Supply Department & PMC'
     });
 
     setIsSubmitting(false);
@@ -235,11 +235,12 @@ export default function JanSuchnaModal({ isOpen, onClose }) {
                     background: '#FFFFFF'
                   }}
                 >
-                  <option value="Wagholi (Ward 14 / Sector 14)">Wagholi (Ward 14 / Sector 14)</option>
-                  <option value="Ward 14 (Rohini Sector 14)">Ward 14 (Rohini Sector 14)</option>
-                  <option value="Ward 8 (Lajpat Nagar)">Ward 8 (Lajpat Nagar)</option>
-                  <option value="Ward 22 (Mayur Vihar)">Ward 22 (Mayur Vihar)</option>
-                  <option value="All City Wards">All City Wards (Citywide Broadcast)</option>
+                  <option value="Wagholi Ward 27 (Nagar Road Highway & Raisoni Chowk)">Wagholi Ward 27 (Nagar Road Highway & Raisoni Chowk)</option>
+                  <option value="Wagholi Ward 28 (Baif Road & Market Yard)">Wagholi Ward 28 (Baif Road & Market Yard)</option>
+                  <option value="Wagholi Ward 29 (Ivy Estate & Kesnand Road)">Wagholi Ward 29 (Ivy Estate & Kesnand Road)</option>
+                  <option value="Wagholi Ward 30 (Domkhel & Ubale Nagar)">Wagholi Ward 30 (Domkhel & Ubale Nagar)</option>
+                  <option value="Wagholi Ward 31 (Bakori Road & Wagheshwar)">Wagholi Ward 31 (Bakori Road & Wagheshwar)</option>
+                  <option value="All Wagholi Sub-Division Wards">All Wagholi Sub-Division Wards (Townwide Broadcast)</option>
                 </select>
               </div>
             </div>

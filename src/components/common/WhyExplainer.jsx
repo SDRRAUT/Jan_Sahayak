@@ -35,7 +35,7 @@ export default function WhyExplainer({
     'High-traffic public transit corridor within 200m',
     '12 duplicate/related reports logged in 72 hours',
     'Biohazard & safety keywords detected in verbatim text',
-    'Historical precedent matching DJB Emergency SOP #14'
+    'Historical precedent matching PMC Emergency SOP #14'
   ];
 
   const list = reasons && reasons.length > 0 ? reasons : defaultReasons;

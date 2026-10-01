@@ -50,7 +50,7 @@ export const INTELLIGENCE_LOOP_STAGES = [
     icon: Building2,
     category: 'Authority Assignment',
     summary: 'Automated direct assignment to exact executive jurisdiction (94.8% accuracy).',
-    example: 'Assigned: Delhi Jal Board (DJB) • Executive Division North-West (Rohini).'
+    example: 'Assigned: PMC Water Supply Department • Wagholi Sub-Division (Ward 29).'
   },
   {
     id: 5,
@@ -66,7 +66,7 @@ export const INTELLIGENCE_LOOP_STAGES = [
     icon: Copy,
     category: 'Cluster Deduplication',
     summary: 'Cross-checks spatial and temporal proximity across neighboring households.',
-    example: 'Matched 18 identical complaints in 400m radius of Mother Dairy; grouped into Cluster CL-W14-WATER-03.'
+    example: 'Matched 18 identical complaints in 400m radius of Raisoni Chowk; grouped into Cluster CL-WAG-WATER-02.'
   },
   {
     id: 7,
@@ -74,7 +74,7 @@ export const INTELLIGENCE_LOOP_STAGES = [
     icon: Database,
     category: 'Knowledge Base Retrieval',
     summary: 'Retrieves similar historical resolutions and proven field procedures from vector database.',
-    example: 'Matched Case DJB-2025-081 (Pocket 1 valve failure resolved in 14 hrs using clamp replacement).'
+    example: 'Matched Case PMC-2025-081 (Raisoni Chowk valve failure resolved in 14 hrs using clamp replacement).'
   },
   {
     id: 8,
@@ -82,7 +82,7 @@ export const INTELLIGENCE_LOOP_STAGES = [
     icon: Lightbulb,
     category: 'Decision Support',
     summary: 'Synthesizes step-by-step SOP, required tools, and pre-drafts citizen notifications.',
-    example: 'Recommended SOP: SOP-DJB-CONTAM-V4. Gear: 100mm Pipe Clamp, Hydraulic Pump, Chlorination Kit.'
+    example: 'Recommended SOP: SOP-PMC-CONTAM-V4. Gear: 100mm Pipe Clamp, Hydraulic Pump, Chlorination Kit.'
   },
   {
     id: 9,
@@ -90,7 +90,7 @@ export const INTELLIGENCE_LOOP_STAGES = [
     icon: UserCheck,
     category: 'Human Authority in the Loop',
     summary: 'Executive Engineer reviews 3-Bullet AI Brief and approves field dispatch order.',
-    example: 'EE Sanjay Sharma approves work order DL-W14-0892; rapid response squad mobilized.'
+    example: 'AEE Sanjay Sharma approves work order PN-WAG-0102; rapid response squad mobilized.'
   },
   {
     id: 10,
@@ -122,7 +122,7 @@ export const INTELLIGENCE_LOOP_STAGES = [
     icon: Repeat,
     category: 'Geospatial Analytics',
     summary: 'DBSCAN algorithms identify chronic recurring failures across seasonal ward cycles.',
-    example: 'Flagged: Ward 14 has experienced 4 separate pipe failures along the same 1.2km line in 6 months.'
+    example: 'Flagged: Ward 29 has experienced 4 separate pipe failures along the same 1.2km line in 6 months.'
   },
   {
     id: 14,
@@ -130,7 +130,7 @@ export const INTELLIGENCE_LOOP_STAGES = [
     icon: ShieldAlert,
     category: 'Macro Infrastructure Strategy',
     summary: 'Shifts governance from reactive complaint-patching to proactive capital replacement.',
-    example: 'Systemic Recommendation: "Replace 35-year-old cast-iron piping in Rohini Pocket 2 with HDPE line (Est. ₹42 Lakhs) to permanently eliminate ₹18 Lakhs/year recurring emergency repairs."'
+    example: 'Systemic Recommendation: "Replace 35-year-old piping along Wagholi Kesnand Road with HDPE line (Est. ₹42 Lakhs) to permanently eliminate ₹18 Lakhs/year recurring emergency repairs."'
   }
 ];
 
@@ -276,7 +276,7 @@ export default function IntelligenceLoop({ activeIndex = null, onSelectStage = n
             boxShadow: 'var(--shadow-xs)'
           }}>
             <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-primary)', display: 'block', marginBottom: '6px' }}>
-              Real Delhi Case Telemetry:
+              Real Wagholi Pune Case Telemetry:
             </span>
             <p style={{ fontSize: '13px', lineHeight: 1.6, color: 'var(--color-text-primary)', fontStyle: 'italic' }}>
               {current.example}

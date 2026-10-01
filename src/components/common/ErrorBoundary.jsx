@@ -52,7 +52,7 @@ export class ErrorBoundary extends React.Component {
               JanSahayak System Recovery
             </h2>
             <p style={{ fontSize: '13.5px', color: '#94A3B8', margin: '0 0 24px 0', lineHeight: 1.5 }}>
-              A temporary display error occurred. Click below to refresh your connection to the Delhi Municipal Grievance Gateway.
+              A temporary display error occurred. Click below to refresh your connection to the Pune Municipal Grievance Gateway.
             </p>
             <button
               type="button"

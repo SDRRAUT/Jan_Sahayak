@@ -3,32 +3,32 @@ import { Network, Droplets, Wrench, Building2, ArrowRight, ShieldCheck, CheckCir
 
 export default function CrossDepartmentMatrix({ crossDeptData, incidentTitle = 'Water Infrastructure Crisis' }) {
   const data = crossDeptData || {
-    primaryDepartment: "Delhi Jal Board (DJB)",
+    primaryDepartment: "PMC Water Supply Department",
     sharedProblemSummary: "A broken underground water pipe is softening the road foundation and causing the street drain to overflow. 3 departments need to work together to fix this completely.",
     departments: [
       {
-        dept: "Delhi Jal Board (DJB)",
+        dept: "PMC Water Supply Department",
         cases: 24,
         icon: "Droplets",
         badgeColor: "#0E5E3A",
         impactSummary: "Clean drinking water pressure is weak and dirty water is reaching 650 homes."
       },
       {
-        dept: "Public Works Department (PWD)",
+        dept: "PWD Pune / PMRDA",
         cases: 9,
         icon: "Wrench",
         badgeColor: "#D97706",
         impactSummary: "Road has sunken by 35 cm due to wet soil. Dangerous for two-wheelers and cars."
       },
       {
-        dept: "Municipal Corporation of Delhi (MCD)",
+        dept: "PMC Solid Waste & Drainage",
         cases: 4,
         icon: "Building2",
         badgeColor: "#7C3AED",
         impactSummary: "Street drain is clogged with mud. Dirty water is pooling near the market."
       }
     ],
-    coordinationRecommendation: "Step 1: DJB turns off water pipe at 11:00 AM → Step 2: PWD checks the underground road base before paving → Step 3: MCD unblocks and flushes the drain."
+    coordinationRecommendation: "Step 1: PMC Water isolates water valve at 11:00 AM → Step 2: PWD Pune inspects road sub-base before asphalt resurfacing → Step 3: PMC Drainage flushes stormwater conduit."
   };
 
   const getDeptIcon = (iconName) => {

@@ -9,8 +9,8 @@ import { Check, Clock, UserCheck, Wrench, ShieldCheck, Sparkles, ArrowRight } fr
 export default function VisualJourneyTimeline({
   status = 'IN_PROGRESS',
   createdAt = 'Recently',
-  officerName = 'Dr. K. S. Tyagi',
-  department = 'Municipal Corporation of Delhi'
+  officerName = 'Er. Sanjay Sharma',
+  department = 'Pune Municipal Corporation (PMC)'
 }) {
   // Map internal status to 6 journey stages
   const stages = [
@@ -19,7 +19,7 @@ export default function VisualJourneyTimeline({
       label: 'Submitted',
       desc: 'Received via portal',
       icon: Check,
-      time: createdAt || '18/9/2026, 12:47 am',
+      time: createdAt || 'Recently',
       isPassed: true,
       isCurrent: false
     },
@@ -35,7 +35,7 @@ export default function VisualJourneyTimeline({
     {
       id: 'assigned',
       label: 'Assigned',
-      desc: `Routed to ${department?.replace('Municipal Corporation of Delhi', 'MCD') || 'MCD'}`,
+      desc: `Routed to ${department?.replace('Pune Municipal Corporation (PMC)', 'PMC') || 'PMC'}`,
       icon: UserCheck,
       time: status === 'INGESTED' ? 'In queue' : 'Assigned',
       isPassed: status !== 'INGESTED' && status !== 'SUBMITTED',

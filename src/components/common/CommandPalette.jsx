@@ -206,7 +206,7 @@ export default function CommandPalette({ isOpen, onClose, onOpenSignalModal }) {
         id: 'act-dept-directory',
         type: 'ACTION',
         title: 'Department Directory',
-        subtitle: 'Oversight across DJB, PWD, MCD, BSES',
+        subtitle: 'Oversight across PMC, PWD, MSEDCL',
         icon: Building2,
         action: () => {
           navigate('/admin/department');

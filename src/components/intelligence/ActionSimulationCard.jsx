@@ -13,7 +13,7 @@ export default function ActionSimulationCard({ simulations = [], onSelectAction,
       recurrenceRisk: "HIGH (65% chance of leaking again within 6 months)",
       resourceRequirement: "Low (1 repair crew + 4 workers)",
       costScore: "₹18,000",
-      coordinationRequired: "DJB only",
+      coordinationRequired: "PMC Water only",
       confidence: "High",
       recommendationVerdict: "NOT RECOMMENDED: Road and pipe likely to break again soon."
     },
@@ -25,9 +25,9 @@ export default function ActionSimulationCard({ simulations = [], onSelectAction,
       expectedResolutionTime: "36 Hours (Free water tankers sent to homes)",
       affectedPopulationReduction: "Permanent solution for all homes",
       recurrenceRisk: "VERY LOW (< 5% chance in 15 years)",
-      resourceRequirement: "Medium (DJB pipe team + PWD road roller)",
+      resourceRequirement: "Medium (PMC Water pipe team + PWD Pune road roller)",
       costScore: "₹1,45,000",
-      coordinationRequired: "DJB + PWD + Traffic Police",
+      coordinationRequired: "PMC Water + PWD Pune + Traffic Police",
       confidence: "High",
       recommendationVerdict: "RECOMMENDED: Permanent fix, prevents digging road again."
     },
@@ -41,7 +41,7 @@ export default function ActionSimulationCard({ simulations = [], onSelectAction,
       recurrenceRisk: "N/A",
       resourceRequirement: "Low (2 diagnostic engineers)",
       costScore: "₹6,500",
-      coordinationRequired: "DJB + MCD",
+      coordinationRequired: "PMC Water + PMC Drainage",
       confidence: "Very High",
       recommendationVerdict: "Recommended as first step before starting Option B."
     }
@@ -102,7 +102,7 @@ export default function ActionSimulationCard({ simulations = [], onSelectAction,
       }}>
         <ShieldCheck style={{ width: '15px', height: '15px', color: 'var(--color-primary)', flexShrink: 0 }} />
         <span>
-          <strong>Estimated Time & Costs:</strong> Based on past Delhi repair records. The officer always decides the final action.
+          <strong>Estimated Time & Costs:</strong> Based on past Pune repair records. The officer always decides the final action.
         </span>
       </div>
 

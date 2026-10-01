@@ -6,7 +6,7 @@ export default function CivicSignalModal({ isOpen, onClose }) {
   const { submitCivicSignal, user } = useApp();
   const [text, setText] = useState('');
   const [channel, setChannel] = useState('QUICK_TEXT'); // 'QUICK_TEXT' | 'VOICE_NOTE' | 'PHOTO'
-  const [ward, setWard] = useState(user?.ward || 'Ward 14 (Rohini Sector 14)');
+  const [ward, setWard] = useState(user?.ward || 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)');
   const [photoUrl, setPhotoUrl] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -207,11 +207,11 @@ export default function CivicSignalModal({ isOpen, onClose }) {
                     fontSize: '13px'
                   }}
                 >
-                  <option value="Ward 14 (Rohini Sector 14)">Ward 14 (Rohini Sector 14)</option>
-                  <option value="Ward 12 (Pitampura Border)">Ward 12 (Pitampura Border)</option>
-                  <option value="Ward 8 (Lajpat Nagar / Moolchand)">Ward 8 (Lajpat Nagar / Moolchand)</option>
-                  <option value="Ward 5 (Kalkaji)">Ward 5 (Kalkaji)</option>
-                  <option value="Ward 22 (Mayur Vihar Ph-1)">Ward 22 (Mayur Vihar Ph-1)</option>
+                  <option value="Wagholi Ward 27 (Nagar Road Highway & Raisoni Chowk)">Wagholi Ward 27 (Nagar Road Highway & Raisoni Chowk)</option>
+                  <option value="Wagholi Ward 28 (Baif Road & Market Yard)">Wagholi Ward 28 (Baif Road & Market Yard)</option>
+                  <option value="Wagholi Ward 29 (Ivy Estate & Kesnand Road)">Wagholi Ward 29 (Ivy Estate & Kesnand Road)</option>
+                  <option value="Wagholi Ward 30 (Domkhel & Ubale Nagar)">Wagholi Ward 30 (Domkhel & Ubale Nagar)</option>
+                  <option value="Wagholi Ward 31 (Bakori Road & Wagheshwar)">Wagholi Ward 31 (Bakori Road & Wagheshwar)</option>
                 </select>
               </div>
 

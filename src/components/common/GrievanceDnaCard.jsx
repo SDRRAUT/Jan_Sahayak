@@ -30,8 +30,8 @@ export default function GrievanceDnaCard({ dna, isDark = false, compact = false,
   if (!dna) return null;
 
   const category = dna.category || 'Solid Waste & Hazardous Burning';
-  const department = dna.department || 'Municipal Corporation of Delhi (MCD)';
-  const ward = dna.ward || 'Ward 22 (Mayur Vihar Ph-1)';
+  const department = dna.department || 'PMC Solid Waste Management';
+  const ward = dna.ward || 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)';
   const urgencyScore = dna.urgencyScore || 91;
   const confidence = dna.confidence || 97;
   const duplicateCount = dna.clusterCount || dna.duplicateCount || 11;

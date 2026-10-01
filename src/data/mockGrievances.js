@@ -985,42 +985,42 @@ export const INITIAL_GRIEVANCES = [
     ]
   },
   {
-    id: "DL-2026-W14-0892",
-    title: "Main Drinking Water Pipeline Burst & Gushing on Market Street",
-    descriptionRaw: "Bhai pichle 3 din se hamare Sector 14, Main Market ke samne drinking water pipe phat gaya hai aur bohot tez paani bah raha hai. Sadak par paani bhar gaya hai aur pure area mein drinking water ki supply band hai.",
-    languageDetected: "Hinglish / Hindi (Confidence 98%)",
+    id: "PN-2026-WAG-0116",
+    title: "Main Drinking Water Pipeline Rupture & Gushing on Baif Road Bazaar",
+    descriptionRaw: "Wagholi Baif Road main market ke samne drinking water pipeline phat gayi hai. Sadak par paani beh raha hai aur 400 se zyada gharon mein drinking water supply band ho gayi hai.",
+    languageDetected: "Hinglish / Marathi (Confidence 98%)",
     category: "Water Supply & Contamination",
-    department: "Delhi Jal Board (DJB)",
-    officerName: "Er. Sanjay Sharma",
-    officerDesignation: "Assistant Executive Engineer (Water Distribution)",
+    department: "PMC Water Supply Department",
+    officerName: "Er. Rajesh Patil",
+    officerDesignation: "PMC Water Works Executive Engineer",
     location: {
-      ward: "Ward 14 (Rohini Sector 14)",
-      area: "Main Market Road, Near Shree Ganesh Medicals",
-      city: "New Delhi",
-      pincode: "110085",
-      lat: 28.7189,
-      lng: 77.1265
+      ward: "Wagholi Ward 27 (Baif Road Corridor)",
+      area: "Baif Road Market, Near Shree Ganesh Medicals",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5789,
+      lng: 73.9775
     },
     urgency: "CRITICAL",
     urgencyScore: 96,
     status: "IN_PROGRESS",
-    createdAt: "2026-09-17 08:30 AM",
-    slaDeadline: "2026-09-18 04:00 PM",
-    slaHoursLeft: 8,
-    clusterId: "CL-W14-WATER-01",
-    clusterTitle: "Rohini Sector 14 Main Feeder Pipe Fracture Cluster",
-    clusterCount: 14,
-    upvotes: 48,
+    createdAt: "2026-10-01 08:30 AM",
+    slaDeadline: "2026-10-01 04:00 PM",
+    slaHoursLeft: 4,
+    clusterId: "CL-WAG-WATER-02",
+    clusterTitle: "Wagholi Baif Road & Kesnand Feeder Pipe Rupture Cluster",
+    clusterCount: 18,
+    upvotes: 68,
     citizenName: "Aditya Verma",
     citizenPhone: "+91 98712-88491",
     evidence: {
-      photoUrl: "/civic-problems/ai_water_pipe_leak.jpg",
+      photoUrl: "/civic-problems/water_pipe_leak.jpg",
       confidenceScore: 0.98,
       detectedIssue: "High Pressure Potable Pipeline Fracture"
     },
-    photoUrl: "/civic-problems/ai_water_pipe_leak.jpg",
+    photoUrl: "/civic-problems/water_pipe_leak.jpg",
     grievanceDna: {
-      dnaId: "DNA-94820-W14",
+      dnaId: "DNA-WAG-412207-16",
       departmentConfidence: 99.2,
       urgencyScore: 96,
       sentimentScore: -0.89,
@@ -1028,78 +1028,77 @@ export const INITIAL_GRIEVANCES = [
       healthRiskLevel: "HIGH",
       extractedEntities: [
         { label: "Infrastructure", val: "150mm High-Pressure Cast Iron Main" },
-        { label: "Landmark", val: "Shree Ganesh Medicals, Market Gali" },
+        { label: "Landmark", val: "Baif Road Market Corridor" },
         { label: "Wastage Rate", val: "~3,200 Litres/Hour Potable Water" },
         { label: "Affected Population", val: "450+ Households & 30 Retail Shops" }
       ],
       ragMatches: [
         {
-          caseId: "DJB-WATER-2025-119",
+          caseId: "PMC-WATER-2025-119",
           summary: "Emergency shutoff valve isolation and carbon steel clamp fitting.",
           similarity: 0.96,
-          resolutionTime: "5 hours"
+          resolutionTime: "4 hours"
         }
       ]
     },
     aiOfficerBrief: [
       "High-pressure pipeline burst visible on road surface; wasting clean drinking water at 3,200 L/hr.",
-      "Road traffic stalled; auto-rickshaw lane partially flooded.",
-      "Feeder valve upstream at Rohini Zone 4 needs immediate shutoff to begin pipe sleeve clamp installation."
+      "Road traffic stalled; market approach lane partially flooded.",
+      "Feeder valve upstream at Wagholi Zone 4 needs immediate shutoff to begin pipe sleeve clamp installation."
     ],
     recommendedResolution: {
-      primaryAction: "Isolate Sector 14 Gate Valve & Install 150mm Sleeve Clamp",
-      standardOperatingProcedure: "DJB-SOP-WATER-RUPTURE-V3",
-      estimatedFixTime: "4.5 Hours",
+      primaryAction: "Isolate Baif Road Gate Valve & Install 150mm Sleeve Clamp",
+      standardOperatingProcedure: "PMC-SOP-WATER-RUPTURE-V3",
+      estimatedFixTime: "3.5 Hours",
       equipmentRequired: ["150mm Heavy Duty Pipe Clamp", "Submersible Dewatering Pump", "Asphalt Excavator"],
-      citizenDraftHindi: "प्रिय नागरिक, आपकी शिकायत (DL-2026-W14-0892) पर त्वरित संज्ञान लेते हुए जल बोर्ड की टीम मौके पर पहुंच चुकी है। वाल्व ठीक कर पानी की सप्लाई शाम 4 बजे तक शुरू कर दी जाएगी।",
-      citizenDraftEnglish: "Dear Citizen, DJB rapid response team is on site repairing the ruptured water pipeline near Shree Ganesh Medicals. Water supply will be restored by 4:00 PM."
+      citizenDraftHindi: "प्रिय नागरिक, वाघोली बैफ रोड पानी पाइपलाइन मरम्मत के लिए पीएमसी जल विभाग की टीम मौके पर काम कर रही है। शाम 4 बजे तक आपूर्ति बहाल हो जाएगी।",
+      citizenDraftEnglish: "Dear Citizen, PMC rapid response team is on site repairing the ruptured water pipeline near Baif Road Market. Water supply will be restored by 4:00 PM."
     },
     timeline: [
-      { stage: "Submitted", time: "Sep 17, 08:30 AM", detail: "Citizen logged complaint with photo of water fountain burst", status: "completed" },
-      { stage: "AI Triage & DNA Generated", time: "Sep 17, 08:31 AM", detail: "Classified as CRITICAL Water Wastage Hazard (Score 96)", status: "completed" },
-      { stage: "Cluster Linked", time: "Sep 17, 08:35 AM", detail: "Merged with 14 related reports in Rohini Ward 14", status: "completed" },
-      { stage: "Officer Assigned", time: "Sep 17, 09:00 AM", detail: "Assigned to Er. Sanjay Sharma; emergency crew dispatched", status: "completed" },
-      { stage: "Field Repair Active", time: "Sep 17, 10:15 AM", detail: "Gate valve isolated; clamp installation in progress", status: "in_progress" },
-      { stage: "Quality Testing & Closure", time: "Pending", detail: "Pressure test & asphalt resurfacing", status: "pending" }
+      { stage: "Submitted", time: "Oct 1, 08:30 AM", detail: "Citizen logged complaint with photo of water fountain burst", status: "completed" },
+      { stage: "AI Triage & DNA Generated", time: "Oct 1, 08:31 AM", detail: "Classified as CRITICAL Water Wastage Hazard (Score 96)", status: "completed" },
+      { stage: "Cluster Linked", time: "Oct 1, 08:35 AM", detail: "Merged with 18 related reports in Wagholi Ward 27", status: "completed" },
+      { stage: "Officer Assigned", time: "Oct 1, 09:00 AM", detail: "Assigned to Er. Rajesh Patil; emergency crew dispatched", status: "completed" },
+      { stage: "Field Repair Active", time: "Oct 1, 10:15 AM", detail: "Gate valve isolated; clamp installation in progress", status: "in_progress" }
     ]
   },
   {
-    id: "DL-2026-W22-0112",
-    title: "Huge Overflowing Garbage Pile & Trash Bags on Market Road",
-    descriptionRaw: "Market road ke beech mein kude ka pahad ban gaya hai. Pura rasta block hai, kaale aur peele trash bags sadak par bikhre pade hain aur kutte-janwar kachra faila rahe hain. Dumper 4 din se nahi aaya.",
-    languageDetected: "Hinglish (Confidence 99%)",
+    id: "PN-2026-WAG-0117",
+    title: "Commercial Plastic & Solid Waste Backlog on Ivy Estate Commercial Plaza",
+    descriptionRaw: "Ivy Estate commercial market road ke paas kude ka dher jama hai. 4 din se garbage dumper nahi aaya, kutte kachra raste par bikhra rahe hain.",
+    languageDetected: "Hinglish / Marathi (Confidence 99%)",
     category: "Sanitation & Solid Waste",
-    department: "Municipal Corporation of Delhi (MCD)",
-    officerName: "Dr. K. S. Tyagi",
-    officerDesignation: "Chief Sanitation Inspector (Shahdara Zone)",
+    department: "PMC Solid Waste Management",
+    officerName: "Er. Amit Deshmukh",
+    officerDesignation: "PMC Sanitation Superintendent",
     location: {
-      ward: "Ward 22 (Mayur Vihar Ph-1)",
-      area: "Main Market Complex Roadway",
-      city: "New Delhi",
-      pincode: "110091",
-      lat: 28.6012,
-      lng: 77.2982
+      ward: "Wagholi Ward 29 (Kesnand Corridor)",
+      area: "Ivy Estate Commercial Complex Road",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5798,
+      lng: 73.9875
     },
     urgency: "HIGH",
     urgencyScore: 88,
     status: "IN_PROGRESS",
-    createdAt: "2026-09-16 11:15 AM",
-    slaDeadline: "2026-09-17 06:00 PM",
+    createdAt: "2026-10-01 07:45 AM",
+    slaDeadline: "2026-10-01 06:00 PM",
     slaHoursLeft: 4,
-    clusterId: "CL-W22-SAN-09",
-    clusterTitle: "Mayur Vihar Phase 1 Commercial Waste Backlog",
+    clusterId: "CL-WAG-GARBAGE-01",
+    clusterTitle: "Wagholi East Commercial Waste Backlog",
     clusterCount: 16,
     upvotes: 52,
     citizenName: "Gurpreet Singh",
     citizenPhone: "+91 99532-77180",
     evidence: {
-      photoUrl: "/civic-problems/ai_garbage_dump.jpg",
+      photoUrl: "/civic-problems/roadside_garbage_heap.jpg",
       confidenceScore: 0.98,
       detectedIssue: "Commercial & Domestic Solid Waste Overflow"
     },
-    photoUrl: "/civic-problems/ai_garbage_dump.jpg",
+    photoUrl: "/civic-problems/roadside_garbage_heap.jpg",
     grievanceDna: {
-      dnaId: "DNA-22112-W22",
+      dnaId: "DNA-WAG-412207-17",
       departmentConfidence: 99.4,
       urgencyScore: 88,
       sentimentScore: -0.84,
@@ -1108,77 +1107,72 @@ export const INITIAL_GRIEVANCES = [
       extractedEntities: [
         { label: "Waste Classification", val: "Municipal Solid Waste (Commercial + Household)" },
         { label: "Volume Estimate", val: "~8.5 Metric Tonnes Uncollected Waste" },
-        { label: "Road Impact", val: "50% Carriageway Blocked" },
-        { label: "Sanitary Risk", val: "Stray Animal Foraging & Odour Plume" }
+        { label: "Road Impact", val: "50% Carriageway Blocked" }
       ],
       ragMatches: [
         {
-          caseId: "MCD-SAN-2025-667",
+          caseId: "PMC-SAN-2025-667",
           summary: "Double-trip hydraulic compactor clearance & sodium hypochlorite wash.",
           similarity: 0.95,
-          resolutionTime: "5 hours"
+          resolutionTime: "4 hours"
         }
       ]
     },
     aiOfficerBrief: [
-      "Large overflow of commercial plastic bags extending 15 meters along the market street.",
-      "Road narrowed by half, pedestrians forced to walk in oncoming vehicular traffic.",
-      "12MT compactor truck and sweeping gang required immediately."
+      "Large overflow of commercial plastic bags extending 15 meters along Ivy Estate complex.",
+      "12MT compactor truck and sweeping gang dispatched."
     ],
     recommendedResolution: {
       primaryAction: "Deploy 12MT Hydraulic Compactor & Disinfectant Lime Wash",
-      standardOperatingProcedure: "MCD-SOP-MSW-MARKET-CLEAN",
-      estimatedFixTime: "4 Hours",
+      standardOperatingProcedure: "PMC-SOP-MSW-MARKET-CLEAN",
+      estimatedFixTime: "3.5 Hours",
       equipmentRequired: ["12MT Compactor Dumper", "Front Loader Backhoe", "Bleaching Powder & Lime Sanitizer"],
-      citizenDraftHindi: "प्रिय नागरिक, मयूर विहार मार्केट में कचरा हटाने के लिए 12 टन का कॉम्पेक्टर वाहन और सफाई कर्मचारियों की टीम तैनात कर दी गई है। आज शाम 6 बजे तक पूरा क्षेत्र साफ कर कीटाणुरहित कर दिया जाएगा।",
-      citizenDraftEnglish: "Dear Citizen, MCD 12MT compactor unit and sanitation crew have arrived at Mayur Vihar Market road. Complete clearance and lime sanitization will finish by 6:00 PM."
+      citizenDraftHindi: "प्रिय नागरिक, आइवी एस्टेट मार्केट क्षेत्र से कचरा हटाने के लिए 12 टन कॉम्पेक्टर वाहन भेज दिया गया है। शाम तक सफाई पूरी हो जाएगी।",
+      citizenDraftEnglish: "Dear Citizen, PMC 12MT compactor unit and sanitation crew have arrived at Ivy Estate. Complete clearance will finish by 6:00 PM."
     },
     timeline: [
-      { stage: "Submitted", time: "Sep 16, 11:15 AM", detail: "Citizen uploaded complaint with geo-tagged photograph of garbage pile", status: "completed" },
-      { stage: "AI Triage & DNA Generated", time: "Sep 16, 11:16 AM", detail: "Assigned HIGH Urgency score (88); routed to Shahdara Sanitation Zone", status: "completed" },
-      { stage: "Cluster Linked", time: "Sep 16, 11:25 AM", detail: "Consolidated with 16 citizen alerts from Phase 1 commercial block", status: "completed" },
-      { stage: "Vehicle Dispatched", time: "Sep 16, 01:00 PM", detail: "Compactor vehicle #DL-1M-4421 en route from Ghazipur Depot", status: "completed" },
-      { stage: "Clearance in Progress", time: "Sep 17, 09:30 AM", detail: "7 metric tonnes loaded; road sweeping & disinfectant wash active", status: "in_progress" },
-      { stage: "Sanitary Verification", time: "Pending", detail: "Supervisory signoff and odor level audit", status: "pending" }
+      { stage: "Submitted", time: "Oct 1, 07:45 AM", detail: "Citizen uploaded complaint with geo-tagged photograph", status: "completed" },
+      { stage: "Vehicle Dispatched", time: "Oct 1, 09:00 AM", detail: "Compactor vehicle en route from Wagholi PMC Depot", status: "completed" },
+      { stage: "Clearance in Progress", time: "Oct 1, 10:30 AM", detail: "7 metric tonnes loaded; road sweeping active", status: "in_progress" }
     ]
   },
   {
-    id: "DL-2026-W03-0667",
-    title: "Severe Monsoon Road Waterlogging & Submerged Open Drain",
-    descriptionRaw: "Halki barish mein bhi pura chowk doob gaya hai. Scooter aur gaadiyan band ho rahi hain, paani ghutno tak bhara hai aur naali ka dhakkan khula hone se bohot bada accident ho sakta hai.",
-    languageDetected: "Hinglish (Confidence 99%)",
+    id: "PN-2026-WAG-0118",
+    title: "Severe Monsoon Road Waterlogging & Submerged Open Drain at Ubale Nagar Junction",
+    descriptionRaw: "Halki barish mein bhi Ubale Nagar chowk doob gaya hai. Scooter aur gaadiyan band ho rahi hain, paani ghutno tak bhara hai aur naali ka dhakkan khula hone se bohot bada accident risk hai.",
+    languageDetected: "Hinglish / Marathi (Confidence 99%)",
     category: "Drainage & Waterlogging",
-    department: "Public Works Department (PWD)",
-    officerName: "Er. Rajesh K. Meena",
-    officerDesignation: "Executive Engineer (Monsoon Emergency Control)",
+    department: "PMC Drainage Department",
+    officerName: "Er. Sunita Kulkarni",
+    officerDesignation: "PMC Drainage Inspector",
     location: {
-      ward: "Ward 3 (Karol Bagh)",
-      area: "Main Market Crossroad, Pusa Road Junction",
-      city: "New Delhi",
-      pincode: "110005",
-      lat: 28.6514,
-      lng: 77.1907
+      ward: "Wagholi Ward 30 (Ubale Nagar)",
+      area: "Ubale Nagar Crossroad, Nagar Road Junction",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5835,
+      lng: 73.9855
     },
     urgency: "CRITICAL",
     urgencyScore: 97,
     status: "IN_PROGRESS",
-    createdAt: "2026-09-17 07:15 AM",
-    slaDeadline: "2026-09-17 01:00 PM",
-    slaHoursLeft: 3,
-    clusterId: "CL-W03-DRAIN-01",
-    clusterTitle: "Karol Bagh Junction Monsoon Inundation Cluster",
+    createdAt: "2026-10-01 07:15 AM",
+    slaDeadline: "2026-10-01 01:00 PM",
+    slaHoursLeft: 2,
+    clusterId: "CL-WAG-DRAIN-04",
+    clusterTitle: "Ubale Nagar & Underpass Monsoon Inundation Cluster",
     clusterCount: 19,
     upvotes: 74,
     citizenName: "Harsh Vardhan",
     citizenPhone: "+91 98103-99120",
     evidence: {
-      photoUrl: "/civic-problems/ai_monsoon_waterlogging.jpg",
+      photoUrl: "/civic-problems/open_sewage_nullah_garbage.jpg",
       confidenceScore: 0.99,
       detectedIssue: "Severe Urban Waterlogging & Open Manhole Submergence"
     },
-    photoUrl: "/civic-problems/ai_monsoon_waterlogging.jpg",
+    photoUrl: "/civic-problems/open_sewage_nullah_garbage.jpg",
     grievanceDna: {
-      dnaId: "DNA-06671-W03",
+      dnaId: "DNA-WAG-412207-18",
       departmentConfidence: 99.8,
       urgencyScore: 97,
       sentimentScore: -0.93,
@@ -1191,71 +1185,68 @@ export const INITIAL_GRIEVANCES = [
       ],
       ragMatches: [
         {
-          caseId: "PWD-FLOOD-2025-014",
-          summary: "Super-sucker suction pump deployment and gravity drain culvert unclogging.",
+          caseId: "PMC-FLOOD-2025-014",
+          summary: "Super-sucker suction pump deployment and culvert unclogging.",
           similarity: 0.99,
           resolutionTime: "2 hours"
         }
       ]
     },
     aiOfficerBrief: [
-      "Dangerous waterlogging at busy market intersection with submerged open manhole.",
-      "High probability of fatal two-wheeler falls into open drain chamber.",
+      "Dangerous waterlogging at busy Ubale Nagar intersection with submerged open manhole.",
       "Deploy mobile high-capacity dewatering pump and place red warning barricade around manhole."
     ],
     recommendedResolution: {
       primaryAction: "Deploy 50HP Super-Sucker Dewatering Pump & Install High-Visibility Manhole Cone",
-      standardOperatingProcedure: "PWD-MONSOON-CRITICAL-SOP",
+      standardOperatingProcedure: "PMC-MONSOON-CRITICAL-SOP",
       estimatedFixTime: "2 Hours",
       equipmentRequired: ["50HP Mobile Dewatering Pump", "Suction Hose (100m)", "Safety Cones & Cordon Tape"],
-      citizenDraftHindi: "प्रिय नागरिक, करोल बाग चौराहे पर पानी निकालने के लिए 50HP का भारी पंप तैनात कर दिया गया है। नाले के खुले चैंबर पर सुरक्षा बैरिकेड लगा दिया गया है।",
-      citizenDraftEnglish: "Dear Citizen, heavy 50HP dewatering pumps are clearing the waterlogging at Karol Bagh junction. Safety barricades placed over open drains."
+      citizenDraftHindi: "प्रिय नागरिक, उबाले नगर चौराहे पर जलभराव निकालने के लिए 50HP का भारी पंप तैनात कर दिया गया है।",
+      citizenDraftEnglish: "Dear Citizen, heavy 50HP dewatering pumps are clearing waterlogging at Ubale Nagar junction."
     },
     timeline: [
-      { stage: "Submitted", time: "Sep 17, 07:15 AM", detail: "Citizen reported submerged vehicles and invisible open drain", status: "completed" },
-      { stage: "AI Triage & DNA Generated", time: "Sep 17, 07:16 AM", detail: "Flagged as CRITICAL Safety Hazard (Score 97)", status: "completed" },
-      { stage: "Emergency Unit Dispatched", time: "Sep 17, 07:35 AM", detail: "50HP Mobile Dewatering Pump en route to Pusa Road", status: "completed" },
-      { stage: "Dewatering & Cordon Active", time: "Sep 17, 08:15 AM", detail: "Water pumped down by 25cm; caution barricade placed around open chamber", status: "in_progress" },
-      { stage: "Culvert Unblocking", time: "Pending", detail: "Super-sucker silt removal from drainage bridge", status: "pending" }
+      { stage: "Submitted", time: "Oct 1, 07:15 AM", detail: "Citizen reported submerged vehicles and invisible open drain", status: "completed" },
+      { stage: "AI Triage", time: "Oct 1, 07:16 AM", detail: "Flagged as CRITICAL Safety Hazard (Score 97)", status: "completed" },
+      { stage: "Dewatering Active", time: "Oct 1, 08:15 AM", detail: "Water pumped down by 25cm; caution barricade placed", status: "in_progress" }
     ]
   },
   {
-    id: "DL-2026-W08-0419",
-    title: "Dangerous Deep Asphalt Crater & Broken Storm Drain Grate",
-    descriptionRaw: "Main road pe bohot bada gaddha ban gaya hai jisme barish ka ganda paani bhara hai. Saath hi naali ki lohe ki jaali toot chuki hai jisse do-wheelers ke pahiye phans rahe hain aur roz log gir rahe hain.",
-    languageDetected: "Hinglish (Confidence 98%)",
+    id: "PN-2026-WAG-0119",
+    title: "Dangerous Deep Asphalt Crater & Broken Storm Drain Grate on Nagar Road Highway",
+    descriptionRaw: "Pune-Nagar Highway stretch near Lexicon entrance pe bohot bada gaddha ban gaya hai jisme barish ka ganda paani bhara hai. Naali ki lohe ki jaali toot chuki hai jisse two-wheelers roz gir rahe hain.",
+    languageDetected: "Hinglish / Marathi (Confidence 98%)",
     category: "Roads & Infrastructure",
-    department: "Public Works Department (PWD)",
-    officerName: "Er. Rajesh K. Meena",
-    officerDesignation: "Executive Engineer (Roads Division)",
+    department: "Public Works Department (PWD Pune)",
+    officerName: "Er. Amit Deshmukh",
+    officerDesignation: "PWD Executive Engineer (Roads)",
     location: {
-      ward: "Ward 8 (Civil Lines / Ring Road)",
-      area: "Ring Road, Near ISBT Kashmere Gate Junction",
-      city: "New Delhi",
-      pincode: "110054",
-      lat: 28.6692,
-      lng: 77.2285
+      ward: "Wagholi Ward 28 (Nagar Road Corridor)",
+      area: "Nagar Road Highway, Opp. Lexicon School",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5782,
+      lng: 73.9795
     },
     urgency: "CRITICAL",
     urgencyScore: 92,
     status: "IN_PROGRESS",
-    createdAt: "2026-09-16 01:20 PM",
-    slaDeadline: "2026-09-17 06:00 PM",
+    createdAt: "2026-10-01 08:20 AM",
+    slaDeadline: "2026-10-01 06:00 PM",
     slaHoursLeft: 5,
-    clusterId: "CL-W08-ROAD-02",
-    clusterTitle: "Civil Lines Ring Road Arterial Pothole & Broken Grate Cluster",
+    clusterId: "CL-WAG-ROADS-03",
+    clusterTitle: "Wagholi Highway Arterial Pothole & Broken Grate Cluster",
     clusterCount: 15,
     upvotes: 59,
     citizenName: "Pooja Malhotra",
     citizenPhone: "+91 98101-55829",
     evidence: {
-      photoUrl: "/civic-problems/ai_road_pothole.jpg",
+      photoUrl: "/civic-problems/pothole_broken_drain_grate.jpg",
       confidenceScore: 0.99,
       detectedIssue: "Severe Road Pothole Cavity & Damaged Iron Drain Grating"
     },
-    photoUrl: "/civic-problems/ai_road_pothole.jpg",
+    photoUrl: "/civic-problems/pothole_broken_drain_grate.jpg",
     grievanceDna: {
-      dnaId: "DNA-84192-W08",
+      dnaId: "DNA-WAG-412207-19",
       departmentConfidence: 99.3,
       urgencyScore: 92,
       sentimentScore: -0.87,
@@ -1263,21 +1254,19 @@ export const INITIAL_GRIEVANCES = [
       healthRiskLevel: "CRITICAL",
       extractedEntities: [
         { label: "Cavity Dimensions", val: "0.9m x 0.7m, Depth 0.25m" },
-        { label: "Hardware Failure", val: "Cast Iron Storm Drain Grate Fractured" },
-        { label: "Accident History", val: "3 Two-Wheeler Skids Logged in 48 Hours" }
+        { label: "Hardware Failure", val: "Cast Iron Storm Drain Grate Fractured" }
       ],
       ragMatches: [
         {
           caseId: "PWD-ROAD-2025-112",
           summary: "Cold-mix asphalt rapid patchwork and cast-iron frame replacement.",
           similarity: 0.97,
-          resolutionTime: "3.5 hours"
+          resolutionTime: "3 hours"
         }
       ]
     },
     aiOfficerBrief: [
       "Dual hazard: Deep asphalt pothole filled with water plus collapsed drain grate.",
-      "High danger of wheel-trap and severe rollover injuries for two-wheelers.",
       "Dispatch rapid patching truck with cast iron grate replacement and cold asphalt mix."
     ],
     recommendedResolution: {
@@ -1285,42 +1274,39 @@ export const INITIAL_GRIEVANCES = [
       standardOperatingProcedure: "PWD-FASTPATCH-ROAD-SOP",
       estimatedFixTime: "3 Hours",
       equipmentRequired: ["Cast Iron Grate (600x600mm)", "Cold Asphalt Mix (6 Bags)", "Compaction Plate Tamper"],
-      citizenDraftHindi: "प्रिय नागरिक, आपकी शिकायत पर PWD की टीम ने टूटी हुई जाली को बदलने और गड्ढे को डामर से भरने का काम शुरू कर दिया है। आज शाम तक सड़क पूरी तरह ठीक हो जाएगी।",
-      citizenDraftEnglish: "Dear Citizen, PWD maintenance crew is on site replacing the broken drain grate and filling the pothole with bituminous mix."
+      citizenDraftHindi: "प्रिय नागरिक, वाघोली नगर रोड पर गड्ढा भरने और टूटी जाली बदलने का कार्य PWD टीम द्वारा शुरू कर दिया गया है।",
+      citizenDraftEnglish: "Dear Citizen, PWD maintenance crew is on site replacing the broken drain grate and filling the pothole on Nagar Road."
     },
     timeline: [
-      { stage: "Submitted", time: "Sep 16, 01:20 PM", detail: "Citizen submitted dual photo of crater and broken drain grate", status: "completed" },
-      { stage: "AI Triage & DNA Generated", time: "Sep 16, 01:21 PM", detail: "Identified Critical Road Accident Hazard (Score 92)", status: "completed" },
-      { stage: "Contractor Dispatched", time: "Sep 16, 02:45 PM", detail: "Truck DL-2C-1090 loaded with replacement grate & asphalt", status: "completed" },
-      { stage: "On-Site Repair", time: "Sep 17, 09:30 AM", detail: "Grate frame anchored in concrete; pothole compaction underway", status: "in_progress" },
-      { stage: "Traffic Reopened", time: "Pending", detail: "Surface levelling verification", status: "pending" }
+      { stage: "Submitted", time: "Oct 1, 08:20 AM", detail: "Citizen submitted photo of crater and broken drain grate", status: "completed" },
+      { stage: "On-Site Repair", time: "Oct 1, 10:30 AM", detail: "Grate frame anchored; pothole compaction underway", status: "in_progress" }
     ]
   },
   {
-    id: "DL-2026-W05-0298",
-    title: "Dangerous Dangling Overhead Power Cables & Sparking Transformer",
-    descriptionRaw: "Bazaar ke pole par bijli ke taar bohot neeche latak rahe hain aur transformer se chingaariyan nikal rahi hain. Niche log aur dukan wale dar rahe hain, short circuit se kabhi bhi badi aag lag sakti hai.",
-    languageDetected: "Hinglish (Confidence 98%)",
-    category: "Electricity & Streetlights",
-    department: "BSES / Tata Power Delhi Distribution",
-    officerName: "Er. Neeraj Bansal",
-    officerDesignation: "Assistant Engineer (Electrical Safety & Distribution)",
+    id: "PN-2026-WAG-0120",
+    title: "Dangerous Dangling Overhead Power Cables & Sparking Transformer at Wagholi Chowk",
+    descriptionRaw: "Wagholi main chowk ke pole par 11kV transformer se chingaariyan nikal rahi hain aur LT wire bohot neeche latak rahi hai. Niche bazaar me dukan wale aur pedestrians dar rahe hain.",
+    languageDetected: "Hinglish / Marathi (Confidence 98%)",
+    category: "Electricity & Power Grid",
+    department: "MSEDCL Wagholi Sub-Division",
+    officerName: "Er. Nitin Chavan",
+    officerDesignation: "MSEDCL Junior Engineer (Wagholi)",
     location: {
-      ward: "Ward 5 (Kalkaji Market)",
-      area: "Main Market Commercial Electric Post #4B",
-      city: "New Delhi",
-      pincode: "110019",
-      lat: 28.5389,
-      lng: 77.2598
+      ward: "Wagholi Ward 27 (Central Market)",
+      area: "Wagholi Main Chowk, Near Bus Stop Post #4B",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5775,
+      lng: 73.9780
     },
     urgency: "CRITICAL",
     urgencyScore: 98,
     status: "IN_PROGRESS",
-    createdAt: "2026-09-17 07:00 AM",
-    slaDeadline: "2026-09-17 01:00 PM",
+    createdAt: "2026-10-01 07:00 AM",
+    slaDeadline: "2026-10-01 01:00 PM",
     slaHoursLeft: 2,
-    clusterId: "CL-W05-ELEC-01",
-    clusterTitle: "Kalkaji Market Dangling Power Cables & Sparking Hazard",
+    clusterId: "CL-WAG-POWER-05",
+    clusterTitle: "Wagholi Chowk Dangling Power Cables & Sparking Hazard",
     clusterCount: 16,
     upvotes: 79,
     citizenName: "Rakesh Gupta",
@@ -1332,7 +1318,7 @@ export const INITIAL_GRIEVANCES = [
     },
     photoUrl: "/civic-problems/ai_dangling_power_cables.jpg",
     grievanceDna: {
-      dnaId: "DNA-05298-W05",
+      dnaId: "DNA-WAG-412207-20",
       departmentConfidence: 99.8,
       urgencyScore: 98,
       sentimentScore: -0.94,
@@ -1340,12 +1326,11 @@ export const INITIAL_GRIEVANCES = [
       healthRiskLevel: "CRITICAL",
       extractedEntities: [
         { label: "Asset Type", val: "11kV Distribution Transformer & Low Tension Overhead Lines" },
-        { label: "Defect", val: "Sagging Uninsulated Lines (< 2.2m clearance), Arcing Spark Jumps" },
-        { label: "Surrounding Hazard", val: "Cloth Shop Awnings & Pedestrian Crowds" }
+        { label: "Defect", val: "Sagging Uninsulated Lines (< 2.2m clearance), Arcing Spark Jumps" }
       ],
       ragMatches: [
         {
-          caseId: "BSES-CABLE-2025-003",
+          caseId: "MSEDCL-CABLE-2025-003",
           summary: "Substation feeder trip, line re-tensioning and bundle cabling upgrade.",
           similarity: 0.99,
           resolutionTime: "2 hours"
@@ -1353,92 +1338,89 @@ export const INITIAL_GRIEVANCES = [
       ]
     },
     aiOfficerBrief: [
-      "Severe electrocution hazard with low-hanging loose electrical cables over market walkway.",
-      "Sparks detected near transformer terminal; high fire risk to surrounding shop awnings.",
-      "Emergency line gang dispatched for immediate power isolation and aerial bundle re-tensioning."
+      "Severe electrocution hazard with low-hanging electrical cables over market walkway.",
+      "Emergency lineman gang dispatched for power isolation and aerial bundle re-tensioning."
     ],
     recommendedResolution: {
       primaryAction: "Isolate Feeder & Re-tension Overhead Cables into Aerial Bundle Conductors (ABC)",
-      standardOperatingProcedure: "BSES-EMERGENCY-ELECTRICAL-SOP",
+      standardOperatingProcedure: "MSEDCL-EMERGENCY-ELECTRICAL-SOP",
       estimatedFixTime: "2 Hours",
       equipmentRequired: ["Hydraulic Cherry Picker Lift", "Insulated Hot Stick (33kV)", "Aerial Bundle Cable Clamps"],
-      citizenDraftHindi: "प्रिय नागरिक, लटकते बिजली के तारों और ट्रांसफार्मर की जांच के लिए बिजली विभाग की आपातकालीन टीम मौके पर पहुंच चुकी है। तारों को कसकर सुरक्षित किया जा रहा है।",
-      citizenDraftEnglish: "Dear Citizen, emergency electrical line squad is on site isolating the feed, re-tensioning loose cables, and securing the transformer."
+      citizenDraftHindi: "प्रिय नागरिक, वाघोली चौक पर लटकते बिजली के तारों और ट्रांसफार्मर की मरम्मत के लिए महावितरण की आपातकालीन टीम मौके पर पहुंच चुकी है।",
+      citizenDraftEnglish: "Dear Citizen, MSEDCL emergency electrical line squad is on site isolating the feed, re-tensioning loose cables, and securing the transformer at Wagholi Chowk."
     },
     timeline: [
-      { stage: "Submitted", time: "Sep 17, 07:00 AM", detail: "Citizen logged emergency complaint of sagging live wires and sparks", status: "completed" },
-      { stage: "AI Triage & DNA Generated", time: "Sep 17, 07:01 AM", detail: "Triggered CRITICAL Electrocution & Fire Risk Alert (Score 98)", status: "completed" },
-      { stage: "Line Gang Dispatched", time: "Sep 17, 07:20 AM", detail: "Hydraulic lift bucket truck en route to market", status: "completed" },
-      { stage: "Cable Re-tensioning Active", time: "Sep 17, 08:00 AM", detail: "Power temporarily isolated; cables being elevated", status: "in_progress" },
-      { stage: "Final Safety Inspection", time: "Pending", detail: "Transformer insulation testing & signoff", status: "pending" }
+      { stage: "Submitted", time: "Oct 1, 07:00 AM", detail: "Citizen logged emergency complaint of sagging wires and sparks", status: "completed" },
+      { stage: "Line Gang Dispatched", time: "Oct 1, 07:20 AM", detail: "Hydraulic lift bucket truck en route to Wagholi Chowk", status: "completed" },
+      { stage: "Cable Re-tensioning Active", time: "Oct 1, 08:00 AM", detail: "Power temporarily isolated; cables being elevated", status: "in_progress" }
     ]
   }
 ];
 
 export const MOCK_CLUSTERS = [
   {
-    id: "CL-W14-WATER-01",
-    title: "Rohini Sector 14 Main Feeder Pipe Fracture Cluster",
-    department: "Delhi Jal Board (DJB)",
-    ward: "Ward 14 (Rohini Sector 14)",
-    complaintCount: 14,
+    id: "CL-WAG-WATER-02",
+    title: "Wagholi Baif Road & Kesnand Feeder Pipe Rupture Cluster",
+    department: "PMC Water Supply Department",
+    ward: "Wagholi Ward 27 (Baif Road Corridor)",
+    complaintCount: 18,
     severity: "CRITICAL",
-    rootCause: "150mm High-pressure cast-iron main joint rupture near Shree Ganesh Medicals",
-    impactRadius: "450 Households across Sector 14 Market & Block B",
+    rootCause: "150mm High-pressure cast-iron main joint rupture near Baif Road Market",
+    impactRadius: "450 Households across Baif Road & Kesnand Corridor",
     status: "ACTIVE_INVESTIGATION",
-    firstReported: "Sep 16, 2026",
+    firstReported: "Oct 1, 2026",
     estimatedResolution: "Today, 04:00 PM"
   },
   {
-    id: "CL-W22-SAN-09",
-    title: "Mayur Vihar Phase 1 Commercial Waste Backlog",
-    department: "Municipal Corporation of Delhi (MCD)",
-    ward: "Ward 22 (Mayur Vihar)",
+    id: "CL-WAG-GARBAGE-01",
+    title: "Wagholi Baif Road & Ivy Estate Commercial Waste Backlog",
+    department: "PMC Solid Waste Management",
+    ward: "Wagholi Ward 29 (Kesnand Corridor)",
     complaintCount: 16,
     severity: "HIGH",
     rootCause: "Dumper collection backlog leading to commercial plastic trash pile up on carriageway",
     impactRadius: "Market visitors & 80 retail shops",
     status: "IN_PROGRESS",
-    firstReported: "Sep 16, 2026",
+    firstReported: "Oct 1, 2026",
     estimatedResolution: "Today, 06:00 PM"
   },
   {
-    id: "CL-W03-DRAIN-01",
-    title: "Karol Bagh Junction Monsoon Inundation & Submerged Manhole",
-    department: "Public Works Department (PWD)",
-    ward: "Ward 3 (Karol Bagh)",
+    id: "CL-WAG-DRAIN-04",
+    title: "Ubale Nagar & Underpass Monsoon Inundation Cluster",
+    department: "PMC Drainage Department",
+    ward: "Wagholi Ward 30 (Ubale Nagar)",
     complaintCount: 19,
     severity: "CRITICAL",
     rootCause: "Blocked underground culvert combined with uncovered open storm manhole chamber",
-    impactRadius: "Arterial Pusa Road Crossing",
+    impactRadius: "Arterial Ubale Nagar Crossing",
     status: "CREW_DISPATCHED",
-    firstReported: "Sep 17, 2026",
+    firstReported: "Oct 1, 2026",
     estimatedResolution: "Today, 01:00 PM"
   },
   {
-    id: "CL-W08-ROAD-02",
-    title: "Civil Lines Ring Road Arterial Pothole & Broken Grate Cluster",
-    department: "Public Works Department (PWD)",
-    ward: "Ward 8 (Civil Lines / Ring Road)",
+    id: "CL-WAG-ROADS-03",
+    title: "Pune-Nagar Highway Arterial Pothole & Broken Grate Cluster",
+    department: "Public Works Department (PWD Pune)",
+    ward: "Wagholi Ward 28 (Nagar Road Corridor)",
     complaintCount: 15,
     severity: "CRITICAL",
     rootCause: "Heavy monsoon runoff subgrade subsidence and damaged iron storm drain grating",
-    impactRadius: "Arterial Ring Road Junction & ISBT Flyover Approach",
+    impactRadius: "Arterial Highway Junction & Lexicon School Entrance",
     status: "CREW_DISPATCHED",
-    firstReported: "Sep 16, 2026",
+    firstReported: "Oct 1, 2026",
     estimatedResolution: "Today, 06:00 PM"
   },
   {
-    id: "CL-W05-ELEC-01",
-    title: "Kalkaji Market Dangling Power Cables & Sparking Hazard",
-    department: "BSES / Tata Power Delhi Distribution",
-    ward: "Ward 5 (Kalkaji)",
+    id: "CL-WAG-POWER-05",
+    title: "Wagholi Chowk Dangling Power Cables & Sparking Hazard",
+    department: "MSEDCL Wagholi Sub-Division",
+    ward: "Wagholi Ward 27 (Central Market)",
     complaintCount: 16,
     severity: "CRITICAL",
     rootCause: "Low-tension distribution cable slackening and arcing transformer terminals over market street",
     impactRadius: "Commercial shopping market corridor & 1,200 pedestrians",
     status: "ACTIVE_INVESTIGATION",
-    firstReported: "Sep 17, 2026",
+    firstReported: "Oct 1, 2026",
     estimatedResolution: "Today, 01:00 PM"
   }
 ];
@@ -1461,9 +1443,9 @@ export const INITIAL_NOTIFICATIONS = [
     userId: 'USR-CITIZEN-01',
     userRole: 'citizen',
     title: 'Water Pipe Burst Squad on Site',
-    message: 'DJB Quick-Response Team is actively repairing the 150mm pipe burst near Shree Ganesh Medicals (Ticket DL-2026-W14-0892).',
-    grievanceId: 'DL-2026-W14-0892',
-    link: '/citizen/DL-2026-W14-0892',
+    message: 'PMC Quick-Response Team is actively repairing the 200mm pipe burst near Ivy Estate Gate 2 (Ticket PN-2026-WAG-0102).',
+    grievanceId: 'PN-2026-WAG-0102',
+    link: '/citizen/PN-2026-WAG-0102',
     type: 'STATUS_UPDATE',
     read: false,
     createdAt: '10 mins ago',
@@ -1474,9 +1456,9 @@ export const INITIAL_NOTIFICATIONS = [
     userId: 'USR-CITIZEN-01',
     userRole: 'citizen',
     title: 'Sanitation Dumper Dispatched',
-    message: 'MCD 12MT compactor unit deployed to Mayur Vihar Market road for ticket DL-2026-W22-0112.',
-    grievanceId: 'DL-2026-W22-0112',
-    link: '/citizen/DL-2026-W22-0112',
+    message: 'PMC 12MT compactor unit deployed to Baif Road Market Yard for ticket PN-2026-WAG-0101.',
+    grievanceId: 'PN-2026-WAG-0101',
+    link: '/citizen/PN-2026-WAG-0101',
     type: 'STATUS_UPDATE',
     read: true,
     createdAt: '25 mins ago',
@@ -1487,8 +1469,8 @@ export const INITIAL_NOTIFICATIONS = [
     userId: 'USR-OFFICER-01',
     userRole: 'officer',
     title: 'Emergency Drainage Case Assigned',
-    message: 'New grievance DL-2026-W03-0667 (Severe Monsoon Inundation & Submerged Drain) assigned with 3h SLA.',
-    grievanceId: 'DL-2026-W03-0667',
+    message: 'New grievance PN-2026-WAG-0103 (Domkhel Road Stormwater Drainage Blockage) assigned with 3h SLA.',
+    grievanceId: 'PN-2026-WAG-0103',
     link: '/officer',
     type: 'ASSIGNMENT',
     read: false,
@@ -1500,8 +1482,8 @@ export const INITIAL_NOTIFICATIONS = [
     userId: 'USR-OFFICER-01',
     userRole: 'officer',
     title: 'Electrical Hazard SLA Alert',
-    message: 'Ticket DL-2026-W05-0298 (Dangling Power Cables & Sparking Transformer) approaching SLA deadline.',
-    grievanceId: 'DL-2026-W05-0298',
+    message: 'Ticket PN-2026-WAG-0104 (Raisoni College Chowk Transformer Sparking) approaching SLA deadline.',
+    grievanceId: 'PN-2026-WAG-0104',
     link: '/officer',
     type: 'SLA_ALERT',
     read: false,
@@ -1513,8 +1495,8 @@ export const INITIAL_NOTIFICATIONS = [
     userId: 'USR-DEPTADMIN-01',
     userRole: 'dept_admin',
     title: 'Arterial Road Cavity Alert',
-    message: 'Ticket DL-2026-W08-0419 (Civil Lines Ring Road Pothole & Broken Grate) prioritized for emergency compaction.',
-    grievanceId: 'DL-2026-W08-0419',
+    message: 'Ticket PN-2026-WAG-0105 (Pune-Nagar Highway Deep Crater near Lexicon) prioritized for emergency compaction.',
+    grievanceId: 'PN-2026-WAG-0105',
     link: '/admin',
     type: 'SYSTEMIC_HOTSPOT',
     read: false,
@@ -1522,3 +1504,4 @@ export const INITIAL_NOTIFICATIONS = [
     timestamp: new Date(Date.now() - 120 * 60 * 1000).toISOString()
   }
 ];
+

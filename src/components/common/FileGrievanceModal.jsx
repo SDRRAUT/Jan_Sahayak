@@ -49,17 +49,17 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
   // Step 3: Location Details
   const [isDetectingGps, setIsDetectingGps] = useState(false);
   const [landmark, setLandmark] = useState('');
-  const [area, setArea] = useState('Sector 14 Corridor');
-  const [ward, setWard] = useState(user?.ward || 'Ward 14 (Rohini Sector 14)');
-  const [pincode, setPincode] = useState(user?.pincode || '110085');
+  const [area, setArea] = useState('Ivy Estate, Kesnand Road');
+  const [ward, setWard] = useState(user?.ward || 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)');
+  const [pincode, setPincode] = useState(user?.pincode || '412207');
   const [gpsLocked, setGpsLocked] = useState(false);
   const [gpsCoordinates, setGpsCoordinates] = useState(null);
   const [gpsErrorMsg, setGpsErrorMsg] = useState('');
   const [stepErrorMsg, setStepErrorMsg] = useState('');
 
   // Step 4: Contact & Urgency
-  const [citizenName, setCitizenName] = useState(user?.name || 'Aditya Verma');
-  const [citizenPhone, setCitizenPhone] = useState(user?.phone || '+91 98712-88210');
+  const [citizenName, setCitizenName] = useState(user?.name || 'Rahul Raut');
+  const [citizenPhone, setCitizenPhone] = useState(user?.phone || '+91 98230-12345');
   const [urgency, setUrgency] = useState('HIGH');
 
   // Submission State & Result
@@ -422,15 +422,15 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
         pincode,
         category,
         urgency,
-        citizenName: citizenName || user?.name || 'Aditya Verma',
-        citizenPhone: citizenPhone || user?.phone || '+91 98712-88210',
+        citizenName: citizenName || user?.name || 'Rahul Raut',
+        citizenPhone: citizenPhone || user?.phone || '+91 98230-12345',
         location: {
           ward,
           area: landmark ? `${landmark}, ${area}` : area,
-          city: 'New Delhi',
+          city: 'Pune, Maharashtra',
           pincode,
-          lat: gpsCoordinates?.lat || 28.7185,
-          lng: gpsCoordinates?.lng || 77.1250
+          lat: gpsCoordinates?.lat || 18.5793,
+          lng: gpsCoordinates?.lng || 73.9785
         },
         evidence: {
           hasPhoto: !!photoPreview,
@@ -610,7 +610,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
               </div>
 
               <p style={{ fontSize: '13px', color: '#475569', maxWidth: '480px', margin: '0 auto 16px auto', lineHeight: 1.5 }}>
-                Your grievance is officially registered and dispatched to <strong>{createdTicket.department || 'Delhi Municipal Authority'}</strong>. Real-time updates active.
+                Your grievance is officially registered and dispatched to <strong>{createdTicket.department || 'Pune Municipal Corporation (PMC)'}</strong>. Real-time updates active.
               </p>
 
               {/* Real-time Dispatch Dual Channel Cards */}
@@ -1290,11 +1290,11 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                           background: '#FFFFFF'
                         }}
                       >
-                        <option value="Ward 14 (Rohini Sector 14)">Ward 14 (Rohini Sector 14)</option>
-                        <option value="Ward 22 (Civil Lines)">Ward 22 (Civil Lines)</option>
-                        <option value="Ward 33 (Karol Bagh)">Ward 33 (Karol Bagh)</option>
-                        <option value="Ward 45 (Lajpat Nagar)">Ward 45 (Lajpat Nagar)</option>
-                        <option value="Ward 60 (Dwarka Sector 6)">Ward 60 (Dwarka Sector 6)</option>
+                        <option value="Wagholi Ward 27 (Nagar Road Highway & Raisoni Chowk)">Wagholi Ward 27 (Nagar Road Highway & Raisoni Chowk)</option>
+                        <option value="Wagholi Ward 28 (Baif Road & Market Yard)">Wagholi Ward 28 (Baif Road & Market Yard)</option>
+                        <option value="Wagholi Ward 29 (Ivy Estate & Kesnand Road)">Wagholi Ward 29 (Ivy Estate & Kesnand Road)</option>
+                        <option value="Wagholi Ward 30 (Domkhel & Ubale Nagar)">Wagholi Ward 30 (Domkhel & Ubale Nagar)</option>
+                        <option value="Wagholi Ward 31 (Bakori Road & Wagheshwar)">Wagholi Ward 31 (Bakori Road & Wagheshwar)</option>
                       </select>
                     </div>
 
@@ -1306,7 +1306,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                         type="text"
                         value={pincode}
                         onChange={(e) => setPincode(e.target.value)}
-                        placeholder="110085"
+                        placeholder="412207"
                         style={{
                           width: '100%',
                           height: '38px',

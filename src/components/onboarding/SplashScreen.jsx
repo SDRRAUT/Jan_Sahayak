@@ -140,7 +140,7 @@ export default function SplashScreen({ onStart }) {
         </svg>
 
         {/* Floating Integration Node Pills (Left Side — Municipal Authorities) */}
-        {/* Node L1: DJB */}
+        {/* Node L1: PMC */}
         <div style={{
           position: 'absolute',
           left: '10%',
@@ -167,7 +167,7 @@ export default function SplashScreen({ onStart }) {
           }}>
             💧
           </div>
-          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>DJB Water</span>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>PMC Water</span>
         </div>
 
         {/* Node L2: PWD */}
@@ -197,10 +197,10 @@ export default function SplashScreen({ onStart }) {
           }}>
             🛣️
           </div>
-          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>PWD Roads</span>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>PWD Pune</span>
         </div>
 
-        {/* Node L3: MCD */}
+        {/* Node L3: PMC Waste */}
         <div style={{
           position: 'absolute',
           left: '13%',
@@ -227,10 +227,10 @@ export default function SplashScreen({ onStart }) {
           }}>
             ♻️
           </div>
-          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>MCD Waste</span>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>PMC Waste</span>
         </div>
 
-        {/* Node L4: BSES */}
+        {/* Node L4: MSEDCL */}
         <div style={{
           position: 'absolute',
           left: '10%',
@@ -257,7 +257,7 @@ export default function SplashScreen({ onStart }) {
           }}>
             ⚡
           </div>
-          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>BSES Power</span>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>MSEDCL Power</span>
         </div>
 
         {/* Floating Integration Node Pills (Right Side — Intelligence & AI Capabilities) */}

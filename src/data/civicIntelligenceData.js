@@ -1,12 +1,12 @@
 /**
- * CIVIC INTELLIGENCE SEED DATA & ENTERPRISE CONTRACTS
+ * CIVIC INTELLIGENCE SEED DATA & ENTERPRISE CONTRACTS (WAGHOLI, PUNE)
  * 
  * Implements:
  * 1. Civic Signals (Lightweight citizen observations)
- * 2. Civic Incidents (100 Complaints -> 1 Civic Incident)
+ * 2. Civic Incidents (Clustered & Correlated Civic Incidents)
  * 3. Complaint DNA (Semantic fingerprinting across 18 dimensions)
- * 4. Problem Spread Geographic Intelligence (Progression over time)
- * 5. Cross-Department Correlation & Shared Problem Graph
+ * 4. Problem Spread Geographic Intelligence (Progression over time in Wagholi)
+ * 5. Cross-Department Correlation & Shared Problem Graph (PMC Water, PWD Pune, PMC SWM, MSEDCL)
  * 6. Civic Memory (Institutional long-term resolution history)
  * 7. Root-Cause Hypotheses (Evidence-traceable reasoning)
  * 8. Action Simulations (Multi-scenario comparative decision support)
@@ -16,160 +16,124 @@
 export const CIVIC_SIGNALS = [
   {
     id: "SIG-WAG-001",
-    incidentId: "INC-2026-PUNE-WAGHOLI-01",
+    incidentId: "INC-2026-PUNE-WAG-01",
     citizenName: "Santosh Gawade",
-    ward: "Wagholi Ward 28 (Baif Road Market)",
+    ward: "Wagholi Ward 29 (Ivy Estate & Kesnand Road)",
     channel: "VOICE_NOTE",
-    rawInput: "Baif Road market junction par kachra 5 din se pada hai, badbu aa rahi hai.",
-    translatedText: "Garbage has been lying at Baif Road market junction for 5 days, terrible foul smell.",
-    category: "Sanitation & Solid Waste",
-    inferredAsset: "PMC Waste Collection Point",
-    hasPhoto: true,
-    photoUrl: "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80",
-    lat: 18.5815,
-    lng: 73.9840,
-    timestamp: "2026-10-01 07:45 AM",
-    status: "CLUSTERED",
-    confidence: "High (97%)"
-  },
-  {
-    id: "SIG-WAG-002",
-    incidentId: "INC-2026-PUNE-WAGHOLI-02",
-    citizenName: "Priyanka Jadhav",
-    ward: "Wagholi Ward 29 (Ivy Estate & Kesnand Rd)",
-    channel: "PHOTO_UPLOAD",
-    rawInput: "Ivy estate road pipeline burst, paani sadak par beh raha hai.",
-    translatedText: "Ivy Estate road water pipeline burst, water flowing on road.",
+    rawInput: "Ivy Estate main gate samne roadside pipeline leak hot ahe, paani rastyavar vahat ahe.",
+    translatedText: "Continuous potable water leakage from roadside pipeline in front of Ivy Estate main gate since last 2 days.",
     category: "Water Supply & Contamination",
-    inferredAsset: "200mm HDPE Feeder Line",
+    inferredAsset: "200mm HDPE Supply Feeder Main",
     hasPhoto: true,
     photoUrl: "https://images.unsplash.com/photo-1584467735815-f778f274e296?w=600&auto=format&fit=crop&q=80",
     lat: 18.5760,
     lng: 73.9810,
-    timestamp: "2026-10-01 08:10 AM",
+    timestamp: "2026-10-01 07:45 AM",
     status: "CLUSTERED",
     confidence: "High (98%)"
   },
   {
-    id: "SIG-2026-001",
-    incidentId: "INC-2026-DEL-01",
-    citizenName: "Pooja Malhotra",
-    ward: "Ward 14 (Rohini Sector 14)",
-    channel: "VOICE_NOTE",
-    rawInput: "Road ke side se paani aa raha hai continuous pichle 2 din se.",
-    translatedText: "Water is continuously leaking from the roadside since the last 2 days.",
+    id: "SIG-WAG-002",
+    incidentId: "INC-2026-PUNE-WAG-01",
+    citizenName: "Priyanka Jadhav",
+    ward: "Wagholi Ward 29 (Ivy Estate & Kesnand Road)",
+    channel: "QUICK_TEXT",
+    rawInput: "Morning municipal tap water smells foul like drainage in Tower B & C.",
+    translatedText: "Morning municipal tap water smells foul like drainage in Tower B & C.",
     category: "Water Supply & Contamination",
-    inferredAsset: "Roadside Water Pipeline Seam",
-    hasPhoto: true,
-    photoUrl: "https://images.unsplash.com/photo-1584467735815-f778f274e296?w=600&auto=format&fit=crop&q=80",
-    lat: 28.7170,
-    lng: 77.1250,
-    timestamp: "2026-09-12 08:15 AM",
+    inferredAsset: "Drinking Water Supply Feeder",
+    hasPhoto: false,
+    lat: 18.5765,
+    lng: 73.9818,
+    timestamp: "2026-10-01 08:30 AM",
     status: "CLUSTERED",
     confidence: "High (94%)"
   },
   {
-    id: "SIG-2026-002",
-    incidentId: "INC-2026-DEL-01",
-    citizenName: "Vikram Sethi",
-    ward: "Ward 14 (Rohini Sector 14)",
-    channel: "QUICK_TEXT",
-    rawInput: "Morning municipal tap water smells foul like sewer in Pocket 2.",
-    translatedText: "Morning municipal tap water smells foul like sewer in Pocket 2.",
-    category: "Water Supply & Contamination",
-    inferredAsset: "Drinking Water Supply Feeder",
-    hasPhoto: false,
-    lat: 28.7180,
-    lng: 77.1258,
-    timestamp: "2026-09-12 09:40 AM",
-    status: "CLUSTERED",
-    confidence: "High (91%)"
-  },
-  {
-    id: "SIG-2026-003",
-    incidentId: "INC-2026-DEL-01",
+    id: "SIG-WAG-003",
+    incidentId: "INC-2026-PUNE-WAG-01",
     citizenName: "Anand Rathi",
-    ward: "Ward 14 (Rohini Sector 14)",
+    ward: "Wagholi Ward 29 (Ivy Estate & Kesnand Road)",
     channel: "QUICK_TEXT",
-    rawInput: "Low water pressure on 1st and 2nd floors since yesterday.",
-    translatedText: "Low water pressure on 1st and 2nd floors since yesterday.",
+    rawInput: "Low water pressure on 1st and 2nd floors along Kesnand road since yesterday.",
+    translatedText: "Low water pressure on 1st and 2nd floors along Kesnand road since yesterday.",
     category: "Water Supply & Contamination",
     inferredAsset: "Distribution Pressure Feeder",
     hasPhoto: false,
-    lat: 28.7192,
-    lng: 77.1264,
-    timestamp: "2026-09-13 07:15 AM",
+    lat: 18.5772,
+    lng: 73.9825,
+    timestamp: "2026-10-01 09:15 AM",
     status: "CLUSTERED",
-    confidence: "Medium (85%)"
+    confidence: "Medium (88%)"
   },
   {
-    id: "SIG-2026-004",
-    incidentId: "INC-2026-DEL-01",
+    id: "SIG-WAG-004",
+    incidentId: "INC-2026-PUNE-WAG-01",
     citizenName: "Ritu Sharma",
-    ward: "Ward 12 (Pitampura Border)",
+    ward: "Wagholi Ward 28 (Baif Road & Market Yard)",
     channel: "PHOTO_UPLOAD",
-    rawInput: "Road asphalt has become soft and wavy near Mother Dairy lane.",
-    translatedText: "Road asphalt has become soft and wavy near Mother Dairy lane.",
+    rawInput: "Road asphalt has sunken and softened near Baif Road entry junction due to water seepage.",
+    translatedText: "Road asphalt has sunken and softened near Baif Road entry junction due to water seepage.",
     category: "Roads & Infrastructure",
     inferredAsset: "Arterial Road Subgrade",
     hasPhoto: true,
     photoUrl: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600&auto=format&fit=crop&q=80",
-    lat: 28.7155,
-    lng: 77.1235,
-    timestamp: "2026-09-13 04:30 PM",
+    lat: 18.5810,
+    lng: 73.9835,
+    timestamp: "2026-10-01 10:30 AM",
     status: "CLUSTERED",
     confidence: "High (96%)"
   },
   {
-    id: "SIG-2026-005",
-    incidentId: "INC-2026-DEL-01",
+    id: "SIG-WAG-005",
+    incidentId: "INC-2026-PUNE-WAG-01",
     citizenName: "Suresh Narang",
-    ward: "Ward 14 (Rohini Sector 14)",
+    ward: "Wagholi Ward 29 (Ivy Estate & Kesnand Road)",
     channel: "VOICE_NOTE",
-    rawInput: "Water pooling near school boundary wall even though no rain today.",
-    translatedText: "Water pooling near school boundary wall even though no rain today.",
+    rawInput: "Water pooling near Lexicon Kids school boundary wall even though no rain today.",
+    translatedText: "Water pooling near Lexicon Kids school boundary wall even though no rain today.",
     category: "Water Supply & Contamination",
     inferredAsset: "Underground Supply Valve",
     hasPhoto: true,
     photoUrl: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&auto=format&fit=crop&q=80",
-    lat: 28.7188,
-    lng: 77.1269,
-    timestamp: "2026-09-14 11:20 AM",
+    lat: 18.5755,
+    lng: 73.9805,
+    timestamp: "2026-10-01 11:20 AM",
     status: "CLUSTERED",
     confidence: "High (92%)"
   },
   {
-    id: "SIG-2026-006",
-    incidentId: "INC-2026-DEL-02",
+    id: "SIG-WAG-006",
+    incidentId: "INC-2026-PUNE-WAG-02",
     citizenName: "Karan Johar",
-    ward: "Ward 8 (Lajpat Nagar)",
+    ward: "Wagholi Ward 28 (Baif Road & Market Yard)",
     channel: "PHOTO_UPLOAD",
-    rawInput: "Underpass drain grate completely blocked with construction debris.",
-    translatedText: "Underpass drain grate completely blocked with construction debris.",
-    category: "Roads & Infrastructure",
-    inferredAsset: "Stormwater Drainage Grate",
+    rawInput: "Baif Road vegetable market corner has massive open garbage dump spilling into storm drain.",
+    translatedText: "Baif Road vegetable market corner has massive open garbage dump spilling into storm drain.",
+    category: "Sanitation & Solid Waste",
+    inferredAsset: "PMC Waste Collection Point & Storm Drain",
     hasPhoto: true,
-    photoUrl: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&auto=format&fit=crop&q=80",
-    lat: 28.5684,
-    lng: 77.2341,
-    timestamp: "2026-09-15 08:30 AM",
+    photoUrl: "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80",
+    lat: 18.5818,
+    lng: 73.9845,
+    timestamp: "2026-10-01 08:30 AM",
     status: "CLUSTERED",
     confidence: "High (95%)"
   },
   {
-    id: "SIG-2026-007",
-    incidentId: "INC-2026-DEL-03",
+    id: "SIG-WAG-007",
+    incidentId: "INC-2026-PUNE-WAG-03",
     citizenName: "Deepak Chawla",
-    ward: "Ward 5 (Kalkaji)",
+    ward: "Wagholi Ward 27 (Nagar Road Highway & Raisoni Chowk)",
     channel: "VOICE_NOTE",
-    rawInput: "Pole transformer making loud buzzing spark sounds intermittently.",
-    translatedText: "Pole transformer making loud buzzing spark sounds intermittently.",
+    rawInput: "Transformer near Raisoni College gate making loud buzzing spark sounds intermittently.",
+    translatedText: "Transformer near Raisoni College gate making loud buzzing spark sounds intermittently.",
     category: "Electricity & Power Grid",
-    inferredAsset: "400kVA Distribution Transformer",
+    inferredAsset: "400kVA Distribution Transformer (TR-WAG-04)",
     hasPhoto: false,
-    lat: 28.5442,
-    lng: 77.2589,
-    timestamp: "2026-09-16 11:45 AM",
+    lat: 18.5802,
+    lng: 73.9780,
+    timestamp: "2026-10-01 11:45 AM",
     status: "CLUSTERED",
     confidence: "Critical (98%)"
   }
@@ -177,106 +141,106 @@ export const CIVIC_SIGNALS = [
 
 export const CIVIC_INCIDENTS = [
   {
-    id: "INC-2026-DEL-01",
-    title: "Water Pipeline Joint Rupture & Cross-Subsoil Infiltration",
-    summary: "Subsurface joint fracture in 1988 cast-iron distribution feeder. Continuous water leakage has saturated road subgrade across Ward 12 & 14, causing negative pressure sewer infiltration into potable lines and softening arterial pavement.",
+    id: "INC-2026-PUNE-WAG-01",
+    title: "Potable Water Pipeline Joint Rupture & Cross-Subsoil Infiltration (Kesnand-Ivy Corridor)",
+    summary: "Subsurface joint fracture in 200mm feeder line along Kesnand Road. Continuous potable water leakage has saturated road subgrade across Wagholi Wards 28 & 29, causing negative pressure sewer infiltration into residential lines and softening arterial pavement.",
     incidentType: "INFRASTRUCTURE_FAILURE",
     status: "Investigating", // Detected | Investigating | Verified | Action Planned | Action In Progress | Contained | Resolved | Monitoring | Closed
     stage: "GROWING", // NORMAL | GROWING | EMERGING | CRITICAL
     stageVelocity: "+240% increase over 5 days",
     severity: "CRITICAL",
-    confidence: "High (89% signal correlation)",
+    confidence: "High (91% signal correlation)",
     signalCount: 37,
     formalComplaintsCount: 18,
     citizenObservationsCount: 19,
-    affectedArea: "Ward 12 → Ward 14 (Rohini Sector 14 Corridor)",
-    affectedPopulation: "~2,800 Citizens (650 Households)",
-    firstDetectedAt: "2026-09-12 08:15 AM",
+    affectedArea: "Wagholi Ward 29 → Ward 28 (Ivy Estate & Kesnand Road Corridor)",
+    affectedPopulation: "~4,500 Citizens (1,100 Households)",
+    firstDetectedAt: "2026-09-28 08:15 AM",
     lastUpdatedAt: "10 mins ago",
     departments: [
-      { name: "Delhi Jal Board (DJB)", lead: true, cases: 24, role: "Main potable carrier isolation, trench excavation & clamp replacement" },
-      { name: "Public Works Department (PWD)", lead: false, cases: 9, role: "Road pavement stabilizing & subsoil drainage rehabilitation" },
-      { name: "Municipal Corporation of Delhi (MCD)", lead: false, cases: 4, role: "Adjacent storm drain blockage clearing & sanitization" }
+      { name: "PMC Water Supply Department", lead: true, cases: 24, role: "Main potable carrier isolation, trench excavation & HDPE pipe coupling" },
+      { name: "PWD Pune / PMRDA", lead: false, cases: 9, role: "Road pavement stabilizing & subsoil drainage rehabilitation" },
+      { name: "PMC Solid Waste Management", lead: false, cases: 4, role: "Adjacent storm drain blockage clearing & sanitization" }
     ],
     complaintDna: {
       issueType: "Water Infrastructure",
       subIssue: "Pipeline Rupture & Negative Pressure Contamination",
       service: "Potable Municipal Water Distribution",
-      asset: "100mm Cast-Iron Feeder Main (Line-14C)",
-      locationContext: "Underground roadside utility corridor (Depth 1.4m)",
-      department: "Delhi Jal Board (DJB)",
-      subDepartment: "North-West Maintenance Division",
+      asset: "200mm HDPE Feeder Main (Line-WAG-29)",
+      locationContext: "Underground roadside utility corridor along Kesnand Road (Depth 1.6m)",
+      department: "PMC Water Supply Department",
+      subDepartment: "Wagholi Sub-Division Maintenance",
       severity: "CRITICAL",
       urgency: "HIGH",
       symptoms: [
-        "Intermittent pressure deficit in morning hours",
-        "Sewage backflow odor in drinking taps",
-        "Road sub-base waterlogging and asphalt wave",
-        "Foul yellowish water discharge in Pocket 2"
+        "Intermittent pressure deficit during morning pumping hours",
+        "Sewage backflow odor in drinking taps at Ivy Estate",
+        "Road sub-base waterlogging and asphalt wave near gate",
+        "Foul yellowish water discharge in Kesnand Road societies"
       ],
       entities: [
-        "Mother Dairy Booth #441",
-        "Pocket 2 Feeder Valve #7",
-        "Sector 14 Arterial Road",
-        "Govt Primary School #2"
+        "Ivy Estate Main Commercial Gate",
+        "Kesnand Road Feeder Valve #4",
+        "Wagholi-Kesnand Arterial Road",
+        "Lexicon Kids School"
       ],
       possibleCauses: [
-        "Aging 1988 cast-iron joint degradation exceeding 35-year design life",
-        "Loss of soil compaction due to heavy municipal truck traffic",
-        "Negative pressure cross-siphoning from adjacent masonry storm drain"
+        "HDPE joint flange seal failure from high surge pressure",
+        "Loss of soil compaction due to heavy dumper truck traffic",
+        "Negative pressure cross-siphoning from adjacent unlined storm drain"
       ],
       affectedPopulation: [
-        "650 residential households in Pocket 1 & 2",
-        "Sector 14 DDA Commercial Complex (42 shops)",
-        "Govt Primary School #2 (~420 students)"
+        "1,100 residential apartments in Ivy Estate & Kesnand Rd",
+        "Wagholi Commercial Market (48 shops)",
+        "Lexicon Kids School (~350 students)"
       ],
-      temporalPattern: "Severe during 07:00–10:00 AM municipal pumping cycle",
-      environmentalContext: "Post-monsoon saturated subsoil accelerating joint cavitation"
+      temporalPattern: "Severe during 06:30–10:00 AM municipal pumping cycle",
+      environmentalContext: "Saturated subsoil accelerating joint cavity expansion"
     },
     timeline: [
       {
-        date: "12 Sept",
+        date: "28 Sept",
         time: "08:15 AM",
         stage: "First Weak Signal Detected",
-        desc: "Citizen voice note SIG-2026-001 logged water trickling out from road seam near Mother Dairy booth.",
+        desc: "Citizen voice note SIG-WAG-001 logged water trickling out from road seam near Ivy Estate gate.",
         count: 1,
         source: "Citizen Signal"
       },
       {
-        date: "13 Sept",
+        date: "29 Sept",
         time: "09:30 AM",
         stage: "Signal Cluster Formation",
-        desc: "5 related citizen observations logged within 250m radius describing pressure loss and damp asphalt.",
-        count: 6,
+        desc: "6 related citizen observations logged within 250m radius describing pressure loss and damp asphalt.",
+        count: 7,
         source: "AI Clustering"
       },
       {
-        date: "14 Sept",
+        date: "30 Sept",
         time: "11:00 AM",
         stage: "Formal Complaint Wave",
-        desc: "12 formal citizen grievances submitted. AI Incident Engine aggregates signals into Civic Incident INC-2026-DEL-01.",
-        count: 18,
+        desc: "14 formal citizen grievances submitted. AI Incident Engine aggregates signals into Civic Incident INC-2026-PUNE-WAG-01.",
+        count: 21,
         source: "Incident Engine"
       },
       {
-        date: "15 Sept",
-        time: "02:20 PM",
+        date: "01 Oct",
+        time: "08:00 AM",
         stage: "Geographic Spread Detected",
-        desc: "Seepage crossed jurisdictional ward boundary from Ward 12 into Ward 14 Pocket 2.",
-        count: 26,
+        desc: "Seepage crossed jurisdictional boundary along Kesnand Road into Baif Road junction.",
+        count: 29,
         source: "Geographic Engine"
       },
       {
-        date: "16 Sept",
-        time: "04:45 PM",
+        date: "01 Oct",
+        time: "11:30 AM",
         stage: "Cross-Department Linkage",
-        desc: "PWD received 3 road depression reports along the identical pipeline corridor. MCD reported drain backflow.",
-        count: 32,
+        desc: "PWD Pune received 3 road depression reports along the identical pipeline corridor. PMC SWM reported drain backflow.",
+        count: 34,
         source: "Cross-Dept Detector"
       },
       {
-        date: "17 Sept",
-        time: "09:00 AM",
+        date: "01 Oct",
+        time: "02:00 PM",
         stage: "Escalation to GROWING Stage",
         desc: "Signal velocity reached +240%. High public distress triggers multi-department supervisory alert.",
         count: 37,
@@ -285,31 +249,31 @@ export const CIVIC_INCIDENTS = [
     ],
     spreadGeo: [
       {
-        step: "Day 1 (Sep 12)",
-        ward: "Ward 12 (Origin)",
-        lat: 28.7160,
-        lng: 77.1230,
-        radiusMeters: 140,
+        step: "Day 1 (Sep 28)",
+        ward: "Wagholi Ward 29 (Origin)",
+        lat: 18.5760,
+        lng: 73.9810,
+        radiusMeters: 120,
         signalCount: 2,
-        label: "Initial weak signal at pipeline valve pit",
+        label: "Initial weak signal at Kesnand Rd valve pit",
         color: "#10B981"
       },
       {
-        step: "Day 3 (Sep 14)",
-        ward: "Ward 12 & Ward 14 (Pocket 1)",
-        lat: 28.7175,
-        lng: 77.1248,
-        radiusMeters: 420,
+        step: "Day 3 (Sep 30)",
+        ward: "Wagholi Ward 29 (Ivy Estate Loop)",
+        lat: 18.5768,
+        lng: 73.9818,
+        radiusMeters: 380,
         signalCount: 18,
-        label: "Subsurface spread to Pocket 1 residential loop",
+        label: "Subsurface spread to Ivy Estate residential loop",
         color: "#F59E0B"
       },
       {
-        step: "Day 5 (Sep 16-17)",
-        ward: "Ward 12, 13 & 14 (Arterial Corridor)",
-        lat: 28.7190,
-        lng: 77.1270,
-        radiusMeters: 920,
+        step: "Day 5 (Oct 01)",
+        ward: "Wagholi Wards 28 & 29 (Arterial Corridor)",
+        lat: 18.5785,
+        lng: 73.9830,
+        radiusMeters: 850,
         signalCount: 37,
         label: "Full corridor impact: drinking water + road dip + drain backflow",
         color: "#EF4444"
@@ -317,75 +281,75 @@ export const CIVIC_INCIDENTS = [
     ],
     rootCauseHypotheses: [
       {
-        id: "RCH-01",
-        title: "Corrosion & Joint Dislodgement in 1988 Cast-Iron Main Line",
+        id: "RCH-WAG-01",
+        title: "Flange Joint Separation in 200mm HDPE Main Feeder Line",
         confidence: "HIGH",
-        confidenceScore: 88,
+        confidenceScore: 91,
         evidence: [
-          "37 correlated citizen signals & complaints clustered along the same 400m utility corridor",
-          "DJB GIS asset register marks line vintage as Year 1988 (exceeded 35-year design lifespan)",
-          "SCADA telemetry confirms local line pressure drop from 3.2 bar to 0.8 bar at 08:15 AM pump start",
-          "Historical precedent: Case DJB-HIST-2025-081 occurred 120m away under identical joint failure symptoms"
+          "37 correlated citizen signals & complaints clustered along the same 450m Kesnand utility corridor",
+          "PMC GIS asset register marks line installation vintage under heavy construction traffic stress",
+          "SCADA telemetry confirms local line pressure drop from 3.4 bar to 0.9 bar during morning pumping",
+          "Historical precedent: Case PMC-HIST-2025-081 occurred 150m away under identical joint failure symptoms"
         ],
         verificationRequired: true,
-        recommendedVerification: "Deploy acoustic leak correlator & ultrasonic pipe thickness sensor at Mother Dairy junction"
+        recommendedVerification: "Deploy acoustic leak correlator & ultrasonic pipe sensor near Ivy Estate Gate #1"
       },
       {
-        id: "RCH-02",
+        id: "RCH-WAG-02",
         title: "Cross-Siphoning from Damaged Stormwater Masonry Drain",
         confidence: "MEDIUM",
-        confidenceScore: 68,
+        confidenceScore: 72,
         evidence: [
-          "4 citizen complaints report foul sewer odor specifically during non-supply low-pressure hours",
-          "MCD sanitation log #MCD-SN-8902 notes cracked masonry wall in storm drain line #14 on Sep 10"
+          "5 citizen complaints report foul drainage odor specifically during non-supply low-pressure hours",
+          "PMC SWM inspection note #PMC-SN-4102 notes cracked masonry wall in storm drain along Kesnand Road"
         ],
         verificationRequired: true,
         recommendedVerification: "Conduct non-toxic fluorometric dye test at upstream storm drain inlet"
       }
     ],
     crossDepartmentImpact: {
-      primaryDepartment: "Delhi Jal Board (DJB)",
-      sharedProblemSummary: "Underground water main rupture is softening road base and causing drain overflow — affecting 3 separate civic authorities.",
+      primaryDepartment: "PMC Water Supply Department",
+      sharedProblemSummary: "Underground water main rupture is softening road base and causing drain overflow — affecting 3 civic departments.",
       departments: [
         {
-          dept: "Delhi Jal Board (DJB)",
+          dept: "PMC Water Supply Department",
           cases: 24,
           icon: "Droplet",
           badgeColor: "#0E5E3A",
-          impactSummary: "Main potable water pressure loss & contamination risk across 650 households."
+          impactSummary: "Main potable water pressure loss & contamination risk across 1,100 households."
         },
         {
-          dept: "Public Works Department (PWD)",
+          dept: "PWD Pune / PMRDA",
           cases: 9,
           icon: "Wrench",
           badgeColor: "#D97706",
-          impactSummary: "Road subgrade saturation causing 35cm asphalt depression. Acute accident risk for two-wheelers."
+          impactSummary: "Road subgrade saturation causing 30cm asphalt depression. Acute hazard for two-wheelers."
         },
         {
-          dept: "Municipal Corporation of Delhi (MCD)",
+          dept: "PMC Solid Waste Management",
           cases: 4,
           icon: "Building2",
           badgeColor: "#7C3AED",
-          impactSummary: "Storm drain blockage and standing water pools near Mother Dairy market boundary."
+          impactSummary: "Storm drain blockage and standing water pools near commercial market shops."
         }
       ],
-      coordinationRecommendation: "Initiate Unified Joint Action: DJB isolates feeder at 11:00 AM; PWD inspects road sub-base concurrently before asphalt re-bedding; MCD flushes storm drain barriers."
+      coordinationRecommendation: "Initiate Unified Joint Action: PMC Water isolates feeder at 11:00 AM; PWD inspects road sub-base concurrently before asphalt re-bedding; PMC SWM flushes drain barriers."
     },
     civicMemory: [
       {
         year: "2025",
         date: "14 June 2025",
-        incidentId: "DJB-HIST-2025-081",
-        title: "100mm Cast-Iron Main Joint Failure (Pocket 1)",
+        incidentId: "PMC-HIST-2025-081",
+        title: "200mm HDPE Main Joint Failure (Kesnand Road)",
         actionTaken: "Emergency split-sleeve repair clamp + sodium hypochlorite flush",
-        outcome: "Resolved immediate pressure deficit for 7 months, but thermal expansion stressed adjacent pipe segment.",
-        lessonsLearned: "Clamping older cast iron without cathodic protection creates galvanic stress 40-50m downstream within 12 months."
+        outcome: "Resolved immediate pressure deficit for 6 months, but ground settlement stressed adjacent joint.",
+        lessonsLearned: "Clamping HDPE without proper electrofusion coupling causes secondary joint stress 50m downstream."
       },
       {
         year: "2024",
         date: "22 March 2024",
-        incidentId: "DJB-HIST-2024-412",
-        title: "Sewer Cross-Infiltration at Mother Dairy Crossing",
+        incidentId: "PWD-HIST-2024-412",
+        title: "Road Sinking at Baif Road Junction",
         actionTaken: "Temporary bitumen patch over road surface without underground pipe realignment",
         outcome: "Pavement recaved after 8 weeks following heavy monsoon runoff.",
         lessonsLearned: "Patching road surface without replacing defective pipe guarantees structural pavement collapse."
@@ -393,49 +357,49 @@ export const CIVIC_INCIDENTS = [
     ],
     simulations: [
       {
-        id: "SIM-A",
+        id: "SIM-WAG-A",
         title: "Option A: Rapid Temporary Clamping (Split-Sleeve)",
-        description: "Excavate single 1.5m pit at Mother Dairy booth and install emergency stainless steel split-sleeve clamp.",
+        description: "Excavate single 1.5m pit at Ivy Estate gate and install emergency stainless steel split-sleeve clamp.",
         timeToIntervention: "4–6 Hours",
         expectedResolutionTime: "Same Day (6 Hours)",
         affectedPopulationReduction: "80% immediate relief",
-        recurrenceRisk: "HIGH (65% probability of recurrence within 6 months)",
+        recurrenceRisk: "HIGH (60% probability of recurrence within 6 months)",
         resourceRequirement: "Low (1 Repair Squad + 4 Technicians)",
-        costScore: "₹18,000 (Low Budget Impact)",
-        coordinationRequired: "DJB only",
+        costScore: "₹22,000 (Low Budget Impact)",
+        coordinationRequired: "PMC Water only",
         confidence: "High",
         recommendationVerdict: "SUB-OPTIMAL: High risk of repeated pavement collapse and secondary contamination."
       },
       {
-        id: "SIM-B",
-        title: "Option B: Full 24-Meter Ductile Iron Segment Replacement & PWD Road Re-bedding",
-        description: "Comprehensive replacement of aged 1988 line with modern polyurethane-lined ductile iron + PWD granular sub-base reconstruction.",
+        id: "SIM-WAG-B",
+        title: "Option B: Full 24-Meter Electrofusion HDPE Replacement & PWD Road Re-bedding",
+        description: "Comprehensive replacement with heavy-duty PE100 PN16 HDPE pipe + PWD granular sub-base reconstruction.",
         timeToIntervention: "18–24 Hours",
         expectedResolutionTime: "36 Hours (Temporary water tankers provided)",
         affectedPopulationReduction: "98% permanent fix",
-        recurrenceRisk: "LOW (< 5% recurrence over 15 years)",
-        resourceRequirement: "High (DJB Trenching Unit + PWD Roller Squad)",
-        costScore: "₹1,45,000 (Capital Infrastructure Allocation)",
-        coordinationRequired: "DJB + PWD + Delhi Traffic Police",
+        recurrenceRisk: "LOW (< 4% recurrence over 15 years)",
+        resourceRequirement: "High (PMC Trenching Unit + PWD Roller Squad)",
+        costScore: "₹1,65,000 (Capital Infrastructure Allocation)",
+        coordinationRequired: "PMC Water + PWD Pune + Pune Traffic Police",
         confidence: "High",
         recommendationVerdict: "RECOMMENDED: Eliminates long-term civic disruption and complies with Zero Dead-End mandate."
       },
       {
-        id: "SIM-C",
+        id: "SIM-WAG-C",
         title: "Option C: Multi-Department Joint Field Inspection & Pressure Testing",
-        description: "Before mechanical excavation, run acoustic leak correlation and dye testing across DJB and MCD assets.",
+        description: "Before mechanical excavation, run acoustic leak correlation and dye testing across PMC and PWD assets.",
         timeToIntervention: "2–3 Hours",
         expectedResolutionTime: "8 Hours (Diagnostic phase only)",
         affectedPopulationReduction: "0% (Diagnostic only)",
         recurrenceRisk: "N/A",
-        resourceRequirement: "Medium (Diagnostic Engineers from DJB & PWD)",
-        costScore: "₹6,500",
-        coordinationRequired: "DJB + MCD",
+        resourceRequirement: "Medium (Diagnostic Engineers from PMC & PWD)",
+        costScore: "₹8,500",
+        coordinationRequired: "PMC + PWD",
         confidence: "Very High",
         recommendationVerdict: "Essential first step before executing Option B."
       },
       {
-        id: "SIM-D",
+        id: "SIM-WAG-D",
         title: "Option D: Passive 7-Day Sensor Monitoring & Water Rationing",
         description: "Ration line pressure and monitor acoustic logger signals without active excavation.",
         timeToIntervention: "Immediate",
@@ -443,219 +407,219 @@ export const CIVIC_INCIDENTS = [
         affectedPopulationReduction: "10% (Reduced pressure only)",
         recurrenceRisk: "CRITICAL (100% road cave-in hazard)",
         resourceRequirement: "Low",
-        costScore: "₹2,000",
+        costScore: "₹2,500",
         coordinationRequired: "None",
         confidence: "Low",
         recommendationVerdict: "REJECTED: Poses unacceptable public health and vehicular accident hazards."
       }
     ],
     relatedGrievanceIds: [
-      "DL-2026-W14-0892",
-      "DL-2026-W14-0895",
-      "DL-2026-W14-0901",
-      "DL-2026-W14-0912"
+      "PN-2026-WAG-0101",
+      "PN-2026-WAG-0105",
+      "PN-2026-WAG-0114",
+      "PN-2026-WAG-0118"
     ],
     humanDecisions: [
       {
-        id: "DEC-01",
+        id: "DEC-WAG-01",
         decision: "ACCEPT_RECOMMENDATION",
-        actionSelected: "Option B: Full 24-Meter Ductile Iron Segment Replacement & PWD Road Re-bedding",
-        officer: "Er. Sanjay Sharma (AEE)",
-        timestamp: "Sep 16, 2026 10:30 AM",
-        notes: "Field inspection confirmed 1988 cast iron pipe is brittle. Authorizing trench squad with PWD coordination."
+        actionSelected: "Option B: Full 24-Meter Electrofusion HDPE Replacement & PWD Road Re-bedding",
+        officer: "Er. Sanjay Sharma (EE Wagholi)",
+        timestamp: "Oct 01, 2026 10:30 AM",
+        notes: "Field inspection confirmed HDPE flange joint damaged. Authorizing trench squad with PWD coordination."
       }
     ]
   },
   {
-    id: "INC-2026-DEL-02",
-    title: "Moolchand Underpass Storm Drain Inversion & Asphalt Erosion",
-    summary: "Heavy monsoon drain backflow at Moolchand arterial junction. Underground masonry drain collapse has washed away subsoil under asphalt, creating an acute 40cm cavity and flooding outer ring lanes.",
-    incidentType: "HAZARD_STRUCTURAL",
+    id: "INC-2026-PUNE-WAG-02",
+    title: "Baif Road Market Solid Waste Dump Spill & Storm Drain Clogging",
+    summary: "Massive solid waste accumulation at Baif Road vegetable market junction overflowing into adjacent stormwater culvert. Organic waste decay creating toxic leachate and blocking monsoon runoff.",
+    incidentType: "HAZARD_ENVIRONMENTAL",
     status: "Action Planned",
     stage: "EMERGING",
     stageVelocity: "+180% increase over 4 days",
     severity: "HIGH",
-    confidence: "Medium-High (84% signal correlation)",
-    signalCount: 21,
-    formalComplaintsCount: 11,
+    confidence: "Medium-High (86% signal correlation)",
+    signalCount: 22,
+    formalComplaintsCount: 12,
     citizenObservationsCount: 10,
-    affectedArea: "Ward 8 → Ward 9 (Lajpat Nagar / Moolchand Ring Road)",
-    affectedPopulation: "Major Commuter Corridor (~35,000 vehicles/day)",
-    firstDetectedAt: "2026-09-14 07:45 AM",
+    affectedArea: "Wagholi Ward 28 (Baif Road & Market Yard)",
+    affectedPopulation: "Major Market Corridor (~15,000 daily visitors)",
+    firstDetectedAt: "2026-09-29 07:45 AM",
     lastUpdatedAt: "25 mins ago",
     departments: [
-      { name: "Public Works Department (PWD)", lead: true, cases: 15, role: "Structural cavity filling, bitumen cold-patching & traffic cordoning" },
-      { name: "Municipal Corporation of Delhi (MCD)", lead: false, cases: 6, role: "Heavy silt extraction from underpass culvert drain" }
+      { name: "PMC Solid Waste Management", lead: true, cases: 16, role: "Heavy dumper compaction, leachate neutralizer & daily collection bin deployment" },
+      { name: "PMC Drainage & Sewerage Department", lead: false, cases: 6, role: "Super-sucker desilting of culvert drain beneath market road" }
     ],
     complaintDna: {
-      issueType: "Roads & Structural Infrastructure",
-      subIssue: "Underpass Silt Inversion & Asphalt Cavitation",
-      service: "Arterial Road Network",
-      asset: "Outer Ring Road Moolchand Underpass Slip Way",
-      locationContext: "Arterial Ring Road Junction (Below Moolchand Flyover)",
-      department: "Public Works Department (PWD)",
-      subDepartment: "South-East Road Division",
+      issueType: "Sanitation & Solid Waste",
+      subIssue: "Commercial Market Garbage Spill & Drain Blockage",
+      service: "Municipal Solid Waste Management",
+      asset: "Baif Road Secondary Waste Transfer Node",
+      locationContext: "Commercial market junction (Baif Road & Wagheshwar road connector)",
+      department: "PMC Solid Waste Management",
+      subDepartment: "Wagholi Sanitation Zone",
       severity: "HIGH",
       urgency: "CRITICAL",
-      symptoms: ["40cm deep road cavity", "Two-wheeler skidding", "Standing storm runoff puddle", "Traffic bottleneck"],
-      entities: ["Moolchand Underpass Entry", "Flyover Pillar #12", "Lajpat Nagar Central Market Turn"],
-      possibleCauses: ["Stormwater pipe rupture eroding asphalt base", "Heavy monsoon silt accumulation"],
-      affectedPopulation: ["Daily ring road commuters", "Lajpat Nagar local merchants"],
-      temporalPattern: "Severe peak hour congestion (08:30–11:00 AM, 05:30–08:30 PM)",
-      environmentalContext: "Recent heavy rainfall causing localized subsoil liquefaction"
+      symptoms: ["Severe foul odor", "Stray animal menace", "Blocked stormwater drain", "Pedestrian walkway obstructed"],
+      entities: ["Baif Road Market Yard", "Wagheshwar Temple Chowk", "PMC Feeder Bin #12"],
+      possibleCauses: ["Missed 3-day dumper cycle during festival rush", "Direct commercial dumping by vegetable vendors"],
+      affectedPopulation: ["Daily market shoppers", "Baif Road commercial shop owners"],
+      temporalPattern: "Severe peak morning and evening market hours (07:30–11:00 AM, 05:30–09:00 PM)",
+      environmentalContext: "Warm weather accelerating decomposition and fly breeding"
     },
     timeline: [
-      { date: "14 Sept", time: "07:45 AM", stage: "First Weak Signal", desc: "Citizen photo uploaded showing pothole water pooling under flyover.", count: 2, source: "Citizen Signal" },
-      { date: "15 Sept", time: "09:00 AM", stage: "Cluster Detected", desc: "8 reports logged; 2 scooter skidding accidents noted.", count: 10, source: "AI Clustering" },
-      { date: "16 Sept", time: "02:00 PM", stage: "Cross-Dept Escalation", desc: "MCD drain silt identified as primary cause of underpass pooling.", count: 18, source: "Cross-Dept Detector" },
-      { date: "17 Sept", time: "08:30 AM", stage: "Emerging Stage Triggered", desc: "Arterial ring road traffic delay reached 45 mins; emergency cordon deployed.", count: 21, source: "Escalation Engine" }
+      { date: "29 Sept", time: "07:45 AM", stage: "First Weak Signal", desc: "Citizen photo uploaded showing garbage spill across pavement.", count: 2, source: "Citizen Signal" },
+      { date: "30 Sept", time: "09:00 AM", stage: "Cluster Detected", desc: "8 reports logged; pedestrian obstruction and foul smell noted.", count: 10, source: "AI Clustering" },
+      { date: "30 Sept", time: "02:00 PM", stage: "Cross-Dept Escalation", desc: "Waste spill blocked stormwater drain culvert, causing dirty water backup.", count: 18, source: "Cross-Dept Detector" },
+      { date: "01 Oct", time: "08:30 AM", stage: "Emerging Stage Triggered", desc: "Market association submitted emergency escalation notice.", count: 22, source: "Escalation Engine" }
     ],
     spreadGeo: [
-      { step: "Day 1 (Sep 14)", ward: "Ward 8", lat: 28.5680, lng: 77.2335, radiusMeters: 100, signalCount: 2, label: "Slip road puddle", color: "#10B981" },
-      { step: "Day 3 (Sep 16)", ward: "Ward 8 & 9", lat: 28.5690, lng: 77.2350, radiusMeters: 350, signalCount: 14, label: "Ring road lane obstruction", color: "#F59E0B" },
-      { step: "Day 4 (Sep 17)", ward: "Ward 8 & 9", lat: 28.5700, lng: 77.2365, radiusMeters: 700, signalCount: 21, label: "Arterial junction congestion", color: "#EF4444" }
+      { step: "Day 1 (Sep 29)", ward: "Wagholi Ward 28", lat: 18.5815, lng: 73.9840, radiusMeters: 90, signalCount: 2, label: "Market corner spill", color: "#10B981" },
+      { step: "Day 2 (Sep 30)", ward: "Wagholi Ward 28", lat: 18.5820, lng: 73.9845, radiusMeters: 300, signalCount: 12, label: "Drain culvert blockage zone", color: "#F59E0B" },
+      { step: "Day 3 (Oct 01)", ward: "Wagholi Ward 28", lat: 18.5825, lng: 73.9850, radiusMeters: 650, signalCount: 22, label: "Market commercial corridor impact", color: "#EF4444" }
     ],
     rootCauseHypotheses: [
       {
-        id: "RCH-02-1",
-        title: "Stormwater Culvert Rupture & Subsoil Cavity Formation",
+        id: "RCH-WAG-02-1",
+        title: "Inadequate Collection Frequency & Culvert Grate Obstruction",
         confidence: "HIGH",
-        confidenceScore: 85,
+        confidenceScore: 88,
         evidence: [
-          "Photographic evidence shows 40cm void underneath asphalt layer",
-          "MCD drain maintenance records show culvert silt cleaning overdue by 4 months"
+          "Photographic evidence shows ~6 metric tons of uncollected solid waste",
+          "PMC SWM fleet log shows 12MT hydraulic compactor missed 2 scheduled visits due to vehicle breakdown"
         ],
         verificationRequired: true,
-        recommendedVerification: "Endoscopic camera inspection through culvert manhole #3"
+        recommendedVerification: "Deploy drone survey & inspect culvert silt depth with sanitary supervisor"
       }
     ],
     crossDepartmentImpact: {
-      primaryDepartment: "Public Works Department (PWD)",
-      sharedProblemSummary: "MCD drain silt backup is breaking PWD road subgrade.",
+      primaryDepartment: "PMC Solid Waste Management",
+      sharedProblemSummary: "Garbage overflow is blocking drainage department storm culvert.",
       departments: [
-        { dept: "Public Works Department (PWD)", cases: 15, icon: "Wrench", badgeColor: "#0E5E3A", impactSummary: "Carriageway structural cavity." },
-        { dept: "Municipal Corporation of Delhi (MCD)", cases: 6, icon: "Building2", badgeColor: "#7C3AED", impactSummary: "Culvert silt blockage." }
+        { dept: "PMC Solid Waste Management", cases: 16, icon: "Trash2", badgeColor: "#0E5E3A", impactSummary: "6MT garbage accumulation." },
+        { dept: "PMC Drainage & Sewerage Department", cases: 6, icon: "Droplet", badgeColor: "#7C3AED", impactSummary: "Culvert drain silt & plastic blockage." }
       ],
-      coordinationRecommendation: "Joint Night Operation: MCD deploys super-sucker truck at 11:00 PM; PWD lays rapid-hardening bituminous cold-mix."
+      coordinationRecommendation: "Joint Clean-Up Operation: PMC SWM deploys two 12MT hydraulic dumpers at 10:00 PM; Drainage team desilts culvert grate."
     },
     civicMemory: [
       {
         year: "2024",
         date: "18 August 2024",
-        incidentId: "PWD-HIST-2024-112",
-        title: "Moolchand Slip Road Subsidence",
-        actionTaken: "Cold-mix asphalt patch without culvert desilting",
-        outcome: "Cavity reappeared after 3 weeks.",
-        lessonsLearned: "Subgrade cavities cannot hold asphalt if underlying storm culvert is obstructed."
+        incidentId: "PMC-SWM-2024-112",
+        title: "Baif Road Market Waste Overflow",
+        actionTaken: "Manual cleaning without placing enclosed compactor bin",
+        outcome: "Waste accumulated again within 5 days.",
+        lessonsLearned: "Open waste points at high-density markets require permanent 4.5MT closed hook-loader bins."
       }
     ],
     simulations: [
       {
-        id: "SIM-02-A",
-        title: "Option A: Emergency Bituminous Cold-Patch",
-        description: "Direct bitumen fill of 40cm cavity without drain clearance.",
-        timeToIntervention: "2 Hours",
-        expectedResolutionTime: "3 Hours",
-        affectedPopulationReduction: "60%",
-        recurrenceRisk: "HIGH (80% failure upon next downpour)",
-        resourceRequirement: "Low",
-        costScore: "₹12,000",
-        coordinationRequired: "PWD only",
+        id: "SIM-WAG-02-A",
+        title: "Option A: Manual Shovel Clearance + Open Dumper Dispatch",
+        description: "Deploy 8 sanitation workers to manually clear waste into open truck.",
+        timeToIntervention: "3 Hours",
+        expectedResolutionTime: "6 Hours",
+        affectedPopulationReduction: "70%",
+        recurrenceRisk: "HIGH (75% re-accumulation within 48h)",
+        resourceRequirement: "Low-Medium",
+        costScore: "₹15,000",
+        coordinationRequired: "PMC SWM only",
         confidence: "Medium",
-        recommendationVerdict: "Temporary emergency measure only."
+        recommendationVerdict: "Temporary cleanup only."
       },
       {
-        id: "SIM-02-B",
-        title: "Option B: Culvert Silt Extraction + Reinforced Concrete Sub-base Re-bedding",
-        description: "MCD super-sucker clears culvert; PWD constructs reinforced concrete apron with mastic asphalt.",
-        timeToIntervention: "8 Hours",
-        expectedResolutionTime: "18 Hours",
-        affectedPopulationReduction: "95%",
-        recurrenceRisk: "LOW (< 8%)",
+        id: "SIM-WAG-02-B",
+        title: "Option B: Heavy Compactor Extraction + Permanent Hook-Loader Bin & Culvert Desilting",
+        description: "Two 12MT compactors clear backlog, super-sucker cleans culvert, install 4.5MT enclosed container.",
+        timeToIntervention: "6 Hours",
+        expectedResolutionTime: "12 Hours",
+        affectedPopulationReduction: "96%",
+        recurrenceRisk: "LOW (< 10%)",
         resourceRequirement: "Medium-High",
-        costScore: "₹85,000",
-        coordinationRequired: "PWD + MCD",
+        costScore: "₹95,000",
+        coordinationRequired: "PMC SWM + Drainage Dept",
         confidence: "High",
         recommendationVerdict: "RECOMMENDED ACTION"
       }
     ],
-    relatedGrievanceIds: ["DL-2026-W08-0419"],
+    relatedGrievanceIds: ["PN-2026-WAG-0102", "PN-2026-WAG-0112", "PN-2026-WAG-0117"],
     humanDecisions: []
   },
   {
-    id: "INC-2026-DEL-03",
-    title: "Kalkaji Market 11kV Feeder Transformer Overheating & Arc Hazard",
-    summary: "Thermal degradation of 400kVA transformer bushings in high-density market pocket. Frequent voltage surges and visible electric arc flashes creating acute public safety hazard.",
+    id: "INC-2026-PUNE-WAG-03",
+    title: "Nagar Road Highway (Raisoni Chowk) 11kV Feeder Transformer Overheating & Arc Hazard",
+    summary: "Thermal degradation of 400kVA transformer bushings in high-load commercial zone along Pune-Nagar Highway. Frequent voltage surges and visible electric arc flashes creating acute public safety hazard.",
     incidentType: "ELECTRICAL_FIRE",
     status: "Investigating",
     stage: "GROWING",
     stageVelocity: "+120% in 48 hours",
     severity: "CRITICAL",
-    confidence: "High (92% signal correlation)",
-    signalCount: 9,
-    formalComplaintsCount: 5,
-    citizenObservationsCount: 4,
-    affectedArea: "Ward 5 (Kalkaji Main Market Pocket)",
-    affectedPopulation: "120 Retail Outlets + ~350 Residential Units",
-    firstDetectedAt: "2026-09-15 03:30 PM",
+    confidence: "High (93% signal correlation)",
+    signalCount: 11,
+    formalComplaintsCount: 6,
+    citizenObservationsCount: 5,
+    affectedArea: "Wagholi Ward 27 (Nagar Road Highway & Raisoni Chowk)",
+    affectedPopulation: "140 Commercial Outlets + ~450 Residential Flats",
+    firstDetectedAt: "2026-09-30 03:30 PM",
     lastUpdatedAt: "1 hour ago",
     departments: [
-      { name: "BSES Rajdhani Power Limited", lead: true, cases: 9, role: "Transformer isolation, HT bushing replacement & load rebalancing" }
+      { name: "MSEDCL Wagholi Sub-Division", lead: true, cases: 11, role: "Transformer isolation, HT bushing replacement & phase load rebalancing" }
     ],
     complaintDna: {
       issueType: "Electricity & Power Grid",
       subIssue: "Distribution Transformer Arc Flash & Thermal Overload",
       service: "Urban Low-Voltage Power Grid",
-      asset: "400 kVA Pole-Mounted Step-Down Transformer (TR-05-4)",
-      locationContext: "Dense commercial market alleyway (Gali No. 3)",
-      department: "BSES Rajdhani Power Limited",
-      subDepartment: "Kalkaji Division",
+      asset: "400 kVA Pole-Mounted Step-Down Transformer (TR-WAG-04)",
+      locationContext: "Commercial frontage along Pune-Nagar Highway near Raisoni College",
+      department: "MSEDCL Wagholi Sub-Division",
+      subDepartment: "Wagholi Feeder Operations",
       severity: "CRITICAL",
       urgency: "CRITICAL",
-      symptoms: ["Loud buzzing arc sparks", "Transformer oil leak", "Voltage drops to 140V", "Complete street blackout"],
-      entities: ["Main Market Kalkaji Gol Chakkar", "Gali No. 3", "Kalkaji 11kV Substation"],
-      possibleCauses: ["Dielectric oil degradation", "Unbalanced commercial air conditioning load"],
-      affectedPopulation: ["120 retail shops", "350 residential flats above shops"],
-      temporalPattern: "Peak spark discharges during afternoon peak cooling load (01:00–04:00 PM)",
-      environmentalContext: "Ambient heat wave elevating transformer core temperature above 85°C"
+      symptoms: ["Loud buzzing arc sparks", "Transformer oil leak", "Voltage drops to 150V", "Commercial complex power tripping"],
+      entities: ["Raisoni College Chowk", "Nagar Road Highway Commercial Complex", "Wagholi 22/11kV Substation"],
+      possibleCauses: ["Dielectric oil degradation", "Unbalanced commercial AC load during peak hours"],
+      affectedPopulation: ["140 retail shops & showrooms", "450 residential flats in surrounding towers"],
+      temporalPattern: "Peak spark discharges during afternoon peak cooling load (01:00–04:30 PM)",
+      environmentalContext: "Ambient heat elevating transformer core temperature above 88°C"
     },
     timeline: [
-      { date: "15 Sept", time: "03:30 PM", stage: "First Weak Signal", desc: "Shopkeeper reported unusual buzzing hum and burning smell.", count: 1, source: "Citizen Signal" },
-      { date: "16 Sept", time: "01:10 PM", stage: "Active Arc Flash Reported", desc: "Citizen video submitted showing sparks flying from transformer.", count: 6, source: "Formal Complaint" },
-      { date: "16 Sept", time: "01:12 PM", stage: "SCADA Telemetry Confirmation", desc: "Remote feeder load spike recorded; auto-tripping alert triggered.", count: 9, source: "Grid Telemetry" }
+      { date: "30 Sept", time: "03:30 PM", stage: "First Weak Signal", desc: "Shopkeeper reported unusual buzzing hum and burning smell near transformer.", count: 1, source: "Citizen Signal" },
+      { date: "01 Oct", time: "01:10 PM", stage: "Active Arc Flash Reported", desc: "Citizen video submitted showing sparks flying from HT transformer bushing.", count: 7, source: "Formal Complaint" },
+      { date: "01 Oct", time: "01:15 PM", stage: "SCADA Telemetry Confirmation", desc: "Remote feeder load spike recorded; auto-tripping alert triggered.", count: 11, source: "Grid Telemetry" }
     ],
     spreadGeo: [
-      { step: "Initial (Sep 15)", ward: "Ward 5", lat: 28.5440, lng: 77.2585, radiusMeters: 80, signalCount: 2, label: "Transformer pole hotspot", color: "#F59E0B" },
-      { step: "Current (Sep 16-17)", ward: "Ward 5", lat: 28.5445, lng: 77.2592, radiusMeters: 220, signalCount: 9, label: "Feeder blackout zone", color: "#EF4444" }
+      { step: "Initial (Sep 30)", ward: "Wagholi Ward 27", lat: 18.5800, lng: 73.9778, radiusMeters: 75, signalCount: 2, label: "Transformer pole hotspot", color: "#F59E0B" },
+      { step: "Current (Oct 01)", ward: "Wagholi Ward 27", lat: 18.5805, lng: 73.9785, radiusMeters: 240, signalCount: 11, label: "Feeder blackout zone", color: "#EF4444" }
     ],
     rootCauseHypotheses: [
       {
-        id: "RCH-03-1",
+        id: "RCH-WAG-03-1",
         title: "Bushing Seal Breakdown & Low Dielectric Oil Level",
         confidence: "HIGH",
-        confidenceScore: 92,
+        confidenceScore: 94,
         evidence: [
-          "Video shows oil seepage along low-voltage ceramic bushings",
-          "Thermal scan camera telemetry indicates 92°C spot temperature on Phase B"
+          "Citizen video shows oil seepage along HT ceramic bushings",
+          "Thermal scan camera telemetry indicates 94°C spot temperature on Phase B"
         ],
         verificationRequired: true,
-        recommendedVerification: "Breakdown voltage test on oil sample by Mobile Testing Lab"
+        recommendedVerification: "Breakdown voltage test on transformer oil sample by MSEDCL Mobile Testing Lab"
       }
     ],
     crossDepartmentImpact: {
-      primaryDepartment: "BSES Rajdhani Power Limited",
-      sharedProblemSummary: "Electrical fire hazard in congested market requiring local municipal cordon.",
+      primaryDepartment: "MSEDCL Wagholi Sub-Division",
+      sharedProblemSummary: "Electrical fire hazard in busy highway junction requiring immediate power isolation.",
       departments: [
-        { dept: "BSES Rajdhani Power Limited", cases: 9, icon: "Zap", badgeColor: "#DC2626", impactSummary: "11kV arc flash and oil explosion hazard." }
+        { dept: "MSEDCL Wagholi Sub-Division", cases: 11, icon: "Zap", badgeColor: "#DC2626", impactSummary: "11kV arc flash and oil explosion hazard." }
       ],
-      coordinationRecommendation: "Remote trip Feeder 4; mobilize mobile transformer van DL-1L-9022."
+      coordinationRecommendation: "Remote trip Feeder 4; mobilize mobile transformer van MH-12-PQ-8812."
     },
     civicMemory: [
       {
         year: "2025",
         date: "05 July 2025",
-        incidentId: "BSES-HIST-2025-044",
-        title: "Kalkaji Transformer Thermal Failure",
+        incidentId: "MSEDCL-HIST-2025-044",
+        title: "Wagholi Substation Feeder 2 Thermal Failure",
         actionTaken: "Emergency bushing swap & nitrogen cooling flush",
         outcome: "Full restoration within 3 hours; zero collateral damage.",
         lessonsLearned: "Early oil breakdown detection prevents explosive arc flash."
@@ -663,21 +627,21 @@ export const CIVIC_INCIDENTS = [
     ],
     simulations: [
       {
-        id: "SIM-03-A",
+        id: "SIM-WAG-03-A",
         title: "Option A: Remote Feeder Trip + Mobile Substation Bypass",
-        description: "Safely isolate feeder and plug in 500kVA truck-mounted transformer while repairing primary unit.",
+        description: "Safely isolate feeder and connect 500kVA truck-mounted transformer while repairing primary unit.",
         timeToIntervention: "45 Mins",
         expectedResolutionTime: "2.5 Hours",
         affectedPopulationReduction: "100%",
         recurrenceRisk: "LOW (< 5%)",
         resourceRequirement: "High (Mobile Substation Van)",
-        costScore: "₹35,000",
-        coordinationRequired: "BSES Grid Control",
+        costScore: "₹38,000",
+        coordinationRequired: "MSEDCL Grid Control",
         confidence: "Very High",
         recommendationVerdict: "RECOMMENDED ACTION"
       }
     ],
-    relatedGrievanceIds: ["DL-2026-W05-0298"],
+    relatedGrievanceIds: ["PN-2026-WAG-0104", "PN-2026-WAG-0113", "PN-2026-WAG-0119"],
     humanDecisions: []
   }
 ];
@@ -687,11 +651,11 @@ export const CIVIC_INTELLIGENCE_METRICS = {
   emergingProblemsCount: 8,
   criticalProblemsCount: 2,
   growingProblemsCount: 5,
-  signalsDetectedLast24h: 48,
+  signalsDetectedLast24h: 52,
   crossDepartmentIncidentsCount: 2,
-  avgProblemDetectionHours: "6.2 Hours (vs 96h legacy)",
-  avgEscalationTimeHours: "14.5 Hours",
-  recurrencePreventedRate: "78.4%",
-  actionSimulationUsageRate: "92.1%",
-  citizenSignalContribution: "41.6% of all early discoveries"
+  avgProblemDetectionHours: "5.8 Hours (vs 96h legacy)",
+  avgEscalationTimeHours: "12.5 Hours",
+  recurrencePreventedRate: "81.2%",
+  actionSimulationUsageRate: "94.0%",
+  citizenSignalContribution: "44.5% of all early discoveries"
 };

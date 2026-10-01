@@ -31,7 +31,7 @@ export default function AdminHeatmap() {
   const { grievances = [], clusters = [], metrics } = useApp();
   const targetCaseId = searchParams.get('caseId');
   const latestGrievance = (targetCaseId ? grievances.find(g => g.id === targetCaseId) : null) || grievances[0];
-  const [selectedWard, setSelectedWard] = useState('Ward 14 (Rohini Sector 14)');
+  const [selectedWard, setSelectedWard] = useState('Ward 27 (Nagar Road Highway)');
   const [selectedCluster, setSelectedCluster] = useState(clusters[0]);
   const [categoryFilter, setCategoryFilter] = useState('ALL');
   const [useRealMap, setUseRealMap] = useState(true);
@@ -42,11 +42,11 @@ export default function AdminHeatmap() {
   const [legendOpen, setLegendOpen] = useState(false);
 
   const wardStats = [
-    { ward: 'Ward 14 (Rohini)', category: 'Water Supply', active: 18, critical: 1, resolved: 14, status: 'HIGH_ALERT', trend: '+48% this week', lat: 28.7175, lng: 77.1248 },
-    { ward: 'Ward 8 (Lajpat Nagar)', category: 'Electricity', active: 7, critical: 0, resolved: 22, status: 'NORMAL', trend: '+12% this week', lat: 28.5677, lng: 77.2433 },
-    { ward: 'Ward 22 (Mayur Vihar)', category: 'Roads', active: 11, critical: 0, resolved: 31, status: 'NORMAL', trend: '-8% this week', lat: 28.6096, lng: 77.2965 },
-    { ward: 'Ward 5 (Kalkaji)', category: 'Water Supply', active: 9, critical: 1, resolved: 19, status: 'HIGH_ALERT', trend: '+22% this week', lat: 28.5367, lng: 77.2570 },
-    { ward: 'Ward 19 (Karol Bagh)', category: 'Sanitation', active: 4, critical: 0, resolved: 28, status: 'RESOLVED', trend: '-40% this week', lat: 28.6517, lng: 77.1906 }
+    { ward: 'Ward 27 (Nagar Road Highway)', category: 'Water Supply', active: 18, critical: 1, resolved: 14, status: 'HIGH_ALERT', trend: '+48% this week', lat: 18.5793, lng: 73.9785 },
+    { ward: 'Ward 28 (Baif Road & Market)', category: 'Roads', active: 7, critical: 0, resolved: 22, status: 'NORMAL', trend: '+12% this week', lat: 18.5835, lng: 73.9840 },
+    { ward: 'Ward 29 (Ivy Estate & Kesnand)', category: 'Water Supply', active: 11, critical: 1, resolved: 31, status: 'HIGH_ALERT', trend: '+35% this week', lat: 18.5740, lng: 73.9920 },
+    { ward: 'Ward 30 (Domkhel & Ubale Nagar)', category: 'Sanitation', active: 9, critical: 0, resolved: 19, status: 'NORMAL', trend: '+22% this week', lat: 18.5890, lng: 73.9710 },
+    { ward: 'Ward 31 (Bakori Road & Wagheshwar)', category: 'Electricity', active: 4, critical: 0, resolved: 28, status: 'RESOLVED', trend: '-40% this week', lat: 18.5865, lng: 73.9950 }
   ];
 
   const categories = ['ALL', 'Water', 'Roads', 'Sanitation', 'Electricity', 'Other'];
@@ -154,7 +154,7 @@ export default function AdminHeatmap() {
                   </span>
                 </div>
                 <div style={{ fontSize: '12px', color: '#047857', marginTop: '3px' }}>
-                  Reported in <strong>{latestGrievance.location?.ward || 'Ward 14'}</strong> by {maskCitizenName(latestGrievance.citizenName || 'Citizen')} • Assigned to <strong>{latestGrievance.officerName || latestGrievance.department || 'DJB'}</strong> • Target SLA: 24h
+                  Reported in <strong>{latestGrievance.location?.ward || 'Ward 27 (Wagholi)'}</strong> by {maskCitizenName(latestGrievance.citizenName || 'Citizen')} • Assigned to <strong>{latestGrievance.officerName || latestGrievance.department || 'PMC Water Supply Department'}</strong> • Target SLA: 24h
                 </div>
               </div>
             </div>
@@ -199,20 +199,20 @@ export default function AdminHeatmap() {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <strong style={{ fontSize: '13px', color: '#991B1B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  EMERGING THIS WEEK: WARD 14 PIPELINE PRESSURE DROP
+                  EMERGING THIS WEEK: WARD 27 & 29 PIPELINE PRESSURE DROP
                 </strong>
                 <span style={{ fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', background: '#DC2626', color: '#FFFFFF' }}>
                   +48% SPIKE
                 </span>
               </div>
               <p style={{ fontSize: '12px', color: '#7F1D1D', margin: '2px 0 0 0' }}>
-                18 separate citizen submissions in Rohini Sector 14 correlate with 40m crack near Mother Dairy booster valve.
+                18 separate citizen submissions along Wagholi Kesnand Road correlate with main distribution valve rupture near Raisoni Chowk.
               </p>
             </div>
           </div>
 
           <Link
-            to="/officer/complaints/GRV-2025-001"
+            to="/officer/complaints/PN-2026-WAG-0102"
             className="btn-primary btn-sm"
             style={{ background: '#DC2626', borderColor: '#DC2626' }}
           >
@@ -254,7 +254,7 @@ export default function AdminHeatmap() {
             <div style={{ fontSize: '28px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#EF4444', marginTop: '4px' }}>
               2 Wards
             </div>
-            <span style={{ fontSize: '11px', color: '#EF4444' }}>Ward 14 (DJB) & Ward 5 (BSES)</span>
+            <span style={{ fontSize: '11px', color: '#EF4444' }}>Ward 27 (PMC Water) & Ward 31 (MSEDCL)</span>
           </div>
 
           <div className="card" style={{ padding: '16px' }}>
@@ -552,11 +552,11 @@ export default function AdminHeatmap() {
                 }}>
                   {wardStats.map((w, idx) => {
                     const positions = [
-                      { top: '25%', left: '30%' }, // Ward 14 Rohini
-                      { top: '65%', left: '60%' }, // Ward 8 Lajpat Nagar
-                      { top: '45%', left: '75%' }, // Ward 22 Mayur Vihar
-                      { top: '75%', left: '45%' }, // Ward 5 Kalkaji
-                      { top: '40%', left: '45%' }  // Ward 19 Karol Bagh
+                      { top: '25%', left: '30%' }, // Ward 27 Nagar Road
+                      { top: '65%', left: '60%' }, // Ward 28 Baif Road
+                      { top: '45%', left: '75%' }, // Ward 29 Ivy Estate
+                      { top: '75%', left: '45%' }, // Ward 30 Domkhel
+                      { top: '40%', left: '45%' }  // Ward 31 Bakori Road
                     ];
                     const pos = positions[idx];
                     const isSelected = selectedWard.includes(w.ward.split(' ')[1]);
@@ -1194,7 +1194,7 @@ export default function AdminHeatmap() {
                 Proactive Capital Infrastructure Replacement
               </h4>
               <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: 1.6, marginBottom: '12px' }}>
-                Telemetry indicates 4 separate pipeline fractures along Rohini Sector 14's 35-year-old cast-iron conduit in the last 6 months.
+                Telemetry indicates 4 separate pipeline fractures along Wagholi Kesnand Road's aging 300mm conduit in the last 6 months.
               </p>
               <div style={{ padding: '12px', borderRadius: 'var(--radius-sm)', background: '#F8F9FA', border: '1px solid #E2E8F0', fontSize: '12px', lineHeight: 1.5 }}>
                 <strong style={{ color: 'var(--color-primary)', display: 'block', marginBottom: '4px' }}>

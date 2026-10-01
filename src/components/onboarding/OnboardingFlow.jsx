@@ -89,8 +89,8 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
     {
       key: 'citizen',
       label: 'Citizen',
-      name: 'Aditya Verma',
-      badge: 'Ward 14 (Rohini)',
+      name: 'Rahul Raut',
+      badge: 'Ward 29 (Ivy Estate)',
       email: DEMO_CREDENTIALS.citizen.email,
       password: DEMO_CREDENTIALS.citizen.password,
       icon: User,
@@ -102,7 +102,7 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
       key: 'civic_officer',
       label: 'Govt Officer',
       name: 'Er. Sanjay Sharma',
-      badge: 'Field Engineer (DJB)',
+      badge: 'Field Engineer (PMC)',
       email: DEMO_CREDENTIALS.civic_officer.email,
       password: DEMO_CREDENTIALS.civic_officer.password,
       icon: Briefcase,
@@ -131,7 +131,7 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
     const roleKey = targetRoleKey || selectedRole;
     setIsVerifying(true);
     setVerifyProgress(15);
-    setVerifyStageMessage('Checking credentials in Delhi Municipal Auth Directory...');
+    setVerifyStageMessage('Checking credentials in Pune Municipal Auth Directory...');
 
     // Phase 1: 0.9s
     const t1 = setTimeout(() => {
@@ -391,7 +391,7 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
             </div>
 
             <span style={{ fontSize: '11px', color: '#94A3B8', fontFamily: 'monospace' }}>
-              Delhi Municipal Directory Auth ({verifyProgress}%)
+              Pune Municipal Directory Auth ({verifyProgress}%)
             </span>
           </div>
         )}
@@ -433,7 +433,7 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
                 fontWeight: 700,
                 color: '#FFFFFF'
               }}>
-                📍 Delhi Municipal Ground Reality
+                📍 Pune Municipal Ground Reality
               </div>
               <div style={{
                 position: 'absolute',
@@ -555,7 +555,7 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
                     <Building2 style={{ width: '15px', height: '15px' }} />
                   </div>
                   <strong style={{ fontSize: '11px', display: 'block', color: '#5B21B6' }}>Auto-Routing</strong>
-                  <span style={{ fontSize: '9.5px', color: '#475569' }}>Direct to DJB/PWD</span>
+                  <span style={{ fontSize: '9.5px', color: '#475569' }}>Direct to PMC/PWD</span>
                 </div>
 
                 <div style={{ background: 'rgba(255, 255, 255, 0.82)', backdropFilter: 'blur(4px)', padding: '8px 6px', borderRadius: '12px', border: '1px solid #DDD6FE', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>

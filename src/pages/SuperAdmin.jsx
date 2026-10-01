@@ -43,34 +43,34 @@ export default function SuperAdmin() {
 
   // Departments State
   const [departments, setDepartments] = useState([
-    { code: 'DJB', name: 'Delhi Jal Board (DJB)', officers: 280, activeCases: 142, sla: '94.8%', head: 'Er. Rajiv Malhotra', active: true },
-    { code: 'PWD', name: 'Public Works Department (PWD)', officers: 340, activeCases: 189, sla: '88.2%', head: 'Er. Rajesh K. Meena', active: true },
-    { code: 'MCD', name: 'Municipal Corporation of Delhi (MCD)', officers: 520, activeCases: 310, sla: '91.4%', head: 'Dr. K. S. Tyagi', active: true },
-    { code: 'BSES', name: 'BSES Rajdhani Power Limited', officers: 190, activeCases: 64, sla: '99.1%', head: 'Er. Neeraj Bansal', active: true }
+    { code: 'PMC Water', name: 'PMC Water Supply Department', officers: 280, activeCases: 142, sla: '94.8%', head: 'Er. Sachin Patil', active: true },
+    { code: 'PWD', name: 'Public Works Department (PWD Pune)', officers: 340, activeCases: 189, sla: '88.2%', head: 'Er. Rajesh K. Meena', active: true },
+    { code: 'PMC SWM', name: 'PMC Solid Waste Management', officers: 520, activeCases: 310, sla: '91.4%', head: 'Dr. K. S. Tyagi', active: true },
+    { code: 'MSEDCL', name: 'MSEDCL Wagholi Sub-Division', officers: 190, activeCases: 64, sla: '99.1%', head: 'Er. Neha Singh', active: true }
   ]);
 
   // Users State
   const [usersList, setUsersList] = useState([
-    { id: 'USR-CITIZEN-01', name: 'Aditya Verma', email: 'aditya@citizen.in', role: 'citizen', status: 'Active', ward: 'Ward 14 (Rohini)' },
-    { id: 'USR-OFFICER-01', name: 'Er. Sanjay Sharma', email: 'sanjay.sharma@djb.gov.in', role: 'officer', status: 'Active', department: 'DJB' },
-    { id: 'USR-DEPTADMIN-01', name: 'Er. Rajiv Malhotra', email: 'admin.djb@delhi.gov.in', role: 'dept_admin', status: 'Active', department: 'DJB' },
-    { id: 'USR-SUPERADMIN-01', name: 'Dr. Meenakshi Sundaram, IAS', email: 'superadmin@delhi.gov.in', role: 'super_admin', status: 'Active', department: 'Govt of NCT Delhi' }
+    { id: 'USR-CITIZEN-01', name: 'Santosh Gawade', email: 'santosh@citizen.in', role: 'citizen', status: 'Active', ward: 'Wagholi Ward 29 (Ivy Estate)' },
+    { id: 'USR-OFFICER-01', name: 'Er. Sanjay Sharma', email: 'sanjay.sharma@pmc.gov.in', role: 'officer', status: 'Active', department: 'PMC Water' },
+    { id: 'USR-DEPTADMIN-01', name: 'Er. Sachin Patil', email: 'admin.water@pune.gov.in', role: 'dept_admin', status: 'Active', department: 'PMC Water' },
+    { id: 'USR-SUPERADMIN-01', name: 'Dr. Suhas Diwase, IAS', email: 'commissioner@pmc.gov.in', role: 'super_admin', status: 'Active', department: 'PMC Pune' }
   ]);
 
   // Categories & Grievance Types
   const [categories, setCategories] = useState([
-    { id: 'CAT-01', name: 'Water Supply & Contamination', department: 'DJB', priority: 'CRITICAL', typesCount: 6 },
+    { id: 'CAT-01', name: 'Water Supply & Contamination', department: 'PMC Water', priority: 'CRITICAL', typesCount: 6 },
     { id: 'CAT-02', name: 'Roads & Infrastructure', department: 'PWD', priority: 'HIGH', typesCount: 8 },
-    { id: 'CAT-03', name: 'Sanitation & Solid Waste', department: 'MCD', priority: 'HIGH', typesCount: 5 },
-    { id: 'CAT-04', name: 'Electricity & Power Grid', department: 'BSES', priority: 'CRITICAL', typesCount: 4 }
+    { id: 'CAT-03', name: 'Sanitation & Solid Waste', department: 'PMC SWM', priority: 'HIGH', typesCount: 5 },
+    { id: 'CAT-04', name: 'Electricity & Power Grid', department: 'MSEDCL', priority: 'CRITICAL', typesCount: 4 }
   ]);
 
   // SLA Rules State
   const [slaRules, setSlaRules] = useState([
-    { category: 'Water Supply & Contamination', criticalHours: 12, highHours: 24, normalHours: 48, escalationTarget: 'Chief Engineer (DJB)' },
-    { category: 'Roads & Infrastructure', criticalHours: 6, highHours: 24, normalHours: 72, escalationTarget: 'Superintending Engineer (PWD)' },
-    { category: 'Sanitation & Solid Waste', criticalHours: 12, highHours: 24, normalHours: 48, escalationTarget: 'Chief Sanitary Inspector (MCD)' },
-    { category: 'Electricity & Power Grid', criticalHours: 2, highHours: 6, normalHours: 24, escalationTarget: 'Grid Safety Director (BSES)' }
+    { category: 'Water Supply & Contamination', criticalHours: 12, highHours: 24, normalHours: 48, escalationTarget: 'Chief Engineer (PMC Water Works)' },
+    { category: 'Roads & Infrastructure', criticalHours: 6, highHours: 24, normalHours: 72, escalationTarget: 'Superintending Engineer (PWD Pune)' },
+    { category: 'Sanitation & Solid Waste', criticalHours: 12, highHours: 24, normalHours: 48, escalationTarget: 'Chief Sanitary Inspector (PMC SWM)' },
+    { category: 'Electricity & Power Grid', criticalHours: 2, highHours: 6, normalHours: 24, escalationTarget: 'Grid Safety Director (MSEDCL)' }
   ]);
 
   // AI & System Configuration State
@@ -84,10 +84,10 @@ export default function SuperAdmin() {
 
   // Audit Logs (Live from PostgreSQL with seed fallback)
   const [auditLogs, setAuditLogs] = useState([
-    { id: 'LOG-8841', timestamp: '2026-09-16 09:31 AM', actor: 'System AI Engine', action: 'GRIEVANCE_TRIAGED', targetId: 'DL-2026-W14-0892', details: 'Autoclassified as Critical Biological Hazard, routed to DJB' },
-    { id: 'LOG-8842', timestamp: '2026-09-16 10:15 AM', actor: 'Er. Sanjay Sharma', action: 'DISPATCH_APPROVED', targetId: 'DL-2026-W14-0892', details: 'Emergency repair clamp squad DL-441 mobilized to Mother Dairy junction' },
-    { id: 'LOG-8843', timestamp: '2026-09-16 11:21 AM', actor: 'System Vision AI', action: 'MEDIA_CLASSIFIED', targetId: 'DL-2026-W08-0419', details: 'Cavity detected on arterial road; depth ~40cm; severity 88%' },
-    { id: 'LOG-8844', timestamp: '2026-09-16 01:12 PM', actor: 'System SCADA Gateway', action: 'AUTO_SIGNAL_TRIP', targetId: 'DL-2026-W05-0298', details: 'Automated arc hazard notification sent to Kalkaji 11kV Feeder Control' }
+    { id: 'LOG-8841', timestamp: '2026-10-01 07:46 AM', actor: 'System AI Engine', action: 'GRIEVANCE_TRIAGED', targetId: 'PN-2026-WAG-0101', details: 'Autoclassified as Critical Solid Waste Hazard, routed to PMC SWM' },
+    { id: 'LOG-8842', timestamp: '2026-10-01 08:30 AM', actor: 'Er. Sanjay Sharma', action: 'DISPATCH_APPROVED', targetId: 'PN-2026-WAG-0102', details: 'Emergency repair clamp squad mobilized to Ivy Estate junction' },
+    { id: 'LOG-8843', timestamp: '2026-10-01 09:15 AM', actor: 'System Vision AI', action: 'MEDIA_CLASSIFIED', targetId: 'PN-2026-WAG-0105', details: 'Cavity detected on Pune-Nagar Highway; depth ~35cm; severity 90%' },
+    { id: 'LOG-8844', timestamp: '2026-10-01 11:45 AM', actor: 'System SCADA Gateway', action: 'AUTO_SIGNAL_TRIP', targetId: 'PN-2026-WAG-0104', details: 'Automated arc hazard notification sent to MSEDCL Wagholi Substation Control' }
   ]);
 
   React.useEffect(() => {
@@ -164,7 +164,7 @@ export default function SuperAdmin() {
         email: newUserEmail,
         role: newUserRole,
         status: 'Active',
-        department: newUserRole !== 'citizen' ? 'Delhi Jal Board (DJB)' : 'Public'
+        department: newUserRole !== 'citizen' ? 'PMC Water Supply Department' : 'Public'
       }
     ]);
     setNewUserName('');
@@ -251,7 +251,7 @@ export default function SuperAdmin() {
                 <div style={{ fontSize: '28px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-primary)', marginTop: '4px' }}>
                   {grievances.length}
                 </div>
-                <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>Across all Delhi NCT zones</span>
+                <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>Across all Wagholi Pune zones</span>
               </div>
 
               <div className="card" style={{ padding: '18px 20px' }}>
@@ -290,7 +290,7 @@ export default function SuperAdmin() {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '14px' }}>
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
                   <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-muted)', marginRight: '4px' }}>Department:</span>
-                  {['ALL', 'DJB', 'PWD', 'MCD', 'BSES'].map(dep => (
+                  {['ALL', 'PMC Water', 'PWD', 'PMC SWM', 'MSEDCL'].map(dep => (
                     <button
                       key={dep}
                       type="button"

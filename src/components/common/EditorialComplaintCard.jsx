@@ -90,11 +90,12 @@ export default function EditorialComplaintCard({
   const displayImage = item.evidence?.photoUrl || item.photoPreview || item.photoUrl || CATEGORY_IMAGES[catCfg.key] || CATEGORY_IMAGES['Other Civic Issue'];
 
   const deptShort = (item.department || 'Civic Services')
-    .replace('Delhi Jal Board (DJB)', 'DJB')
-    .replace('Public Works Department (PWD)', 'PWD')
-    .replace('Municipal Corporation of Delhi (MCD)', 'MCD')
-    .replace('BSES Rajdhani Power Limited', 'BSES')
-    .slice(0, 16);
+    .replace('PMC Water Supply Department', 'PMC Water')
+    .replace('PMC Solid Waste Management', 'PMC Waste')
+    .replace('PWD Pune / PMRDA', 'PWD Pune')
+    .replace('MSEDCL Wagholi Sub-Division', 'MSEDCL')
+    .replace('PMC Drainage & Sewerage Department', 'PMC Drainage')
+    .slice(0, 18);
 
   const itemHours = item.slaHoursLeft ?? (item.slaDeadline ? parseInt(item.slaDeadline) : 18);
   const slaStatus = itemHours <= 0 ? 'OVERDUE' : (itemHours <= 6 ? 'AT_RISK' : 'ON_TRACK');

@@ -147,27 +147,27 @@ export default function Impact() {
           </div>
         </div>
 
-        {/* Featured Case Study: Rohini Sector 14 Water Line Recovery */}
+        {/* Featured Case Study: Wagholi Kesnand Road Water Line Recovery */}
         <div className="inset-dark-container impact-case-study">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
             <span className="category-pill" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10B981', borderColor: 'rgba(16, 185, 129, 0.3)' }}>
               VERIFIED FIELD STUDY
             </span>
             <span style={{ fontSize: '12px', color: 'var(--color-text-inverse-muted)' }}>
-              Resolution Time: 14 Hours • Delhi Jal Board
+              Resolution Time: 14 Hours • PMC Water Supply Department
             </span>
           </div>
 
           <h3 style={{ fontSize: '26px', color: '#FFFFFF', marginBottom: '14px' }}>
-            Rohini Ward 14: Cross-Contamination Pipeline Isolation
+            Wagholi Ward 29: Cross-Contamination Pipeline Isolation
           </h3>
 
           <p style={{ color: 'var(--color-text-inverse-muted)', fontSize: '15px', lineHeight: 1.6, marginBottom: '24px', maxWidth: '720px' }}>
-            When a burst 100mm underground valve allowed storm drain water into drinking conduits across Sector 14, 18 separate households submitted complaints in Hinglish. JanSahayak grouped them into Cluster #CL-W14-WATER-03 in 2 minutes, dispatched emergency excavation crews with replacement gaskets, and cleared the biohazard within 14 hours.
+            When a burst 200mm underground valve allowed storm drain water into drinking conduits near Ivy Estate on Kesnand Road, 24 separate households submitted complaints in Marathi and Hinglish. JanSahayak grouped them into Cluster #CL-WAG-WATER-02 in 2 minutes, dispatched emergency excavation crews with electrofusion couplings, and cleared the biohazard within 14 hours.
           </p>
 
           <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
-            <Link to="/officer/complaints/DL-2026-W14-0892" className="btn-primary btn-sm" style={{ background: 'var(--color-accent)', color: '#0B1914', fontWeight: 700 }}>
+            <Link to="/officer/complaints/PN-2026-WAG-0102" className="btn-primary btn-sm" style={{ background: 'var(--color-accent)', color: '#0B1914', fontWeight: 700 }}>
               <span>Inspect Live Case Record</span>
               <ArrowRight className="btn-arrow" style={{ width: '14px', height: '14px' }} />
             </Link>

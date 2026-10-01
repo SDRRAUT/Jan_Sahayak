@@ -10,17 +10,17 @@ export default function CivicMemoryCard({ memories = [] }) {
     {
       year: "2025",
       date: "14 June 2025",
-      incidentId: "DJB-HIST-2025-081",
-      title: "Emergency Pipe Clamp Installed (Pocket 1)",
-      actionTaken: "Installed temporary metal clamp on old cast-iron pipe",
+      incidentId: "PMC-HIST-2025-081",
+      title: "Emergency Pipe Clamp Installed (Raisoni Chowk)",
+      actionTaken: "Installed temporary metal clamp on old pipe",
       outcome: "Stopped the leak for 7 months, but pipe cracked again nearby due to water pressure.",
       lessonsLearned: "Clamping old iron pipes without replacing the section causes another leak within a year."
     },
     {
       year: "2024",
       date: "22 March 2024",
-      incidentId: "DJB-HIST-2024-412",
-      title: "Tar Paved Over Sunken Road (Mother Dairy Crossing)",
+      incidentId: "PMC-HIST-2024-412",
+      title: "Tar Paved Over Sunken Road (Kesnand Road Crossing)",
       actionTaken: "Paved fresh tar over sunken road without fixing the leaking pipe below",
       outcome: "Road sank and cracked open again after 8 weeks during monsoon rain.",
       lessonsLearned: "Never pave tar over a street before fixing the leaking pipe underneath."

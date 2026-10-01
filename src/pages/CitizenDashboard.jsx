@@ -287,11 +287,12 @@ function GrievanceCard({ item, citizen, onOpen }) {
   const displayImage = item.evidence?.photoUrl || item.photoPreview || item.photoUrl || CATEGORY_IMAGES[catCfg.key] || CATEGORY_IMAGES['Other Civic Issue'];
 
   const deptShort = (item.department || 'Civic Services')
-    .replace('Delhi Jal Board (DJB)', 'DJB')
-    .replace('Public Works Department (PWD)', 'PWD')
-    .replace('Municipal Corporation of Delhi (MCD)', 'MCD')
-    .replace('BSES Rajdhani Power Limited', 'BSES')
-    .slice(0, 16);
+    .replace('PMC Water Supply Department', 'PMC Water')
+    .replace('PMC Solid Waste Management', 'PMC Waste')
+    .replace('PWD Pune / PMRDA', 'PWD Pune')
+    .replace('MSEDCL Wagholi Sub-Division', 'MSEDCL')
+    .replace('PMC Drainage & Sewerage Department', 'PMC Drainage')
+    .slice(0, 18);
 
   return (
     <div
@@ -534,7 +535,7 @@ export default function CitizenDashboard() {
   const [fileModalCategory,setFileModalCategory] = useState('');
   const [selectedGrievance,setSelectedGrievance] = useState(null);
   const [dashboardData,setDashboardData]     = useState(null);
-  const citizen = user||contextCitizen||{id:'USR-CITIZEN-01',name:'Aditya Verma',ward:'Ward 14 (Rohini Sector 14)',pincode:'110085'};
+  const citizen = user||contextCitizen||{id:'USR-CITIZEN-01',name:'Rahul Raut',ward:'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',pincode:'412207'};
 
   // If navigated with ?fileGrievance=true, automatically open the popup modal
   useEffect(() => {

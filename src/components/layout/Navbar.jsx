@@ -69,8 +69,8 @@ export default function Navbar() {
     {
       key: 'citizen',
       label: 'Citizen',
-      name: 'Aditya Verma',
-      badge: 'Ward 14 (Rohini)',
+      name: 'Rahul Raut',
+      badge: 'Ward 29 (Ivy Estate)',
       email: DEMO_CREDENTIALS.citizen.email,
       password: DEMO_CREDENTIALS.citizen.password,
       icon: User,
@@ -82,7 +82,7 @@ export default function Navbar() {
       key: 'civic_officer',
       label: 'Govt Officer',
       name: 'Er. Sanjay Sharma',
-      badge: 'Field Engineer (DJB)',
+      badge: 'Field Engineer (PMC)',
       email: DEMO_CREDENTIALS.civic_officer.email,
       password: DEMO_CREDENTIALS.civic_officer.password,
       icon: Briefcase,
@@ -161,7 +161,7 @@ export default function Navbar() {
     const key = roleKey || loginSelectedRole;
     setLoginIsVerifying(true);
     setLoginVerifyProgress(15);
-    setLoginVerifyMsg('Checking credentials in Delhi Municipal Auth Directory...');
+    setLoginVerifyMsg('Checking credentials in Pune Municipal Auth Directory...');
     setTimeout(() => {
       setLoginVerifyProgress(55);
       setLoginVerifyMsg('Verifying security clearance & jurisdiction...');
@@ -862,7 +862,7 @@ export default function Navbar() {
                     <div style={{ paddingBottom: '8px', borderBottom: '1px solid var(--color-divider)', marginBottom: '8px' }}>
                       <strong style={{ fontSize: '13px', display: 'block', color: 'var(--color-text-primary)' }}>{user.name}</strong>
                       <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'capitalize' }}>
-                        {role?.replace('_', ' ')} • {user.ward || user.department || 'Delhi'}
+                        {role?.replace('_', ' ')} • {user.ward || user.department || 'Wagholi, Pune'}
                       </span>
                     </div>
 
@@ -1743,7 +1743,7 @@ export default function Navbar() {
               <div style={{ marginBottom: '16px' }}>
                 <input
                   type="text"
-                  placeholder="e.g. DL-2026-W14-0892"
+                  placeholder="e.g. PN-2026-WAG-0102"
                   value={trackTicketId}
                   onChange={(e) => setTrackTicketId(e.target.value)}
                   style={{

@@ -82,18 +82,18 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
       const source = user || defaultProfile;
       setName(source.name || '');
       setEmail(source.email || '');
-      setPhone(source.phone || '+91 98712-88210');
-      setAltPhone(source.altPhone || '+91 98111-90021');
+      setPhone(source.phone || '+91 98230-12345');
+      setAltPhone(source.altPhone || '+91 98230-90021');
 
-      setWard(source.ward || 'Ward 14 (Rohini Sector 14)');
-      setPincode(source.pincode || '110085');
-      setAddress(source.address || 'Pocket 2, Sector 14, Rohini, New Delhi');
+      setWard(source.ward || 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)');
+      setPincode(source.pincode || '412207');
+      setAddress(source.address || 'Ivy Estate, Kesnand Road, Wagholi, Pune');
       
-      setDepartment(source.department || (currentRole === 'super_admin' ? 'Secretariat & IT Governance' : 'Delhi Jal Board (DJB)'));
+      setDepartment(source.department || (currentRole === 'super_admin' ? 'Maharashtra Secretariat & IT Governance' : 'PMC Water Supply Department'));
       setDesignation(source.designation || (currentRole === 'super_admin' ? 'Principal Secretary, IAS' : 'Assistant Executive Engineer'));
-      setZone(source.zone || 'Zone North-West (Rohini)');
-      setEmployeeId(source.employeeId || (currentRole === 'super_admin' ? 'DEL-IAS-0042' : 'DJB-ENG-2024'));
-      setOffice(source.office || 'Players Building, Delhi Secretariat');
+      setZone(source.zone || 'Wagholi Sub-Division (Wards 27-31, Pune)');
+      setEmployeeId(source.employeeId || (currentRole === 'super_admin' ? 'MAH-IAS-0042' : 'PMC-ENG-2024'));
+      setOffice(source.office || 'PMC Main Administrative Building, Pune');
 
       if (source.settings) {
         setNotifyWhatsapp(source.settings.notifyWhatsapp ?? true);
@@ -123,7 +123,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
       case 'officer':
       case 'dept_admin':
         return {
-          label: 'Govt Civic Officer (DJB)',
+          label: 'Govt Civic Officer (PMC)',
           badgeColor: '#059669',
           badgeBg: '#ECFDF5',
           border: '#A7F3D0',
@@ -542,7 +542,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
                               type="text"
                               value={ward}
                               onChange={(e) => setWard(e.target.value)}
-                              placeholder="e.g. Ward 14 (Rohini)"
+                              placeholder="e.g. Wagholi Ward 29 (Ivy Estate)"
                               style={{ border: 'none', background: 'transparent', width: '100%', fontSize: '12px', fontWeight: 600, color: '#0F172A', outline: 'none' }}
                             />
                           </div>
@@ -554,7 +554,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
                             type="text"
                             value={pincode}
                             onChange={(e) => setPincode(e.target.value)}
-                            placeholder="110085"
+                            placeholder="412207"
                             style={{ background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: '8px', padding: '6px 10px', width: '100%', fontSize: '12px', fontWeight: 600, color: '#0F172A', outline: 'none', boxSizing: 'border-box' }}
                           />
                         </div>
@@ -566,7 +566,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
                           type="text"
                           value={address}
                           onChange={(e) => setAddress(e.target.value)}
-                          placeholder="e.g. Pocket 2, Sector 14, Rohini"
+                          placeholder="e.g. Ivy Estate, Kesnand Road, Wagholi"
                           style={{ background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: '8px', padding: '6px 10px', width: '100%', fontSize: '12px', fontWeight: 600, color: '#0F172A', outline: 'none', boxSizing: 'border-box' }}
                         />
                       </div>
@@ -585,7 +585,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
                               type="text"
                               value={department}
                               onChange={(e) => setDepartment(e.target.value)}
-                              placeholder="e.g. Delhi Jal Board (DJB)"
+                              placeholder="e.g. PMC Water Supply Department"
                               style={{ border: 'none', background: 'transparent', width: '100%', fontSize: '12px', fontWeight: 600, color: '#0F172A', outline: 'none' }}
                             />
                           </div>
@@ -597,7 +597,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
                             type="text"
                             value={employeeId}
                             onChange={(e) => setEmployeeId(e.target.value)}
-                            placeholder="DJB-ENG-2024"
+                            placeholder="PMC-ENG-2024"
                             style={{ background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: '8px', padding: '6px 10px', width: '100%', fontSize: '12px', fontWeight: 600, color: '#0F172A', outline: 'none', boxSizing: 'border-box' }}
                           />
                         </div>
@@ -621,7 +621,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
                             type="text"
                             value={zone}
                             onChange={(e) => setZone(e.target.value)}
-                            placeholder="Zone North-West (Rohini)"
+                            placeholder="Wagholi Sub-Division (Wards 27-31, Pune)"
                             style={{ background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: '8px', padding: '6px 10px', width: '100%', fontSize: '12px', fontWeight: 600, color: '#0F172A', outline: 'none', boxSizing: 'border-box' }}
                           />
                         </div>
@@ -653,7 +653,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
                             type="text"
                             value={employeeId}
                             onChange={(e) => setEmployeeId(e.target.value)}
-                            placeholder="DEL-IAS-0042"
+                            placeholder="MAH-IAS-0042"
                             style={{ background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: '8px', padding: '6px 10px', width: '100%', fontSize: '12px', fontWeight: 600, color: '#0F172A', outline: 'none', boxSizing: 'border-box' }}
                           />
                         </div>
@@ -665,7 +665,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
                           type="text"
                           value={office}
                           onChange={(e) => setOffice(e.target.value)}
-                          placeholder="Players Building, Delhi Secretariat, IP Estate"
+                          placeholder="PMC Main Administrative Building, Shivajinagar, Pune"
                           style={{ background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: '8px', padding: '6px 10px', width: '100%', fontSize: '12px', fontWeight: 600, color: '#0F172A', outline: 'none', boxSizing: 'border-box' }}
                         />
                       </div>
@@ -846,7 +846,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
                       <span style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A' }}>Security & Credentials</span>
                     </div>
                     <span style={{ fontSize: '10px', color: '#10B981', fontWeight: 700, background: '#ECFDF5', padding: '2px 8px', borderRadius: '999px' }}>
-                      ✓ Delhi Single Sign-On Verified
+                      ✓ Pune Single Sign-On Verified
                     </span>
                   </div>
 
