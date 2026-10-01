@@ -849,32 +849,23 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
               boxShadow: '0 2px 6px rgba(5,150,105,0.1)'
             }}
           >
-            <option value="dashboard">📊 Overview (Dashboard)</option>
+            <option value="dashboard">📊 Case Overview</option>
             <option value="my_work">📌 My Tasks ({myWorkGrievances.length})</option>
-            <option value="operations">👷 Team & Workers ({filteredGrievances.length})</option>
-            <option value="intelligence">🤖 AI Problem Helper</option>
-            <option value="investigation">🔍 Check Problem (#{activeItem?.id?.slice(-4) || 'CASE'})</option>
-            <option value="coordination">🤝 Other Depts</option>
-            <option value="reports">📈 Work Results</option>
+            <option value="investigation">🔍 Case Investigation (#{activeItem?.id?.slice(-4) || 'CASE'})</option>
           </select>
         </div>
 
-        {/* 2. THE 7 WORKSPACE TABS (Segmented Control Navigation Bar) */}
+        {/* 2. THE MAIN WORKSPACE TABS (Segmented Control Navigation Bar) */}
         <div className="officer-tabs-scroll-container">
           {[
-            { id: 'dashboard', label: 'Case Overview', icon: Activity, badge: null, group: 'workspace' },
-            { id: 'my_work', label: 'My Tasks', icon: CheckSquare, badge: myWorkGrievances.length, group: 'workspace' },
-            { id: 'investigation', label: 'Case Investigation', icon: Eye, badge: `#${activeItem?.id?.slice(-4) || 'CASE'}`, group: 'workspace' },
-            { id: 'intelligence', label: 'AI SOP Helper', icon: Sparkles, badge: 'AI', group: 'workspace' },
-            { id: 'coordination', label: 'Inter-Dept Linkage', icon: Network, badge: null, group: 'workspace' },
-            { id: 'reports', label: 'Resolution Reports', icon: BarChart3, badge: null, group: 'workspace' },
-            { id: 'operations', label: 'Field Operations & Roster', icon: SlidersHorizontal, badge: `${officerRoster.length} Staff`, group: 'operations' }
+            { id: 'dashboard', label: 'Case Overview', icon: Activity, badge: null },
+            { id: 'my_work', label: 'My Tasks', icon: CheckSquare, badge: myWorkGrievances.length },
+            { id: 'investigation', label: 'Case Investigation', icon: Eye, badge: `#${activeItem?.id?.slice(-4) || 'CASE'}` }
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeSection === tab.id;
-            const isOpsTab = tab.group === 'operations';
             const bgGrad = isActive
-              ? (isOpsTab ? 'linear-gradient(135deg, #312E81 0%, #4338CA 100%)' : 'linear-gradient(135deg, #0E5E3A 0%, #059669 100%)')
+              ? 'linear-gradient(135deg, #0E5E3A 0%, #059669 100%)'
               : 'transparent';
             const textColor = isActive ? '#FFFFFF' : '#475569';
 
@@ -891,7 +882,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   fontWeight: isActive ? 700 : 500,
                   background: bgGrad,
                   color: textColor,
-                  boxShadow: isActive ? (isOpsTab ? '0 2px 8px rgba(67, 56, 202, 0.25)' : '0 2px 8px rgba(14, 94, 58, 0.25)') : 'none',
+                  boxShadow: isActive ? '0 2px 8px rgba(14, 94, 58, 0.25)' : 'none',
                   border: 'none',
                   cursor: 'pointer',
                   display: 'inline-flex',
@@ -1362,23 +1353,22 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
 
               <button
                 type="button"
-                onClick={() => switchSection('operations')}
+                onClick={() => switchSection('investigation')}
                 className="btn-secondary"
                 style={{ borderRadius: '9999px', fontSize: '13px' }}
               >
-                <SlidersHorizontal style={{ width: '15px', height: '15px' }} />
-                <span>See All Team Workers ({filteredGrievances.length})</span>
+                <Eye style={{ width: '15px', height: '15px' }} />
+                <span>Inspect Active Case (#{activeItem?.id?.slice(-4) || 'CASE'})</span>
               </button>
 
-              <button
-                type="button"
-                onClick={() => switchSection('intelligence')}
+              <Link
+                to="/intelligence"
                 className="btn-secondary"
-                style={{ borderRadius: '9999px', fontSize: '13px', color: '#4338CA', borderColor: '#C7D2FE', background: '#EEF2FF' }}
+                style={{ borderRadius: '9999px', fontSize: '13px', color: '#4338CA', borderColor: '#C7D2FE', background: '#EEF2FF', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
                 <Sparkles style={{ width: '15px', height: '15px' }} />
-                <span>AI Problem Helper</span>
-              </button>
+                <span>Civic Intelligence Hub</span>
+              </Link>
             </div>
           </div>
         )}
