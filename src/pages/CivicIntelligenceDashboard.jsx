@@ -20,7 +20,12 @@ import {
   Building2,
   Flame,
   FileCheck,
-  Compass
+  Compass,
+  LayoutList,
+  LayoutGrid,
+  Table2,
+  AlignJustify,
+  Rows3
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import ProblemSpreadMap from '../components/intelligence/ProblemSpreadMap';
@@ -39,6 +44,7 @@ export default function CivicIntelligenceDashboard() {
   const [showSignalModal, setShowSignalModal] = useState(false);
   const [showTerritoryModal, setShowTerritoryModal] = useState(false);
   const [showJanSuchnaModal, setShowJanSuchnaModal] = useState(false);
+  const [viewMode, setViewMode] = useState('detail'); // 'detail' | 'compact' | 'grid' | 'table' | 'minimal'
 
   const filteredIncidents = civicIncidents.filter(inc => {
     const matchesStage = selectedStage === 'ALL' || inc.stage === selectedStage;
@@ -454,6 +460,35 @@ export default function CivicIntelligenceDashboard() {
                     }}
                   />
                   <Search style={{ position: 'absolute', left: '10px', top: '10px', width: '14px', height: '14px', color: '#94A3B8' }} />
+                </div>
+
+                {/* View Mode Toggles */}
+                <div style={{ display: 'flex', background: '#FFFFFF', padding: '3px', borderRadius: '10px', border: '1px solid #E2E8F0', gap: '2px' }}>
+                  {[
+                    { id: 'detail',  Icon: AlignJustify, title: 'Detail View' },
+                    { id: 'compact', Icon: LayoutList,   title: 'Compact View' },
+                    { id: 'grid',    Icon: LayoutGrid,   title: 'Grid View' },
+                    { id: 'table',   Icon: Table2,       title: 'Table View' },
+                    { id: 'minimal', Icon: Rows3,        title: 'Minimal View' },
+                  ].map(({ id, Icon, title }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      title={title}
+                      onClick={() => setViewMode(id)}
+                      style={{
+                        width: '30px', height: '30px',
+                        borderRadius: '7px',
+                        border: 'none',
+                        background: viewMode === id ? '#0F172A' : 'transparent',
+                        color: viewMode === id ? '#FFFFFF' : '#94A3B8',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', transition: 'all 120ms ease'
+                      }}
+                    >
+                      <Icon style={{ width: '14px', height: '14px' }} />
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>

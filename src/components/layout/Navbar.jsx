@@ -140,7 +140,7 @@ export default function Navbar() {
       setLoginVerifyProgress(0);
       const targetRole = logged?.role || roleKey;
       if (targetRole === 'citizen') navigate('/');
-      else if (targetRole === 'civic_officer' || targetRole === 'officer' || targetRole === 'dept_admin') navigate('/officer');
+      else if (targetRole === 'civic_officer' || targetRole === 'officer' || targetRole === 'dept_admin') navigate('/intelligence');
       else if (targetRole === 'super_admin') navigate('/admin/super');
       else navigate('/');
     } catch (e) {
@@ -150,7 +150,7 @@ export default function Navbar() {
       setLoginIsVerifying(false);
       setLoginVerifyProgress(0);
       if (roleKey === 'citizen') navigate('/');
-      else if (roleKey === 'civic_officer' || roleKey === 'officer' || roleKey === 'dept_admin') navigate('/officer');
+      else if (roleKey === 'civic_officer' || roleKey === 'officer' || roleKey === 'dept_admin') navigate('/intelligence');
       else if (roleKey === 'super_admin') navigate('/admin/super');
       else navigate('/');
     }
@@ -233,7 +233,7 @@ export default function Navbar() {
   const getHomeLink = () => {
     if (!user) return '/';
     if (role === 'citizen') return '/';
-    if (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') return '/officer';
+    if (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') return '/intelligence';
     if (role === 'super_admin') return '/admin/super';
     return '/';
   };

@@ -163,7 +163,7 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
       if (roleKey === 'citizen') {
         navigate('/');
       } else if (roleKey === 'civic_officer' || roleKey === 'officer' || roleKey === 'dept_admin') {
-        navigate('/officer');
+        navigate('/intelligence');
       } else if (roleKey === 'super_admin') {
         navigate('/admin/super');
       } else {

@@ -26,7 +26,14 @@ import NewFeaturePopup from './components/common/NewFeaturePopup';
 import MobileDesktopBanner from './components/common/MobileDesktopBanner';
 
 function RoleHome() {
-  // Logged-in citizen or officer opening root sees the Home page with their authenticated profile
+  const { user, role } = useApp();
+  // Government officer opening root or logging in goes directly to Civic Intelligence
+  if (user && (role === 'civic_officer' || role === 'officer' || role === 'dept_admin')) {
+    return <Navigate to="/intelligence" replace />;
+  }
+  if (user && role === 'super_admin') {
+    return <Navigate to="/admin/super" replace />;
+  }
   return <Home />;
 }
 
