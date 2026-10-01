@@ -10,7 +10,6 @@ import { normalizeStatus, getRoleStatusLabel, getStatusConfig } from '../utils/s
 import WhyExplainer from '../components/common/WhyExplainer';
 import CivicSignalModal from '../components/intelligence/CivicSignalModal';
 import FileGrievanceModal from '../components/common/FileGrievanceModal';
-import JanSuchnaBanner from '../components/common/JanSuchnaBanner';
 
 const PROBLEM_CATEGORIES = [
   { key:'Water Supply & Contamination', label:'Water Supply',    emoji:'💧', light:'#F0F9FF', border:'#BAE6FD', text:'#0369A1', badgeBg:'#E0F2FE' },
@@ -595,10 +594,6 @@ export default function CitizenDashboard() {
 
       {/* ── Aesthetic Hero Box (Contained, curved corners, gap both sides) ── */}
       <div className="container" style={{ paddingTop:'24px' }}>
-        
-        {/* Active Jan Suchna Public Advisory Banner */}
-        <JanSuchnaBanner citizenWard={citizen?.ward || 'Ward 14 (Rohini Sector 14)'} />
-
         <div style={{
           borderRadius:'24px',
           background:'linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 50%, #EEF2FF 100%)',

@@ -2136,4 +2136,37 @@ h6, .text-h6, .fluid-h6 {
   }
 }
 
+/* Notification Bell Pulse & Ping Animations */
+@keyframes notificationBlink {
+  0% {
+    transform: scale(0.92);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.85);
+  }
+  60% {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 7px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(0.92);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+@keyframes bellShake {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(14deg); }
+  30% { transform: rotate(-12deg); }
+  45% { transform: rotate(8deg); }
+  60% { transform: rotate(-6deg); }
+  75% { transform: rotate(0deg); }
+}
+
+.notification-bell-ringing {
+  animation: bellShake 3s ease-in-out infinite;
+}
+
+.notification-blink-dot {
+  animation: notificationBlink 1.4s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
 

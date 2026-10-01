@@ -21,7 +21,10 @@ import {
   MapPin,
   Settings,
   Mail,
-  Lock
+  Lock,
+  Volume2,
+  VolumeX,
+  Radio
 } from 'lucide-react';
 import { useApp, DEMO_CREDENTIALS } from '../../context/AppContext';
 import FileGrievanceModal from '../common/FileGrievanceModal';
@@ -39,12 +42,15 @@ export default function Navbar() {
     unreadNotificationCount = 0, 
     markNotificationAsRead, 
     markAllNotificationsAsRead,
-    grievances = []
+    grievances = [],
+    janSuchnaList = []
   } = useApp();
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [isJanSuchnaSpeaking, setIsJanSuchnaSpeaking] = useState(false);
+  const [dismissedJanSuchnaIds, setDismissedJanSuchnaIds] = useState([]);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showTrackModal, setShowTrackModal] = useState(false);
   const [showFileGrievanceModal, setShowFileGrievanceModal] = useState(false);
@@ -242,6 +248,32 @@ export default function Navbar() {
     return false;
   });
   const relevantUnreadCount = user ? relevantNotifications.filter(n => !n.read).length : 0;
+
+  // Active Jan Suchna Public Advisory matching current user / citywide
+  const activeJanSuchna = janSuchnaList.find(s => {
+    if (dismissedJanSuchnaIds.includes(s.id)) return false;
+    if (s.status !== 'ACTIVE') return false;
+    return true;
+  });
+
+  const totalUnreadAlerts = relevantUnreadCount + (activeJanSuchna ? 1 : 0);
+
+  const handleJanSuchnaSpeech = (suchna) => {
+    if ('speechSynthesis' in window) {
+      if (isJanSuchnaSpeaking) {
+        window.speechSynthesis.cancel();
+        setIsJanSuchnaSpeaking(false);
+      } else {
+        const text = `जन सूचना अलर्ट. ${suchna.title}. अवधि: ${suchna.duration}. कृपया ध्यान दें: ${suchna.instructions}. हेल्पलाइन: ${suchna.helpline}`;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'hi-IN';
+        utterance.onend = () => setIsJanSuchnaSpeaking(false);
+        utterance.onerror = () => setIsJanSuchnaSpeaking(false);
+        setIsJanSuchnaSpeaking(true);
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+  };
 
   return (
     <>
@@ -479,37 +511,40 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="notification-bell-btn"
+                className={`notification-bell-btn ${totalUnreadAlerts > 0 ? 'notification-bell-ringing' : ''}`}
                 style={{
-                  width: '34px',
-                  height: '34px',
+                  width: '36px',
+                  height: '36px',
                   borderRadius: '50%',
-                  background: showNotifications ? '#F1F5F9' : '#F8FAFC',
-                  border: showNotifications ? '1px solid rgba(15, 23, 42, 0.16)' : '1px solid rgba(15, 23, 42, 0.10)',
+                  background: showNotifications ? '#F1F5F9' : (totalUnreadAlerts > 0 ? '#FEF2F2' : '#F8FAFC'),
+                  border: showNotifications ? '1.5px solid #CBD5E1' : (totalUnreadAlerts > 0 ? '1.5px solid #FCA5A5' : '1px solid rgba(15, 23, 42, 0.10)'),
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: showNotifications ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                  color: totalUnreadAlerts > 0 ? '#DC2626' : (showNotifications ? 'var(--color-text-primary)' : 'var(--color-text-secondary)'),
                   position: 'relative',
                   cursor: 'pointer',
                   flexShrink: 0,
                   transition: 'all 150ms ease'
                 }}
-                title="Notifications"
+                title={totalUnreadAlerts > 0 ? `${totalUnreadAlerts} Notifications & Jan Suchna Public Advisories` : 'Notifications'}
                 aria-label="Notifications"
               >
-                <Bell style={{ width: '16px', height: '16px' }} />
-                {relevantUnreadCount > 0 && (
-                  <span style={{
-                    position: 'absolute',
-                    top: '5px',
-                    right: '5px',
-                    width: '7px',
-                    height: '7px',
-                    borderRadius: '50%',
-                    background: '#EF4444',
-                    boxShadow: '0 0 0 2px #FFFFFF'
-                  }} />
+                <Bell style={{ width: '17px', height: '17px' }} />
+                {totalUnreadAlerts > 0 && (
+                  <span
+                    className="notification-blink-dot"
+                    style={{
+                      position: 'absolute',
+                      top: '2px',
+                      right: '2px',
+                      width: '9px',
+                      height: '9px',
+                      borderRadius: '50%',
+                      background: '#EF4444',
+                      border: '2px solid #FFFFFF'
+                    }}
+                  />
                 )}
               </button>
 
@@ -519,24 +554,26 @@ export default function Navbar() {
                   className="notification-popover"
                   style={{
                     position: 'absolute',
-                    top: '44px',
+                    top: '46px',
                     right: 0,
-                    width: '340px',
+                    width: '420px',
                     maxWidth: 'calc(100vw - 24px)',
-                    maxHeight: '420px',
+                    maxHeight: '480px',
                     overflowY: 'auto',
                     background: '#FFFFFF',
-                    borderRadius: '16px',
-                    border: '1px solid var(--color-border-subtle)',
-                    boxShadow: '0 12px 36px rgba(15, 23, 42, 0.16)',
+                    borderRadius: '18px',
+                    border: '1.5px solid #CBD5E1',
+                    boxShadow: '0 16px 40px rgba(15, 23, 42, 0.20)',
                     padding: '16px',
                     zIndex: 1100
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  {/* Top Bar */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', color: '#0F172A' }}>
-                        📢 जन सूचना & Notifications
+                      <Bell style={{ width: '15px', height: '15px', color: '#0F172A' }} />
+                      <span style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', color: '#0F172A' }}>
+                        Civic Notifications & Alerts
                       </span>
                     </div>
                     {relevantUnreadCount > 0 && (
@@ -549,7 +586,131 @@ export default function Navbar() {
                       </button>
                     )}
                   </div>
-                  {relevantNotifications.length === 0 ? (
+
+                  {/* 📢 ACTIVE JAN SUCHNA PUBLIC ADVISORY CARD INSIDE NOTIFICATION POPOVER */}
+                  {activeJanSuchna && (
+                    <div style={{
+                      marginBottom: '14px',
+                      borderRadius: '16px',
+                      background: 'linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%)',
+                      color: '#FFFFFF',
+                      padding: '14px 16px',
+                      boxShadow: '0 6px 18px rgba(49, 46, 129, 0.25)',
+                      border: '1.5px solid #818CF8',
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}>
+                      {/* Top Badges & Audio / Dismiss Buttons */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                          <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            fontSize: '10.5px',
+                            fontWeight: 800,
+                            background: '#F59E0B',
+                            color: '#78350F',
+                            padding: '2px 8px',
+                            borderRadius: '999px',
+                            letterSpacing: '0.02em'
+                          }}>
+                            <Radio style={{ width: '11px', height: '11px' }} />
+                            📢 जन सूचना (JAN SUCHNA)
+                          </span>
+                          <span style={{
+                            fontSize: '10.5px',
+                            fontWeight: 700,
+                            background: 'rgba(255, 255, 255, 0.15)',
+                            color: '#FDE68A',
+                            padding: '2px 8px',
+                            borderRadius: '999px'
+                          }}>
+                            📍 {activeJanSuchna.ward}
+                          </span>
+                          <span style={{
+                            fontSize: '10.5px',
+                            fontWeight: 700,
+                            background: 'rgba(239, 68, 68, 0.3)',
+                            color: '#FCA5A5',
+                            border: '1px solid rgba(239, 68, 68, 0.4)',
+                            padding: '2px 7px',
+                            borderRadius: '999px'
+                          }}>
+                            ⏱️ {activeJanSuchna.duration} Outage
+                          </span>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleJanSuchnaSpeech(activeJanSuchna)}
+                            style={{
+                              padding: '4px 10px',
+                              borderRadius: '999px',
+                              background: isJanSuchnaSpeaking ? '#10B981' : 'rgba(255, 255, 255, 0.18)',
+                              color: '#FFFFFF',
+                              fontSize: '10.5px',
+                              fontWeight: 700,
+                              border: '1px solid rgba(255, 255, 255, 0.3)',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}
+                          >
+                            {isJanSuchnaSpeaking ? <VolumeX style={{ width: '12px', height: '12px' }} /> : <Volume2 style={{ width: '12px', height: '12px' }} />}
+                            <span>{isJanSuchnaSpeaking ? 'Stop Audio' : 'Audio Guide (हिंदी)'}</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDismissedJanSuchnaIds(prev => [...prev, activeJanSuchna.id])}
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              borderRadius: '50%',
+                              background: 'rgba(255, 255, 255, 0.15)',
+                              border: 'none',
+                              color: '#FFFFFF',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer'
+                            }}
+                            title="Dismiss Advisory"
+                          >
+                            <X style={{ width: '13px', height: '13px' }} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Title */}
+                      <h4 style={{ fontSize: '13.5px', fontWeight: 800, margin: '0 0 6px 0', color: '#FFFFFF', lineHeight: 1.35 }}>
+                        {activeJanSuchna.title}
+                      </h4>
+
+                      {/* Instructions */}
+                      <p style={{ fontSize: '11.5px', color: '#E0E7FF', margin: '0 0 8px 0', lineHeight: 1.45 }}>
+                        {activeJanSuchna.instructions}
+                      </p>
+
+                      {/* Metadata Chips */}
+                      <div style={{ fontSize: '10.5px', color: '#C7D2FE', lineHeight: 1.4, borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: '6px' }}>
+                        <span>Timing: <strong style={{ color: '#FFFFFF' }}>{activeJanSuchna.startTime} ({activeJanSuchna.duration})</strong></span>
+                        <span style={{ margin: '0 4px' }}>•</span>
+                        <span>Dept: <strong style={{ color: '#FFFFFF' }}>{activeJanSuchna.department}</strong></span>
+                        <span style={{ margin: '0 4px' }}>•</span>
+                        <span>Helpline: <strong style={{ color: '#FDE68A' }}>{activeJanSuchna.helpline}</strong></span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* RECENT NOTIFICATIONS LIST */}
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.04em' }}>
+                    Recent Updates & Tickets
+                  </div>
+
+                  {relevantNotifications.length === 0 && !activeJanSuchna ? (
                     <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', textAlign: 'center', padding: '20px 0' }}>
                       No notifications yet.
                     </p>
