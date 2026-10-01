@@ -146,6 +146,325 @@ export const INITIAL_GRIEVANCES = [
     ]
   },
   {
+    id: "PN-2026-WAG-0103",
+    title: "Deep Asphalt Cratering & Road Sinking on Nagar Road Highway",
+    descriptionRaw: "Pune-Ahmednagar Highway stretch near Lexicon School mein 3 bade potholes ban gaye hain. Gaadiyan fisal rahi hain aur continuous traffic jam lag raha hai.",
+    languageDetected: "Hinglish / Marathi (Confidence 98%)",
+    category: "Roads & Infrastructure",
+    department: "Public Works Department (PWD Pune)",
+    officerName: "Er. Amit Deshmukh",
+    officerDesignation: "PWD Executive Engineer (Roads)",
+    location: {
+      ward: "Wagholi Ward 27 (Nagar Road Corridor)",
+      area: "Nagar Road Highway, Opp. Lexicon School",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5780,
+      lng: 73.9790
+    },
+    urgency: "CRITICAL",
+    urgencyScore: 96,
+    status: "INGESTED",
+    createdAt: "2026-10-01 09:30 AM",
+    slaDeadline: "2026-10-01 08:00 PM",
+    slaHoursLeft: 8,
+    clusterId: "CL-WAG-ROADS-03",
+    clusterTitle: "Wagholi Nagar Road Highway Cratering & Potholes",
+    clusterCount: 16,
+    upvotes: 89,
+    citizenName: "Rahul Shirole",
+    citizenPhone: "+91 98223-55910",
+    evidence: {
+      photoUrl: "/civic-problems/pothole_broken_drain_grate.jpg",
+      confidenceScore: 0.99,
+      detectedIssue: "Highway Asphalt Failure & Pothole Cluster"
+    },
+    photoUrl: "/civic-problems/pothole_broken_drain_grate.jpg",
+    grievanceDna: {
+      dnaId: "DNA-WAG-412207-03",
+      departmentConfidence: 99.4,
+      urgencyScore: 96,
+      sentimentScore: -0.91,
+      sentimentLabel: "Highway Accident Risk & Severe Traffic Stoppage",
+      healthRiskLevel: "HIGH",
+      extractedEntities: [
+        { label: "Infrastructure", val: "Bituminous Highway Subgrade" },
+        { label: "Landmark", val: "Lexicon International School Entrance" },
+        { label: "Pothole Count", val: "3 Deep Sinking Cavities (> 18cm depth)" }
+      ],
+      ragMatches: []
+    },
+    aiOfficerBrief: [
+      "Highway cavity causing vehicular slowdown and two-wheeler skid hazards.",
+      "Emergency cold-mix asphalt patch squad required before evening rush hour."
+    ],
+    recommendedResolution: {
+      primaryAction: "Deploy Emergency PWD Asphalt Resurfacing Squad",
+      standardOperatingProcedure: "PWD-SOP-ROAD-PATCH-V2",
+      estimatedFixTime: "3.5 Hours",
+      equipmentRequired: ["Vibratory Roller", "Cold Mix Bitumen", "Safety Barricades"],
+      citizenDraftHindi: "प्रिय नागरिक, वाघोली नगर रोड गड्ढे ठीक करने के लिए पीडब्ल्यूडी टीम काम शुरू कर रही है। शाम तक सड़क समतल कर दी जाएगी।",
+      citizenDraftEnglish: "Dear Citizen, PWD road squad is patching the Nagar Road highway craters. Expected completion by 7 PM."
+    },
+    timeline: [
+      { stage: "Submitted", time: "Oct 1, 09:30 AM", detail: "Citizen uploaded highway crater photo", status: "completed" },
+      { stage: "AI Triage & DNA Generated", time: "Oct 1, 09:31 AM", detail: "Classified as CRITICAL Highway Risk (Score 96)", status: "completed" }
+    ]
+  },
+  {
+    id: "PN-2026-WAG-0104",
+    title: "Open Stormwater Drain Overflow & Black Water Stagnation in Ubale Nagar",
+    descriptionRaw: "Ubale Nagar Lane 3 mein drainage line block ho chuki hai. Ganda kala paani raste par jama hai aur bimari ka khatra ho raha hai.",
+    languageDetected: "Hinglish / Hindi (Confidence 97%)",
+    category: "Drainage & Waterlogging",
+    department: "PMC Drainage Department",
+    officerName: "Er. Sunita Kulkarni",
+    officerDesignation: "PMC Drainage Inspector",
+    location: {
+      ward: "Wagholi Ward 30 (Ubale Nagar)",
+      area: "Ubale Nagar Lane 3, Near Primary School",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5830,
+      lng: 73.9860
+    },
+    urgency: "HIGH",
+    urgencyScore: 89,
+    status: "INGESTED",
+    createdAt: "2026-10-01 10:15 AM",
+    slaDeadline: "2026-10-02 02:00 PM",
+    slaHoursLeft: 16,
+    clusterId: "CL-WAG-DRAIN-04",
+    clusterTitle: "Ubale Nagar Storm Drain Siltation Cluster",
+    clusterCount: 11,
+    upvotes: 43,
+    citizenName: "Mahesh Ubale",
+    citizenPhone: "+91 98901-22441",
+    evidence: {
+      photoUrl: "/civic-problems/open_sewage_nullah_garbage.jpg",
+      confidenceScore: 0.96,
+      detectedIssue: "Drain Siltation & Black Water Overflow"
+    },
+    photoUrl: "/civic-problems/open_sewage_nullah_garbage.jpg",
+    grievanceDna: {
+      dnaId: "DNA-WAG-412207-04",
+      departmentConfidence: 98.2,
+      urgencyScore: 89,
+      sentimentScore: -0.85,
+      sentimentLabel: "Sanitation Hazard & School Inundation",
+      healthRiskLevel: "HIGH",
+      extractedEntities: [
+        { label: "Infrastructure", val: "Covered Stormwater Masonry Drain" },
+        { label: "Location", val: "Ubale Nagar School Approach Road" }
+      ],
+      ragMatches: []
+    },
+    aiOfficerBrief: [
+      "Drain blocked by plastic debris; backflow onto school lane.",
+      "Suction jetting machine required to clear 25m blockage."
+    ],
+    recommendedResolution: {
+      primaryAction: "Deploy PMC High-Pressure Suction Jetting Van",
+      standardOperatingProcedure: "PMC-SOP-DRAINAGE-DESILT",
+      estimatedFixTime: "2 Hours",
+      equipmentRequired: ["Suction Jetting Tanker", "Silt Dredger"],
+      citizenDraftHindi: "प्रिय नागरिक, उबाले नगर नाली की सफाई के लिए जेटिंग मशीन भेजी जा रही है।",
+      citizenDraftEnglish: "Dear Citizen, suction machine dispatched to clear drainage line in Ubale Nagar."
+    },
+    timeline: [
+      { stage: "Submitted", time: "Oct 1, 10:15 AM", detail: "Citizen logged drainage overflow report", status: "completed" },
+      { stage: "AI Triage & DNA Generated", time: "Oct 1, 10:16 AM", detail: "Classified as HIGH Priority Drain Hazard", status: "completed" }
+    ]
+  },
+  {
+    id: "PN-2026-WAG-0105",
+    title: "Dangling 11kV Power Cable & Transformer Sparking at Wagholi Chowk",
+    descriptionRaw: "Wagholi main bus stop ke paas transformer se aag ki chingariyan nikal rahi hain aur 11kV taar niche latak raha hai.",
+    languageDetected: "Hinglish / Marathi (Confidence 99%)",
+    category: "Electricity & Power Grid",
+    department: "Maharashtra State Electricity Board (MSEB)",
+    officerName: "Er. Nitin Chavan",
+    officerDesignation: "MSEB Sub-Station Engineer",
+    location: {
+      ward: "Wagholi Ward 28 (Wagholi Main Chowk)",
+      area: "Wagholi Main Chowk, Near Bus Terminal",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5805,
+      lng: 73.9825
+    },
+    urgency: "CRITICAL",
+    urgencyScore: 98,
+    status: "IN_PROGRESS",
+    createdAt: "2026-10-01 07:15 AM",
+    slaDeadline: "2026-10-01 01:00 PM",
+    slaHoursLeft: 2,
+    clusterId: "CL-WAG-POWER-05",
+    clusterTitle: "Wagholi Chowk High-Tension Cable Spark Hazard",
+    clusterCount: 22,
+    upvotes: 95,
+    citizenName: "Deepak More",
+    citizenPhone: "+91 97654-33210",
+    evidence: {
+      photoUrl: "/civic-problems/ai_dangling_power_cables.jpg",
+      confidenceScore: 0.99,
+      detectedIssue: "Live 11kV Overhead Cable Sagging & Sparking"
+    },
+    photoUrl: "/civic-problems/ai_dangling_power_cables.jpg",
+    grievanceDna: {
+      dnaId: "DNA-WAG-412207-05",
+      departmentConfidence: 99.8,
+      urgencyScore: 98,
+      sentimentScore: -0.96,
+      sentimentLabel: "Immediate Electrocution & Public Market Hazard",
+      healthRiskLevel: "CRITICAL",
+      extractedEntities: [
+        { label: "Asset", val: "11kV Overhead Feeder & Transformer" },
+        { label: "Clearance", val: "< 2.1m above pedestrian road" }
+      ],
+      ragMatches: []
+    },
+    aiOfficerBrief: [
+      "Immediate electrocution threat over crowded market crossing.",
+      "MSEB line squad on site isolating power and re-tensioning cable conductors."
+    ],
+    recommendedResolution: {
+      primaryAction: "Isolate Feeder & Elevate Aerial Bundle Conductors",
+      standardOperatingProcedure: "MSEB-EMERGENCY-ELECTRICAL-SOP",
+      estimatedFixTime: "1.5 Hours",
+      equipmentRequired: ["Cherry Picker Lift", "Insulated Rods"],
+      citizenDraftHindi: "प्रिय नागरिक, वाघोली चौक बिजली के लटकते तारों को ठीक करने का काम जारी है।",
+      citizenDraftEnglish: "Dear Citizen, MSEB squad is securing the power line at Wagholi Chowk."
+    },
+    timeline: [
+      { stage: "Submitted", time: "Oct 1, 07:15 AM", detail: "Emergency spark report logged", status: "completed" },
+      { stage: "AI Triage & DNA Generated", time: "Oct 1, 07:16 AM", detail: "CRITICAL Safety Alert (Score 98)", status: "completed" },
+      { stage: "Field Repair Active", time: "Oct 1, 07:45 AM", detail: "Line squad elevating cables", status: "in_progress" }
+    ]
+  },
+  {
+    id: "PN-2026-WAG-0106",
+    title: "Illegal Construction Dust & Cement Debris Dumping along Bakori Road",
+    descriptionRaw: "Bakori Road par bina cover ke cement aur construction debris feka ja raha tha jisse hawa mein dhool fail rahi thi.",
+    languageDetected: "Hinglish (Confidence 96%)",
+    category: "Sanitation & Solid Waste",
+    department: "Pune Municipal Corporation (PMC)",
+    officerName: "Er. Ramesh Shinde",
+    officerDesignation: "PMC Sanitation Inspector",
+    location: {
+      ward: "Wagholi Ward 30 (Bakori Road Corridor)",
+      area: "Bakori Road Extension, Near Society Gate",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5850,
+      lng: 73.9870
+    },
+    urgency: "MEDIUM",
+    urgencyScore: 72,
+    status: "RESOLVED",
+    createdAt: "2026-09-29 11:00 AM",
+    slaDeadline: "2026-09-30 05:00 PM",
+    slaHoursLeft: 0,
+    clusterId: "CL-WAG-DUST-06",
+    clusterTitle: "Bakori Road Construction Dust Control",
+    clusterCount: 9,
+    upvotes: 36,
+    citizenName: "Anil Kapse",
+    citizenPhone: "+91 98224-99881",
+    evidence: {
+      photoUrl: "/civic-problems/construction_dust_pollution.jpg",
+      confidenceScore: 0.95,
+      detectedIssue: "Uncovered Construction Debris & Dust Pollution"
+    },
+    photoUrl: "/civic-problems/construction_dust_pollution.jpg",
+    grievanceDna: {
+      dnaId: "DNA-WAG-412207-06",
+      departmentConfidence: 97.5,
+      urgencyScore: 72,
+      sentimentScore: -0.70,
+      sentimentLabel: "Air Quality Nuisance",
+      healthRiskLevel: "MEDIUM",
+      extractedEntities: [],
+      ragMatches: []
+    },
+    aiOfficerBrief: [
+      "Debris cleared by PMC dumper and water sprinkler unit deployed."
+    ],
+    recommendedResolution: {
+      primaryAction: "Clear Debris & Issue Fine to Builder",
+      standardOperatingProcedure: "PMC-SOP-DUST-MITIGATION",
+      estimatedFixTime: "4 Hours",
+      equipmentRequired: ["Water Sprinkler", "JCB Dumper"],
+      citizenDraftHindi: "प्रिय नागरिक, बकोरी रोड का मलबा हटा दिया गया है और पानी छिड़क कर धूल साफ कर दी गई है।",
+      citizenDraftEnglish: "Dear Citizen, the construction debris on Bakori Road has been cleared and area washed."
+    },
+    timeline: [
+      { stage: "Submitted", time: "Sep 29, 11:00 AM", detail: "Report logged with photo", status: "completed" },
+      { stage: "Resolved & Verified", time: "Sep 30, 03:30 PM", detail: "Debris cleared & citizen verified", status: "completed" }
+    ]
+  },
+  {
+    id: "PN-2026-WAG-0107",
+    title: "Broken Streetlight Poles & Dangerous Dark Blindspot near Wagheshwar Temple",
+    descriptionRaw: "Wagheshwar Temple approach lane mein 4 streetlights band the, raat mein andhera rehta tha.",
+    languageDetected: "Hinglish (Confidence 97%)",
+    category: "Electricity & Power Grid",
+    department: "PMC Electrical Works",
+    officerName: "Er. Nitin Chavan",
+    officerDesignation: "PMC Electrical Engineer",
+    location: {
+      ward: "Wagholi Ward 27 (Wagheshwar Temple Area)",
+      area: "Wagheshwar Temple Lane, Near Main Gate",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5775,
+      lng: 73.9785
+    },
+    urgency: "LOW",
+    urgencyScore: 60,
+    status: "RESOLVED",
+    createdAt: "2026-09-28 06:00 PM",
+    slaDeadline: "2026-09-29 06:00 PM",
+    slaHoursLeft: 0,
+    clusterId: "CL-WAG-LIGHT-07",
+    clusterTitle: "Wagheshwar Temple Streetlight Maintenance",
+    clusterCount: 7,
+    upvotes: 28,
+    citizenName: "Ganesh Kulkarni",
+    citizenPhone: "+91 97632-88190",
+    evidence: {
+      photoUrl: "/civic-problems/broken_street_light.jpg",
+      confidenceScore: 0.98,
+      detectedIssue: "LED Driver Replacement for Streetlight Array"
+    },
+    photoUrl: "/civic-problems/broken_street_light.jpg",
+    grievanceDna: {
+      dnaId: "DNA-WAG-412207-07",
+      departmentConfidence: 99.0,
+      urgencyScore: 60,
+      sentimentScore: -0.65,
+      sentimentLabel: "Pedestrian Safety at Night",
+      healthRiskLevel: "LOW",
+      extractedEntities: [],
+      ragMatches: []
+    },
+    aiOfficerBrief: [
+      "LED bulbs and circuit drivers replaced; full lane illuminated."
+    ],
+    recommendedResolution: {
+      primaryAction: "Replace 72W LED Fixtures",
+      standardOperatingProcedure: "PMC-SOP-STREETLIGHT",
+      estimatedFixTime: "2 Hours",
+      equipmentRequired: ["Hydraulic Ladder Van", "72W LED Drivers"],
+      citizenDraftHindi: "प्रिय नागरिक, वाघेश्वर मंदिर मार्ग की सभी स्ट्रीटलाइट्स चालू कर दी गई हैं।",
+      citizenDraftEnglish: "Dear Citizen, all streetlights near Wagheshwar Temple have been replaced and tested."
+    },
+    timeline: [
+      { stage: "Submitted", time: "Sep 28, 06:00 PM", detail: "Logged report", status: "completed" },
+      { stage: "Resolved", time: "Sep 29, 02:00 PM", detail: "New LED lights installed & verified", status: "completed" }
+    ]
+  },
+  {
     id: "DL-2026-W14-0892",
     title: "Main Drinking Water Pipeline Burst & Gushing on Market Street",
     descriptionRaw: "Bhai pichle 3 din se hamare Sector 14, Main Market ke samne drinking water pipe phat gaya hai aur bohot tez paani bah raha hai. Sadak par paani bhar gaya hai aur pure area mein drinking water ki supply band hai.",
