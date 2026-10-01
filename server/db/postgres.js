@@ -307,9 +307,11 @@ export const postgresDB = {
         citizenVerification: r.citizen_verification,
         timeline: r.timeline || []
       };
-    } catch (err) {
-      console.warn('PostgreSQL getGrievanceById warning:', err.message);
     }
+  } catch (err) {
+    console.warn('PostgreSQL getGrievanceById warning:', err.message);
+  }
+}
 
     const restClient = getSupabaseRestClient() || supabaseRestClient;
     if (restClient) {
