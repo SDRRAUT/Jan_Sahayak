@@ -24,21 +24,44 @@ const SPREAD_TILES = {
   }
 };
 
-// Sub-component to smoothly pan map camera when selectedDay or hotspot changes
-function SpreadMapController({ center, zoom, resetTrigger }) {
+// Sub-component to smoothly pan map camera ONLY when user switches day or clicks a hotspot
+function SpreadMapController({ targetLat, targetLng, zoom = 15, triggerKey }) {
   const map = useMap();
+  const lastKeyRef = React.useRef(triggerKey);
+  const isMountedRef = React.useRef(false);
+
+  // Invalidate map size once after layout settles to guarantee clear, non-jittery tiles
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        map.invalidateSize();
+      } catch (e) {
+        // ignore
+      }
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [map]);
 
   useEffect(() => {
-    if (center && center[0] && center[1]) {
-      map.flyTo(center, zoom || 15, { duration: 0.8 });
+    // Skip animation on initial mount so map starts completely static and calm
+    if (!isMountedRef.current) {
+      isMountedRef.current = true;
+      lastKeyRef.current = triggerKey;
+      return;
     }
-  }, [center, zoom, map]);
 
-  useEffect(() => {
-    if (resetTrigger > 0 && center) {
-      map.flyTo(center, 15, { duration: 0.6 });
+    if (!targetLat || !targetLng) return;
+    if (lastKeyRef.current === triggerKey) return;
+    lastKeyRef.current = triggerKey;
+
+    const currentCenter = map.getCenter();
+    const dist = Math.hypot(currentCenter.lat - targetLat, currentCenter.lng - targetLng);
+
+    // Only pan if distance is non-trivial (avoids microscopic jitter)
+    if (dist > 0.0003) {
+      map.panTo([targetLat, targetLng], { animate: true, duration: 0.5 });
     }
-  }, [resetTrigger, center, map]);
+  }, [targetLat, targetLng, zoom, triggerKey, map]);
 
   return null;
 }
@@ -48,10 +71,11 @@ const createEpicenterIcon = (point, isCurrent) => {
   const size = isCurrent ? 36 : 28;
   const html = `
     <div style="
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      transform: translate(-50%, -50%);
+      width: ${size}px;
     ">
       <div style="
         width: ${size}px;
@@ -59,7 +83,7 @@ const createEpicenterIcon = (point, isCurrent) => {
         border-radius: 50%;
         background: ${point.color};
         border: 2.5px solid #FFFFFF;
-        box-shadow: 0 0 ${isCurrent ? '22px' : '10px'} ${point.color}, 0 4px 10px rgba(0,0,0,0.5);
+        box-shadow: 0 0 ${isCurrent ? '18px' : '8px'} ${point.color}, 0 4px 10px rgba(0,0,0,0.5);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -89,7 +113,8 @@ const createEpicenterIcon = (point, isCurrent) => {
   return L.divIcon({
     html,
     className: 'custom-epicenter-icon',
-    iconSize: [0, 0]
+    iconSize: [size, size + 22],
+    iconAnchor: [size / 2, size / 2]
   });
 };
 
@@ -98,17 +123,17 @@ const createSignalIcon = () => {
   return L.divIcon({
     html: `
       <div style="
-        width: 12px;
-        height: 12px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
         background: #38BDF8;
         border: 2px solid #FFFFFF;
         box-shadow: 0 0 8px #38BDF8, 0 2px 6px rgba(0,0,0,0.4);
-        transform: translate(-50%, -50%);
       "></div>
     `,
     className: 'custom-signal-icon',
-    iconSize: [0, 0]
+    iconSize: [10, 10],
+    iconAnchor: [5, 5]
   });
 };
 
@@ -121,7 +146,8 @@ const createHotspotIcon = (hotspot, isSelected) => {
       display: flex;
       flex-direction: column;
       align-items: center;
-      transform: translate(-50%, -50%);
+      width: 140px;
+      margin-left: -70px;
       cursor: pointer;
     ">
       <div style="
@@ -130,7 +156,7 @@ const createHotspotIcon = (hotspot, isSelected) => {
         border-radius: 50%;
         background: ${hotspot.color};
         border: 2.5px solid #FFFFFF;
-        box-shadow: 0 0 16px ${hotspot.color}, 0 4px 12px rgba(0,0,0,0.5);
+        box-shadow: 0 0 14px ${hotspot.color}, 0 4px 12px rgba(0,0,0,0.5);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -159,7 +185,8 @@ const createHotspotIcon = (hotspot, isSelected) => {
   return L.divIcon({
     html,
     className: 'custom-hotspot-icon',
-    iconSize: [0, 0]
+    iconSize: [0, 0],
+    iconAnchor: [0, size / 2]
   });
 };
 
@@ -313,38 +340,40 @@ export default function LeafletSpreadMap({
   selectedDay = 0,
   activeLayer = 'spread', // 'spread' | 'signals' | 'cluster' | 'hotspots' | 'affected'
   mapMode = 'satellite',
+  defaultTile,
   height = '420px',
   region = 'wagholi'
 }) {
   const [selectedHotspot, setSelectedHotspot] = useState(null);
-  const [mapCenter, setMapCenter] = useState([18.5785, 73.9820]);
+  const initialCenter = React.useMemo(() => [18.5785, 73.9820], []);
 
-  // Clean dataPoints with Wagholi coordinates
+  // Clean dataPoints with Wagholi coordinates (memoized to prevent re-render loops)
   const rawPoints = (dataPoints && dataPoints.length > 0) ? dataPoints : WAGHOLI_SPREAD_POINTS;
-  const points = rawPoints.map((pt, idx) => {
-    const fallback = WAGHOLI_SPREAD_POINTS[idx] || WAGHOLI_SPREAD_POINTS[0];
-    return sanitizeCoord(pt, fallback.lat, fallback.lng);
-  });
+  const points = React.useMemo(() => {
+    return rawPoints.map((pt, idx) => {
+      const fallback = WAGHOLI_SPREAD_POINTS[idx] || WAGHOLI_SPREAD_POINTS[0];
+      return sanitizeCoord(pt, fallback.lat, fallback.lng);
+    });
+  }, [rawPoints]);
 
   const currentPoint = points[selectedDay] || points[points.length - 1] || WAGHOLI_SPREAD_POINTS[0];
-  
-  useEffect(() => {
-    if (currentPoint && currentPoint.lat && currentPoint.lng) {
-      setMapCenter([currentPoint.lat, currentPoint.lng]);
-    }
-  }, [selectedDay, currentPoint]);
+
+  // Camera targets calculated from selection without triggering state render loops
+  const targetLat = selectedHotspot ? selectedHotspot.lat : (currentPoint?.lat || 18.5785);
+  const targetLng = selectedHotspot ? selectedHotspot.lng : (currentPoint?.lng || 73.9820);
+  const cameraTriggerKey = selectedHotspot ? `hotspot-${selectedHotspot.id}` : `day-${selectedDay}`;
 
   // Pipeline path coordinates along Wagholi Kesnand Road, Ivy Estate & Raisoni Chowk corridor
-  const pipelinePath = [
+  const pipelinePath = React.useMemo(() => [
     [18.5802, 73.9785], // Raisoni Chowk
     [18.5780, 73.9790], // Lexicon School
     [18.5760, 73.9810], // Ivy Estate Gate #1
     [18.5770, 73.9860], // Domkhel Road
     [18.5815, 73.9840]  // Baif Road Market
-  ];
+  ], []);
 
   // Derived citizen signal GPS locations distributed along actual Wagholi streets
-  const signalCoords = [
+  const signalCoords = React.useMemo(() => [
     { id: 'SIG-WAG-01', pos: [18.5762, 73.9808], title: 'Continuous drinking water leakage at Ivy Estate Gate #1', time: '10 min ago', citizen: 'Rahul R.', ward: 'Ward 29', dept: 'PMC Water' },
     { id: 'SIG-WAG-02', pos: [18.5766, 73.9815], title: 'Tap water smells foul like drainage in Ivy Estate Tower B', time: '25 min ago', citizen: 'Priya K.', ward: 'Ward 29', dept: 'PMC Water' },
     { id: 'SIG-WAG-03', pos: [18.5772, 73.9822], title: 'Water pressure collapse on 1st & 2nd floors along Kesnand road', time: '1 hr ago', citizen: 'Amit S.', ward: 'Ward 29', dept: 'PMC Water' },
@@ -353,9 +382,10 @@ export default function LeafletSpreadMap({
     { id: 'SIG-WAG-06', pos: [18.5818, 73.9842], title: 'Baif Road vegetable market corner has massive open garbage dump', time: '4 hrs ago', citizen: 'Sunil J.', ward: 'Ward 28', dept: 'PMC SWM' },
     { id: 'SIG-WAG-07', pos: [18.5803, 73.9783], title: 'Transformer near Raisoni College gate making loud sparking noise', time: '5 hrs ago', citizen: 'Vikas N.', ward: 'Ward 27', dept: 'MSEDCL' },
     { id: 'SIG-WAG-08', pos: [18.5770, 73.9860], title: 'Sewer manhole overflowing onto Domkhel road', time: '6 hrs ago', citizen: 'Anjali P.', ward: 'Ward 30', dept: 'PMC Drainage' }
-  ];
+  ], []);
 
-  const tile = SPREAD_TILES[mapMode] || SPREAD_TILES.satellite;
+  const effectiveTileKey = defaultTile || mapMode;
+  const tile = SPREAD_TILES[effectiveTileKey] || SPREAD_TILES.satellite;
 
   return (
     <div style={{
@@ -368,7 +398,7 @@ export default function LeafletSpreadMap({
       boxShadow: '0 8px 24px rgba(0,0,0,0.3)'
     }}>
       <MapContainer
-        center={mapCenter}
+        center={initialCenter}
         zoom={15}
         minZoom={13}
         maxZoom={18}
@@ -377,16 +407,17 @@ export default function LeafletSpreadMap({
         style={{ width: '100%', height: '100%', background: '#0B1520' }}
       >
         <TileLayer
-          key={mapMode}
+          key={effectiveTileKey}
           url={tile.url}
           attribution={tile.attribution}
           maxZoom={19}
         />
 
         <SpreadMapController
-          center={mapCenter}
+          targetLat={targetLat}
+          targetLng={targetLng}
           zoom={15}
-          resetTrigger={selectedDay}
+          triggerKey={cameraTriggerKey}
         />
 
         {/* Real Geodetic Pipeline Trace */}
@@ -414,7 +445,7 @@ export default function LeafletSpreadMap({
           />
         )}
 
-        {/* AI HOTSPOTS LAYER (Interactive pulsing hotspots across Wagholi) */}
+        {/* AI HOTSPOTS LAYER (Interactive hotspots across Wagholi) */}
         {(activeLayer === 'hotspots' || activeLayer === 'cluster' || activeLayer === 'spread') && WAGHOLI_AI_HOTSPOTS.map((hotspot) => {
           const isSelected = selectedHotspot?.id === hotspot.id;
           return (
@@ -436,12 +467,11 @@ export default function LeafletSpreadMap({
                 icon={createHotspotIcon(hotspot, isSelected)}
                 eventHandlers={{
                   click: () => {
-                    setSelectedHotspot(hotspot);
-                    setMapCenter([hotspot.lat, hotspot.lng]);
+                    setSelectedHotspot(prev => prev?.id === hotspot.id ? null : hotspot);
                   }
                 }}
               >
-                <Popup autoPan={true}>
+                <Popup autoPan={false}>
                   <div style={{ minWidth: '220px', padding: '4px', color: '#0F172A', fontFamily: 'sans-serif' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px', marginBottom: '4px' }}>
                       <span style={{ 
@@ -589,8 +619,7 @@ export default function LeafletSpreadMap({
               key={h.id}
               type="button"
               onClick={() => {
-                setSelectedHotspot(h);
-                setMapCenter([h.lat, h.lng]);
+                setSelectedHotspot(prev => prev?.id === h.id ? null : h);
               }}
               style={{
                 fontSize: '10.5px',

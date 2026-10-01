@@ -39,6 +39,15 @@ function MapController({ selectedWardCoord, resetTrigger, defaultCenter, default
   const map = useMap();
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        map.invalidateSize();
+      } catch (e) {}
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [map]);
+
+  useEffect(() => {
     if (selectedWardCoord && selectedWardCoord.lat && selectedWardCoord.lng) {
       map.flyTo([selectedWardCoord.lat, selectedWardCoord.lng], 13, {
         duration: 0.8,

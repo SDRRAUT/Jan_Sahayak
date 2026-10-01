@@ -89,7 +89,9 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
     ? spreadGeo 
     : (incident?.spreadGeo && incident.spreadGeo.length >= 3 ? incident.spreadGeo : defaultWagholiPoints);
 
-  const dataPoints = rawPoints.map((p, i) => sanitizeWagholiPoint(p, defaultWagholiPoints[i] || defaultWagholiPoints[0]));
+  const dataPoints = React.useMemo(() => {
+    return rawPoints.map((p, i) => sanitizeWagholiPoint(p, defaultWagholiPoints[i] || defaultWagholiPoints[0]));
+  }, [rawPoints]);
 
   // Specific citizen report signal points along actual Wagholi streets
   const citizenSignals = [
