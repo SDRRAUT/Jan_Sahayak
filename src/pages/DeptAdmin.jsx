@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import EditorialComplaintCard, { ComplaintDetailModal } from '../components/common/EditorialComplaintCard';
+import { maskCitizenName } from '../utils/privacy';
 
 export default function DeptAdmin() {
   const { user, grievances, clusters } = useApp();
@@ -70,7 +71,7 @@ export default function DeptAdmin() {
   const realFeedbacks = deptGrievances
     .filter(g => g.citizenFeedback && g.citizenFeedback.rating)
     .map(g => ({
-      citizen: g.citizenName || 'Citizen',
+      citizen: maskCitizenName(g.citizenName),
       ward: g.location?.ward || 'Municipal Ward',
       rating: Number(g.citizenFeedback.rating) || 5,
       comment: g.citizenFeedback.comment,
