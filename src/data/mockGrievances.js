@@ -465,6 +465,526 @@ export const INITIAL_GRIEVANCES = [
     ]
   },
   {
+    id: "PN-2026-WAG-0108",
+    title: "Broken Manhole Cover & Open Drain Chamber at Raisoni College Chowk",
+    descriptionRaw: "Raisoni College main chowk pe open manhole chamber hai, concrete slab toot gayi hai. Night me two wheelers ke girne ka extreme accident risk hai.",
+    languageDetected: "Hinglish / Hindi (Confidence 98%)",
+    category: "Drainage & Waterlogging",
+    department: "PMC Drainage Department",
+    officerName: "Er. Sunita Kulkarni",
+    officerDesignation: "PMC Drainage Inspector",
+    location: {
+      ward: "Wagholi Ward 28 (Raisoni Sub-District)",
+      area: "Raisoni College Road, Domkhel Phata",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5842,
+      lng: 73.9815
+    },
+    urgency: "CRITICAL",
+    urgencyScore: 97,
+    status: "INGESTED",
+    createdAt: "2026-10-01 11:20 AM",
+    slaDeadline: "2026-10-01 05:00 PM",
+    slaHoursLeft: 4,
+    clusterId: "CL-WAG-DRAIN-04",
+    clusterTitle: "Raisoni Chowk Manhole & Drain Hazards",
+    clusterCount: 14,
+    upvotes: 62,
+    citizenName: "Sanket Shinde",
+    citizenPhone: "+91 98812-44321",
+    evidence: {
+      photoUrl: "/civic-problems/pothole_broken_drain_grate.jpg",
+      confidenceScore: 0.99,
+      detectedIssue: "Shattered Heavy RCC Manhole Slab"
+    },
+    photoUrl: "/civic-problems/pothole_broken_drain_grate.jpg",
+    grievanceDna: {
+      dnaId: "DNA-WAG-412207-08",
+      departmentConfidence: 99.2,
+      urgencyScore: 97,
+      sentimentScore: -0.95,
+      sentimentLabel: "Severe Pedestrian & Two-Wheeler Hazard",
+      healthRiskLevel: "HIGH",
+      extractedEntities: [
+        { label: "Chamber Depth", val: "1.8 Meters Deep Open Shaft" },
+        { label: "Traffic Volume", val: "High (College Transit Corridor)" }
+      ],
+      ragMatches: []
+    },
+    aiOfficerBrief: [
+      "Open drainage shaft poses immediate falling hazard.",
+      "Emergency squad dispatched with heavy-duty ductile iron cover and warning cones."
+    ],
+    recommendedResolution: {
+      primaryAction: "Install Heavy Duty Reinforced Concrete / Ductile Iron Manhole Cover",
+      standardOperatingProcedure: "PMC-SOP-DRAIN-SAFETY-01",
+      estimatedFixTime: "2.5 Hours",
+      equipmentRequired: ["Hydraulic Loader", "Ductile Iron Manhole Lid (600mm)", "Reflective Safety Barricades"],
+      citizenDraftHindi: "प्रिय नागरिक, रायसोनी कॉलेज चौक के खुले मैनहोल पर तुरंत नया ढक्कन लगाने के लिए आपातकालीन टीम भेजी गई है।",
+      citizenDraftEnglish: "Dear Citizen, emergency PMC squad dispatched with replacement heavy-duty manhole cover at Raisoni Chowk."
+    },
+    timeline: [
+      { stage: "Submitted", time: "Oct 1, 11:20 AM", detail: "Citizen uploaded live photo of broken manhole slab", status: "completed" },
+      { stage: "AI Triage & Urgency Flag", time: "Oct 1, 11:21 AM", detail: "Classified as CRITICAL accident hazard", status: "completed" }
+    ]
+  },
+  {
+    id: "PN-2026-WAG-0109",
+    title: "Dead Animal Carcass & Unhygienic Biohazard at Domkhel Road Corner",
+    descriptionRaw: "Domkhel road corner pe animal carcass pichle 2 din se pada hai, foul smell aur flies se residential area me bimari fail rahi hai.",
+    languageDetected: "Hinglish / Marathi (Confidence 96%)",
+    category: "Solid Waste Management",
+    department: "PMC Solid Waste Management",
+    officerName: "Er. Amit Deshmukh",
+    officerDesignation: "PMC Sanitation Superintendent",
+    location: {
+      ward: "Wagholi Ward 28 (Domkhel)",
+      area: "Domkhel Road, Near Oxy Valley Society",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5875,
+      lng: 73.9850
+    },
+    urgency: "CRITICAL",
+    urgencyScore: 95,
+    status: "INGESTED",
+    createdAt: "2026-10-01 10:45 AM",
+    slaDeadline: "2026-10-01 04:00 PM",
+    slaHoursLeft: 3,
+    clusterId: "CL-WAG-GARBAGE-01",
+    clusterTitle: "Domkhel Sanitation & Health Biohazards",
+    clusterCount: 9,
+    upvotes: 48,
+    citizenName: "Pradeep More",
+    citizenPhone: "+91 97654-11892",
+    evidence: {
+      photoUrl: "/civic-problems/roadside_garbage_heap.jpg",
+      confidenceScore: 0.98,
+      detectedIssue: "Animal Carcass & Unsanitary Waste Deposit"
+    },
+    photoUrl: "/civic-problems/roadside_garbage_heap.jpg",
+    grievanceDna: {
+      dnaId: "DNA-WAG-412207-09",
+      departmentConfidence: 98.8,
+      urgencyScore: 95,
+      sentimentScore: -0.92,
+      sentimentLabel: "Public Health Threat & Biohazard",
+      healthRiskLevel: "HIGH",
+      extractedEntities: [
+        { label: "Zone", val: "Residential Society Entrance" },
+        { label: "Odor Dispersion", val: "Severe within 150m radius" }
+      ],
+      ragMatches: []
+    },
+    aiOfficerBrief: [
+      "Bio-waste carcass causing health hazards and stray dog pack aggregation.",
+      "Requires rapid sanitized burial van and bleaching powder disinfection."
+    ],
+    recommendedResolution: {
+      primaryAction: "Dispatch Special Animal Carcass Sanitization Van & Disinfect Area",
+      standardOperatingProcedure: "PMC-SOP-BIO-CLEAN-V3",
+      estimatedFixTime: "1.5 Hours",
+      equipmentRequired: ["Sanitized Bio-Disposal Van", "Calcium Hypochlorite Bleach (20kg)", "Protective PPE Kits"],
+      citizenDraftHindi: "प्रिय नागरिक, डोमखेल रोड पर मृत पशु उठाने और क्षेत्र में कीटनाशक छिड़काव के लिए विशेष वाहन भेजा जा रहा है।",
+      citizenDraftEnglish: "Dear Citizen, animal carcass removal squad with disinfection chemical sprayer has been mobilized for Domkhel Road."
+    },
+    timeline: [
+      { stage: "Submitted", time: "Oct 1, 10:45 AM", detail: "Citizen logged urgent biohazard photo", status: "completed" },
+      { stage: "AI Priority Escalated", time: "Oct 1, 10:46 AM", detail: "Prioritized as Priority Red bio-sanitation incident", status: "completed" }
+    ]
+  },
+  {
+    id: "PN-2026-WAG-0110",
+    title: "Turbid Brown Drinking Water & Chemical Odor in Majestique City Society Line",
+    descriptionRaw: "Society main inlet tap se muddy contaminated brown water aa raha hai with strong chemical foul smell. Drinking water unsafe for 400+ flats.",
+    languageDetected: "Hinglish (Confidence 97%)",
+    category: "Water Supply & Contamination",
+    department: "PMC Water Supply Department",
+    officerName: "Er. Rajesh Patil",
+    officerDesignation: "PMC Water Works Engineer",
+    location: {
+      ward: "Wagholi Ward 29 (Kesnand Corridor)",
+      area: "Majestique City Main Gate, Kesnand Road",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5795,
+      lng: 73.9880
+    },
+    urgency: "HIGH",
+    urgencyScore: 88,
+    status: "INGESTED",
+    createdAt: "2026-10-01 08:50 AM",
+    slaDeadline: "2026-10-02 12:00 PM",
+    slaHoursLeft: 14,
+    clusterId: "CL-WAG-WATER-02",
+    clusterTitle: "Kesnand Corridor Water Purity Crisis",
+    clusterCount: 18,
+    upvotes: 77,
+    citizenName: "Vandana Joshi",
+    citizenPhone: "+91 98230-77123",
+    evidence: {
+      photoUrl: "/civic-problems/water_pipe_leak.jpg",
+      confidenceScore: 0.97,
+      detectedIssue: "Water Line Infiltration & High Turbidity"
+    },
+    photoUrl: "/civic-problems/water_pipe_leak.jpg",
+    grievanceDna: {
+      dnaId: "DNA-WAG-412207-10",
+      departmentConfidence: 99.1,
+      urgencyScore: 88,
+      sentimentScore: -0.84,
+      sentimentLabel: "Contaminated Domestic Drinking Water Supply",
+      healthRiskLevel: "HIGH",
+      extractedEntities: [
+        { label: "Population Impacted", val: "400+ Residential Families" },
+        { label: "Turbidity (NTU)", val: "18.5 (Standard < 1.0)" }
+      ],
+      ragMatches: []
+    },
+    aiOfficerBrief: [
+      "Inlet pipeline ingress detected near stormwater culvert.",
+      "Valves need isolation, suction flush, and water sample testing before restoring supply."
+    ],
+    recommendedResolution: {
+      primaryAction: "Isolate Feeder Valve, High-Pressure Pipeline Flush & Chlorine Shock",
+      standardOperatingProcedure: "PMC-SOP-WATER-PURITY",
+      estimatedFixTime: "4 Hours",
+      equipmentRequired: ["Water Sample Testing Kit", "High Pressure Flushing Pump", "Chlorine Dosing Unit"],
+      citizenDraftHindi: "प्रिय नागरिक, मेजेस्टिक सिटी की पानी पाइपलाइन की जांच शुरू हो गई है। पाइपलाइन फ्लश कर शुद्ध पानी की आपूर्ति बहाल की जाएगी।",
+      citizenDraftEnglish: "Dear Citizen, PMC water department has begun pipeline flushing and chlorination for Majestique City line."
+    },
+    timeline: [
+      { stage: "Submitted", time: "Oct 1, 08:50 AM", detail: "Report submitted with water color photo", status: "completed" },
+      { stage: "AI Triage", time: "Oct 1, 08:52 AM", detail: "Flagged as high-risk domestic water contamination", status: "completed" }
+    ]
+  },
+  {
+    id: "PN-2026-WAG-0111",
+    title: "Continuous Open Garbage Burning & Dense Toxic Smoke at Soygaon Phata",
+    descriptionRaw: "Illegal plastic and solid waste burning happening daily in open plot near canal road. Dense toxic smoke entering nearby apartments.",
+    languageDetected: "Hinglish / Marathi (Confidence 97%)",
+    category: "Solid Waste Management",
+    department: "PMC Solid Waste Management",
+    officerName: "Er. Amit Deshmukh",
+    officerDesignation: "PMC Sanitation Superintendent",
+    location: {
+      ward: "Wagholi Ward 31 (Soygaon)",
+      area: "Soygaon Phata, Near Canal Road",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5860,
+      lng: 73.9920
+    },
+    urgency: "HIGH",
+    urgencyScore: 85,
+    status: "IN_PROGRESS",
+    createdAt: "2026-10-01 07:15 AM",
+    slaDeadline: "2026-10-01 07:00 PM",
+    slaHoursLeft: 8,
+    clusterId: "CL-WAG-GARBAGE-01",
+    clusterTitle: "Wagholi East Waste Dumping & Open Burning",
+    clusterCount: 12,
+    upvotes: 55,
+    citizenName: "Tanaji Shinde",
+    citizenPhone: "+91 99214-33810",
+    evidence: {
+      photoUrl: "/civic-problems/garbage_dumping_market.jpg",
+      confidenceScore: 0.98,
+      detectedIssue: "Open Plastic Combustive Smoldering"
+    },
+    photoUrl: "/civic-problems/garbage_dumping_market.jpg",
+    grievanceDna: {
+      dnaId: "DNA-WAG-412207-11",
+      departmentConfidence: 98.6,
+      urgencyScore: 85,
+      sentimentScore: -0.87,
+      sentimentLabel: "Severe Air Quality Deterioration & Respiratory Risk",
+      healthRiskLevel: "MEDIUM",
+      extractedEntities: [
+        { label: "AQI Local Spike", val: "340 PM2.5 in plume" },
+        { label: "Plot Status", val: "Vacant Private Layout (Plot #44)" }
+      ],
+      ragMatches: []
+    },
+    aiOfficerBrief: [
+      "Open smoldering garbage fire causing PM2.5 haze over Soygaon residential complexes.",
+      "Water mist tanker deployed; penalty notice generated under NGT municipal bylaws."
+    ],
+    recommendedResolution: {
+      primaryAction: "Extinguish Smoldering Pile, Apply Soil Capping & Issue Section 133 NGT Notice",
+      standardOperatingProcedure: "PMC-SOP-FIRE-AIR-02",
+      estimatedFixTime: "2 Hours",
+      equipmentRequired: ["PMC Water Bowser Tanker", "JCB Backhoe Loader", "Fine Notice Protocol"],
+      citizenDraftHindi: "प्रिय नागरिक, सोयगांव फाटा पर कचरा जलाने वाले स्थान पर पानी का टैंकर भेजकर आग बुझा दी गई है और प्लॉट मालिक को नोटिस जारी किया गया है।",
+      citizenDraftEnglish: "Dear Citizen, PMC fire water bowser has quenched the smoldering dump at Soygaon Phata and penalty notice has been served."
+    },
+    timeline: [
+      { stage: "Submitted", time: "Oct 1, 07:15 AM", detail: "Citizen submitted morning smoke photo", status: "completed" },
+      { stage: "Squad Mobilized", time: "Oct 1, 08:30 AM", detail: "PMC Bowser Squad reached location", status: "completed" }
+    ]
+  },
+  {
+    id: "PN-2026-WAG-0112",
+    title: "Dangling Low-Tension Power Wire & Sparking Pole near Oasis Breeze",
+    descriptionRaw: "Overhead service line pole wire is hanging loose at 6 feet height. Sparks seen during evening wind.",
+    languageDetected: "Hinglish (Confidence 98%)",
+    category: "Electricity & Power Grid",
+    department: "MSEDCL Wagholi Sub-Division",
+    officerName: "Er. Nitin Chavan",
+    officerDesignation: "MSEDCL Junior Engineer (Wagholi)",
+    location: {
+      ward: "Wagholi Ward 29 (Bakori Road)",
+      area: "Oasis Breeze Society Lane, Bakori Phata",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5810,
+      lng: 73.9830
+    },
+    urgency: "HIGH",
+    urgencyScore: 82,
+    status: "ACTION_DISPATCHED",
+    createdAt: "2026-10-01 09:10 AM",
+    slaDeadline: "2026-10-01 06:00 PM",
+    slaHoursLeft: 6,
+    clusterId: "CL-WAG-POWER-05",
+    clusterTitle: "Bakori Road Overhead Power Line Sags",
+    clusterCount: 8,
+    upvotes: 39,
+    citizenName: "Sameer Kulkarni",
+    citizenPhone: "+91 98229-44012",
+    evidence: {
+      photoUrl: "/civic-problems/ai_dangling_power_cables.jpg",
+      confidenceScore: 0.99,
+      detectedIssue: "Overhead 440V Conductor Sag & Insulation Damage"
+    },
+    photoUrl: "/civic-problems/ai_dangling_power_cables.jpg",
+    grievanceDna: {
+      dnaId: "DNA-WAG-412207-12",
+      departmentConfidence: 99.4,
+      urgencyScore: 82,
+      sentimentScore: -0.89,
+      sentimentLabel: "Electrocution Hazard for Pedestrians",
+      healthRiskLevel: "HIGH",
+      extractedEntities: [
+        { label: "Voltage", val: "440V 3-Phase LT Line" },
+        { label: "Sag Clearance", val: "1.9m (Mandatory > 5.5m)" }
+      ],
+      ragMatches: []
+    },
+    aiOfficerBrief: [
+      "Low hanging wire poses electrocution risk to pedestrians and delivery vans.",
+      "Lineman emergency team assigned with cable tensioner."
+    ],
+    recommendedResolution: {
+      primaryAction: "Re-tension Overhead Conductor, Install Aerial Bundled Cable (ABC) Spacer",
+      standardOperatingProcedure: "MSEDCL-SOP-LT-LINE-FIX",
+      estimatedFixTime: "2 Hours",
+      equipmentRequired: ["Hydraulic Bucket Truck", "Insulated Tension Puller", "Aerial Cable Ties"],
+      citizenDraftHindi: "प्रिय नागरिक, ओएसिस ब्रीज के पास ढीले बिजली तार को खींचकर सुरक्षित ऊंचाई पर बांधने के लिए महावितरण टीम मौके पर पहुंच रही है।",
+      citizenDraftEnglish: "Dear Citizen, MSEDCL lineman team is en route to re-tension and secure the dangling overhead power cable."
+    },
+    timeline: [
+      { stage: "Submitted", time: "Oct 1, 09:10 AM", detail: "Citizen submitted hazard report", status: "completed" },
+      { stage: "Work Order Issued", time: "Oct 1, 09:25 AM", detail: "Squad WO-WAG-ELEC-44 dispatched", status: "completed" }
+    ]
+  },
+  {
+    id: "PN-2026-WAG-0113",
+    title: "Illegal Encroachment & Blocked Pedestrian Walkway on Wagholi Weekly Mandi Road",
+    descriptionRaw: "Temporary iron stalls and crates placed on footpath forcing school children and pedestrians onto heavy traffic road.",
+    languageDetected: "Hinglish (Confidence 96%)",
+    category: "Roads & Infrastructure",
+    department: "PMC Encroachment Department",
+    officerName: "Er. Ramesh Gaikwad",
+    officerDesignation: "PMC Encroachment Inspector",
+    location: {
+      ward: "Wagholi Ward 27 (Central Market)",
+      area: "Wagholi Mandi Ground Road, Opp Bus Stand",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5760,
+      lng: 73.9770
+    },
+    urgency: "MEDIUM",
+    urgencyScore: 72,
+    status: "INGESTED",
+    createdAt: "2026-10-01 10:00 AM",
+    slaDeadline: "2026-10-02 06:00 PM",
+    slaHoursLeft: 22,
+    clusterId: "CL-WAG-MARKET-08",
+    clusterTitle: "Central Wagholi Market Encroachments",
+    clusterCount: 6,
+    upvotes: 31,
+    citizenName: "Anita Thorat",
+    citizenPhone: "+91 97633-99011",
+    evidence: {
+      photoUrl: "/civic-problems/roadside_garbage_heap.jpg",
+      confidenceScore: 0.95,
+      detectedIssue: "Footpath Obstruction & Commercial Encroachment"
+    },
+    photoUrl: "/civic-problems/roadside_garbage_heap.jpg",
+    grievanceDna: {
+      dnaId: "DNA-WAG-412207-13",
+      departmentConfidence: 97.5,
+      urgencyScore: 72,
+      sentimentScore: -0.71,
+      sentimentLabel: "Pedestrian Blockade & Traffic Congestion",
+      healthRiskLevel: "LOW",
+      extractedEntities: [
+        { label: "Footpath Width Blocked", val: "100% of 2.2m walkway" },
+        { label: "Target Area", val: "Bus Stand Entrance corridor" }
+      ],
+      ragMatches: []
+    },
+    aiOfficerBrief: [
+      "Unauthorized wooden stalls encroaching main school transit walkway.",
+      "Notice and anti-encroachment removal drive planned for afternoon."
+    ],
+    recommendedResolution: {
+      primaryAction: "Execute Anti-Encroachment Footpath Clearance & Erect Pedestrian Guardrails",
+      standardOperatingProcedure: "PMC-SOP-ENCROACH-03",
+      estimatedFixTime: "3 Hours",
+      equipmentRequired: ["Encroachment Recovery Truck", "PMC Security Squad", "Bilingual Notice Seals"],
+      citizenDraftHindi: "प्रिय नागरिक, वाघोली बस स्टैंड के पास फुटपाथ पर अवैध अतिक्रमण हटाने की कार्रवाई पीएमसी दस्ते द्वारा की जा रही है।",
+      citizenDraftEnglish: "Dear Citizen, PMC anti-encroachment squad has scheduled footpath clearance at Wagholi Mandi road."
+    },
+    timeline: [
+      { stage: "Submitted", time: "Oct 1, 10:00 AM", detail: "Citizen logged pedestrian obstruction", status: "completed" },
+      { stage: "Assigned", time: "Oct 1, 10:15 AM", detail: "Forwarded to PMC Encroachment Ward 27 Officer", status: "completed" }
+    ]
+  },
+  {
+    id: "PN-2026-WAG-0114",
+    title: "Unmarked Speed Breaker & Dangerous Bump on Kesnand Phata Bridge Approach",
+    descriptionRaw: "Speed breaker without thermoplastic retroreflective paint or warning signboard causing sudden vehicle braking and minor accidents.",
+    languageDetected: "Hinglish (Confidence 97%)",
+    category: "Roads & Infrastructure",
+    department: "Public Works Department (PWD Pune)",
+    officerName: "Er. Amit Deshmukh",
+    officerDesignation: "PWD Executive Engineer (Roads)",
+    location: {
+      ward: "Wagholi Ward 29 (Kesnand Corridor)",
+      area: "Kesnand Phata Flyover Descent",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5788,
+      lng: 73.9845
+    },
+    urgency: "MEDIUM",
+    urgencyScore: 68,
+    status: "IN_PROGRESS",
+    createdAt: "2026-09-30 04:30 PM",
+    slaDeadline: "2026-10-02 04:30 PM",
+    slaHoursLeft: 20,
+    clusterId: "CL-WAG-ROADS-03",
+    clusterTitle: "Wagholi Highway Road Safety & Markings",
+    clusterCount: 5,
+    upvotes: 35,
+    citizenName: "Deepak Choudhary",
+    citizenPhone: "+91 98811-00234",
+    evidence: {
+      photoUrl: "/civic-problems/pothole_broken_drain_grate.jpg",
+      confidenceScore: 0.96,
+      detectedIssue: "Unmarked Speed Breaker Surface Hazard"
+    },
+    photoUrl: "/civic-problems/pothole_broken_drain_grate.jpg",
+    grievanceDna: {
+      dnaId: "DNA-WAG-412207-14",
+      departmentConfidence: 98.0,
+      urgencyScore: 68,
+      sentimentScore: -0.68,
+      sentimentLabel: "Vehicular Safety & Unmarked Road Hazard",
+      healthRiskLevel: "LOW",
+      extractedEntities: [
+        { label: "Location", val: "Bridge Flyover Ramp Downhill" },
+        { label: "Night Visibility", val: "Poor (Zero Reflective Paint)" }
+      ],
+      ragMatches: []
+    },
+    aiOfficerBrief: [
+      "Unmarked speed bump causing heavy braking and rear-end crash risks.",
+      "Thermoplastic paint crew deployed for zebra striping."
+    ],
+    recommendedResolution: {
+      primaryAction: "Apply Thermoplastic Retroreflective Yellow/White Stripes & Install IRC Standard Signboard",
+      standardOperatingProcedure: "IRC-SOP-SPEEDBREAKER-2023",
+      estimatedFixTime: "2.5 Hours",
+      equipmentRequired: ["Thermoplastic Road Marking Applicator", "Retroreflective Glass Beads", "IRC Caution Signboard"],
+      citizenDraftHindi: "प्रिय नागरिक, केसनंद फाटा ब्रिज के स्पीड ब्रेकर पर पीले रिफ्लेक्टिव पट्टे और चेतावनी बोर्ड लगाने का कार्य प्रगति पर है।",
+      citizenDraftEnglish: "Dear Citizen, PWD road safety squad is painting thermoplastic reflective stripes on the Kesnand flyover speed breaker."
+    },
+    timeline: [
+      { stage: "Submitted", time: "Sep 30, 04:30 PM", detail: "Citizen uploaded unmarked speed bump photo", status: "completed" },
+      { stage: "Work Initiated", time: "Oct 1, 09:00 AM", detail: "Road painting crew reached site", status: "completed" }
+    ]
+  },
+  {
+    id: "PN-2026-WAG-0115",
+    title: "Wild Bush Overgrowth & Broken Benches at Wagheshwar Lake Public Garden",
+    descriptionRaw: "Overgrown weed shrubs and broken walking track wooden benches repaired and landscaped.",
+    languageDetected: "English / Hinglish (Confidence 99%)",
+    category: "Public Parks & Horticulture",
+    department: "PMC Garden & Tree Authority",
+    officerName: "Er. Ramesh Gaikwad",
+    officerDesignation: "PMC Garden Superintendent",
+    location: {
+      ward: "Wagholi Ward 27 (Wagheshwar Temple Area)",
+      area: "Wagheshwar Lakefront Promenade",
+      city: "Pune",
+      pincode: "412207",
+      lat: 18.5770,
+      lng: 73.9792
+    },
+    urgency: "LOW",
+    urgencyScore: 45,
+    status: "RESOLVED",
+    createdAt: "2026-09-29 10:00 AM",
+    slaDeadline: "2026-09-30 06:00 PM",
+    slaHoursLeft: 0,
+    clusterId: "CL-WAG-PARK-09",
+    clusterTitle: "Wagheshwar Lake Promenade Upkeep",
+    clusterCount: 4,
+    upvotes: 22,
+    citizenName: "Meenakshi Kulkarni",
+    citizenPhone: "+91 97645-33219",
+    evidence: {
+      photoUrl: "/civic-problems/open_sewage_nullah_garbage.jpg",
+      confidenceScore: 0.97,
+      detectedIssue: "Lakefront Garden Landscaping & Maintenance"
+    },
+    photoUrl: "/civic-problems/open_sewage_nullah_garbage.jpg",
+    grievanceDna: {
+      dnaId: "DNA-WAG-412207-15",
+      departmentConfidence: 98.4,
+      urgencyScore: 45,
+      sentimentScore: 0.45,
+      sentimentLabel: "Civic Amenity Restoration",
+      healthRiskLevel: "LOW",
+      extractedEntities: [
+        { label: "Park Zone", val: "Lake Walking Track Section C" },
+        { label: "Benches Installed", val: "4 Cast Iron & Concrete Benches" }
+      ],
+      ragMatches: []
+    },
+    aiOfficerBrief: [
+      "Horticulture pruning completed; 4 new pre-cast concrete benches installed.",
+      "Resident senior citizens verified restoration."
+    ],
+    recommendedResolution: {
+      primaryAction: "Horticulture Trimming & Concrete Bench Replacement",
+      standardOperatingProcedure: "PMC-SOP-PARKS-MAINT",
+      estimatedFixTime: "3 Hours",
+      equipmentRequired: ["Horticulture Hedge Trimmer", "4x Precast Reinforced Benches", "Lawn Mower"],
+      citizenDraftHindi: "प्रिय नागरिक, वाघेश्वर झील उद्यान की झाड़ियों की छंटाई और नई बेंच लगाने का कार्य सफलतापूर्वक पूरा हो चुका है।",
+      citizenDraftEnglish: "Dear Citizen, Wagheshwar Lake promenade bushes have been pruned and new concrete benches installed."
+    },
+    timeline: [
+      { stage: "Submitted", time: "Sep 29, 10:00 AM", detail: "Citizen logged garden upkeep request", status: "completed" },
+      { stage: "Resolved", time: "Sep 30, 04:30 PM", detail: "Maintenance completed & citizen verified", status: "completed" }
+    ]
+  },
+  {
     id: "DL-2026-W14-0892",
     title: "Main Drinking Water Pipeline Burst & Gushing on Market Street",
     descriptionRaw: "Bhai pichle 3 din se hamare Sector 14, Main Market ke samne drinking water pipe phat gaya hai aur bohot tez paani bah raha hai. Sadak par paani bhar gaya hai aur pure area mein drinking water ki supply band hai.",

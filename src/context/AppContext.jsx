@@ -129,10 +129,11 @@ export function AppProvider({ children }) {
 
   const [grievances, setGrievances] = useState(() => {
     try {
+      localStorage.removeItem('jansahayk_grievances_v5');
       localStorage.removeItem('jansahayk_grievances_v4');
       localStorage.removeItem('jansahayk_grievances');
     } catch (e) {}
-    const saved = localStorage.getItem('jansahayk_grievances_v5');
+    const saved = localStorage.getItem('jansahayk_grievances_v6');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -142,23 +143,24 @@ export function AppProvider({ children }) {
         }
       } catch (e) {}
     }
-    localStorage.setItem('jansahayk_grievances_v5', JSON.stringify(INITIAL_GRIEVANCES));
+    localStorage.setItem('jansahayk_grievances_v6', JSON.stringify(INITIAL_GRIEVANCES));
     return INITIAL_GRIEVANCES;
   });
 
   const [clusters, setClusters] = useState(() => {
     try {
+      localStorage.removeItem('jansahayk_clusters_v5');
       localStorage.removeItem('jansahayk_clusters_v4');
       localStorage.removeItem('jansahayk_clusters');
     } catch (e) {}
-    const saved = localStorage.getItem('jansahayk_clusters_v5');
+    const saved = localStorage.getItem('jansahayk_clusters_v6');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length >= MOCK_CLUSTERS.length) return parsed;
       } catch (e) {}
     }
-    localStorage.setItem('jansahayk_clusters_v5', JSON.stringify(MOCK_CLUSTERS));
+    localStorage.setItem('jansahayk_clusters_v6', JSON.stringify(MOCK_CLUSTERS));
     return MOCK_CLUSTERS;
   });
 
@@ -242,11 +244,11 @@ export function AppProvider({ children }) {
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem('jansahayk_grievances_v5', JSON.stringify(grievances));
+    localStorage.setItem('jansahayk_grievances_v6', JSON.stringify(grievances));
   }, [grievances]);
 
   useEffect(() => {
-    localStorage.setItem('jansahayk_clusters_v5', JSON.stringify(clusters));
+    localStorage.setItem('jansahayk_clusters_v6', JSON.stringify(clusters));
   }, [clusters]);
 
   useEffect(() => {
