@@ -20,6 +20,7 @@ import {
 import confetti from 'canvas-confetti';
 import { useApp } from '../../context/AppContext';
 import LiveCameraCapture from './LiveCameraCapture';
+import MultiAgentSubmissionPipeline from './MultiAgentSubmissionPipeline';
 
 export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = '' }) {
   const navigate = useNavigate();
@@ -64,6 +65,8 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
 
   // Submission State & Result
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAgentPipelineActive, setIsAgentPipelineActive] = useState(false);
+  const [pendingCreatedTicket, setPendingCreatedTicket] = useState(null);
   const [createdTicket, setCreatedTicket] = useState(null);
 
   // Refs
@@ -101,6 +104,8 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
     if (isOpen && !prevIsOpenRef.current) {
       setCurrentStep(1);
       setCreatedTicket(null);
+      setPendingCreatedTicket(null);
+      setIsAgentPipelineActive(false);
       setAiDetectedCategory(null);
       setAiModeSelected(false);
       if (defaultCategory) setCategory(defaultCategory);
@@ -412,6 +417,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
     }
 
     setIsSubmitting(true);
+    setIsAgentPipelineActive(true);
 
     try {
       const created = await submitGrievance({
@@ -441,16 +447,22 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
       });
 
       console.log('[FileGrievanceModal] Grievance created successfully:', created);
-      setCreatedTicket(created);
-      setIsSubmitting(false);
-
-      try {
-        confetti({ particleCount: 90, spread: 75, origin: { y: 0.6 } });
-      } catch (err) {}
+      setPendingCreatedTicket(created);
     } catch (err) {
       console.error('[FileGrievanceModal] Submit error:', err);
       setIsSubmitting(false);
+      setIsAgentPipelineActive(false);
     }
+  };
+
+  const handlePipelineComplete = () => {
+    setIsAgentPipelineActive(false);
+    setIsSubmitting(false);
+    setCreatedTicket(pendingCreatedTicket);
+
+    try {
+      confetti({ particleCount: 90, spread: 75, origin: { y: 0.6 } });
+    } catch (err) {}
   };
 
   if (!isOpen) return null;
@@ -512,7 +524,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
         </div>
 
         {/* Progress Bar */}
-        {!createdTicket && (
+        {!createdTicket && !isAgentPipelineActive && (
           <div style={{ padding: '10px 22px 6px 22px', background: '#FFFFFF', borderBottom: '1px solid #F8FAFC' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
               <span style={{ fontSize: '11px', fontWeight: 700, color: '#2563EB', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -546,7 +558,18 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
 
         {/* Content Body */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '18px 22px' }}>
-          {createdTicket ? (
+          {isAgentPipelineActive ? (
+            <MultiAgentSubmissionPipeline
+              grievanceDraft={{
+                title: title || `${category} Issue in ${ward}`,
+                description,
+                ward,
+                area,
+                pincode
+              }}
+              onComplete={handlePipelineComplete}
+            />
+          ) : createdTicket ? (
             <div style={{ textAlign: 'center', padding: '8px 4px 6px 4px' }}>
               {/* Animated Success Badge */}
               <div style={{

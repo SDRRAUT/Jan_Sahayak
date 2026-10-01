@@ -29,6 +29,7 @@ import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
 import { uploadComplaintMedia, uploadVoiceRecording } from '../services/supabaseClient';
 import { analyzeCivicPhoto } from '../services/aiVisionService';
+import MultiAgentSubmissionPipeline from '../components/common/MultiAgentSubmissionPipeline';
 
 const QUICK_PRESETS = [
   {
@@ -128,6 +129,8 @@ export default function CitizenSubmit() {
 
   // Submission Flow
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAgentPipelineActive, setIsAgentPipelineActive] = useState(false);
+  const [pendingCreatedTicket, setPendingCreatedTicket] = useState(null);
   const [createdTicket, setCreatedTicket] = useState(null);
 
   // Refs for media capture
@@ -396,12 +399,13 @@ export default function CitizenSubmit() {
     );
   };
 
-  // 4. SUBMIT GRIEVANCE DIRECTLY
+  // 4. SUBMIT GRIEVANCE WITH 15-SECOND 8-AGENT ORCHESTRATION
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!description.trim()) return;
 
     setIsSubmitting(true);
+    setIsAgentPipelineActive(true);
     const finalCategory = manualCategory || liveUnderstanding?.category || 'General Civic Infrastructure';
 
     try {
@@ -436,17 +440,23 @@ export default function CitizenSubmit() {
         }
       });
 
-      setCreatedTicket(created);
-      setIsSubmitting(false);
-
-      // Celebration confetti
-      try {
-        confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-      } catch (err) {}
+      setPendingCreatedTicket(created);
     } catch (err) {
       console.error('Submission error:', err);
       setIsSubmitting(false);
+      setIsAgentPipelineActive(false);
     }
+  };
+
+  const handlePipelineComplete = () => {
+    setIsAgentPipelineActive(false);
+    setIsSubmitting(false);
+    setCreatedTicket(pendingCreatedTicket);
+
+    // Celebration confetti
+    try {
+      confetti({ particleCount: 90, spread: 75, origin: { y: 0.6 } });
+    } catch (err) {}
   };
 
   const handleCopyTicket = (id) => {
@@ -468,6 +478,8 @@ export default function CitizenSubmit() {
     setDocumentFile(null);
     setLiveUnderstanding(null);
     setCreatedTicket(null);
+    setPendingCreatedTicket(null);
+    setIsAgentPipelineActive(false);
     setGpsCoordinates(null);
     setLocationStatusMsg(null);
     setMicStatusMsg(null);
@@ -690,10 +702,22 @@ export default function CitizenSubmit() {
           </div>
 
           {/* ==================================================================
-              IF SUBMITTED: SHOW BEAUTIFUL INLINE SUCCESS STATE
-              (No disjointed popups!)
+              IF SUBMITTING: SHOW 15-SECOND 8-AGENT ORCHESTRATION PIPELINE
              ================================================================== */}
-          {createdTicket ? (
+          {isAgentPipelineActive ? (
+            <div style={{ padding: '16px' }}>
+              <MultiAgentSubmissionPipeline
+                grievanceDraft={{
+                  title: title || `${manualCategory || 'Civic'} Issue in ${ward}`,
+                  description,
+                  ward,
+                  area,
+                  pincode
+                }}
+                onComplete={handlePipelineComplete}
+              />
+            </div>
+          ) : createdTicket ? (
             <div style={{ padding: '48px 32px', textAlign: 'center' }}>
               <div style={{
                 width: '72px',
