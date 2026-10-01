@@ -63,6 +63,7 @@ import ActionSimulationCard from '../components/intelligence/ActionSimulationCar
 import LiveComplaintLinkageSection from '../components/intelligence/LiveComplaintLinkageSection';
 import EditorialComplaintCard, { ComplaintDetailModal } from '../components/common/EditorialComplaintCard';
 import JanSuchnaModal from '../components/officer/JanSuchnaModal';
+import { maskCitizenName, maskCitizenPhone } from '../utils/privacy';
 
 export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
   const { id } = useParams();
@@ -1770,7 +1771,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                             </td>
                             <td style={{ padding: '12px 10px', maxWidth: '320px' }}>
                               <strong style={{ display: 'block', color: 'var(--color-text-primary)', marginBottom: '2px' }}>{g.title}</strong>
-                              <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>by {g.citizenName || 'Citizen'}</span>
+                              <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>by {maskCitizenName(g.citizenName)}</span>
                             </td>
                             <td style={{ padding: '12px 10px', color: 'var(--color-text-secondary)' }}>
                               {g.location?.ward || 'Ward 14'}
@@ -1846,7 +1847,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                               {g.id}
                             </span>
                             <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                              • {g.citizenName || 'Citizen'}
+                              • {maskCitizenName(g.citizenName)}
                             </span>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -2100,7 +2101,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   </div>
 
                   <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
-                    Citizen: <strong>{activeItem.citizenName || 'Aditya Verma'}</strong> ({activeItem.citizenPhone || '+91 98712-XXXXX'})
+                    Citizen: <strong>{maskCitizenName(activeItem.citizenName || 'Aditya Verma')}</strong> ({maskCitizenPhone(activeItem.citizenPhone)})
                   </div>
                 </div>
 
@@ -2474,7 +2475,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px', flexWrap: 'wrap', gap: '8px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <strong className="font-mono-numbers" style={{ fontSize: '13px' }}>{candidate.id}</strong>
-                              <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>by {candidate.citizenName}</span>
+                              <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>by {maskCitizenName(candidate.citizenName)}</span>
                               <span style={{
                                 fontSize: '10px',
                                 fontWeight: 800,
