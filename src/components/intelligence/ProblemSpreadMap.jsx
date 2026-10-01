@@ -400,21 +400,16 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
           overscrollBehavior: 'contain'
         }}
       >
-        {/* REAL MAP IMAGE BASEMAP */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          backgroundImage: mapMode === 'satellite' 
-            ? 'url("/delhi-gis-map-satellite.jpg")' 
-            : 'url("/delhi-gis-map-dark.jpg")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          transform: `scale(${zoomLevel})`,
-          transition: 'transform 300ms cubic-bezier(0.16, 1, 0.3, 1), background-image 300ms ease',
-          filter: mapMode === 'satellite' ? 'brightness(0.92) contrast(1.08)' : 'brightness(1.02)'
-        }} />
+        {/* REAL INTERACTIVE LEAFLET MAP BASEMAP */}
+        <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 0 }}>
+          <LeafletSpreadMap
+            dataPoints={dataPoints}
+            selectedDay={selectedDay}
+            activeLayer={activeLayer}
+            defaultTile={mapMode === 'satellite' ? 'satellite' : 'dark'}
+            height="100%"
+          />
+        </div>
 
         {/* Subtle Dark Vignette & Geographic Mesh Overlay */}
         <div style={{

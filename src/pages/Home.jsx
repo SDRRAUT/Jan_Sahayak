@@ -38,6 +38,7 @@ import { INITIAL_GRIEVANCES, SYSTEM_METRICS } from '../data/mockGrievances';
 import citizenBg from '../assets/citizen-bg.jpg';
 import WhyExplainer from '../components/common/WhyExplainer';
 import FileGrievanceModal from '../components/common/FileGrievanceModal';
+import LeafletSpreadMap from '../components/common/LeafletSpreadMap';
 
 const FOUR_STEPS = [
   {
@@ -1597,23 +1598,13 @@ export default function Home() {
                 flexDirection: 'column'
               }}
             >
-              {/* REAL SATELLITE / GIS MAP IMAGE BASEMAP */}
-              <div 
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  width: '100%',
-                  height: '100%',
-                  backgroundImage: mapBasemap === 'satellite' 
-                    ? 'url("/delhi-gis-map-satellite.jpg")' 
-                    : 'url("/delhi-gis-map-dark.jpg")',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  transform: `scale(${mapZoom})`,
-                  transition: 'transform 300ms cubic-bezier(0.16, 1, 0.3, 1), background-image 300ms ease',
-                  filter: mapBasemap === 'satellite' ? 'brightness(0.92) contrast(1.08)' : 'brightness(1.05)'
-                }} 
-              />
+              {/* REAL INTERACTIVE LEAFLET MAP BASEMAP */}
+              <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 1 }}>
+                <LeafletSpreadMap
+                  defaultTile={mapBasemap === 'satellite' ? 'satellite' : 'dark'}
+                  height="100%"
+                />
+              </div>
 
               {/* Geographic Mesh & Cybernetic Radar Overlay */}
               <div 

@@ -397,18 +397,16 @@ export default function AdminHeatmap() {
                   overscrollBehavior: 'contain'
                 }}
               >
-                {/* Real Cartographic GIS Basemap Image with Zoom Level Transform */}
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  backgroundImage: 'url("/delhi-gis-map-dark.jpg")',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  opacity: 0.88,
-                  filter: 'brightness(0.92) contrast(1.08)',
-                  transform: `scale(${zoomLevel})`,
-                  transition: 'transform 300ms cubic-bezier(0.16, 1, 0.3, 1)'
-                }} />
+                {/* Real Cartographic GIS Leaflet Basemap */}
+                <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 0 }}>
+                  <LeafletMap
+                    wards={filteredWards}
+                    selectedWard={selectedWard}
+                    onSelectWard={handleSelectWard}
+                    height="100%"
+                    initialLayer="dark"
+                  />
+                </div>
                 <div style={{
                   position: 'absolute',
                   inset: 0,
