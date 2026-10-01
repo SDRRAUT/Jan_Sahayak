@@ -412,7 +412,7 @@ export default function CivicIntelligenceDashboard() {
 
               {/* Stage Filter Buttons & Search */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', background: '#FFFFFF', padding: '3px', borderRadius: '999px', border: '1px solid #E2E8F0' }}>
+                <div style={{ display: 'flex', background: '#FFFFFF', padding: '3px', borderRadius: '999px', border: '1.5px solid #A7F3D0', boxShadow: '0 1px 3px rgba(16, 185, 129, 0.08)' }}>
                   {['ALL', 'CRITICAL', 'GROWING', 'EMERGING'].map((stg) => (
                     <button
                       key={stg}
@@ -424,10 +424,11 @@ export default function CivicIntelligenceDashboard() {
                         padding: '4px 12px',
                         borderRadius: '999px',
                         border: 'none',
-                        background: selectedStage === stg ? '#0F172A' : 'transparent',
-                        color: selectedStage === stg ? '#FFFFFF' : '#475569',
+                        background: selectedStage === stg ? 'linear-gradient(135deg, #10B981 0%, #059669 100%)' : 'transparent',
+                        color: selectedStage === stg ? '#FFFFFF' : '#065F46',
                         cursor: 'pointer',
-                        transition: 'all 150ms ease'
+                        transition: 'all 150ms ease',
+                        boxShadow: selectedStage === stg ? '0 2px 6px rgba(16, 185, 129, 0.3)' : 'none'
                       }}
                     >
                       {stg}
