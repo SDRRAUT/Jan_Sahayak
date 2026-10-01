@@ -2855,7 +2855,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 Request Additional Information from Citizen
               </h3>
               <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
-                Inquiry dispatched via SMS and WhatsApp to <strong>{activeItem.citizenName}</strong> ({activeItem.citizenPhone}).
+                Inquiry dispatched via JanSahayak Secure In-App SMS to <strong>{maskCitizenName(activeItem.citizenName)}</strong> ({maskCitizenPhone(activeItem.citizenPhone)}).
               </p>
               <textarea
                 rows={3}

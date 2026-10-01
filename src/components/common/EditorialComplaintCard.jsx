@@ -16,6 +16,7 @@ import {
   ChevronRight,
   Sparkles
 } from 'lucide-react';
+import { maskCitizenName, maskCitizenPhone } from '../../utils/privacy';
 
 export const CATEGORY_IMAGES = {
   'Water Supply & Contamination': '/civic-problems/water_pipe_leak.jpg',
@@ -795,8 +796,10 @@ export function ComplaintDetailModal({
         <div style={{ margin: '0 24px 20px', padding: '12px 16px', borderRadius: '12px', background: '#F8FAFC', border: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px' }}>
           <div>
             <span style={{ color: '#64748B' }}>Citizen: </span>
-            <strong style={{ color: '#0F172A' }}>{item.citizenName || 'Aditya Verma'}</strong>
-            {item.citizenPhone && <span style={{ color: '#94A3B8' }}> ({item.citizenPhone})</span>}
+            <strong style={{ color: '#0F172A' }}>{maskCitizenName(item.citizenName || 'Aditya Verma')}</strong>
+            <span style={{ color: '#059669', fontSize: '11px', fontWeight: 600, marginLeft: '6px' }}>
+              (🔒 Contact Protected)
+            </span>
           </div>
           <div>
             <span style={{ color: '#64748B' }}>Officer: </span>

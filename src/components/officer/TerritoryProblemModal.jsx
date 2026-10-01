@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { Link } from 'react-router-dom';
+import { maskCitizenName, maskCitizenPhone } from '../../utils/privacy';
 
 export default function TerritoryProblemModal({ isOpen, onClose, selectedWard = 'Wagholi Municipal Ward 27-31' }) {
   const { 
@@ -814,11 +815,22 @@ export default function TerritoryProblemModal({ isOpen, onClose, selectedWard = 
                       </div>
                       <div>
                         <span style={{ color: '#64748B', display: 'block', fontSize: '11px' }}>Citizen Reporter</span>
-                        <strong style={{ color: '#0F172A' }}>{selectedGrievance.citizenName || 'Resident'}</strong>
+                        <strong style={{ color: '#0F172A' }}>{maskCitizenName(selectedGrievance.citizenName || 'Resident')}</strong>
                       </div>
                       <div>
-                        <span style={{ color: '#64748B', display: 'block', fontSize: '11px' }}>Contact Phone</span>
-                        <strong style={{ color: '#0F172A' }}>{selectedGrievance.citizenPhone || '+91 98XXX-XXXXX'}</strong>
+                        <span style={{ color: '#64748B', display: 'block', fontSize: '11px' }}>Contact Channel</span>
+                        <span style={{
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          color: '#065F46',
+                          background: '#ECFDF5',
+                          border: '1px solid #A7F3D0',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          display: 'inline-block'
+                        }}>
+                          {maskCitizenPhone(selectedGrievance.citizenPhone)}
+                        </span>
                       </div>
                     </div>
 

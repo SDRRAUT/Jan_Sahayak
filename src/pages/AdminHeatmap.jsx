@@ -24,6 +24,7 @@ import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
 import WhyExplainer from '../components/common/WhyExplainer';
 import LeafletMap from '../components/common/LeafletMap';
+import { maskCitizenName } from '../utils/privacy';
 
 export default function AdminHeatmap() {
   const [searchParams] = useSearchParams();
@@ -153,7 +154,7 @@ export default function AdminHeatmap() {
                   </span>
                 </div>
                 <div style={{ fontSize: '12px', color: '#047857', marginTop: '3px' }}>
-                  Reported in <strong>{latestGrievance.location?.ward || 'Ward 14'}</strong> by {latestGrievance.citizenName || 'Citizen'} • Assigned to <strong>{latestGrievance.officerName || latestGrievance.department || 'DJB'}</strong> • Target SLA: 24h
+                  Reported in <strong>{latestGrievance.location?.ward || 'Ward 14'}</strong> by {maskCitizenName(latestGrievance.citizenName || 'Citizen')} • Assigned to <strong>{latestGrievance.officerName || latestGrievance.department || 'DJB'}</strong> • Target SLA: 24h
                 </div>
               </div>
             </div>
