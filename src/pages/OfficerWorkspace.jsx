@@ -64,6 +64,7 @@ import LiveComplaintLinkageSection from '../components/intelligence/LiveComplain
 import EditorialComplaintCard, { ComplaintDetailModal } from '../components/common/EditorialComplaintCard';
 import JanSuchnaModal from '../components/officer/JanSuchnaModal';
 import TerritoryProblemModal from '../components/officer/TerritoryProblemModal';
+import ComplaintStatusStoryModal from '../components/officer/ComplaintStatusStoryModal';
 import { maskCitizenName, maskCitizenPhone } from '../utils/privacy';
 
 export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
@@ -89,6 +90,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
 
   const [showTerritoryModal, setShowTerritoryModal] = useState(false);
   const [showJanSuchnaModal, setShowJanSuchnaModal] = useState(false);
+  const [showStoryModal, setShowStoryModal] = useState(false);
   
   // Unified Civic Officer Profile (combines field engineer + department admin credentials)
   const rawOfficer = (user && user.role !== 'citizen') ? user : {
@@ -613,6 +615,35 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
           }}>
             {/* Primary Action Group */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              {/* WhatsApp Status Style Priority Complaint Review Button */}
+              <button
+                type="button"
+                onClick={() => setShowStoryModal(true)}
+                style={{
+                  height: '36px',
+                  padding: '0 14px',
+                  borderRadius: '9px',
+                  background: 'linear-gradient(135deg, #059669 0%, #10B981 100%)',
+                  color: '#FFFFFF',
+                  fontSize: '12.5px',
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '7px',
+                  boxShadow: '0 2px 8px rgba(16, 185, 129, 0.35)',
+                  transition: 'all 120ms ease'
+                }}
+                title="Review complaints one-by-one as WhatsApp Status (Today Critical -> Pending Critical -> Solved)"
+              >
+                <span style={{ fontSize: '14px' }}>📱</span>
+                <span>Review Status Story</span>
+                <span style={{ fontSize: '10.5px', background: 'rgba(255,255,255,0.25)', padding: '1px 6px', borderRadius: '999px', fontWeight: 800 }}>
+                  {grievances.length}
+                </span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => setShowTerritoryModal(true)}
@@ -2998,6 +3029,16 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
             }}
           />
         )}
+
+        {/* WhatsApp Status Style Complaint Review Modal */}
+        <ComplaintStatusStoryModal
+          isOpen={showStoryModal}
+          onClose={() => setShowStoryModal(false)}
+          grievances={grievances}
+          onOpenGrievance={(caseId) => {
+            openInspectionForCase(caseId);
+          }}
+        />
 
         {/* Territory Problem Explorer Modal */}
         <TerritoryProblemModal
