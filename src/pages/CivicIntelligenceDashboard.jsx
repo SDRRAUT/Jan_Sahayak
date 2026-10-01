@@ -493,255 +493,146 @@ export default function CivicIntelligenceDashboard() {
               </div>
             </div>
 
-            {/* Incident Cards Stack */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', marginBottom: '32px' }}>
-              {filteredIncidents.map((incident) => {
-                const isCritical = incident.stage === 'CRITICAL';
-                const isGrowing = incident.stage === 'GROWING';
+            {/* ═══ MULTI-VIEW INCIDENT RENDERER ═══ */}
 
-                return (
-                  <div
-                    key={incident.id}
-                    style={{
-                      background: '#FFFFFF',
-                      borderRadius: '20px',
-                      border: isCritical ? '1.5px solid #FECACA' : (isGrowing ? '1.5px solid #FED7AA' : '1px solid #E2E8F0'),
-                      padding: '24px',
-                      boxShadow: '0 4px 18px rgba(15, 23, 42, 0.05)',
-                      transition: 'transform 150ms ease, box-shadow 150ms ease'
-                    }}
-                  >
-                    {/* Top Row: Stage Badge + ID + Actions */}
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      justifyContent: 'space-between',
-                      flexWrap: 'wrap',
-                      gap: '14px',
-                      marginBottom: '14px'
-                    }}>
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
-                          <span style={{
-                            fontSize: '11px',
-                            fontWeight: 800,
-                            padding: '3px 10px',
-                            borderRadius: '999px',
-                            background: isCritical ? '#FEF2F2' : (isGrowing ? '#FFF7ED' : '#F0FDF4'),
-                            color: isCritical ? '#DC2626' : (isGrowing ? '#EA580C' : '#16A34A'),
-                            border: `1px solid ${isCritical ? '#FCA5A5' : (isGrowing ? '#FDBA74' : '#86EFAC')}`,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px'
-                          }}>
-                            ● {incident.stage || 'ACTIVE'}
-                          </span>
-
-                          <span style={{
-                            fontSize: '11px',
-                            fontWeight: 700,
-                            color: '#64748B',
-                            fontFamily: 'var(--font-mono)',
-                            background: '#F1F5F9',
-                            padding: '3px 8px',
-                            borderRadius: '6px'
-                          }}>
-                            {incident.id}
-                          </span>
-
-                          <span style={{
-                            fontSize: '11px',
-                            color: '#DC2626',
-                            fontWeight: 700,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '3px'
-                          }}>
-                            <TrendingUp style={{ width: '13px', height: '13px' }} />
-                            {incident.stageVelocity || '+48% reports today'}
-                          </span>
-
-                          <span style={{
-                            fontSize: '11px',
-                            color: '#0369A1',
-                            fontWeight: 600,
-                            background: '#F0F9FF',
-                            padding: '3px 8px',
-                            borderRadius: '6px',
-                            border: '1px solid #BAE6FD'
-                          }}>
-                            📍 {incident.affectedArea || 'Ward 29 (Ivy Estate, Wagholi)'}
-                          </span>
+            {/* VIEW 1 — DETAIL (default): Full expanded cards */}
+            {viewMode === 'detail' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', marginBottom: '32px' }}>
+                {filteredIncidents.map((incident) => {
+                  const isCritical = incident.stage === 'CRITICAL';
+                  const isGrowing  = incident.stage === 'GROWING';
+                  return (
+                    <div key={incident.id} style={{ background: '#FFFFFF', borderRadius: '20px', border: isCritical ? '1.5px solid #FECACA' : isGrowing ? '1.5px solid #FED7AA' : '1px solid #E2E8F0', padding: '24px', boxShadow: '0 4px 18px rgba(15,23,42,0.05)' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px', marginBottom: '14px' }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 10px', borderRadius: '999px', background: isCritical ? '#FEF2F2' : isGrowing ? '#FFF7ED' : '#F0FDF4', color: isCritical ? '#DC2626' : isGrowing ? '#EA580C' : '#16A34A', border: isCritical ? '1px solid #FCA5A5' : isGrowing ? '1px solid #FDBA74' : '1px solid #86EFAC' }}>● {incident.stage || 'ACTIVE'}</span>
+                            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', fontFamily: 'monospace', background: '#F1F5F9', padding: '3px 8px', borderRadius: '6px' }}>{incident.id}</span>
+                            <span style={{ fontSize: '11px', color: '#0369A1', fontWeight: 600, background: '#F0F9FF', padding: '3px 8px', borderRadius: '6px', border: '1px solid #BAE6FD' }}>📍 {incident.affectedArea || 'Ward 29'}</span>
+                          </div>
+                          <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: 0, lineHeight: 1.3 }}>{incident.title}</h3>
                         </div>
-
-                        <h3 style={{
-                          fontSize: '18px',
-                          fontWeight: 800,
-                          color: '#0F172A',
-                          margin: 0,
-                          lineHeight: 1.3
-                        }}>
-                          {incident.title}
-                        </h3>
-                      </div>
-
-                      {/* Primary Action Button */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Link
-                          to={`/intelligence/incidents/${incident.id}`}
-                          style={{
-                            height: '42px',
-                            padding: '0 18px',
-                            borderRadius: '999px',
-                            background: '#0F172A',
-                            color: '#FFFFFF',
-                            fontSize: '13px',
-                            fontWeight: 700,
-                            textDecoration: 'none',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            boxShadow: '0 2px 8px rgba(15, 23, 42, 0.18)',
-                            transition: 'all 150ms ease'
-                          }}
-                        >
-                          <span>Investigate Action Plan</span>
-                          <ArrowRight style={{ width: '14px', height: '14px' }} />
+                        <Link to={`/intelligence/incidents/${incident.id}`} style={{ height: '42px', padding: '0 18px', borderRadius: '999px', background: '#0F172A', color: '#FFFFFF', fontSize: '13px', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', boxShadow: '0 2px 8px rgba(15,23,42,0.18)' }}>
+                          <span>Investigate Action Plan</span><ArrowRight style={{ width: '14px', height: '14px' }} />
                         </Link>
                       </div>
-                    </div>
-
-                    {/* Plain Language Summary */}
-                    <p style={{
-                      fontSize: '13.5px',
-                      color: '#334155',
-                      lineHeight: 1.5,
-                      marginBottom: '16px',
-                      background: '#F8FAFC',
-                      padding: '12px 16px',
-                      borderRadius: '12px',
-                      border: '1px solid #E2E8F0'
-                    }}>
-                      <strong>Problem Summary: </strong>
-                      {incident.summary}
-                    </p>
-
-                    {/* 3 High-Impact Executive Metric Chips */}
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                      gap: '10px',
-                      marginBottom: '16px'
-                    }}>
-                      <div style={{
-                        padding: '10px 14px',
-                        borderRadius: '12px',
-                        background: '#EFF6FF',
-                        border: '1px solid #BFDBFE'
-                      }}>
-                        <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#1E40AF', textTransform: 'uppercase', display: 'block' }}>
-                          👥 Impacted Residents
-                        </span>
-                        <strong style={{ fontSize: '14px', color: '#1E3A8A' }}>
-                          {incident.affectedPopulation || '1,250 Residents'} ({incident.signalCount || incident.complaintCount || 1} Reports)
-                        </strong>
+                      <p style={{ fontSize: '13.5px', color: '#334155', lineHeight: 1.5, marginBottom: '16px', background: '#F8FAFC', padding: '12px 16px', borderRadius: '12px', border: '1px solid #E2E8F0' }}><strong>Problem Summary: </strong>{incident.summary}</p>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', marginBottom: '16px' }}>
+                        <div style={{ padding: '10px 14px', borderRadius: '12px', background: '#EFF6FF', border: '1px solid #BFDBFE' }}><span style={{ fontSize: '10.5px', fontWeight: 700, color: '#1E40AF', textTransform: 'uppercase', display: 'block' }}>👥 Impacted Residents</span><strong style={{ fontSize: '14px', color: '#1E3A8A' }}>{incident.affectedPopulation || '~120 Citizens'} ({incident.signalCount || incident.complaintCount || 1} Reports)</strong></div>
+                        <div style={{ padding: '10px 14px', borderRadius: '12px', background: '#ECFDF5', border: '1px solid #A7F3D0' }}><span style={{ fontSize: '10.5px', fontWeight: 700, color: '#065F46', textTransform: 'uppercase', display: 'block' }}>🏛️ Lead Municipal Agency</span><strong style={{ fontSize: '14px', color: '#064E3B' }}>{incident.leadDepartment || 'PMC Water Supply Department'}</strong></div>
+                        <div style={{ padding: '10px 14px', borderRadius: '12px', background: '#FEF3C7', border: '1px solid #FDE68A' }}><span style={{ fontSize: '10.5px', fontWeight: 700, color: '#92400E', textTransform: 'uppercase', display: 'block' }}>⏱️ Fix SLA Target</span><strong style={{ fontSize: '14px', color: '#78350F' }}>{incident.slaHoursLeft ? `${incident.slaHoursLeft}h Remaining` : 'Within 24 Hours'}</strong></div>
                       </div>
-
-                      <div style={{
-                        padding: '10px 14px',
-                        borderRadius: '12px',
-                        background: '#ECFDF5',
-                        border: '1px solid #A7F3D0'
-                      }}>
-                        <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#065F46', textTransform: 'uppercase', display: 'block' }}>
-                          🏛️ Lead Municipal Agency
-                        </span>
-                        <strong style={{ fontSize: '14px', color: '#064E3B' }}>
-                          {incident.leadDepartment || 'PMC Water Supply Department'}
-                        </strong>
-                      </div>
-
-                      <div style={{
-                        padding: '10px 14px',
-                        borderRadius: '12px',
-                        background: '#FEF3C7',
-                        border: '1px solid #FDE68A'
-                      }}>
-                        <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#92400E', textTransform: 'uppercase', display: 'block' }}>
-                          ⏱️ Fix SLA Target
-                        </span>
-                        <strong style={{ fontSize: '14px', color: '#78350F' }}>
-                          {incident.slaHoursLeft ? `${incident.slaHoursLeft}h Remaining` : 'Within 24 Hours'}
-                        </strong>
+                      <div style={{ fontSize: '12.5px', color: '#475569', padding: '8px 12px', borderRadius: '8px', background: '#FFFFFF', border: '1px dashed #CBD5E1', marginBottom: '14px' }}><span style={{ fontWeight: 700, color: '#0F172A' }}>💡 Root Cause: </span>{incident.rootCause?.probable_root_cause || incident.rootCauseHypotheses?.[0]?.title || 'Infrastructure capacity constraint.'}</div>
+                      <div style={{ paddingTop: '12px', borderTop: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', fontSize: '12px' }}>
+                        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}><span style={{ color: '#64748B', fontWeight: 700 }}>Coordinating Agencies:</span><span style={{ padding: '2px 8px', borderRadius: '999px', background: '#ECFDF5', color: '#065F46', fontWeight: 700, fontSize: '11px', border: '1px solid #A7F3D0' }}>{(incident.leadDepartment || 'PMC').split('(')[0].trim()} ★ Lead</span></div>
+                        <span style={{ color: '#64748B', fontSize: '11.5px' }}>First Detected: <strong>{incident.firstDetectedAt && !incident.firstDetectedAt.includes('Invalid') ? incident.firstDetectedAt : 'Recently'}</strong></span>
                       </div>
                     </div>
+                  );
+                })}
+              </div>
+            )}
 
-                    {/* Probable Root Cause Callout */}
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      fontSize: '12.5px',
-                      color: '#475569',
-                      padding: '8px 12px',
-                      borderRadius: '8px',
-                      background: '#FFFFFF',
-                      border: '1px dashed #CBD5E1',
-                      marginBottom: '14px'
-                    }}>
-                      <span style={{ fontWeight: 700, color: '#0F172A' }}>💡 Root Cause:</span>
-                      <span>
-                        {incident.rootCause?.probable_root_cause || 
-                         (incident.rootCauseHypotheses?.[0]?.title) ||
-                         'Underground drainage backpressure and pipeline joint compromise.'}
-                      </span>
+            {/* VIEW 2 — COMPACT: Slim rows */}
+            {viewMode === 'compact' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '32px' }}>
+                {filteredIncidents.map((incident) => {
+                  const isCritical = incident.stage === 'CRITICAL';
+                  const isGrowing  = incident.stage === 'GROWING';
+                  return (
+                    <div key={incident.id} style={{ display: 'flex', alignItems: 'center', gap: '14px', background: '#FFFFFF', borderRadius: '12px', border: isCritical ? '1px solid #FECACA' : isGrowing ? '1px solid #FED7AA' : '1px solid #E2E8F0', padding: '12px 16px' }}>
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: isCritical ? '#EF4444' : isGrowing ? '#F97316' : '#22C55E', flexShrink: 0 }} />
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', fontFamily: 'monospace', flexShrink: 0 }}>{incident.id}</span>
+                      <span style={{ flex: 1, fontSize: '13px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{incident.title}</span>
+                      <span style={{ fontSize: '11px', color: '#64748B', flexShrink: 0 }}>{incident.affectedArea?.split('(')[0]?.trim() || 'Ward 29'}</span>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#475569', flexShrink: 0 }}>{incident.leadDepartment?.split('(')[0]?.trim() || 'PMC'}</span>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: incident.slaHoursLeft < 6 ? '#EF4444' : '#059669', background: incident.slaHoursLeft < 6 ? '#FEF2F2' : '#ECFDF5', padding: '2px 8px', borderRadius: '6px', flexShrink: 0 }}>{incident.slaHoursLeft ? `${incident.slaHoursLeft}h` : '24h'} SLA</span>
+                      <Link to={`/intelligence/incidents/${incident.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '30px', height: '30px', borderRadius: '8px', background: '#0F172A', color: '#FFFFFF', textDecoration: 'none', flexShrink: 0 }}><ArrowRight style={{ width: '13px', height: '13px' }} /></Link>
                     </div>
+                  );
+                })}
+              </div>
+            )}
 
-                    {/* Bottom Row: Coordinating Departments */}
-                    <div style={{
-                      paddingTop: '12px',
-                      borderTop: '1px solid #F1F5F9',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      flexWrap: 'wrap',
-                      gap: '10px',
-                      fontSize: '12px'
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                        <span style={{ color: '#64748B', fontWeight: 700 }}>Coordinating Agencies:</span>
-                        {(incident.departments || (incident.participatingDepartments || [incident.leadDepartment || 'PMC', 'PWD Pune', 'MSEDCL']).map(d => ({
-                          name: typeof d === 'string' ? d : (d?.name || 'Department'),
-                          cases: incident.complaintCount || 1,
-                          lead: typeof d === 'string' ? d.includes(incident.leadDepartment?.split(' ')[0] || 'PMC') : !!d?.lead
-                        }))).map((d) => (
-                          <span
-                            key={d.name}
-                            style={{
-                              padding: '2px 8px',
-                              borderRadius: '999px',
-                              background: d.lead ? '#ECFDF5' : '#F1F5F9',
-                              color: d.lead ? '#065F46' : '#475569',
-                              fontWeight: 700,
-                              fontSize: '11px',
-                              border: d.lead ? '1px solid #A7F3D0' : '1px solid #E2E8F0'
-                            }}
-                          >
-                            {d.name.split('(')[0].trim()} {d.lead ? '★ Lead' : ''}
-                          </span>
-                        ))}
+            {/* VIEW 3 — GRID: 2-column cards */}
+            {viewMode === 'grid' && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px', marginBottom: '32px' }}>
+                {filteredIncidents.map((incident) => {
+                  const isCritical = incident.stage === 'CRITICAL';
+                  const isGrowing  = incident.stage === 'GROWING';
+                  return (
+                    <div key={incident.id} style={{ background: '#FFFFFF', borderRadius: '16px', border: isCritical ? '1.5px solid #FECACA' : isGrowing ? '1.5px solid #FED7AA' : '1px solid #E2E8F0', padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 10px', borderRadius: '999px', background: isCritical ? '#FEF2F2' : isGrowing ? '#FFF7ED' : '#F0FDF4', color: isCritical ? '#DC2626' : isGrowing ? '#EA580C' : '#16A34A' }}>● {incident.stage || 'ACTIVE'}</span>
+                        <span style={{ fontSize: '10px', color: '#94A3B8', fontFamily: 'monospace' }}>{incident.id}</span>
                       </div>
-
-                      <div style={{ color: '#64748B', fontSize: '11.5px' }}>
-                        First Detected: <strong>{(incident.firstDetectedAt && !incident.firstDetectedAt.includes('Invalid')) ? incident.firstDetectedAt : 'Recently observed'}</strong>
+                      <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: '#0F172A', lineHeight: 1.35 }}>{incident.title}</h4>
+                      <p style={{ margin: 0, fontSize: '12px', color: '#64748B', lineHeight: 1.4, flex: 1 }}>{(incident.summary || '').slice(0, 100)}{incident.summary?.length > 100 ? '…' : ''}</p>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '11px', color: '#0369A1', background: '#F0F9FF', padding: '2px 8px', borderRadius: '6px', border: '1px solid #BAE6FD' }}>📍 {incident.affectedArea?.split('(')[0]?.trim() || 'Ward 29'}</span>
+                        <span style={{ fontSize: '11px', color: '#92400E', background: '#FEF3C7', padding: '2px 8px', borderRadius: '6px', border: '1px solid #FDE68A' }}>⏱️ {incident.slaHoursLeft ? `${incident.slaHoursLeft}h` : '24h'}</span>
                       </div>
+                      <Link to={`/intelligence/incidents/${incident.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', height: '36px', borderRadius: '8px', background: '#0F172A', color: '#FFFFFF', fontSize: '12px', fontWeight: 700, textDecoration: 'none' }}>Investigate <ArrowRight style={{ width: '12px', height: '12px' }} /></Link>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
+            )}
+
+            {/* VIEW 4 — TABLE: Spreadsheet-style */}
+            {viewMode === 'table' && (
+              <div style={{ marginBottom: '32px', background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', overflow: 'hidden' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px' }}>
+                  <thead>
+                    <tr style={{ background: '#F8FAFC', borderBottom: '1px solid #E2E8F0' }}>
+                      {['Stage', 'ID', 'Title', 'Area', 'Lead Dept', 'Reports', 'SLA', ''].map(h => (
+                        <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#64748B', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredIncidents.map((incident, idx) => {
+                      const isCritical = incident.stage === 'CRITICAL';
+                      const isGrowing  = incident.stage === 'GROWING';
+                      return (
+                        <tr key={incident.id} style={{ borderBottom: '1px solid #F1F5F9', background: idx % 2 === 0 ? '#FFFFFF' : '#FAFAFA' }}>
+                          <td style={{ padding: '10px 14px' }}><span style={{ fontSize: '11px', fontWeight: 800, padding: '2px 8px', borderRadius: '999px', background: isCritical ? '#FEF2F2' : isGrowing ? '#FFF7ED' : '#F0FDF4', color: isCritical ? '#DC2626' : isGrowing ? '#EA580C' : '#16A34A' }}>● {incident.stage || 'ACTIVE'}</span></td>
+                          <td style={{ padding: '10px 14px', fontFamily: 'monospace', color: '#64748B', fontSize: '11px' }}>{incident.id}</td>
+                          <td style={{ padding: '10px 14px', fontWeight: 700, color: '#0F172A', maxWidth: '260px' }}>{incident.title}</td>
+                          <td style={{ padding: '10px 14px', color: '#475569' }}>{incident.affectedArea?.split('(')[0]?.trim() || 'Ward 29'}</td>
+                          <td style={{ padding: '10px 14px', color: '#475569' }}>{incident.leadDepartment?.split('(')[0]?.trim() || 'PMC'}</td>
+                          <td style={{ padding: '10px 14px', color: '#0F172A', fontWeight: 700, textAlign: 'center' }}>{incident.signalCount || incident.complaintCount || 1}</td>
+                          <td style={{ padding: '10px 14px' }}><span style={{ fontWeight: 700, color: incident.slaHoursLeft < 6 ? '#EF4444' : '#059669' }}>{incident.slaHoursLeft ? `${incident.slaHoursLeft}h` : '24h'}</span></td>
+                          <td style={{ padding: '10px 14px' }}><Link to={`/intelligence/incidents/${incident.id}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', height: '28px', padding: '0 10px', borderRadius: '6px', background: '#0F172A', color: '#FFFFFF', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>View <ArrowRight style={{ width: '11px', height: '11px' }} /></Link></td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* VIEW 5 — MINIMAL: Ultra-clean text list */}
+            {viewMode === 'minimal' && (
+              <div style={{ marginBottom: '32px', display: 'flex', flexDirection: 'column' }}>
+                {filteredIncidents.map((incident, idx) => {
+                  const isCritical = incident.stage === 'CRITICAL';
+                  const isGrowing  = incident.stage === 'GROWING';
+                  return (
+                    <Link key={incident.id} to={`/intelligence/incidents/${incident.id}`} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '14px 4px', borderBottom: '1px solid #F1F5F9', textDecoration: 'none', transition: 'background 120ms ease' }}>
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: isCritical ? '#EF4444' : isGrowing ? '#F97316' : '#22C55E', flexShrink: 0 }} />
+                      <span style={{ flex: 1, fontSize: '13.5px', fontWeight: 700, color: '#0F172A' }}>{incident.title}</span>
+                      <span style={{ fontSize: '11.5px', color: '#94A3B8', flexShrink: 0 }}>{incident.affectedArea?.split('(')[0]?.trim() || 'Ward 29'}</span>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: isCritical ? '#EF4444' : isGrowing ? '#F97316' : '#22C55E', flexShrink: 0 }}>{incident.stage}</span>
+                      <ArrowRight style={{ width: '14px', height: '14px', color: '#CBD5E1', flexShrink: 0 }} />
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+
             </div>
-          </div>
-        )}
+          )}
 
         {/* ══════════════════════════════════════════════════════════
             TAB 2: GEOSPATIAL PROBLEM SPREAD MAP
