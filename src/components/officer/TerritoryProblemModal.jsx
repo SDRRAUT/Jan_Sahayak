@@ -191,54 +191,10 @@ export default function TerritoryProblemModal({ isOpen, onClose, selectedWard = 
           </span>
         </div>
 
-        {/* ── Sub-Area Filter Pills (Wagholi & Ward 14 Pockets) ── */}
+        {/* ── Main Tabs Bar with Sub-Area Filter Dropdown beside AI Hotspots ── */}
         <div style={{
           display: 'flex',
-          gap: '8px',
-          padding: '10px 28px',
-          background: '#FFFFFF',
-          borderBottom: '1px solid #F1F5F9',
-          overflowX: 'auto',
-          flexShrink: 0,
-          alignItems: 'center'
-        }}>
-          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#64748B', whiteSpace: 'nowrap' }}>
-            📍 Area Filter:
-          </span>
-          {[
-            { key: 'ALL', label: '🚩 All Wagholi & Ward 14' },
-            { key: 'baif', label: '🗑️ Baif Road Market' },
-            { key: 'kesnand', label: '💧 Ivy Estate / Kesnand Rd' },
-            { key: 'nagar', label: '🛣️ Nagar Road Highway' },
-            { key: 'ubale', label: '🌊 Ubale Nagar' },
-            { key: 'sector 14', label: '🏛️ Rohini Sector 14' }
-          ].map(area => (
-            <button
-              key={area.key}
-              type="button"
-              onClick={() => setFilterArea(area.key)}
-              style={{
-                fontSize: '11.5px',
-                fontWeight: filterArea === area.key ? 700 : 500,
-                padding: '4px 12px',
-                borderRadius: '999px',
-                background: filterArea === area.key ? '#0F172A' : '#F1F5F9',
-                color: filterArea === area.key ? '#FFFFFF' : '#475569',
-                border: '1px solid',
-                borderColor: filterArea === area.key ? '#0F172A' : '#E2E8F0',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                transition: 'all 150ms ease'
-              }}
-            >
-              {area.label}
-            </button>
-          ))}
-        </div>
-
-        {/* ── 4 Main Tabs Bar (Clean Segmented Pills) ── */}
-        <div style={{
-          display: 'flex',
+          alignItems: 'center',
           gap: '8px',
           padding: '12px 28px',
           background: '#F8FAFC',
@@ -289,6 +245,47 @@ export default function TerritoryProblemModal({ isOpen, onClose, selectedWard = 
               </button>
             );
           })}
+
+          {/* ── Area Filter Dropdown (Beside AI Hotspots) ── */}
+          <div style={{
+            marginLeft: 'auto',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: '#FFFFFF',
+            border: '1.5px solid #CBD5E1',
+            borderRadius: '14px',
+            padding: '7px 14px',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+            whiteSpace: 'nowrap'
+          }}>
+            <MapPin style={{ width: '15px', height: '15px', color: '#6366F1', flexShrink: 0 }} />
+            <label htmlFor="areaFilterSelect" style={{ fontSize: '12px', fontWeight: 700, color: '#64748B', cursor: 'pointer' }}>
+              Area:
+            </label>
+            <select
+              id="areaFilterSelect"
+              value={filterArea}
+              onChange={(e) => setFilterArea(e.target.value)}
+              style={{
+                border: 'none',
+                background: 'transparent',
+                fontSize: '12.5px',
+                fontWeight: 700,
+                color: '#0F172A',
+                cursor: 'pointer',
+                outline: 'none',
+                paddingRight: '4px'
+              }}
+            >
+              <option value="ALL">🚩 All Wagholi & Ward 14</option>
+              <option value="baif">🗑️ Baif Road Market</option>
+              <option value="kesnand">💧 Ivy Estate / Kesnand Rd</option>
+              <option value="nagar">🛣️ Nagar Road Highway</option>
+              <option value="ubale">🌊 Ubale Nagar</option>
+              <option value="sector 14">🏛️ Rohini Sector 14</option>
+            </select>
+          </div>
         </div>
 
         {/* ── Modal Body: Visual Responsive Card Grid ── */}
