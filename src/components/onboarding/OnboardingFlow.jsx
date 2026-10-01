@@ -218,7 +218,9 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
 
   return (
     <div style={{
-      width: '100vw',
+      width: '100%',
+      maxWidth: '100%',
+      minHeight: '100vh',
       height: '100vh',
       maxHeight: '100vh',
       overflow: 'hidden',
@@ -247,7 +249,7 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
       />
 
       {/* Central Single-Screen Non-Scrollable Card */}
-      <div style={{
+      <div className="onboarding-card-container" style={{
         background: currentTheme.bg,
         border: `1.5px solid ${currentTheme.border}`,
         borderRadius: '24px',
@@ -547,7 +549,7 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
               boxSizing: 'border-box',
               marginBottom: '12px'
             }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+              <div className="onboarding-step3-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                 <div style={{ background: 'rgba(255, 255, 255, 0.82)', backdropFilter: 'blur(4px)', padding: '8px 6px', borderRadius: '12px', border: '1px solid #DDD6FE', textAlign: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
                   <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#F5F3FF', color: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px auto' }}>
                     <Building2 style={{ width: '15px', height: '15px' }} />
@@ -599,7 +601,7 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
         {currentStep === 4 && (
           <div>
             {/* Top Area: Compact 3-Persona Cards */}
-            <div style={{
+            <div className="onboarding-role-grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(3, 1fr)',
               gap: '8px',
@@ -612,6 +614,7 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
                   <div
                     key={item.key}
                     onClick={() => setSelectedRole(item.key)}
+                    className="onboarding-role-card"
                     style={{
                       padding: '10px 6px',
                       borderRadius: '12px',
@@ -622,7 +625,7 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
                       transition: 'all 150ms ease'
                     }}
                   >
-                    <div style={{
+                    <div className="role-card-icon-wrap" style={{
                       width: '30px',
                       height: '30px',
                       borderRadius: '50%',
@@ -635,10 +638,12 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
                     }}>
                       <Icon style={{ width: '16px', height: '16px' }} />
                     </div>
-                    <strong style={{ fontSize: '12px', display: 'block', color: '#0F172A' }}>{item.label}</strong>
-                    <span style={{ fontSize: '9.5px', color: '#64748B', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {item.name}
-                    </span>
+                    <div className="role-card-text">
+                      <strong style={{ fontSize: '12px', display: 'block', color: '#0F172A' }}>{item.label}</strong>
+                      <span style={{ fontSize: '9.5px', color: '#64748B', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {item.name}
+                      </span>
+                    </div>
                   </div>
                 );
               })}
@@ -847,6 +852,42 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 600px) {
+          .onboarding-card-container {
+            padding: 14px 16px !important;
+            max-height: calc(100vh - 24px) !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+          }
+          .onboarding-role-grid {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+          }
+          .onboarding-role-card {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            text-align: left !important;
+            padding: 8px 12px !important;
+          }
+          .onboarding-role-card .role-card-icon-wrap {
+            margin: 0 !important;
+            flex-shrink: 0 !important;
+          }
+          .onboarding-role-card .role-card-text {
+            flex: 1;
+            min-width: 0;
+          }
+        }
+        @media (max-width: 440px) {
+          .onboarding-step3-grid {
+            grid-template-columns: 1fr !important;
+            gap: 6px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

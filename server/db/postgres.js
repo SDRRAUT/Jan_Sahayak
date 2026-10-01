@@ -9,6 +9,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const STORE_PATH = path.resolve(__dirname, '../data/store.json');
 
+const CURATED_REALISTIC_IDS = new Set([
+  'DL-2026-W14-0892',
+  'DL-2026-W22-0112',
+  'DL-2026-W03-0667',
+  'DL-2026-W08-0419',
+  'DL-2026-W05-0298'
+]);
+
 const { Pool } = pg;
 
 export function getConnectionString() {
@@ -109,6 +117,7 @@ export const postgresDB = {
 
   // --- Grievances (Complaints) ---
   async getAllGrievances() {
+    let result = [];
     const p = getPool();
     if (p) {
       try {
@@ -122,46 +131,48 @@ export const postgresDB = {
         `);
 
         if (res.rows && res.rows.length > 0) {
-          return res.rows.map(r => ({
-            id: r.id,
-            title: r.title,
-            descriptionRaw: r.description_raw,
-            languageDetected: r.language_detected,
-            category: r.category,
-            department: r.department,
-            officerName: r.officer_name,
-            officerDesignation: r.officer_designation,
-            location: {
-              ward: r.location_ward,
-              area: r.location_area,
-              city: r.location_city || 'New Delhi',
-              pincode: r.location_pincode,
-              lat: r.lat_val || (r.location_ward?.includes('14') ? 28.7189 : 28.6139),
-              lng: r.lng_val || (r.location_ward?.includes('14') ? 77.1265 : 77.2090)
-            },
-            urgency: r.urgency,
-            urgencyScore: r.urgency_score,
-            status: r.status,
-            createdAt: r.created_at ? new Date(r.created_at).toLocaleString() : new Date().toLocaleString(),
-            timestamp: r.created_at || new Date().toISOString(),
-            slaDeadline: r.sla_deadline ? new Date(r.sla_deadline).toLocaleString() : '24 Hours',
-            slaHoursLeft: r.sla_hours_left ?? 24,
-            upvotes: r.upvotes || 1,
-            citizenId: r.citizen_id,
-            citizenName: r.citizen_name,
-            citizenPhone: r.citizen_phone,
-            evidence: r.evidence || {},
-            dna: r.dna || {},
-            analysis: r.analysis || {},
-            clusterId: r.cluster_id,
-            clusterTitle: r.cluster_title,
-            clusterCount: r.cluster_count || 1,
-            incidentId: r.incident_id,
-            resolutionNotes: r.resolution_notes,
-            resolutionPhotoUrl: r.resolution_photo_url,
-            citizenVerification: r.citizen_verification,
-            timeline: r.timeline || []
-          }));
+          result = res.rows
+            .filter(r => CURATED_REALISTIC_IDS.has(r.id))
+            .map(r => ({
+              id: r.id,
+              title: r.title,
+              descriptionRaw: r.description_raw,
+              languageDetected: r.language_detected,
+              category: r.category,
+              department: r.department,
+              officerName: r.officer_name,
+              officerDesignation: r.officer_designation,
+              location: {
+                ward: r.location_ward,
+                area: r.location_area,
+                city: r.location_city || 'New Delhi',
+                pincode: r.location_pincode,
+                lat: r.lat_val || (r.location_ward?.includes('14') ? 28.7189 : 28.6139),
+                lng: r.lng_val || (r.location_ward?.includes('14') ? 77.1265 : 77.2090)
+              },
+              urgency: r.urgency,
+              urgencyScore: r.urgency_score,
+              status: r.status,
+              createdAt: r.created_at ? new Date(r.created_at).toLocaleString() : new Date().toLocaleString(),
+              timestamp: r.created_at || new Date().toISOString(),
+              slaDeadline: r.sla_deadline ? new Date(r.sla_deadline).toLocaleString() : '24 Hours',
+              slaHoursLeft: r.sla_hours_left ?? 24,
+              upvotes: r.upvotes || 1,
+              citizenId: r.citizen_id,
+              citizenName: r.citizen_name,
+              citizenPhone: r.citizen_phone,
+              evidence: r.evidence || {},
+              dna: r.dna || {},
+              analysis: r.analysis || {},
+              clusterId: r.cluster_id,
+              clusterTitle: r.cluster_title,
+              clusterCount: r.cluster_count || 1,
+              incidentId: r.incident_id,
+              resolutionNotes: r.resolution_notes,
+              resolutionPhotoUrl: r.resolution_photo_url,
+              citizenVerification: r.citizen_verification,
+              timeline: r.timeline || []
+            }));
         }
       } catch (err) {
         console.warn('[PostgreSQL Pool] Connection failed, falling back to Supabase REST:', err.message);
@@ -169,8 +180,8 @@ export const postgresDB = {
     }
 
     // High-Reliability Fallback: Supabase REST API (via HTTPS, works on Vercel)
-    const restClient = getSupabaseRestClient();
-    if (restClient) {
+    const restClient = getSupabaseRestClient() || supabaseRestClient;
+    if (result.length === 0 && restClient) {
       try {
         const { data, error } = await restClient
           .from('grievances')
@@ -178,54 +189,68 @@ export const postgresDB = {
           .order('created_at', { ascending: false });
 
         if (!error && data && data.length > 0) {
-        return data.map(r => ({
-          id: r.id,
-          title: r.title,
-          descriptionRaw: r.description_raw,
-          languageDetected: r.language_detected,
-          category: r.category,
-          department: r.department,
-          officerName: r.officer_name,
-          officerDesignation: r.officer_designation,
-          location: {
-            ward: r.location_ward,
-            area: r.location_area,
-            city: r.location_city || 'New Delhi',
-            pincode: r.location_pincode,
-            lat: r.lat || 28.7185,
-            lng: r.lng || 77.1250
-          },
-          urgency: r.urgency,
-          urgencyScore: r.urgency_score,
-          status: r.status,
-          createdAt: r.created_at ? new Date(r.created_at).toLocaleString() : new Date().toLocaleString(),
-          timestamp: r.created_at || new Date().toISOString(),
-          slaDeadline: r.sla_deadline ? new Date(r.sla_deadline).toLocaleString() : '24 Hours',
-          slaHoursLeft: r.sla_hours_left ?? 24,
-          upvotes: r.upvotes || 1,
-          citizenId: r.citizen_id,
-          citizenName: r.citizen_name,
-          citizenPhone: r.citizen_phone,
-          evidence: r.evidence || {},
-          dna: r.dna || {},
-          analysis: r.analysis || {},
-          clusterId: r.cluster_id,
-          clusterTitle: r.cluster_title,
-          clusterCount: r.cluster_count || 1,
-          incidentId: r.incident_id,
-          resolutionNotes: r.resolution_notes,
-          resolutionPhotoUrl: r.resolution_photo_url,
-          citizenVerification: r.citizen_verification,
-          timeline: r.timeline || []
-        }));
+          result = data
+            .filter(r => CURATED_REALISTIC_IDS.has(r.id))
+            .map(r => ({
+              id: r.id,
+              title: r.title,
+              descriptionRaw: r.description_raw,
+              languageDetected: r.language_detected,
+              category: r.category,
+              department: r.department,
+              officerName: r.officer_name,
+              officerDesignation: r.officer_designation,
+              location: {
+                ward: r.location_ward,
+                area: r.location_area,
+                city: r.location_city || 'New Delhi',
+                pincode: r.location_pincode,
+                lat: r.lat || 28.7185,
+                lng: r.lng || 77.1250
+              },
+              urgency: r.urgency,
+              urgencyScore: r.urgency_score,
+              status: r.status,
+              createdAt: r.created_at ? new Date(r.created_at).toLocaleString() : new Date().toLocaleString(),
+              timestamp: r.created_at || new Date().toISOString(),
+              slaDeadline: r.sla_deadline ? new Date(r.sla_deadline).toLocaleString() : '24 Hours',
+              slaHoursLeft: r.sla_hours_left ?? 24,
+              upvotes: r.upvotes || 1,
+              citizenId: r.citizen_id,
+              citizenName: r.citizen_name,
+              citizenPhone: r.citizen_phone,
+              evidence: r.evidence || {},
+              dna: r.dna || {},
+              analysis: r.analysis || {},
+              clusterId: r.cluster_id,
+              clusterTitle: r.cluster_title,
+              clusterCount: r.cluster_count || 1,
+              incidentId: r.incident_id,
+              resolutionNotes: r.resolution_notes,
+              resolutionPhotoUrl: r.resolution_photo_url,
+              citizenVerification: r.citizen_verification,
+              timeline: r.timeline || []
+            }));
+        }
+      } catch (restErr) {
+        console.warn('[Supabase REST] Error fetching grievances:', restErr.message);
       }
-    } catch (restErr) {
-      console.warn('[Supabase REST] Error fetching grievances:', restErr.message);
     }
-  }
 
-  return [];
-},
+    // Guarantee that all 5 curated realistic grievances are present by supplementing from local store.json
+    try {
+      if (fs.existsSync(STORE_PATH)) {
+        const storeData = JSON.parse(fs.readFileSync(STORE_PATH, 'utf8'));
+        const existingIds = new Set(result.map(m => m.id));
+        const missing = (storeData.complaints || []).filter(c => CURATED_REALISTIC_IDS.has(c.id) && !existingIds.has(c.id));
+        if (missing.length > 0) {
+          result = [...result, ...missing];
+        }
+      }
+    } catch (e) {}
+
+    return result;
+  },
 
   async getGrievanceById(id) {
     const p = getPool();
@@ -281,14 +306,14 @@ export const postgresDB = {
         resolutionPhotoUrl: r.resolution_photo_url,
         citizenVerification: r.citizen_verification,
         timeline: r.timeline || []
-          };
-        }
-      } catch (err) {
-        console.warn('PostgreSQL getGrievanceById warning:', err.message);
-      }
+      };
     }
+  } catch (err) {
+    console.warn('PostgreSQL getGrievanceById warning:', err.message);
+  }
+}
 
-    const restClient = getSupabaseRestClient();
+    const restClient = getSupabaseRestClient() || supabaseRestClient;
     if (restClient) {
       try {
         const { data, error } = await restClient
@@ -318,6 +343,7 @@ export const postgresDB = {
       } catch (_) {}
     }
 
+    // Fallback to store.json
     try {
       if (fs.existsSync(STORE_PATH)) {
         const raw = fs.readFileSync(STORE_PATH, 'utf-8');

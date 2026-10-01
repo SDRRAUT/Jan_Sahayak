@@ -17,7 +17,10 @@ import {
   Search, 
   FileText,
   FileCheck2,
-  PlayCircle
+  PlayCircle,
+  ChevronDown,
+  ChevronUp,
+  Zap
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import ProblemStageIndicator from '../components/intelligence/ProblemStageIndicator';
@@ -38,6 +41,23 @@ export default function CivicIncidentDetail() {
   const [actionChoice, setActionChoice] = useState(incident?.simulations?.[1]?.title || 'Option B: Full 24-Meter Ductile Iron Segment Replacement');
   const [officerNote, setOfficerNote] = useState('');
   const [decisionSuccess, setDecisionSuccess] = useState(false);
+  const [actionSuccessMessage, setActionSuccessMessage] = useState('');
+
+  // Collapsible Accordion sections state
+  const [openSections, setOpenSections] = useState({
+    dna: true,
+    timeline: true,
+    map: true,
+    hypotheses: true,
+    crossDept: true,
+    simulations: true,
+    verification: true,
+    decision: true
+  });
+
+  const toggleSection = (key) => {
+    setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   // Closed-loop verification state
   const [verificationNotes, setVerificationNotes] = useState('');
@@ -178,6 +198,147 @@ export default function CivicIncidentDetail() {
           </p>
         </div>
 
+        {/* Quick Status Transition Action Bar */}
+        <div style={{
+          background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)',
+          color: '#FFFFFF',
+          borderRadius: 'var(--radius-xl)',
+          padding: '16px 20px',
+          marginBottom: '24px',
+          boxShadow: 'var(--shadow-card)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Zap style={{ width: '18px', height: '18px', color: '#FBBF24' }} />
+              <span style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.03em', textTransform: 'uppercase' }}>
+                Quick Field Transition Actions
+              </span>
+            </div>
+            <span style={{ fontSize: '11px', color: '#94A3B8' }}>
+              Direct 1-Tap Authorization
+            </span>
+          </div>
+
+          <div className="responsive-action-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+            <button
+              type="button"
+              className="mobile-full-width-btn"
+              onClick={() => {
+                recordIncidentDecision(incident.id, {
+                  decision: 'ACCEPT_RECOMMENDATION',
+                  actionSelected: actionChoice,
+                  notes: 'Direct 1-tap approval from Quick Operations Bar.'
+                });
+                setActionSuccessMessage('✓ Recommendation approved & committed to municipal register!');
+                setTimeout(() => setActionSuccessMessage(''), 5000);
+              }}
+              style={{
+                background: 'var(--color-primary)',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                padding: '12px 16px',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                minHeight: '48px'
+              }}
+            >
+              <CheckCircle2 style={{ width: '16px', height: '16px' }} />
+              <span>Approve Recommendation</span>
+            </button>
+
+            <button
+              type="button"
+              className="mobile-full-width-btn"
+              onClick={() => {
+                recordIncidentDecision(incident.id, {
+                  decision: 'MOBILIZE_SQUAD',
+                  actionSelected: 'Immediate Rapid Response Squad Mobilization (Ward Field Crew)',
+                  notes: 'Field crew mobilized via 1-tap quick action.'
+                });
+                setActionSuccessMessage('⚡ Rapid Response Squad mobilized & dispatched to scene!');
+                setTimeout(() => setActionSuccessMessage(''), 5000);
+              }}
+              style={{
+                background: '#D97706',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                padding: '12px 16px',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                minHeight: '48px'
+              }}
+            >
+              <Users style={{ width: '16px', height: '16px' }} />
+              <span>Mobilize Response Squad</span>
+            </button>
+
+            <button
+              type="button"
+              className="mobile-full-width-btn"
+              onClick={() => {
+                recordIncidentDecision(incident.id, {
+                  decision: 'REQUEST_VERIFICATION',
+                  actionSelected: 'Field Diagnostic & Ground Sensor Reading Verification',
+                  notes: 'Field evidence and sensor telemetry requested.'
+                });
+                setActionSuccessMessage('📸 Field evidence & diagnostic telemetry request broadcast!');
+                setTimeout(() => setActionSuccessMessage(''), 5000);
+              }}
+              style={{
+                background: '#334155',
+                color: '#FFFFFF',
+                border: '1px solid #475569',
+                borderRadius: 'var(--radius-md)',
+                padding: '12px 16px',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                minHeight: '48px'
+              }}
+            >
+              <Search style={{ width: '16px', height: '16px' }} />
+              <span>Request Field Evidence</span>
+            </button>
+          </div>
+
+          {actionSuccessMessage && (
+            <div style={{
+              background: 'rgba(16, 185, 129, 0.15)',
+              border: '1px solid #10B981',
+              color: '#A7F3D0',
+              borderRadius: 'var(--radius-md)',
+              padding: '8px 12px',
+              fontSize: '12.5px',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <CheckCircle2 style={{ width: '16px', height: '16px', color: '#34D399' }} />
+              <span>{actionSuccessMessage}</span>
+            </div>
+          )}
+        </div>
+
         {/* Section 2: Problem Escalation Stage Indicator */}
         <div style={{ marginBottom: '28px' }}>
           <ProblemStageIndicator
@@ -197,66 +358,76 @@ export default function CivicIncidentDetail() {
           boxShadow: 'var(--shadow-card)',
           marginBottom: '28px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+          <div 
+            onClick={() => toggleSection('dna')}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: openSections.dna ? '14px' : '0', cursor: 'pointer', userSelect: 'none' }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Sparkles style={{ width: '16px', height: '16px', color: '#4F46E5' }} />
               <h3 style={{ fontSize: '18px', color: 'var(--color-text-primary)' }}>
                 Complaint DNA & Semantic Fingerprint
               </h3>
             </div>
-            <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-              DNA-CORRIDOR-14C
-            </span>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px', marginBottom: '16px' }}>
-            <div className="dna-chip" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <strong>Issue Type</strong>
-              <span>{incident.complaintDna?.issueType}</span>
-            </div>
-            <div className="dna-chip" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <strong>Sub-Issue</strong>
-              <span>{incident.complaintDna?.subIssue}</span>
-            </div>
-            <div className="dna-chip" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <strong>Affected Asset</strong>
-              <span>{incident.complaintDna?.asset}</span>
-            </div>
-            <div className="dna-chip" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <strong>Service Domain</strong>
-              <span>{incident.complaintDna?.service}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+                DNA-CORRIDOR-14C
+              </span>
+              {openSections.dna ? <ChevronUp style={{ width: '18px', height: '18px', color: 'var(--color-text-muted)' }} /> : <ChevronDown style={{ width: '18px', height: '18px', color: 'var(--color-text-muted)' }} />}
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-            <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: '#F8FAFC', border: '1px solid var(--color-border-subtle)' }}>
-              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
-                Observed Symptoms:
-              </span>
-              <ul style={{ paddingLeft: '18px', fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
-                {incident.complaintDna?.symptoms?.map((s, i) => (
-                  <li key={i}>{s}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: '#F8FAFC', border: '1px solid var(--color-border-subtle)' }}>
-              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
-                Key Entities & Landmarks:
-              </span>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                {incident.complaintDna?.entities?.map((e, i) => (
-                  <span key={i} style={{ fontSize: '11.5px', background: '#FFFFFF', border: '1px solid var(--color-border-subtle)', padding: '3px 8px', borderRadius: 'var(--radius-sm)' }}>
-                    📍 {e}
-                  </span>
-                ))}
+          {openSections.dna && (
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px', marginBottom: '16px' }}>
+                <div className="dna-chip" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <strong>Issue Type</strong>
+                  <span>{incident.complaintDna?.issueType}</span>
+                </div>
+                <div className="dna-chip" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <strong>Sub-Issue</strong>
+                  <span>{incident.complaintDna?.subIssue}</span>
+                </div>
+                <div className="dna-chip" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <strong>Affected Asset</strong>
+                  <span>{incident.complaintDna?.asset}</span>
+                </div>
+                <div className="dna-chip" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <strong>Service Domain</strong>
+                  <span>{incident.complaintDna?.service}</span>
+                </div>
               </div>
-            </div>
-          </div>
+
+              <div className="responsive-two-col" style={{ gap: '14px' }}>
+                <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: '#F8FAFC', border: '1px solid var(--color-border-subtle)' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
+                    Observed Symptoms:
+                  </span>
+                  <ul style={{ paddingLeft: '18px', fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+                    {incident.complaintDna?.symptoms?.map((s, i) => (
+                      <li key={i}>{s}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: '#F8FAFC', border: '1px solid var(--color-border-subtle)' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
+                    Key Entities & Landmarks:
+                  </span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {incident.complaintDna?.entities?.map((e, i) => (
+                      <span key={i} style={{ fontSize: '11.5px', background: '#FFFFFF', border: '1px solid var(--color-border-subtle)', padding: '3px 8px', borderRadius: 'var(--radius-sm)' }}>
+                        📍 {e}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Section 4 & 5: Problem Timeline & Problem Spread Map */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px', marginBottom: '28px' }}>
+        <div className="responsive-side-by-side" style={{ marginBottom: '28px' }}>
           {/* Visual Problem Timeline */}
           <div style={{
             background: '#FFFFFF',
@@ -265,49 +436,79 @@ export default function CivicIncidentDetail() {
             padding: '20px',
             boxShadow: 'var(--shadow-card)'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <div 
+              onClick={() => toggleSection('timeline')}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: openSections.timeline ? '16px' : '0', cursor: 'pointer', userSelect: 'none' }}
+            >
               <h3 style={{ fontSize: '18px', color: 'var(--color-text-primary)' }}>
                 Problem Timeline
               </h3>
-              <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>
-                From 1st Signal to Incident
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+                  From 1st Signal to Incident
+                </span>
+                {openSections.timeline ? <ChevronUp style={{ width: '18px', height: '18px', color: 'var(--color-text-muted)' }} /> : <ChevronDown style={{ width: '18px', height: '18px', color: 'var(--color-text-muted)' }} />}
+              </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', position: 'relative' }}>
-              {incident.timeline?.map((step, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    padding: '12px',
-                    borderRadius: 'var(--radius-md)',
-                    background: idx === 0 ? '#F0FDF4' : '#F8FAFC',
-                    border: '1px solid var(--color-border-subtle)',
-                    borderLeft: `4px solid ${idx === incident.timeline.length - 1 ? '#DC2626' : 'var(--color-primary)'}`
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <strong style={{ fontSize: '13px', color: 'var(--color-text-primary)' }}>
-                      {step.stage}
-                    </strong>
-                    <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-muted)' }}>
-                      {step.date}, {step.time}
+            {openSections.timeline && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', position: 'relative' }}>
+                {incident.timeline?.map((step, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      padding: '12px',
+                      borderRadius: 'var(--radius-md)',
+                      background: idx === 0 ? '#F0FDF4' : '#F8FAFC',
+                      border: '1px solid var(--color-border-subtle)',
+                      borderLeft: `4px solid ${idx === incident.timeline.length - 1 ? '#DC2626' : 'var(--color-primary)'}`
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                      <strong style={{ fontSize: '13px', color: 'var(--color-text-primary)' }}>
+                        {step.stage}
+                      </strong>
+                      <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-muted)' }}>
+                        {step.date}, {step.time}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
+                      {step.desc}
+                    </p>
+                    <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginTop: '4px', display: 'block' }}>
+                      Source: <strong>{step.source}</strong> (Cumulative: {step.count} signals)
                     </span>
                   </div>
-                  <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
-                    {step.desc}
-                  </p>
-                  <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginTop: '4px', display: 'block' }}>
-                    Source: <strong>{step.source}</strong> (Cumulative: {step.count} signals)
-                  </span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Problem Spread Map */}
-          <div>
-            <ProblemSpreadMap incident={incident} spreadGeo={incident.spreadGeo} />
+          <div style={{
+            background: '#FFFFFF',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--color-border-subtle)',
+            padding: '20px',
+            boxShadow: 'var(--shadow-card)'
+          }}>
+            <div 
+              onClick={() => toggleSection('map')}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: openSections.map ? '16px' : '0', cursor: 'pointer', userSelect: 'none' }}
+            >
+              <h3 style={{ fontSize: '18px', color: 'var(--color-text-primary)' }}>
+                Problem Spread Map
+              </h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+                  Spatial Cascade
+                </span>
+                {openSections.map ? <ChevronUp style={{ width: '18px', height: '18px', color: 'var(--color-text-muted)' }} /> : <ChevronDown style={{ width: '18px', height: '18px', color: 'var(--color-text-muted)' }} />}
+              </div>
+            </div>
+            {openSections.map && (
+              <ProblemSpreadMap incident={incident} spreadGeo={incident.spreadGeo} />
+            )}
           </div>
         </div>
 
@@ -320,7 +521,10 @@ export default function CivicIncidentDetail() {
           boxShadow: 'var(--shadow-card)',
           marginBottom: '28px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+          <div 
+            onClick={() => toggleSection('hypotheses')}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: openSections.hypotheses ? '16px' : '0', cursor: 'pointer', userSelect: 'none' }}
+          >
             <div>
               <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block' }}>
                 Diagnostic Hypotheses (Evidence-Linked)
@@ -329,69 +533,74 @@ export default function CivicIncidentDetail() {
                 Root Cause Hypotheses
               </h3>
             </div>
-            <span style={{ fontSize: '11px', background: '#FEF3C7', color: '#92400E', padding: '3px 10px', borderRadius: 'var(--radius-full)', fontWeight: 700 }}>
-              ⚠ Requires Field Verification
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '11px', background: '#FEF3C7', color: '#92400E', padding: '3px 10px', borderRadius: 'var(--radius-full)', fontWeight: 700 }}>
+                ⚠ Requires Field Verification
+              </span>
+              {openSections.hypotheses ? <ChevronUp style={{ width: '18px', height: '18px', color: 'var(--color-text-muted)' }} /> : <ChevronDown style={{ width: '18px', height: '18px', color: 'var(--color-text-muted)' }} />}
+            </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {incident.rootCauseHypotheses?.map((hyp) => (
-              <div
-                key={hyp.id}
-                style={{
-                  padding: '16px',
-                  borderRadius: 'var(--radius-md)',
-                  background: '#F8FAFC',
-                  border: '1px solid var(--color-border-subtle)',
-                  borderLeft: '4px solid #4F46E5'
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <strong style={{ fontSize: '14.5px', color: 'var(--color-text-primary)' }}>
-                      {hyp.title}
-                    </strong>
-                    <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-                      ({hyp.id})
+          {openSections.hypotheses && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {incident.rootCauseHypotheses?.map((hyp) => (
+                <div
+                  key={hyp.id}
+                  style={{
+                    padding: '16px',
+                    borderRadius: 'var(--radius-md)',
+                    background: '#F8FAFC',
+                    border: '1px solid var(--color-border-subtle)',
+                    borderLeft: '4px solid #4F46E5'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <strong style={{ fontSize: '14.5px', color: 'var(--color-text-primary)' }}>
+                        {hyp.title}
+                      </strong>
+                      <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+                        ({hyp.id})
+                      </span>
+                    </div>
+                    <span style={{
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      padding: '2px 8px',
+                      borderRadius: 'var(--radius-full)',
+                      background: hyp.confidence === 'HIGH' ? '#ECFDF5' : '#FFFBEB',
+                      color: hyp.confidence === 'HIGH' ? '#065F46' : '#92400E'
+                    }}>
+                      ● Confidence: {hyp.confidence} ({hyp.confidenceScore}%)
                     </span>
                   </div>
-                  <span style={{
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    padding: '2px 8px',
-                    borderRadius: 'var(--radius-full)',
-                    background: hyp.confidence === 'HIGH' ? '#ECFDF5' : '#FFFBEB',
-                    color: hyp.confidence === 'HIGH' ? '#065F46' : '#92400E'
-                  }}>
-                    ● Confidence: {hyp.confidence} ({hyp.confidenceScore}%)
+
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '4px' }}>
+                    Supporting Evidence Signals:
                   </span>
-                </div>
+                  <ul style={{ paddingLeft: '18px', fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '10px' }}>
+                    {hyp.evidence.map((ev, i) => (
+                      <li key={i}>{ev}</li>
+                    ))}
+                  </ul>
 
-                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '4px' }}>
-                  Supporting Evidence Signals:
-                </span>
-                <ul style={{ paddingLeft: '18px', fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '10px' }}>
-                  {hyp.evidence.map((ev, i) => (
-                    <li key={i}>{ev}</li>
-                  ))}
-                </ul>
-
-                <div style={{
-                  paddingTop: '8px',
-                  borderTop: '1px solid var(--color-divider)',
-                  fontSize: '11.5px',
-                  color: '#4338CA',
-                  fontWeight: 600
-                }}>
-                  Recommended Verification: {hyp.recommendedVerification}
+                  <div style={{
+                    paddingTop: '8px',
+                    borderTop: '1px solid var(--color-divider)',
+                    fontSize: '11.5px',
+                    color: '#4338CA',
+                    fontWeight: 600
+                  }}>
+                    Recommended Verification: {hyp.recommendedVerification}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Section 7 & 8: Cross-Department Impact & Civic Memory */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px', marginBottom: '28px' }}>
+        <div className="responsive-side-by-side" style={{ marginBottom: '28px' }}>
           <CrossDepartmentMatrix crossDeptData={incident.crossDepartmentImpact} />
           <CivicMemoryCard memories={incident.civicMemory} />
         </div>
@@ -471,13 +680,14 @@ export default function CivicIncidentDetail() {
               }}
             />
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '10px' }}>
+            <div className="mobile-action-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '10px' }}>
               <button
                 type="button"
                 disabled={verificationSubmitting}
                 onClick={() => handleVerify(false)}
+                className="mobile-full-width-btn"
                 style={{
-                  height: '38px',
+                  minHeight: '44px',
                   padding: '0 18px',
                   borderRadius: 'var(--radius-full)',
                   fontSize: '13px',
@@ -488,6 +698,7 @@ export default function CivicIncidentDetail() {
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   gap: '6px'
                 }}
               >
@@ -499,13 +710,17 @@ export default function CivicIncidentDetail() {
                 type="button"
                 disabled={verificationSubmitting}
                 onClick={() => handleVerify(true)}
-                className="btn-primary"
+                className="btn-primary mobile-full-width-btn"
                 style={{
-                  height: '38px',
+                  minHeight: '44px',
                   padding: '0 20px',
                   borderRadius: 'var(--radius-full)',
                   fontSize: '13px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
                 }}
               >
                 <Check style={{ width: '15px', height: '15px' }} />
@@ -648,7 +863,7 @@ export default function CivicIncidentDetail() {
               />
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+            <div className="mobile-action-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
               {decisionSuccess ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#10B981', fontWeight: 700, fontSize: '13px' }}>
                   <CheckCircle2 style={{ width: '18px', height: '18px' }} />
@@ -662,8 +877,8 @@ export default function CivicIncidentDetail() {
 
               <button
                 type="submit"
-                className="btn-primary"
-                style={{ height: '42px', padding: '0 24px', borderRadius: 'var(--radius-full)', fontSize: '13.5px' }}
+                className="btn-primary mobile-full-width-btn"
+                style={{ minHeight: '48px', padding: '0 24px', borderRadius: 'var(--radius-full)', fontSize: '13.5px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
               >
                 <span>Commit & Authorize Decision</span>
                 <Check style={{ width: '16px', height: '16px' }} />

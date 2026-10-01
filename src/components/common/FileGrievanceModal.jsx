@@ -456,21 +456,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
   if (!isOpen) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(15, 23, 42, 0.78)',
-      backdropFilter: 'blur(8px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 9999,
-      padding: '16px',
-      boxSizing: 'border-box'
-    }}>
+    <div className="file-modal-overlay">
       <input 
         type="file" 
         ref={photoInputRef}
@@ -480,27 +466,12 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
         style={{ display: 'none' }}
       />
 
-      <div style={{
-        background: '#FFFFFF',
-        borderRadius: '24px',
-        maxWidth: '620px',
-        width: '100%',
-        maxHeight: '92vh',
-        display: 'flex',
-        flexDirection: 'column',
-        boxShadow: '0 25px 55px -10px rgba(15, 23, 42, 0.45)',
-        overflow: 'hidden',
-        position: 'relative'
-      }}>
+      <div className="file-modal-card">
+        {/* Mobile bottom-sheet drag handle */}
+        <div className="sheet-handle" />
+
         {/* Header */}
-        <div style={{
-          padding: '16px 22px',
-          borderBottom: '1px solid #F1F5F9',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: '#FAFAFC'
-        }}>
+        <div className="file-modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <img 
               src="/logo.png" 
@@ -522,8 +493,10 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
             onClick={onClose}
             aria-label="Close modal"
             style={{
-              width: '32px',
-              height: '32px',
+              width: '38px',
+              height: '38px',
+              minWidth: '38px',
+              minHeight: '38px',
               borderRadius: '50%',
               background: '#F1F5F9',
               border: 'none',
@@ -534,7 +507,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
               cursor: 'pointer'
             }}
           >
-            <X style={{ width: '17px', height: '17px' }} />
+            <X style={{ width: '18px', height: '18px' }} />
           </button>
         </div>
 
@@ -835,7 +808,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                       </button>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                    <div className="category-selection-grid">
                       {categories.map((cat) => {
                         const isSelected = !aiModeSelected && category === cat.key;
                         const isAiPick = aiDetectedCategory === cat.key;
@@ -845,14 +818,19 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                             type="button"
                             onClick={() => { setCategory(cat.key); setAiDetectedCategory(null); setAiModeSelected(false); }}
                             style={{
-                              padding: '9px 6px',
+                              padding: '10px 8px',
+                              minHeight: '48px',
                               borderRadius: '10px',
                               border: isSelected ? '2px solid #2563EB' : isAiPick ? '2px solid #059669' : '1px solid #E2E8F0',
                               background: isSelected ? '#EFF6FF' : isAiPick ? '#ECFDF5' : '#F8FAFC',
                               textAlign: 'center',
                               cursor: 'pointer',
                               position: 'relative',
-                              transition: 'all 0.2s'
+                              transition: 'all 0.2s',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center'
                             }}
                           >
                             <div style={{ fontSize: '18px', marginBottom: '2px' }}>{cat.icon}</div>
@@ -882,7 +860,8 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                         type="button"
                         onClick={() => { setAiModeSelected(true); setCategory(''); setAiDetectedCategory(null); }}
                         style={{
-                          padding: '9px 6px',
+                          padding: '10px 8px',
+                          minHeight: '48px',
                           borderRadius: '10px',
                           border: aiModeSelected ? '2px solid #6366F1' : '1px dashed #A5B4FC',
                           background: aiModeSelected ? '#EDE9FE' : '#F5F3FF',
@@ -1477,26 +1456,20 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
 
         {/* Footer */}
         {!createdTicket && (
-          <div style={{
-            padding: '12px 22px',
-            borderTop: '1px solid #F1F5F9',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            background: '#FAFAFC'
-          }}>
+          <div className="file-modal-footer">
             {currentStep > 1 ? (
               <button
                 type="button"
                 onClick={() => setCurrentStep(prev => prev - 1)}
                 style={{
-                  height: '38px',
-                  padding: '0 16px',
+                  height: '44px',
+                  minHeight: '44px',
+                  padding: '0 18px',
                   borderRadius: '10px',
                   background: '#FFFFFF',
                   border: '1px solid #CBD5E1',
                   color: '#475569',
-                  fontSize: '12px',
+                  fontSize: '13px',
                   fontWeight: 600,
                   cursor: 'pointer',
                   display: 'inline-flex',
@@ -1504,7 +1477,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                   gap: '6px'
                 }}
               >
-                <ArrowLeft style={{ width: '14px', height: '14px' }} />
+                <ArrowLeft style={{ width: '15px', height: '15px' }} />
                 <span>Back</span>
               </button>
             ) : (
@@ -1512,13 +1485,14 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                 type="button"
                 onClick={onClose}
                 style={{
-                  height: '38px',
-                  padding: '0 16px',
+                  height: '44px',
+                  minHeight: '44px',
+                  padding: '0 18px',
                   borderRadius: '10px',
                   background: 'transparent',
                   border: 'none',
                   color: '#64748B',
-                  fontSize: '12px',
+                  fontSize: '13px',
                   fontWeight: 600,
                   cursor: 'pointer'
                 }}
@@ -1543,13 +1517,14 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                   setCurrentStep(prev => prev + 1);
                 }}
                 style={{
-                  height: '38px',
-                  padding: '0 18px',
+                  height: '44px',
+                  minHeight: '44px',
+                  padding: '0 20px',
                   borderRadius: '10px',
                   background: '#2563EB',
                   color: '#FFFFFF',
                   border: 'none',
-                  fontSize: '12.5px',
+                  fontSize: '13px',
                   fontWeight: 700,
                   cursor: 'pointer',
                   display: 'inline-flex',
@@ -1559,7 +1534,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                 }}
               >
                 <span>{currentStep === 2 && !photoPreview ? 'Skip Photo / Next' : 'Next Step'}</span>
-                <ArrowRight style={{ width: '14px', height: '14px' }} />
+                <ArrowRight style={{ width: '15px', height: '15px' }} />
               </button>
             ) : (
               <button
@@ -1569,13 +1544,14 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                 onClick={handleFinalSubmit}
                 disabled={isSubmitting}
                 style={{
-                  height: '40px',
+                  height: '44px',
+                  minHeight: '44px',
                   padding: '0 22px',
                   borderRadius: '10px',
                   background: 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)',
                   color: '#FFFFFF',
                   border: 'none',
-                  fontSize: '13px',
+                  fontSize: '13.5px',
                   fontWeight: 700,
                   cursor: 'pointer',
                   display: 'inline-flex',

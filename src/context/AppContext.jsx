@@ -88,28 +88,37 @@ export function AppProvider({ children }) {
   });
 
   const [grievances, setGrievances] = useState(() => {
-    const saved = localStorage.getItem('jansahayk_grievances_v4');
+    try {
+      localStorage.removeItem('jansahayk_grievances_v4');
+      localStorage.removeItem('jansahayk_grievances');
+    } catch (e) {}
+    const saved = localStorage.getItem('jansahayk_grievances_v5');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length >= INITIAL_GRIEVANCES.length) {
+        const hasJunk = Array.isArray(parsed) && parsed.some(g => !g.id || g.id.startsWith('TEST-') || g.title === 'adsdasdda' || g.title === 'हेलो');
+        if (Array.isArray(parsed) && !hasJunk && parsed.length >= INITIAL_GRIEVANCES.length) {
           return parsed;
         }
       } catch (e) {}
     }
-    localStorage.setItem('jansahayk_grievances_v4', JSON.stringify(INITIAL_GRIEVANCES));
+    localStorage.setItem('jansahayk_grievances_v5', JSON.stringify(INITIAL_GRIEVANCES));
     return INITIAL_GRIEVANCES;
   });
 
   const [clusters, setClusters] = useState(() => {
-    const saved = localStorage.getItem('jansahayk_clusters_v4');
+    try {
+      localStorage.removeItem('jansahayk_clusters_v4');
+      localStorage.removeItem('jansahayk_clusters');
+    } catch (e) {}
+    const saved = localStorage.getItem('jansahayk_clusters_v5');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length >= MOCK_CLUSTERS.length) return parsed;
       } catch (e) {}
     }
-    localStorage.setItem('jansahayk_clusters_v4', JSON.stringify(MOCK_CLUSTERS));
+    localStorage.setItem('jansahayk_clusters_v5', JSON.stringify(MOCK_CLUSTERS));
     return MOCK_CLUSTERS;
   });
 
@@ -180,13 +189,11 @@ export function AppProvider({ children }) {
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem('jansahayk_grievances_v4', JSON.stringify(grievances));
-    localStorage.setItem('jansahayk_grievances', JSON.stringify(grievances));
+    localStorage.setItem('jansahayk_grievances_v5', JSON.stringify(grievances));
   }, [grievances]);
 
   useEffect(() => {
-    localStorage.setItem('jansahayk_clusters_v4', JSON.stringify(clusters));
-    localStorage.setItem('jansahayk_clusters', JSON.stringify(clusters));
+    localStorage.setItem('jansahayk_clusters_v5', JSON.stringify(clusters));
   }, [clusters]);
 
   useEffect(() => {
@@ -694,7 +701,7 @@ export function AppProvider({ children }) {
 
         setGrievances(prev => {
           const updated = [created, ...prev.filter(g => g.id !== created.id)];
-          localStorage.setItem('jansahayk_grievances_v4', JSON.stringify(updated));
+          localStorage.setItem('jansahayk_grievances_v5', JSON.stringify(updated));
           return updated;
         });
         return created;
@@ -768,7 +775,7 @@ export function AppProvider({ children }) {
 
     setGrievances(prev => {
       const updated = [fallbackItem, ...prev.filter(g => g.id !== fallbackId)];
-      localStorage.setItem('jansahayk_grievances_v4', JSON.stringify(updated));
+      localStorage.setItem('jansahayk_grievances_v5', JSON.stringify(updated));
       return updated;
     });
     return fallbackItem;

@@ -613,19 +613,39 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
           </div>
         </div>
 
-        {/* 2. THE 7 WORKSPACE TABS (Super Simple English) */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          marginBottom: '22px',
-          background: '#FFFFFF',
-          padding: '6px',
-          borderRadius: '16px',
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
-          overflowX: 'auto'
-        }}>
+        {/* Mobile compact dropdown selector for < 768px */}
+        <div className="officer-tabs-mobile-dropdown">
+          <label style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+            Current Workspace Section:
+          </label>
+          <select
+            value={activeSection}
+            onChange={(e) => switchSection(e.target.value)}
+            style={{
+              width: '100%',
+              height: '42px',
+              borderRadius: '12px',
+              border: '1.5px solid #059669',
+              background: '#FFFFFF',
+              padding: '0 12px',
+              fontSize: '13px',
+              fontWeight: 700,
+              color: '#0F172A',
+              boxShadow: '0 2px 6px rgba(5,150,105,0.1)'
+            }}
+          >
+            <option value="dashboard">📊 Overview (Dashboard)</option>
+            <option value="my_work">📌 My Tasks ({myWorkGrievances.length})</option>
+            <option value="operations">👷 Team & Workers ({filteredGrievances.length})</option>
+            <option value="intelligence">🤖 AI Problem Helper</option>
+            <option value="investigation">🔍 Check Problem (#{activeItem?.id?.slice(-4) || 'CASE'})</option>
+            <option value="coordination">🤝 Other Depts</option>
+            <option value="reports">📈 Work Results</option>
+          </select>
+        </div>
+
+        {/* 2. THE 7 WORKSPACE TABS (Horizontally Scrollable Pill Container) */}
+        <div className="officer-tabs-scroll-container">
           {[
             { id: 'dashboard', label: '📊 Overview', icon: Activity, badge: null },
             { id: 'my_work', label: '📌 My Tasks', icon: CheckSquare, badge: myWorkGrievances.length },
@@ -642,6 +662,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 key={tab.id}
                 type="button"
                 onClick={() => switchSection(tab.id)}
+                className="officer-tab-pill"
                 style={{
                   padding: '8px 16px',
                   borderRadius: '12px',
@@ -656,6 +677,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   alignItems: 'center',
                   gap: '6px',
                   whiteSpace: 'nowrap',
+                  flexShrink: 0,
                   transition: 'all 150ms ease'
                 }}
               >
@@ -682,15 +704,10 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
         {/* ========================================================================= */}
         {activeSection === 'dashboard' && (
           <div>
-            {/* 4 Summary Stat Cards with Colorful Accents */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: '16px',
-              marginBottom: '26px'
-            }}>
+            {/* 4 Summary Stat Cards with Responsive minmax 140px Grid */}
+            <div className="officer-kpi-grid">
               {/* Card 1: Waiting to fix */}
-              <div style={{
+              <div className="officer-kpi-card" style={{
                 background: '#FFFFFF',
                 borderRadius: '16px',
                 padding: '20px',
@@ -700,23 +717,23 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 transition: 'transform 150ms ease'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.04em' }}>
+                  <span className="kpi-label" style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.04em' }}>
                     WAITING TO FIX
                   </span>
                   <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#EFF6FF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
                     📋
                   </div>
                 </div>
-                <div style={{ fontSize: '32px', fontWeight: 800, color: '#1E293B', lineHeight: 1 }}>
+                <div className="kpi-num" style={{ fontSize: '32px', fontWeight: 800, color: '#1E293B', lineHeight: 1 }}>
                   {dashboardStats.active}
                 </div>
-                <p style={{ fontSize: '12px', color: '#64748B', margin: '6px 0 0 0' }}>
+                <p className="kpi-desc" style={{ fontSize: '12px', color: '#64748B', margin: '6px 0 0 0' }}>
                   {liveStats ? `${dashboardStats.total} total · Live from database` : 'Complaints in your area'}
                 </p>
               </div>
 
               {/* Card 2: Urgent problems */}
-              <div style={{
+              <div className="officer-kpi-card" style={{
                 background: '#FFFFFF',
                 borderRadius: '16px',
                 padding: '20px',
@@ -726,23 +743,23 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 transition: 'transform 150ms ease'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#DC2626', letterSpacing: '0.04em' }}>
+                  <span className="kpi-label" style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#DC2626', letterSpacing: '0.04em' }}>
                     URGENT PROBLEMS
                   </span>
                   <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#FEF2F2', color: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
                     🚨
                   </div>
                 </div>
-                <div style={{ fontSize: '32px', fontWeight: 800, color: '#DC2626', lineHeight: 1 }}>
+                <div className="kpi-num" style={{ fontSize: '32px', fontWeight: 800, color: '#DC2626', lineHeight: 1 }}>
                   {dashboardStats.critical}
                 </div>
-                <p style={{ fontSize: '12px', color: '#EF4444', margin: '6px 0 0 0', fontWeight: 600 }}>
+                <p className="kpi-desc" style={{ fontSize: '12px', color: '#EF4444', margin: '6px 0 0 0', fontWeight: 600 }}>
                   Needs immediate fix today
                 </p>
               </div>
 
               {/* Card 3: Solved today */}
-              <div style={{
+              <div className="officer-kpi-card" style={{
                 background: '#FFFFFF',
                 borderRadius: '16px',
                 padding: '20px',
@@ -752,23 +769,23 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 transition: 'transform 150ms ease'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#059669', letterSpacing: '0.04em' }}>
+                  <span className="kpi-label" style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#059669', letterSpacing: '0.04em' }}>
                     SOLVED TODAY
                   </span>
                   <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#ECFDF5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
                     ✅
                   </div>
                 </div>
-                <div style={{ fontSize: '32px', fontWeight: 800, color: '#059669', lineHeight: 1 }}>
+                <div className="kpi-num" style={{ fontSize: '32px', fontWeight: 800, color: '#059669', lineHeight: 1 }}>
                   {dashboardStats.resolved}
                 </div>
-                <p style={{ fontSize: '12px', color: '#059669', margin: '6px 0 0 0', fontWeight: 600 }}>
+                <p className="kpi-desc" style={{ fontSize: '12px', color: '#059669', margin: '6px 0 0 0', fontWeight: 600 }}>
                   Fixed & verified by citizens
                 </p>
               </div>
 
               {/* Card 4: Fix speed */}
-              <div style={{
+              <div className="officer-kpi-card" style={{
                 background: '#FFFFFF',
                 borderRadius: '16px',
                 padding: '20px',
@@ -778,17 +795,17 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 transition: 'transform 150ms ease'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.04em' }}>
+                  <span className="kpi-label" style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.04em' }}>
                     ON-TIME FIX RATE
                   </span>
                   <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#ECFDF5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
                     ⚡
                   </div>
                 </div>
-                <div style={{ fontSize: '32px', fontWeight: 800, color: '#059669', lineHeight: 1 }}>
+                <div className="kpi-num" style={{ fontSize: '32px', fontWeight: 800, color: '#059669', lineHeight: 1 }}>
                   94.8%
                 </div>
-                <p style={{ fontSize: '12px', color: '#64748B', margin: '6px 0 0 0' }}>
+                <p className="kpi-desc" style={{ fontSize: '12px', color: '#64748B', margin: '6px 0 0 0' }}>
                   Average turnaround: 14.2 hours
                 </p>
               </div>
@@ -1221,7 +1238,8 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
               <h3 style={{ fontSize: '16px', marginBottom: '14px', color: 'var(--color-text-primary)' }}>
                 Field Engineering Roster & Shift Status
               </h3>
-              <div style={{ overflowX: 'auto' }}>
+              {/* Desktop Table View */}
+              <div className="desktop-only-table" style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
                   <thead>
                     <tr style={{ borderBottom: '2px solid var(--color-border-medium)' }}>
@@ -1277,6 +1295,94 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Mobile Responsive Roster Cards */}
+              <div className="mobile-only-cards">
+                {officerRoster.map((off, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      background: '#FFFFFF',
+                      borderRadius: '14px',
+                      border: '1px solid #E2E8F0',
+                      padding: '16px',
+                      boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                      <div>
+                        <strong style={{ fontSize: '14px', color: 'var(--color-text-primary)', display: 'block' }}>
+                          {off.name}
+                        </strong>
+                        <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                          {off.designation}
+                        </span>
+                      </div>
+                      <span style={{
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        color: '#D97706',
+                        background: '#FFFBEB',
+                        border: '1px solid #FDE68A',
+                        padding: '2px 8px',
+                        borderRadius: '9999px'
+                      }}>
+                        ★ {off.rating}
+                      </span>
+                    </div>
+
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(3, 1fr)',
+                      gap: '8px',
+                      background: '#F8FAFC',
+                      padding: '10px',
+                      borderRadius: '10px',
+                      border: '1px solid #E2E8F0',
+                      textAlign: 'center'
+                    }}>
+                      <div>
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Active</span>
+                        <strong style={{ fontSize: '13px', color: off.activeCases > 5 ? '#EF4444' : '#0F172A' }}>{off.activeCases}</strong>
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Resolved</span>
+                        <strong style={{ fontSize: '13px', color: '#059669' }}>{off.resolvedThisMonth}</strong>
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Avg Speed</span>
+                        <strong style={{ fontSize: '13px', color: '#059669', fontFamily: 'var(--font-mono)' }}>{off.avgResolutionHours}</strong>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => toggleOfficerStatus(i)}
+                      style={{
+                        width: '100%',
+                        minHeight: '44px',
+                        fontSize: '12.5px',
+                        padding: '8px',
+                        borderRadius: '10px',
+                        background: off.status === 'ON_DUTY' ? '#ECFDF5' : '#FFFBEB',
+                        color: off.status === 'ON_DUTY' ? '#065F46' : '#92400E',
+                        border: `1.5px solid ${off.status === 'ON_DUTY' ? '#A7F3D0' : '#FDE68A'}`,
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <span>● Status: {off.status} (Tap to Toggle Shift)</span>
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -1420,34 +1526,109 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   ))}
                 </div>
               ) : (
-                /* High-Density Table View */
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '2px solid var(--color-border-medium)' }}>
-                        <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>CASE ID</th>
-                        <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>TITLE & SUMMARY</th>
-                        <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>WARD</th>
-                        <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>URGENCY</th>
-                        <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>STATUS</th>
-                        <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>ASSIGNED TO</th>
-                        <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>ACTIONS</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredGrievances.map((g) => (
-                        <tr key={g.id} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
-                          <td style={{ padding: '12px 10px', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--color-primary)' }}>
-                            {g.id}
-                          </td>
-                          <td style={{ padding: '12px 10px', maxWidth: '320px' }}>
-                            <strong style={{ display: 'block', color: 'var(--color-text-primary)', marginBottom: '2px' }}>{g.title}</strong>
-                            <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>by {g.citizenName || 'Citizen'}</span>
-                          </td>
-                          <td style={{ padding: '12px 10px', color: 'var(--color-text-secondary)' }}>
-                            {g.location?.ward || 'Ward 14'}
-                          </td>
-                          <td style={{ padding: '12px 10px' }}>
+                /* High-Density Table View for Desktop / Self-Contained Cards for Mobile */
+                <div>
+                  <div className="desktop-only-table" style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '2px solid var(--color-border-medium)' }}>
+                          <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>CASE ID</th>
+                          <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>TITLE & SUMMARY</th>
+                          <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>WARD</th>
+                          <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>URGENCY</th>
+                          <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>STATUS</th>
+                          <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>ASSIGNED TO</th>
+                          <th style={{ padding: '10px', color: 'var(--color-text-muted)' }}>ACTIONS</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredGrievances.map((g) => (
+                          <tr key={g.id} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+                            <td style={{ padding: '12px 10px', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--color-primary)' }}>
+                              {g.id}
+                            </td>
+                            <td style={{ padding: '12px 10px', maxWidth: '320px' }}>
+                              <strong style={{ display: 'block', color: 'var(--color-text-primary)', marginBottom: '2px' }}>{g.title}</strong>
+                              <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>by {g.citizenName || 'Citizen'}</span>
+                            </td>
+                            <td style={{ padding: '12px 10px', color: 'var(--color-text-secondary)' }}>
+                              {g.location?.ward || 'Ward 14'}
+                            </td>
+                            <td style={{ padding: '12px 10px' }}>
+                              <span style={{
+                                fontSize: '10px',
+                                fontWeight: 800,
+                                padding: '2px 8px',
+                                borderRadius: '9999px',
+                                background: g.urgency === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB',
+                                color: g.urgency === 'CRITICAL' ? '#991B1B' : '#92400E'
+                              }}>
+                                {g.urgency}
+                              </span>
+                            </td>
+                            <td style={{ padding: '12px 10px' }}>
+                              <span style={{ fontSize: '11px', fontWeight: 600, color: g.status === 'RESOLVED' ? '#059669' : '#D97706' }}>
+                                {g.status}
+                              </span>
+                            </td>
+                            <td style={{ padding: '12px 10px', color: 'var(--color-text-secondary)', fontSize: '12px' }}>
+                              {g.officerName || 'Er. Sanjay Sharma'}
+                            </td>
+                            <td style={{ padding: '12px 10px' }}>
+                              <div style={{ display: 'flex', gap: '6px' }}>
+                                <button
+                                  type="button"
+                                  onClick={() => openInspectionForCase(g.id)}
+                                  className="btn-secondary btn-sm"
+                                  style={{ fontSize: '11px', padding: '4px 8px' }}
+                                >
+                                  Inspect
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedId(g.id);
+                                    setShowReassignModal(true);
+                                  }}
+                                  className="btn-secondary btn-sm"
+                                  style={{ fontSize: '11px', padding: '4px 8px' }}
+                                >
+                                  Reassign
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Responsive Card Transform for Mobile View */}
+                  <div className="mobile-only-cards">
+                    {filteredGrievances.map((g) => (
+                      <div
+                        key={g.id}
+                        style={{
+                          background: '#FFFFFF',
+                          borderRadius: '14px',
+                          border: '1px solid #E2E8F0',
+                          padding: '16px',
+                          boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '10px'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span className="font-mono-numbers" style={{ fontSize: '12px', fontWeight: 800, color: 'var(--color-primary)' }}>
+                              {g.id}
+                            </span>
+                            <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                              • {g.citizenName || 'Citizen'}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <span style={{
                               fontSize: '10px',
                               fontWeight: 800,
@@ -1458,42 +1639,78 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                             }}>
                               {g.urgency}
                             </span>
-                          </td>
-                          <td style={{ padding: '12px 10px' }}>
-                            <span style={{ fontSize: '11px', fontWeight: 600, color: g.status === 'RESOLVED' ? '#059669' : '#D97706' }}>
+                            <span style={{
+                              fontSize: '10.5px',
+                              fontWeight: 700,
+                              padding: '2px 8px',
+                              borderRadius: '9999px',
+                              background: g.status === 'RESOLVED' ? '#ECFDF5' : '#FFFBEB',
+                              color: g.status === 'RESOLVED' ? '#065F46' : '#D97706',
+                              border: `1px solid ${g.status === 'RESOLVED' ? '#A7F3D0' : '#FDE68A'}`
+                            }}>
                               {g.status}
                             </span>
-                          </td>
-                          <td style={{ padding: '12px 10px', color: 'var(--color-text-secondary)', fontSize: '12px' }}>
-                            {g.officerName || 'Er. Sanjay Sharma'}
-                          </td>
-                          <td style={{ padding: '12px 10px' }}>
-                            <div style={{ display: 'flex', gap: '6px' }}>
-                              <button
-                                type="button"
-                                onClick={() => openInspectionForCase(g.id)}
-                                className="btn-secondary btn-sm"
-                                style={{ fontSize: '11px', padding: '4px 8px' }}
-                              >
-                                Inspect
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setSelectedId(g.id);
-                                  setShowReassignModal(true);
-                                }}
-                                className="btn-secondary btn-sm"
-                                style={{ fontSize: '11px', padding: '4px 8px' }}
-                              >
-                                Reassign
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                          </div>
+                        </div>
+
+                        <div>
+                          <h4 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)', margin: '0 0 4px 0', lineHeight: 1.35 }}>
+                            {g.title}
+                          </h4>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--color-text-secondary)', flexWrap: 'wrap' }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                              <MapPin style={{ width: '12px', height: '12px', color: '#059669' }} />
+                              {g.location?.ward || 'Ward 14'}
+                            </span>
+                            <span>•</span>
+                            <span>Assigned: <strong>{g.officerName || 'Er. Sanjay Sharma'}</strong></span>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '4px', paddingTop: '10px', borderTop: '1px solid #F1F5F9' }}>
+                          <button
+                            type="button"
+                            onClick={() => openInspectionForCase(g.id)}
+                            className="btn-primary btn-sm"
+                            style={{
+                              minHeight: '42px',
+                              fontSize: '12.5px',
+                              fontWeight: 700,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              borderRadius: '10px'
+                            }}
+                          >
+                            <Eye style={{ width: '14px', height: '14px' }} />
+                            <span>Inspect Case</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedId(g.id);
+                              setShowReassignModal(true);
+                            }}
+                            className="btn-secondary btn-sm"
+                            style={{
+                              minHeight: '42px',
+                              fontSize: '12.5px',
+                              fontWeight: 600,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              borderRadius: '10px'
+                            }}
+                          >
+                            <Users style={{ width: '14px', height: '14px' }} />
+                            <span>Reassign</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -1782,7 +1999,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 </div>
 
                 {/* Action Toolbar */}
-                <div style={{
+                <div className="mobile-action-bar" style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
@@ -1796,7 +2013,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   <button
                     type="button"
                     onClick={handleAcceptRecommendation}
-                    className="btn-primary btn-sm"
+                    className="btn-primary btn-sm mobile-full-width-btn"
                     style={{ background: 'var(--color-primary)' }}
                   >
                     <Check style={{ width: '13px', height: '13px' }} />
@@ -1806,7 +2023,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   <button
                     type="button"
                     onClick={() => setShowClarificationModal(true)}
-                    className="btn-secondary btn-sm"
+                    className="btn-secondary btn-sm mobile-full-width-btn"
                     style={{ borderColor: '#FCD34D', color: '#B45309' }}
                   >
                     <MessageSquare style={{ width: '13px', height: '13px' }} />
@@ -1816,7 +2033,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   <button
                     type="button"
                     onClick={() => setShowReassignModal(true)}
-                    className="btn-secondary btn-sm"
+                    className="btn-secondary btn-sm mobile-full-width-btn"
                   >
                     <Users style={{ width: '13px', height: '13px' }} />
                     <span>Reassign</span>
@@ -1825,7 +2042,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   <button
                     type="button"
                     onClick={() => setShowEscalateModal(true)}
-                    className="btn-secondary btn-sm"
+                    className="btn-secondary btn-sm mobile-full-width-btn"
                     style={{ borderColor: '#FECACA', color: '#B91C1C' }}
                   >
                     <AlertOctagon style={{ width: '13px', height: '13px' }} />
@@ -1835,7 +2052,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   <button
                     type="button"
                     onClick={() => setShowResolutionModal(true)}
-                    className="btn-secondary btn-sm"
+                    className="btn-secondary btn-sm mobile-full-width-btn"
                     style={{ borderColor: '#86EFAC', color: '#14532D', marginLeft: 'auto' }}
                   >
                     <CheckCircle2 style={{ width: '13px', height: '13px' }} />
@@ -1863,8 +2080,8 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   </div>
                 )}
 
-                {/* Deep Sub-Tabs */}
-                <div style={{ display: 'flex', gap: '6px', borderBottom: '1px solid var(--color-divider)', paddingBottom: '8px', marginBottom: '18px', flexWrap: 'wrap' }}>
+                {/* Deep Sub-Tabs (Smooth Horizontal Pill Scrolling) */}
+                <div className="horizontal-scroll-pills" style={{ borderBottom: '1px solid var(--color-divider)', marginBottom: '18px' }}>
                   {[
                     { id: 'recommendation', label: '💡 Smart Action Plan (AI)' },
                     { id: 'brief', label: 'Citizen Report & DNA' },
@@ -1879,14 +2096,16 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                       type="button"
                       onClick={() => setDetailSubTab(t.id)}
                       style={{
-                        padding: '6px 12px',
+                        padding: '8px 14px',
                         borderRadius: '9999px',
                         fontSize: '12px',
                         fontWeight: 600,
                         border: 'none',
                         background: detailSubTab === t.id ? 'var(--color-primary)' : '#F1F5F9',
                         color: detailSubTab === t.id ? '#FFFFFF' : 'var(--color-text-secondary)',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
                       }}
                     >
                       {t.label}
@@ -1932,7 +2151,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                     <div style={{
                       padding: '16px 18px',
                       borderRadius: 'var(--radius-md)',
-                      background: '#F8F9FA',
+                      background: '#F8FAFC',
                       border: '1px solid var(--color-border-subtle)',
                       marginBottom: '18px'
                     }}>
@@ -1963,7 +2182,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 {detailSubTab === 'evidence' && (
                   <div>
                     <h4 style={{ fontSize: '14px', marginBottom: '12px' }}>Field Evidence & Geotagged Inspections</h4>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '16px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '14px', marginBottom: '16px' }}>
                       <div style={{ border: '1px solid var(--color-border-subtle)', borderRadius: '8px', overflow: 'hidden' }}>
                         <div style={{ height: '140px', background: '#0B1914', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6EE7B7' }}>
                           <Camera style={{ width: '32px', height: '32px' }} />
@@ -1988,7 +2207,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                     <button
                       type="button"
                       onClick={() => setShowResolutionModal(true)}
-                      className="btn-secondary btn-sm"
+                      className="btn-secondary btn-sm mobile-full-width-btn"
                       style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                     >
                       <Camera style={{ width: '13px', height: '13px' }} />
@@ -2195,7 +2414,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
 
             <CrossDepartmentMatrix incidentTitle={activeItem.title} />
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+            <div className="responsive-side-by-side" style={{ gap: '16px' }}>
               <div className="card" style={{ padding: '24px' }}>
                 <h3 style={{ fontSize: '16px', marginBottom: '10px' }}>Direct Jurisdictional Reassignment</h3>
                 <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
@@ -2204,7 +2423,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 <button
                   type="button"
                   onClick={() => setShowReassignModal(true)}
-                  className="btn-primary btn-sm"
+                  className="btn-primary btn-sm mobile-full-width-btn"
                 >
                   <Users style={{ width: '14px', height: '14px' }} />
                   <span>Reassign Active Case (#{activeItem.id})</span>
@@ -2219,7 +2438,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 <button
                   type="button"
                   onClick={() => setShowEscalateModal(true)}
-                  className="btn-secondary btn-sm"
+                  className="btn-secondary btn-sm mobile-full-width-btn"
                   style={{ borderColor: '#FECACA', color: '#DC2626' }}
                 >
                   <AlertOctagon style={{ width: '14px', height: '14px' }} />
@@ -2246,7 +2465,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
               <button
                 type="button"
                 onClick={handleExportReport}
-                className="btn-primary btn-sm"
+                className="btn-primary btn-sm mobile-full-width-btn"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
                 <Download style={{ width: '14px', height: '14px' }} />
@@ -2254,7 +2473,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
               </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+            <div className="responsive-side-by-side" style={{ gap: '24px' }}>
               {/* Category Breakdown */}
               <div className="card" style={{ padding: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>

@@ -65,17 +65,12 @@ export default function Impact() {
         </div>
 
         {/* Top 3 Metric Cards */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '24px',
-          marginBottom: '56px'
-        }}>
-          <div className="card" style={{ padding: '32px', textAlign: 'center' }}>
+        <div className="impact-stats-grid">
+          <div className="card impact-stat-card">
             <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
               Avg. Resolution Window (Target)
             </span>
-            <div style={{ fontSize: '48px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-primary)', margin: '8px 0' }}>
+            <div className="impact-stat-num" style={{ fontSize: '48px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-primary)', margin: '8px 0' }}>
               3.2 Days
             </div>
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
@@ -83,11 +78,11 @@ export default function Impact() {
             </p>
           </div>
 
-          <div className="card" style={{ padding: '32px', textAlign: 'center' }}>
+          <div className="card impact-stat-card">
             <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
               Duplicate Work Reduction
             </span>
-            <div style={{ fontSize: '48px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', margin: '8px 0' }}>
+            <div className="impact-stat-num" style={{ fontSize: '48px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', margin: '8px 0' }}>
               64.2%
             </div>
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
@@ -95,11 +90,11 @@ export default function Impact() {
             </p>
           </div>
 
-          <div className="card" style={{ padding: '32px', textAlign: 'center' }}>
+          <div className="card impact-stat-card">
             <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
               Verified Citizen Trust
             </span>
-            <div style={{ fontSize: '48px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-text-primary)', margin: '8px 0' }}>
+            <div className="impact-stat-num" style={{ fontSize: '48px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-text-primary)', margin: '8px 0' }}>
               91.6%
             </div>
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
@@ -109,7 +104,7 @@ export default function Impact() {
         </div>
 
         {/* Detailed Comparison Table (Section 11 & 12 of Product Discovery) */}
-        <div className="card" style={{ padding: '36px', marginBottom: '56px' }}>
+        <div className="card impact-comparison-card">
           <div style={{ marginBottom: '24px' }}>
             <span className="category-pill" style={{ marginBottom: '8px' }}>ARCHITECTURAL COMPARISON</span>
             <h3 style={{ fontSize: '24px' }}>Legacy Portals vs. JanSahayak Platform</h3>
@@ -118,8 +113,8 @@ export default function Impact() {
             </p>
           </div>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
+          <div className="table-responsive">
+            <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
               <thead>
                 <tr style={{ borderBottom: '2px solid var(--color-border-medium)' }}>
                   <th style={{ padding: '12px 16px', fontWeight: 700, color: 'var(--color-text-muted)', width: '22%' }}>DIMENSION</th>
@@ -153,7 +148,7 @@ export default function Impact() {
         </div>
 
         {/* Featured Case Study: Rohini Sector 14 Water Line Recovery */}
-        <div className="inset-dark-container" style={{ padding: '48px 36px' }}>
+        <div className="inset-dark-container impact-case-study">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
             <span className="category-pill" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10B981', borderColor: 'rgba(16, 185, 129, 0.3)' }}>
               VERIFIED FIELD STUDY
@@ -182,6 +177,46 @@ export default function Impact() {
           </div>
         </div>
       </div>
+
+      <style>{`
+        .impact-stats-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
+          margin-bottom: 56px;
+        }
+        .impact-stat-card {
+          padding: 32px;
+          text-align: center;
+        }
+        .impact-comparison-card {
+          padding: 36px;
+          margin-bottom: 56px;
+        }
+        .impact-case-study {
+          padding: 48px 36px;
+        }
+        @media (max-width: 768px) {
+          .impact-stats-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+            margin-bottom: 36px !important;
+          }
+          .impact-stat-card {
+            padding: 20px 16px !important;
+          }
+          .impact-stat-num {
+            font-size: 36px !important;
+          }
+          .impact-comparison-card {
+            padding: 20px 16px !important;
+            margin-bottom: 36px !important;
+          }
+          .impact-case-study {
+            padding: 24px 18px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

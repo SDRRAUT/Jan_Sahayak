@@ -405,71 +405,21 @@ export default function JanSahayakAssistant() {
 
   return (
     <>
-      {/* Light & Modern Floating Trigger Button */}
+      {/* Modern Light-Themed Floating Trigger Button */}
       {!isOpen && (
         <button
           id="jansahayak-ai-launcher"
+          className="jansahayak-ai-launcher"
           onClick={() => setIsOpen(true)}
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            zIndex: 9990,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '10px 20px',
-            background: 'linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%)',
-            backdropFilter: 'blur(16px)',
-            color: '#0F172A',
-            border: '1.5px solid rgba(226, 232, 240, 0.9)',
-            borderRadius: '999px',
-            boxShadow: '0 12px 30px -4px rgba(15, 23, 42, 0.15), 0 4px 12px rgba(0, 0, 0, 0.05)',
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            fontWeight: 700,
-            fontSize: '14px',
-            transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)';
-            e.currentTarget.style.boxShadow = '0 18px 36px -4px rgba(15, 23, 42, 0.2), 0 6px 16px rgba(0, 0, 0, 0.08)';
-            e.currentTarget.style.borderColor = activeRoleConfig.badgeColor;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0) scale(1)';
-            e.currentTarget.style.boxShadow = '0 12px 30px -4px rgba(15, 23, 42, 0.15), 0 4px 12px rgba(0, 0, 0, 0.05)';
-            e.currentTarget.style.borderColor = 'rgba(226, 232, 240, 0.9)';
-          }}
+          aria-label="Open JanSahayak AI Assistant"
         >
-          <div style={{
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            background: activeRoleConfig.gradient,
-            color: '#FFFFFF',
-            boxShadow: `0 4px 12px ${activeRoleConfig.glow}`
-          }}>
-            <Sparkles size={18} />
-            <span style={{
-              position: 'absolute',
-              top: '-1px',
-              right: '-1px',
-              width: '10px',
-              height: '10px',
-              borderRadius: '50%',
-              backgroundColor: '#10B981',
-              border: '2px solid #FFFFFF',
-              boxShadow: '0 0 6px rgba(16, 185, 129, 0.6)'
-            }} />
+          <div className="jansahayak-ai-launcher-icon">
+            <Sparkles size={17} style={{ strokeWidth: 2.2 }} />
+            <span className="jansahayak-ai-online-dot" />
           </div>
-          <div style={{ textAlign: 'left' }}>
-            <div style={{ fontSize: '13.5px', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>JanSahayak AI</div>
-            <div style={{ fontSize: '11px', color: activeRoleConfig.badgeColor, fontWeight: 700 }}>
+          <div className="jansahayak-ai-launcher-text">
+            <div className="jansahayak-ai-title">JanSahayak AI</div>
+            <div className="jansahayak-ai-subtitle" style={{ color: activeRoleConfig.badgeColor }}>
               {activeRoleConfig.label}
             </div>
           </div>
@@ -480,13 +430,14 @@ export default function JanSahayakAssistant() {
       {isOpen && (
         <div
           id="jansahayak-ai-window"
+          className={`ai-mobile-drawer ${isMinimized ? 'minimized' : ''}`}
           style={{
             position: 'fixed',
             bottom: '16px',
             right: '16px',
             width: isMinimized ? '320px' : '440px',
             maxWidth: 'calc(100vw - 24px)',
-            height: isMinimized ? '56px' : 'min(560px, calc(100dvh - 32px))',
+            height: isMinimized ? '54px' : 'min(550px, calc(100dvh - 32px))',
             maxHeight: 'calc(100dvh - 32px)',
             zIndex: 9999,
             display: 'flex',
@@ -514,6 +465,22 @@ export default function JanSahayakAssistant() {
             boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
             flexShrink: 0
           }}>
+            {/* Mobile Drag Handle inside drawer */}
+            <div
+              className="mobile-sheet-drag-handle"
+              onClick={() => setIsMinimized(prev => !prev)}
+              style={{
+                width: '36px',
+                height: '4px',
+                background: 'rgba(255, 255, 255, 0.4)',
+                borderRadius: '999px',
+                position: 'absolute',
+                top: '5px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                cursor: 'pointer'
+              }}
+            />
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{
                 position: 'relative',
@@ -630,17 +597,22 @@ export default function JanSahayakAssistant() {
 
           {/* Chat Messages Viewport */}
           {!isMinimized && (
-            <div style={{
-              flex: 1,
-              overflowY: 'auto',
-              overflowX: 'hidden',
-              padding: '16px 14px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '14px',
-              background: '#F8FAFC',
-              minHeight: 0
-            }}>
+            <div
+              className="ai-messages-container"
+              style={{
+                flex: 1,
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain',
+                padding: '16px 14px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '14px',
+                background: '#F8FAFC',
+                minHeight: 0
+              }}
+            >
               {messages.map((msg) => {
                 const isUser = msg.sender === 'user';
                 return (
@@ -887,6 +859,7 @@ export default function JanSahayakAssistant() {
           {/* Modern Light Input Bar */}
           {!isMinimized && (
             <form
+              className="ai-input-form"
               onSubmit={(e) => {
                 e.preventDefault();
                 handleSendMessage();
@@ -904,6 +877,7 @@ export default function JanSahayakAssistant() {
               <input
                 ref={inputRef}
                 type="text"
+                className="ai-chat-input"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder={
@@ -968,6 +942,35 @@ export default function JanSahayakAssistant() {
           )}
         </div>
       )}
+
+      <style>{`
+        @media (max-width: 768px) {
+          #jansahayak-ai-window.ai-mobile-drawer {
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: min(90dvh, calc(100dvh - 64px)) !important;
+            max-height: 90dvh !important;
+            border-radius: 20px 20px 0 0 !important;
+            border-bottom: none !important;
+            border-left: none !important;
+            border-right: none !important;
+            box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.85) !important;
+          }
+          #jansahayak-ai-window.ai-mobile-drawer.minimized {
+            height: 54px !important;
+            border-radius: 16px 16px 0 0 !important;
+          }
+          .ai-chat-input {
+            font-size: 16px !important;
+          }
+          .ai-input-form {
+            padding-bottom: max(12px, env(safe-area-inset-bottom, 12px)) !important;
+          }
+        }
+      `}</style>
     </>
   );
 }

@@ -80,7 +80,7 @@ export default function VisualJourneyTimeline({
       background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
       borderRadius: '18px',
       border: '1.5px solid #E2E8F0',
-      padding: '24px',
+      padding: 'clamp(14px, 3vw, 24px)',
       boxShadow: '0 4px 20px -4px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(0, 0, 0, 0.03)'
     }}>
       {/* Header Bar */}
@@ -172,13 +172,14 @@ export default function VisualJourneyTimeline({
         }} />
       </div>
 
-      {/* 6 Stage Cards Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-        gap: '12px',
-        position: 'relative'
-      }}>
+      {/* Desktop Stepper (>= 768px) */}
+      <div className="vj-timeline-desktop">
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+          gap: '12px',
+          position: 'relative'
+        }}>
         {stages.map((stage, idx) => {
           const Icon = stage.icon;
           const isDone = stage.isPassed;
@@ -297,6 +298,86 @@ export default function VisualJourneyTimeline({
           );
         })}
       </div>
+
+      {/* Mobile Vertical Stepper with Continuous Connector Line (< 768px) */}
+      <div className="vj-timeline-mobile">
+        {stages.map((stage, idx) => {
+          const Icon = stage.icon;
+          const isDone = stage.isPassed;
+          const isNow = stage.isCurrent;
+          const isLast = idx === stages.length - 1;
+
+          let badgeBg = '#F1F5F9';
+          let badgeColor = '#94A3B8';
+
+          if (isDone) {
+            badgeBg = '#ECFDF5';
+            badgeColor = '#065F46';
+          }
+          if (isNow) {
+            badgeBg = '#0E5E3A';
+            badgeColor = '#FFFFFF';
+          }
+
+          return (
+            <div key={stage.id} className="vj-mobile-step">
+              {/* Rail with Node and Connecting Line */}
+              <div className="vj-mobile-rail">
+                <div
+                  className="vj-mobile-node"
+                  style={{
+                    background: badgeBg,
+                    color: badgeColor,
+                    boxShadow: isNow ? '0 0 0 3px rgba(16, 185, 129, 0.25)' : 'none'
+                  }}
+                >
+                  <Icon style={{ width: '15px', height: '15px' }} />
+                </div>
+                {!isLast && (
+                  <div
+                    className={`vj-mobile-connector ${isDone ? 'active' : ''}`}
+                    style={{
+                      height: 'calc(100% - 24px)',
+                      top: '28px'
+                    }}
+                  />
+                )}
+              </div>
+
+              {/* Step Content */}
+              <div className={`vj-mobile-content ${isNow ? 'current' : ''}`}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <strong style={{ fontSize: '13px', color: isNow ? 'var(--color-primary)' : 'var(--color-text-primary)' }}>
+                    {stage.label}
+                  </strong>
+                  <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)', background: '#F1F5F9', padding: '2px 6px', borderRadius: '4px' }}>
+                    0{idx + 1}
+                  </span>
+                </div>
+                <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: 1.4, margin: '0 0 6px 0' }}>
+                  {stage.desc}
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', flexWrap: 'wrap', gap: '4px' }}>
+                  <span style={{ color: isNow ? 'var(--color-primary)' : 'var(--color-text-muted)', fontWeight: isNow ? 600 : 400 }}>
+                    {stage.time}
+                  </span>
+                  {isDone && (
+                    <span style={{ color: '#059669', fontSize: '10px', fontWeight: 700 }}>
+                      ✓ Completed
+                    </span>
+                  )}
+                  {isNow && (
+                    <span style={{ color: '#0E5E3A', fontSize: '10px', fontWeight: 700, background: '#DCFCE7', padding: '1px 6px', borderRadius: '4px' }}>
+                      ● Current Stage
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
     </div>
   );
 }

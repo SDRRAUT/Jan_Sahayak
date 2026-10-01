@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
+import MobileBottomNav from './components/layout/MobileBottomNav';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
 import { useApp } from './context/AppContext';
@@ -127,10 +128,7 @@ export default function App() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Mobile → Desktop Mode prompt */}
-      <MobileDesktopBanner />
-
+    <div className="has-mobile-nav" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Docked Civic Navbar with RBAC Switcher */}
       <Navbar />
 
@@ -161,10 +159,9 @@ export default function App() {
             } 
           />
           
-          {/* Authentication & Onboarding Gateway */}
-          <Route path="/onboarding" element={<Onboarding />} />
           {/* Direct 1-Click Login Screen */}
           <Route path="/login" element={<Onboarding initialStep={4} skipSplash={true} />} />
+          <Route path="/login/form" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
           {/* Citizen Routes (Role: citizen, super_admin) */}
@@ -255,6 +252,9 @@ export default function App() {
 
       {/* JanSahayak Gemini AI Assistant (Accessible across Citizen, Officer & Admin) */}
       <JanSahayakAssistant />
+
+      {/* Modern Fixed Mobile Bottom Navigation */}
+      <MobileBottomNav />
 
       {/* First-Time Feature Announcement Popup: Civic Workforce */}
       <NewFeaturePopup />
