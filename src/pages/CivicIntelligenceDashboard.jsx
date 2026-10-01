@@ -19,7 +19,8 @@ import {
   Zap,
   Building2,
   Flame,
-  FileCheck
+  FileCheck,
+  Compass
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import ProblemSpreadMap from '../components/intelligence/ProblemSpreadMap';
@@ -27,6 +28,8 @@ import CrossDepartmentMatrix from '../components/intelligence/CrossDepartmentMat
 import CivicMemoryCard from '../components/intelligence/CivicMemoryCard';
 import CivicSignalModal from '../components/intelligence/CivicSignalModal';
 import LiveComplaintLinkageSection from '../components/intelligence/LiveComplaintLinkageSection';
+import TerritoryProblemModal from '../components/officer/TerritoryProblemModal';
+import JanSuchnaModal from '../components/officer/JanSuchnaModal';
 
 export default function CivicIntelligenceDashboard() {
   const { civicIncidents = [], civicSignals = [], intelligenceMetrics = {} } = useApp();
@@ -34,6 +37,8 @@ export default function CivicIntelligenceDashboard() {
   const [selectedStage, setSelectedStage] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSignalModal, setShowSignalModal] = useState(false);
+  const [showTerritoryModal, setShowTerritoryModal] = useState(false);
+  const [showJanSuchnaModal, setShowJanSuchnaModal] = useState(false);
 
   const filteredIncidents = civicIncidents.filter(inc => {
     const matchesStage = selectedStage === 'ALL' || inc.stage === selectedStage;
@@ -121,6 +126,56 @@ export default function CivicIntelligenceDashboard() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
               <button
                 type="button"
+                onClick={() => setShowTerritoryModal(true)}
+                style={{
+                  height: '42px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  padding: '0 18px',
+                  borderRadius: '999px',
+                  background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)',
+                  transition: 'all 150ms ease'
+                }}
+              >
+                <Compass style={{ width: '15px', height: '15px', color: '#FFFFFF' }} />
+                <span>🗺️ Territory Problem Explorer</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowJanSuchnaModal(true)}
+                style={{
+                  height: '42px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  padding: '0 18px',
+                  borderRadius: '999px',
+                  background: 'linear-gradient(135deg, #1E1B4B 0%, #4338CA 100%)',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 2px 8px rgba(67, 56, 202, 0.25)',
+                  transition: 'all 150ms ease'
+                }}
+              >
+                <Radio style={{ width: '15px', height: '15px', color: '#F59E0B' }} />
+                <span>📢 Create Jan Suchna Broadcast</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setShowSignalModal(true)}
                 style={{
                   height: '42px',
@@ -141,7 +196,7 @@ export default function CivicIntelligenceDashboard() {
                 }}
               >
                 <Radio style={{ width: '15px', height: '15px', color: '#10B981' }} />
-                <span>+ Report Early Warning Signal</span>
+                <span>+ Report Signal</span>
               </button>
             </div>
           </div>
@@ -727,6 +782,19 @@ export default function CivicIntelligenceDashboard() {
         )}
 
       </div>
+
+      {/* Territory Problem Explorer Modal (Today, Pending, Solved + Wagholi Pockets) */}
+      <TerritoryProblemModal
+        isOpen={showTerritoryModal}
+        onClose={() => setShowTerritoryModal(false)}
+        selectedWard="Wagholi Municipal Ward 27-31"
+      />
+
+      {/* Jan Suchna (जन सूचना) Broadcast Modal */}
+      <JanSuchnaModal
+        isOpen={showJanSuchnaModal}
+        onClose={() => setShowJanSuchnaModal(false)}
+      />
 
       {/* Citizen Signal Submission Modal */}
       <CivicSignalModal

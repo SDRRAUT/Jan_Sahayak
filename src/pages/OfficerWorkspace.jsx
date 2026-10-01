@@ -62,7 +62,6 @@ import CrossDepartmentMatrix from '../components/intelligence/CrossDepartmentMat
 import ActionSimulationCard from '../components/intelligence/ActionSimulationCard';
 import LiveComplaintLinkageSection from '../components/intelligence/LiveComplaintLinkageSection';
 import EditorialComplaintCard, { ComplaintDetailModal } from '../components/common/EditorialComplaintCard';
-import TerritoryProblemModal from '../components/officer/TerritoryProblemModal';
 import JanSuchnaModal from '../components/officer/JanSuchnaModal';
 
 export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
@@ -670,45 +669,17 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
             gap: '10px'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              {/* Button 1: Territory Problem Explorer Modal Trigger */}
-              <button
-                type="button"
-                onClick={() => setShowTerritoryModal(true)}
+              <Link
+                to="/intelligence"
                 style={{
                   height: '38px',
                   padding: '0 16px',
                   borderRadius: '999px',
-                  background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+                  background: 'linear-gradient(135deg, #312E81 0%, #4338CA 100%)',
                   color: '#FFFFFF',
                   fontSize: '12.5px',
                   fontWeight: 700,
-                  border: 'none',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.15)',
-                  transition: 'all 150ms ease'
-                }}
-              >
-                <Compass style={{ width: '14px', height: '14px', color: '#38BDF8' }} />
-                <span>🗺️ Territory Problem Explorer (Today, Pending, Solved)</span>
-              </button>
-
-              {/* Button 2: Jan Suchna Broadcast Trigger */}
-              <button
-                type="button"
-                onClick={() => setShowJanSuchnaModal(true)}
-                style={{
-                  height: '38px',
-                  padding: '0 16px',
-                  borderRadius: '999px',
-                  background: 'linear-gradient(135deg, #1E1B4B 0%, #4338CA 100%)',
-                  color: '#FFFFFF',
-                  fontSize: '12.5px',
-                  fontWeight: 700,
-                  border: 'none',
-                  cursor: 'pointer',
+                  textDecoration: 'none',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
@@ -716,9 +687,9 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   transition: 'all 150ms ease'
                 }}
               >
-                <Radio style={{ width: '14px', height: '14px', color: '#F59E0B' }} />
-                <span>📢 Create Jan Suchna Broadcast</span>
-              </button>
+                <Sparkles style={{ width: '14px', height: '14px', color: '#FDE047' }} />
+                <span>Civic Intelligence Hub ↗</span>
+              </Link>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
@@ -3119,13 +3090,6 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
             }}
           />
         )}
-
-        {/* Territory Problem Explorer Modal (Today's, Pending, Solved + Mapped vs Unique) */}
-        <TerritoryProblemModal
-          isOpen={showTerritoryModal}
-          onClose={() => setShowTerritoryModal(false)}
-          selectedWard="Ward 14 (Rohini Sector 14 & Wagholi Sub-Division)"
-        />
 
         {/* Jan Suchna (जन सूचना) Broadcast Modal */}
         <JanSuchnaModal
