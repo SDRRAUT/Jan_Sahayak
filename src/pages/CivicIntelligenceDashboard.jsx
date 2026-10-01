@@ -217,119 +217,107 @@ export default function CivicIntelligenceDashboard() {
           </div>
         </div>
 
-        {/* ── 4 Executive Metric Tiles ── */}
+        {/* ── 4 Executive Metric Tiles (Minimalist & Easy to Read) ── */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '14px',
-          marginBottom: '24px'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '12px',
+          marginBottom: '20px'
         }}>
           {/* KPI 1 */}
           <div style={{
-            padding: '16px 20px',
-            borderRadius: '16px',
+            padding: '14px 16px',
+            borderRadius: '12px',
             background: '#FFFFFF',
             border: '1px solid #E2E8F0',
-            boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)'
+            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.04em' }}>
-                Active Civic Incidents
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: '#64748B' }}>
+                Active Incidents
               </span>
-              <AlertTriangle style={{ width: '16px', height: '16px', color: '#DC2626' }} />
+              <AlertTriangle style={{ width: '15px', height: '15px', color: '#EF4444' }} />
             </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-              <span style={{ fontSize: '28px', fontWeight: 800, color: '#0F172A', fontFamily: 'var(--font-mono)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A' }}>
                 {civicIncidents.length}
               </span>
-              <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#DC2626', background: '#FEF2F2', padding: '1px 6px', borderRadius: '6px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: '#EF4444', background: '#FEF2F2', padding: '2px 8px', borderRadius: '6px' }}>
                 2 Multi-Ward
               </span>
             </div>
-            <span style={{ fontSize: '11.5px', color: '#64748B', marginTop: '4px', display: 'block' }}>
-              Synthesized from 67 citizen reports
-            </span>
           </div>
 
           {/* KPI 2 */}
           <div style={{
-            padding: '16px 20px',
-            borderRadius: '16px',
+            padding: '14px 16px',
+            borderRadius: '12px',
             background: '#FFFFFF',
             border: '1px solid #E2E8F0',
-            boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)'
+            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.04em' }}>
-                Early Signals Ingested
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: '#64748B' }}>
+                Signals Detected
               </span>
-              <Radio style={{ width: '16px', height: '16px', color: '#4F46E5' }} />
+              <Radio style={{ width: '15px', height: '15px', color: '#6366F1' }} />
             </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-              <span style={{ fontSize: '28px', fontWeight: 800, color: '#4338CA', fontFamily: 'var(--font-mono)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '24px', fontWeight: 800, color: '#4F46E5' }}>
                 {civicSignals.length + 42}
               </span>
-              <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#059669', background: '#ECFDF5', padding: '1px 6px', borderRadius: '6px' }}>
-                ↑ 34% Early Catch
+              <span style={{ fontSize: '11px', fontWeight: 600, color: '#059669', background: '#ECFDF5', padding: '2px 8px', borderRadius: '6px' }}>
+                +34% Early
               </span>
             </div>
-            <span style={{ fontSize: '11.5px', color: '#64748B', marginTop: '4px', display: 'block' }}>
-              Audio & pre-complaint hints
-            </span>
           </div>
 
           {/* KPI 3 */}
           <div style={{
-            padding: '16px 20px',
-            borderRadius: '16px',
+            padding: '14px 16px',
+            borderRadius: '12px',
             background: '#FFFFFF',
             border: '1px solid #E2E8F0',
-            boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)'
+            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.04em' }}>
-                Multi-Dept Operations
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: '#64748B' }}>
+                Joint Operations
               </span>
-              <Building2 style={{ width: '16px', height: '16px', color: '#D97706' }} />
+              <Building2 style={{ width: '15px', height: '15px', color: '#F59E0B' }} />
             </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-              <span style={{ fontSize: '28px', fontWeight: 800, color: '#D97706', fontFamily: 'var(--font-mono)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '24px', fontWeight: 800, color: '#D97706' }}>
                 2
               </span>
-              <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#92400E', background: '#FEF3C7', padding: '1px 6px', borderRadius: '6px' }}>
-                PMC + PWD + MSEDCL
+              <span style={{ fontSize: '11px', fontWeight: 600, color: '#B45309', background: '#FEF3C7', padding: '2px 8px', borderRadius: '6px' }}>
+                Multi-Agency
               </span>
             </div>
-            <span style={{ fontSize: '11.5px', color: '#64748B', marginTop: '4px', display: 'block' }}>
-              Joint inter-agency work orders
-            </span>
           </div>
 
           {/* KPI 4 */}
           <div style={{
-            padding: '16px 20px',
-            borderRadius: '16px',
+            padding: '14px 16px',
+            borderRadius: '12px',
             background: '#FFFFFF',
             border: '1px solid #E2E8F0',
-            boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)'
+            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.04em' }}>
-                Avg Problem Discovery
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: '#64748B' }}>
+                Avg Discovery Speed
               </span>
-              <Clock style={{ width: '16px', height: '16px', color: '#059669' }} />
+              <Clock style={{ width: '15px', height: '15px', color: '#10B981' }} />
             </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-              <span style={{ fontSize: '28px', fontWeight: 800, color: '#059669', fontFamily: 'var(--font-mono)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '24px', fontWeight: 800, color: '#059669' }}>
                 6.2h
               </span>
-              <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#059669', background: '#ECFDF5', padding: '1px 6px', borderRadius: '6px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: '#059669', background: '#ECFDF5', padding: '2px 8px', borderRadius: '6px' }}>
                 93% Faster
               </span>
             </div>
-            <span style={{ fontSize: '11.5px', color: '#64748B', marginTop: '4px', display: 'block' }}>
-              vs 96h traditional manual triage
-            </span>
           </div>
         </div>
 
