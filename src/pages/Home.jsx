@@ -39,6 +39,8 @@ import citizenBg from '../assets/citizen-bg.jpg';
 import WhyExplainer from '../components/common/WhyExplainer';
 import FileGrievanceModal from '../components/common/FileGrievanceModal';
 import LeafletSpreadMap from '../components/common/LeafletSpreadMap';
+import JanSuchnaBanner from '../components/common/JanSuchnaBanner';
+import { useApp } from '../context/AppContext';
 
 const FOUR_STEPS = [
   {
@@ -100,6 +102,7 @@ const FOUR_STEPS = [
 ];
 
 export default function Home() {
+  const { user } = useApp();
   const [showGrievanceModal, setShowGrievanceModal] = useState(false);
   const [mapCategory, setMapCategory] = useState('ALL');
   const [activeWardIndex, setActiveWardIndex] = useState(0);
@@ -560,6 +563,9 @@ export default function Home() {
           }}
         />
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+          {/* Active Jan Suchna Public Advisory Banner */}
+          <JanSuchnaBanner citizenWard={user?.ward || 'Ward 14 (Rohini Sector 14)'} />
+
           <div style={{
             maxWidth: '840px',
             margin: '0 auto',

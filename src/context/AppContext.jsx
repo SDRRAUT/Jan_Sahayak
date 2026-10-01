@@ -23,6 +23,46 @@ export const DEMO_CREDENTIALS = {
   dept_admin: { email: 'civic.officer@djb.gov.in', password: 'civicofficer123', label: 'Civic Officer (Department Operations Lead)' }
 };
 
+// Pre-seeded Jan Suchna (जन सूचना) Public Advisories
+export const INITIAL_JAN_SUCHNA = [
+  {
+    id: 'JS-2026-001',
+    title: '⚡ 4-Hour Scheduled Electricity Grid Maintenance — Wagholi & Ward 14',
+    category: 'Electricity / Power Grid',
+    ward: 'Wagholi (Ward 14 / Sector 14)',
+    affectedAreas: ['Wagholi Sub-Division', 'Pocket 2', 'Main Market', 'Sector 14'],
+    startTime: 'Today, 10:00 AM',
+    endTime: '02:00 PM',
+    duration: '4 Hours',
+    status: 'ACTIVE',
+    severity: 'HIGH',
+    department: 'BSES & Maharashtra State Electricity Board (MSEB)',
+    officerName: 'Er. Sanjay Sharma',
+    officerDesignation: 'Executive Engineer',
+    instructions: 'Sub-station transformer upgrade underway. High-voltage backup systems active for medical centers. Please keep essential devices charged.',
+    helpline: '1800-11-2222 / +91 98111-90021',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'JS-2026-002',
+    title: '💧 Drinking Water Trunkline Hydro-Testing & Chlorination',
+    category: 'Water Supply',
+    ward: 'Ward 14 (Rohini Sector 14)',
+    affectedAreas: ['Pocket 1', 'Pocket 2', 'Arterial Road 14'],
+    startTime: 'Tomorrow, 06:00 AM',
+    endTime: '09:00 AM',
+    duration: '3 Hours',
+    status: 'SCHEDULED',
+    severity: 'MEDIUM',
+    department: 'Delhi Jal Board (DJB)',
+    officerName: 'Er. Sanjay Sharma',
+    officerDesignation: 'AEE (Civil & Water Works)',
+    instructions: 'Water supply will be regulated for 3 hours to perform pressure stabilization. Complimentary water tankers dispatched on standby.',
+    helpline: '1916 (DJB Citizen Helpline)',
+    createdAt: new Date(Date.now() - 3600000).toISOString()
+  }
+];
+
 // Full profile objects for offline and instant demo switching
 export const DEMO_USERS = {
   citizen: {
@@ -148,6 +188,19 @@ export function AppProvider({ children }) {
       return INITIAL_NOTIFICATIONS;
     }
   });
+
+  const [janSuchnaList, setJanSuchnaList] = useState(() => {
+    try {
+      const saved = localStorage.getItem('jansahayk_jan_suchna');
+      return saved ? JSON.parse(saved) : INITIAL_JAN_SUCHNA;
+    } catch (e) {
+      return INITIAL_JAN_SUCHNA;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('jansahayk_jan_suchna', JSON.stringify(janSuchnaList));
+  }, [janSuchnaList]);
 
   const [auditLogs, setAuditLogs] = useState([]);
   const [slaRules, setSlaRules] = useState([]);
@@ -1488,6 +1541,141 @@ export function AppProvider({ children }) {
     return false;
   }).length;
 
+  // Jan Suchna (जन सूचना) Public Civic Advisory Broadcasts
+  const broadcastJanSuchna = (suchnaData) => {
+    const newSuchna = {
+      id: `JS-2026-${String(Date.now()).slice(-4)}`,
+      status: 'ACTIVE',
+      createdAt: new Date().toISOString(),
+      ...suchnaData
+    };
+
+    setJanSuchnaList(prev => [newSuchna, ...prev]);
+
+    // Push high-priority public advisory notification
+    const notif = {
+      id: `NOTIF-JS-${Date.now()}`,
+      type: 'JAN_SUCHNA',
+      priority: suchnaData.severity === 'HIGH' ? 'URGENT' : 'NORMAL',
+      title: `📢 जन सूचना: ${suchnaData.title}`,
+      message: `${suchnaData.instructions || suchnaData.description || 'Public maintenance underway.'} (Duration: ${suchnaData.duration || 'Scheduled'})`,
+      ward: suchnaData.ward,
+      timestamp: 'Just now',
+      read: false,
+      userRole: 'citizen'
+    };
+
+    setNotifications(prev => [notif, ...prev]);
+    return newSuchna;
+  };
+
+  const deleteJanSuchna = (id) => {
+    setJanSuchnaList(prev => prev.filter(s => s.id !== id));
+  };
+
+  // Civic Intelligence Officer Multi-Aspect Performance Evaluation Grade & Reward
+  const calculateOfficerGrade = (officer = user) => {
+    const defaultOfficer = {
+      name: officer?.name || 'Er. Sanjay Sharma',
+      department: officer?.department || 'Delhi Jal Board (DJB)',
+      zone: officer?.zone || 'Zone North-West (Rohini & Wagholi)'
+    };
+
+    const slaScore = 96; // 96% resolved before target SLA
+    const citizenSatisfactionScore = 95; // 4.9/5 star citizen rating
+    const recurrencePreventionScore = 92; // 92% zero recurrence rate
+    const crossDeptTeamworkScore = 95; // Joint PWD + DJB + MCD coordination
+    const janSuchnaProactivenessScore = (janSuchnaList && janSuchnaList.length > 0) ? 98 : 92; // Proactive notices
+
+    const compositeScore = Math.round(
+      (slaScore * 0.25) +
+      (citizenSatisfactionScore * 0.25) +
+      (recurrencePreventionScore * 0.20) +
+      (crossDeptTeamworkScore * 0.15) +
+      (janSuchnaProactivenessScore * 0.15)
+    );
+
+    return {
+      officer: defaultOfficer,
+      score: (compositeScore + 0.8).toFixed(1), // e.g. 94.8 / 100
+      letterGrade: 'A+',
+      honorTitle: 'Executive Civic Champion',
+      shieldTier: 'Platinum Civic Champion Shield',
+      shieldColor: '#4F46E5',
+      awardedBy: 'Chief Municipal Commissioner & Urban Governance Council',
+      aspects: [
+        { key: 'sla', label: '⏱️ SLA Fix Velocity', score: slaScore, detail: '96% on-time resolution turnaround' },
+        { key: 'trust', label: '👥 Citizen Trust & Feedback', score: citizenSatisfactionScore, detail: '4.9 ★ verified satisfaction score' },
+        { key: 'prevention', label: '🧬 Root-Cause Prevention', score: recurrencePreventionScore, detail: '92% zero-repeat infrastructure fix' },
+        { key: 'coordination', label: '🤝 Cross-Dept Teamwork', score: crossDeptTeamworkScore, detail: 'DJB + PWD + MCD joint operations' },
+        { key: 'advisory', label: '📢 Jan Suchna Proactiveness', score: janSuchnaProactivenessScore, detail: `${janSuchnaList.length} proactive public advisories issued` }
+      ]
+    };
+  };
+
+  // Territory Problem Explorer Aggregator (Today's, Pending, Solved, Mapped vs Unique)
+  const getTerritoryProblemBreakdown = (targetWard = 'Ward 14 (Rohini Sector 14)') => {
+    const territoryComplaints = grievances.filter(g => {
+      const gWard = (g.location?.ward || '').toLowerCase();
+      const target = (targetWard || '').toLowerCase().split('(')[0].trim();
+      return !target || gWard.includes(target) || gWard.includes('rohini') || gWard.includes('wagholi');
+    });
+
+    const today = territoryComplaints.filter(g => {
+      return g.status === 'INGESTED' || g.status === 'ANALYZED' || g.urgency === 'CRITICAL' || (g.createdAt && g.createdAt.includes('2026'));
+    });
+
+    const pending = territoryComplaints.filter(g => {
+      return g.status === 'IN_PROGRESS' || g.status === 'ACTION_DISPATCHED' || g.status === 'INVESTIGATION' || g.status === 'VERIFICATION_PENDING';
+    });
+
+    const solved = territoryComplaints.filter(g => {
+      return g.status === 'RESOLVED' || g.status === 'ACTION_COMPLETED';
+    });
+
+    const mapped = territoryComplaints.filter(g => {
+      return Boolean(g.clusterId || g.incidentId);
+    });
+
+    const unique = territoryComplaints.filter(g => {
+      return !g.clusterId && !g.incidentId;
+    });
+
+    const priorityZones = [
+      {
+        id: 'PZ-01',
+        pocket: 'Pocket 2 & Main Trunkline Corridor (Wagholi / Rohini)',
+        severity: 'CRITICAL',
+        issue: 'Underground pipeline joint leakage near school',
+        complaintCount: 14,
+        leadDept: 'Delhi Jal Board (DJB)',
+        status: 'EMERGENCY_REPAIR',
+        urgency: 'Immediate Action Needed'
+      },
+      {
+        id: 'PZ-02',
+        pocket: 'Main Market Sector 14 / Wagholi Plaza',
+        severity: 'HIGH',
+        issue: 'Stormwater drain siltation causing backflow during peak hours',
+        complaintCount: 5,
+        leadDept: 'MCD / Municipal Works',
+        status: 'DESILTING_SQUAD_DEPLOYED',
+        urgency: 'High Priority'
+      }
+    ];
+
+    return {
+      territoryName: targetWard,
+      total: territoryComplaints.length,
+      today,
+      pending,
+      solved,
+      mapped,
+      unique,
+      priorityZones
+    };
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -1514,6 +1702,11 @@ export function AppProvider({ children }) {
         civicIncidents,
         civicSignals,
         intelligenceMetrics: CIVIC_INTELLIGENCE_METRICS,
+        janSuchnaList,
+        broadcastJanSuchna,
+        deleteJanSuchna,
+        calculateOfficerGrade,
+        getTerritoryProblemBreakdown,
         submitCivicSignal,
         recordIncidentDecision,
         verifyIncidentResolution,
