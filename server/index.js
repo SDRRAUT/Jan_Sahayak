@@ -2492,15 +2492,15 @@ let CIVIC_INCIDENTS_DB = [
     timeline: [
       { date: "12 Sept", time: "08:15 AM", stage: "First Weak Signal Detected", desc: "Citizen voice note SIG-2026-001 logged water trickling out from road seam near Mother Dairy booth.", count: 1, source: "Citizen Signal" },
       { date: "13 Sept", time: "09:30 AM", stage: "Signal Cluster Formation", desc: "5 related citizen observations logged within 250m radius describing pressure loss and damp asphalt.", count: 6, source: "AI Clustering" },
-      { date: "14 Sept", time: "11:00 AM", stage: "Formal Complaint Wave", desc: "12 formal citizen grievances submitted. AI Incident Engine aggregates signals into Civic Incident INC-2026-DEL-01.", count: 18, source: "Incident Engine" },
-      { date: "15 Sept", time: "02:20 PM", stage: "Geographic Spread Detected", desc: "Seepage crossed jurisdictional ward boundary from Ward 12 into Ward 14 Pocket 2.", count: 26, source: "Geographic Engine" },
-      { date: "16 Sept", time: "04:45 PM", stage: "Cross-Department Linkage", desc: "PWD received 3 road depression reports along the identical pipeline corridor. MCD reported drain backflow.", count: 32, source: "Cross-Dept Detector" },
-      { date: "17 Sept", time: "09:00 AM", stage: "Escalation to GROWING Stage", desc: "Signal velocity reached +240%. High public distress triggers multi-department supervisory alert.", count: 37, source: "Escalation Engine" }
+      { date: "30 Sept", time: "11:00 AM", stage: "Formal Complaint Wave", desc: "12 formal citizen grievances submitted. AI Incident Engine aggregates signals into Civic Incident INC-2026-PUNE-WAG-01.", count: 18, source: "Incident Engine" },
+      { date: "01 Oct", time: "02:20 PM", stage: "Geographic Spread Detected", desc: "Seepage crossed jurisdictional ward boundary from Wagholi Ward 29 into Ward 27.", count: 26, source: "Geographic Engine" },
+      { date: "01 Oct", time: "04:45 PM", stage: "Cross-Department Linkage", desc: "PWD received road depression reports along Nagar Road corridor. PMC reported drain backflow.", count: 32, source: "Cross-Dept Detector" },
+      { date: "02 Oct", time: "09:00 AM", stage: "Escalation to GROWING Stage", desc: "Signal velocity reached +240%. High public distress triggers multi-department supervisory alert.", count: 37, source: "Escalation Engine" }
     ],
     spreadGeo: [
-      { step: "Day 1 (Sep 12)", ward: "Ward 12 (Origin)", lat: 28.7160, lng: 77.1230, radiusMeters: 140, signalCount: 2, label: "Initial weak signal at pipeline valve pit", color: "#10B981" },
-      { step: "Day 3 (Sep 14)", ward: "Ward 12 & Ward 14 (Pocket 1)", lat: 28.7175, lng: 77.1248, radiusMeters: 420, signalCount: 18, label: "Subsurface spread to Pocket 1 residential loop", color: "#F59E0B" },
-      { step: "Day 5 (Sep 16-17)", ward: "Ward 12, 13 & 14 (Arterial Corridor)", lat: 28.7190, lng: 77.1270, radiusMeters: 920, signalCount: 37, label: "Full corridor impact: drinking water + road dip + drain backflow", color: "#EF4444" }
+      { step: "Day 1 (Sep 28)", ward: "Wagholi Ward 29 (Origin)", lat: 18.5760, lng: 73.9810, radiusMeters: 140, signalCount: 2, label: "Initial weak signal at Kesnand Rd valve pit", color: "#10B981" },
+      { step: "Day 3 (Sep 30)", ward: "Wagholi Ward 29 (Ivy Estate Loop)", lat: 18.5768, lng: 73.9818, radiusMeters: 420, signalCount: 18, label: "Subsurface spread to Ivy Estate residential loop", color: "#F59E0B" },
+      { step: "Day 5 (Oct 01)", ward: "Wagholi Wards 27, 28 & 29 (Arterial Corridor)", lat: 18.5785, lng: 73.9830, radiusMeters: 850, signalCount: 37, label: "Full corridor impact: drinking water + road dip + drain backflow", color: "#EF4444" }
     ],
     rootCauseHypotheses: [
       {

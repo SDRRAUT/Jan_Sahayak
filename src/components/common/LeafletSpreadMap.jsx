@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Radio, AlertTriangle, Layers, RotateCcw } from 'lucide-react';
+import { Radio, AlertTriangle, Layers, RotateCcw, MapPin, Flame, ShieldAlert, Sparkles, Building2 } from 'lucide-react';
 
-// Tile providers
+// Tile providers (Esri Satellite & Esri/OSM Street maps)
 const SPREAD_TILES = {
   osm: {
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -14,13 +14,17 @@ const SPREAD_TILES = {
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
     attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
   },
+  street: {
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> Wagholi, Pune'
+  },
   satellite: {
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS'
   }
 };
 
-// Sub-component to control map camera when selectedDay or data changes
+// Sub-component to smoothly pan map camera when selectedDay or hotspot changes
 function SpreadMapController({ center, zoom, resetTrigger }) {
   const map = useMap();
 
@@ -39,7 +43,7 @@ function SpreadMapController({ center, zoom, resetTrigger }) {
   return null;
 }
 
-// Custom DivIcon for contamination epicenters
+// Custom DivIcon for contamination epicenters (Day 1, 3, 5 progression)
 const createEpicenterIcon = (point, isCurrent) => {
   const size = isCurrent ? 36 : 28;
   const html = `
@@ -67,10 +71,10 @@ const createEpicenterIcon = (point, isCurrent) => {
       </div>
       <div style="
         margin-top: 3px;
-        padding: 2px 6px;
-        background: rgba(11, 21, 32, 0.92);
+        padding: 2px 7px;
+        background: rgba(11, 21, 32, 0.95);
         color: #FFFFFF;
-        border: 1px solid rgba(255,255,255,0.25);
+        border: 1px solid rgba(255,255,255,0.3);
         border-radius: 4px;
         font-size: 9.5px;
         font-weight: 700;
@@ -108,71 +112,250 @@ const createSignalIcon = () => {
   });
 };
 
-export const WAGHOLI_SPREAD_POINTS = [
+// Custom DivIcon for AI Problem Hotspots
+const createHotspotIcon = (hotspot, isSelected) => {
+  const size = isSelected ? 38 : 30;
+  const html = `
+    <div style="
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+    ">
+      <div style="
+        width: ${size}px;
+        height: ${size}px;
+        border-radius: 50%;
+        background: ${hotspot.color};
+        border: 2.5px solid #FFFFFF;
+        box-shadow: 0 0 16px ${hotspot.color}, 0 4px 12px rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: ${isSelected ? '15px' : '12px'};
+        z-index: 2;
+      ">
+        ${hotspot.icon || '🔥'}
+      </div>
+      <div style="
+        margin-top: 3px;
+        padding: 2px 8px;
+        background: rgba(15, 23, 42, 0.94);
+        color: #FFFFFF;
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 999px;
+        font-size: 9.5px;
+        font-weight: 800;
+        white-space: nowrap;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        z-index: 2;
+      ">
+        ${hotspot.name}
+      </div>
+    </div>
+  `;
+  return L.divIcon({
+    html,
+    className: 'custom-hotspot-icon',
+    iconSize: [0, 0]
+  });
+};
+
+// REAL WAGHOLI, PUNE AI CLUSTER HOTSPOTS
+export const WAGHOLI_AI_HOTSPOTS = [
   {
-    step: 'Day 1 (Oct 1)',
-    ward: 'Wagholi Ward 28 (Baif Road Market)',
-    lat: 18.5815,
-    lng: 73.9840,
-    radiusMeters: 180,
-    signalCount: 4,
-    label: 'Open dump yard accumulation at Baif Road market junction',
-    color: '#EF4444'
-  },
-  {
-    step: 'Day 3 (Oct 3)',
+    id: 'HOTSPOT-WAG-01',
+    name: 'Ivy Estate Pipeline Rupture',
+    category: 'Water Supply & Contamination',
     ward: 'Wagholi Ward 29 (Ivy Estate & Kesnand Rd)',
     lat: 18.5760,
     lng: 73.9810,
     radiusMeters: 450,
+    activeComplaints: 37,
+    severity: 'CRITICAL',
+    color: '#EF4444',
+    icon: '💧',
+    dept: 'PMC Water Supply Department',
+    action: 'Feeder isolation & 200mm HDPE coupling underway',
+    slaRisk: 'High (12h overdue)'
+  },
+  {
+    id: 'HOTSPOT-WAG-02',
+    name: 'Baif Road SWM Overflow',
+    category: 'Sanitation & Solid Waste',
+    ward: 'Wagholi Ward 28 (Baif Road Market)',
+    lat: 18.5815,
+    lng: 73.9840,
+    radiusMeters: 320,
+    activeComplaints: 22,
+    severity: 'EMERGING',
+    color: '#F59E0B',
+    icon: '🗑️',
+    dept: 'PMC Solid Waste Management',
+    action: 'Compactor deployment & stormwater culvert clearing',
+    slaRisk: 'Medium (Within 24h SLA)'
+  },
+  {
+    id: 'HOTSPOT-WAG-03',
+    name: 'Raisoni Chowk 11kV Arcing',
+    category: 'Electricity & Power Grid',
+    ward: 'Wagholi Ward 27 (Nagar Road & Raisoni)',
+    lat: 18.5802,
+    lng: 73.9785,
+    radiusMeters: 220,
+    activeComplaints: 11,
+    severity: 'HIGH_ALERT',
+    color: '#8B5CF6',
+    icon: '⚡',
+    dept: 'MSEDCL Wagholi Sub-Division',
+    action: 'Transformer load rebalancing & bushing replacement',
+    slaRisk: 'Critical (Fire Hazard)'
+  },
+  {
+    id: 'HOTSPOT-WAG-04',
+    name: 'Lexicon School Highway Potholes',
+    category: 'Roads & Infrastructure',
+    ward: 'Wagholi Ward 27 (Pune-Nagar Highway)',
+    lat: 18.5780,
+    lng: 73.9790,
+    radiusMeters: 380,
+    activeComplaints: 19,
+    severity: 'GROWING',
+    color: '#F97316',
+    icon: '🚧',
+    dept: 'Public Works Department (PWD Pune)',
+    action: 'Mastic asphalt patching & highway shoulder leveling',
+    slaRisk: 'Medium (In Progress)'
+  },
+  {
+    id: 'HOTSPOT-WAG-05',
+    name: 'Domkhel Road Sewerage Backflow',
+    category: 'Drainage & Waterlogging',
+    ward: 'Wagholi Ward 30 (Domkhel Road)',
+    lat: 18.5770,
+    lng: 73.9860,
+    radiusMeters: 260,
+    activeComplaints: 14,
+    severity: 'GROWING',
+    color: '#06B6D4',
+    icon: '🌊',
+    dept: 'PMC Water Supply & Drainage',
+    action: 'Suction jetting machine dispatched to clear blockage',
+    slaRisk: 'Low (Within 48h SLA)'
+  },
+  {
+    id: 'HOTSPOT-WAG-06',
+    name: 'Bakori Road Surface Cavities',
+    category: 'Roads & Infrastructure',
+    ward: 'Wagholi Ward 31 (Bakori Road)',
+    lat: 18.5835,
+    lng: 73.9890,
+    radiusMeters: 300,
+    activeComplaints: 16,
+    severity: 'NORMAL',
+    color: '#64748B',
+    icon: '🛣️',
+    dept: 'PWD Pune Division',
+    action: 'Grading and aggregate leveling scheduled',
+    slaRisk: 'Normal'
+  }
+];
+
+// REAL WAGHOLI SPREAD TIMELINE POINTS
+export const WAGHOLI_SPREAD_POINTS = [
+  {
+    step: 'Day 1 (Sep 28)',
+    ward: 'Wagholi Ward 29 (Origin: Kesnand Road)',
+    lat: 18.5760,
+    lng: 73.9810,
+    radiusMeters: 140,
+    signalCount: 2,
+    label: 'Origin: Subterranean valve fracture near Kesnand Road valve pit',
+    color: '#10B981'
+  },
+  {
+    step: 'Day 3 (Sep 30)',
+    ward: 'Wagholi Ward 29 (Ivy Estate Loop)',
+    lat: 18.5768,
+    lng: 73.9818,
+    radiusMeters: 420,
     signalCount: 18,
-    label: 'Feeder pipe rupture under Kesnand Road; water pressure collapse',
+    label: 'Subsurface seep along Kesnand utility corridor to Ivy Estate towers',
     color: '#F59E0B'
   },
   {
-    step: 'Day 5 (Oct 5)',
-    ward: 'Wagholi Ward 27 (Nagar Road Corridor)',
-    lat: 18.5780,
-    lng: 73.9790,
+    step: 'Day 5 (Oct 01)',
+    ward: 'Corridor: Wagholi Wards 27, 28 & 29',
+    lat: 18.5785,
+    lng: 73.9830,
     radiusMeters: 850,
-    signalCount: 32,
-    label: 'Highway asphalt cratering & waterlogging near Lexicon School',
-    color: '#10B981'
+    signalCount: 37,
+    label: 'Critical multi-ward impact across Wagholi distribution line & Highway',
+    color: '#EF4444'
   }
 ];
+
+// Coordinate sanitization: ensure coordinates fall within Wagholi, Pune bounds
+const sanitizeCoord = (pt, fallbackLat = 18.5785, fallbackLng = 73.9820) => {
+  if (!pt) return { lat: fallbackLat, lng: fallbackLng };
+  const lat = Number(pt.lat);
+  const lng = Number(pt.lng);
+  if (isNaN(lat) || isNaN(lng) || lat > 20 || lat < 17 || lng < 72 || lng > 76) {
+    return { ...pt, lat: fallbackLat, lng: fallbackLng };
+  }
+  return { ...pt, lat, lng };
+};
 
 export default function LeafletSpreadMap({
   dataPoints = [],
   selectedDay = 0,
-  activeLayer = 'spread',
-  mapMode = 'dark',
+  activeLayer = 'spread', // 'spread' | 'signals' | 'cluster' | 'hotspots' | 'affected'
+  mapMode = 'satellite',
   height = '420px',
   region = 'wagholi'
 }) {
-  const points = dataPoints && dataPoints.length > 0 ? dataPoints : WAGHOLI_SPREAD_POINTS;
-  const currentPoint = points[selectedDay] || points[0];
-  const centerCoord = currentPoint ? [currentPoint.lat, currentPoint.lng] : [18.5793, 73.9820];
+  const [selectedHotspot, setSelectedHotspot] = useState(null);
+  const [mapCenter, setMapCenter] = useState([18.5785, 73.9820]);
 
-  // Pipeline path coordinates along Wagholi Kesnand Road & Raisoni Chowk corridor
+  // Clean dataPoints with Wagholi coordinates
+  const rawPoints = (dataPoints && dataPoints.length > 0) ? dataPoints : WAGHOLI_SPREAD_POINTS;
+  const points = rawPoints.map((pt, idx) => {
+    const fallback = WAGHOLI_SPREAD_POINTS[idx] || WAGHOLI_SPREAD_POINTS[0];
+    return sanitizeCoord(pt, fallback.lat, fallback.lng);
+  });
+
+  const currentPoint = points[selectedDay] || points[points.length - 1] || WAGHOLI_SPREAD_POINTS[0];
+  
+  useEffect(() => {
+    if (currentPoint && currentPoint.lat && currentPoint.lng) {
+      setMapCenter([currentPoint.lat, currentPoint.lng]);
+    }
+  }, [selectedDay, currentPoint]);
+
+  // Pipeline path coordinates along Wagholi Kesnand Road, Ivy Estate & Raisoni Chowk corridor
   const pipelinePath = [
-    [18.5793, 73.9785],
-    [18.5760, 73.9810],
-    [18.5740, 73.9920]
+    [18.5802, 73.9785], // Raisoni Chowk
+    [18.5780, 73.9790], // Lexicon School
+    [18.5760, 73.9810], // Ivy Estate Gate #1
+    [18.5770, 73.9860], // Domkhel Road
+    [18.5815, 73.9840]  // Baif Road Market
   ];
 
-  // Derived citizen signal GPS locations distributed along the Wagholi corridor
+  // Derived citizen signal GPS locations distributed along actual Wagholi streets
   const signalCoords = [
-    { id: 'SIG-1', pos: [18.5790, 73.9780], title: 'Low pressure & chlorine smell', time: 'Day 1' },
-    { id: 'SIG-2', pos: [18.5795, 73.9788], title: 'Valve pit seeping water', time: 'Day 1' },
-    { id: 'SIG-3', pos: [18.5780, 73.9795], title: 'Road dampness on Nagar Road Highway', time: 'Day 2' },
-    { id: 'SIG-4', pos: [18.5765, 73.9815], title: 'Turbid tap water in Ivy Estate', time: 'Day 3' },
-    { id: 'SIG-5', pos: [18.5755, 73.9830], title: 'Drain backflow near community center', time: 'Day 3' },
-    { id: 'SIG-6', pos: [18.5748, 73.9860], title: 'Water puddle on Kesnand road', time: 'Day 4' },
-    { id: 'SIG-7', pos: [18.5742, 73.9900], title: 'Contaminated supply in school zone', time: 'Day 5' },
-    { id: 'SIG-8', pos: [18.5738, 73.9930], title: 'Road cavity near Wagheshwar chowk', time: 'Day 5' }
+    { id: 'SIG-WAG-01', pos: [18.5762, 73.9808], title: 'Continuous drinking water leakage at Ivy Estate Gate #1', time: '10 min ago', citizen: 'Rahul R.', ward: 'Ward 29', dept: 'PMC Water' },
+    { id: 'SIG-WAG-02', pos: [18.5766, 73.9815], title: 'Tap water smells foul like drainage in Ivy Estate Tower B', time: '25 min ago', citizen: 'Priya K.', ward: 'Ward 29', dept: 'PMC Water' },
+    { id: 'SIG-WAG-03', pos: [18.5772, 73.9822], title: 'Water pressure collapse on 1st & 2nd floors along Kesnand road', time: '1 hr ago', citizen: 'Amit S.', ward: 'Ward 29', dept: 'PMC Water' },
+    { id: 'SIG-WAG-04', pos: [18.5812, 73.9838], title: 'Sunken road asphalt near Baif Road entry junction', time: '2 hrs ago', citizen: 'Kavita M.', ward: 'Ward 28', dept: 'PWD Pune' },
+    { id: 'SIG-WAG-05', pos: [18.5756, 73.9788], title: 'Water pooling near Lexicon Kids school boundary', time: '3 hrs ago', citizen: 'Suresh D.', ward: 'Ward 27', dept: 'PMC Water' },
+    { id: 'SIG-WAG-06', pos: [18.5818, 73.9842], title: 'Baif Road vegetable market corner has massive open garbage dump', time: '4 hrs ago', citizen: 'Sunil J.', ward: 'Ward 28', dept: 'PMC SWM' },
+    { id: 'SIG-WAG-07', pos: [18.5803, 73.9783], title: 'Transformer near Raisoni College gate making loud sparking noise', time: '5 hrs ago', citizen: 'Vikas N.', ward: 'Ward 27', dept: 'MSEDCL' },
+    { id: 'SIG-WAG-08', pos: [18.5770, 73.9860], title: 'Sewer manhole overflowing onto Domkhel road', time: '6 hrs ago', citizen: 'Anjali P.', ward: 'Ward 30', dept: 'PMC Drainage' }
   ];
 
-  const tile = SPREAD_TILES[mapMode] || SPREAD_TILES.dark;
+  const tile = SPREAD_TILES[mapMode] || SPREAD_TILES.satellite;
 
   return (
     <div style={{
@@ -185,9 +368,9 @@ export default function LeafletSpreadMap({
       boxShadow: '0 8px 24px rgba(0,0,0,0.3)'
     }}>
       <MapContainer
-        center={centerCoord}
+        center={mapCenter}
         zoom={15}
-        minZoom={12}
+        minZoom={13}
         maxZoom={18}
         zoomControl={false}
         scrollWheelZoom={true}
@@ -201,7 +384,7 @@ export default function LeafletSpreadMap({
         />
 
         <SpreadMapController
-          center={centerCoord}
+          center={mapCenter}
           zoom={15}
           resetTrigger={selectedDay}
         />
@@ -213,7 +396,7 @@ export default function LeafletSpreadMap({
             color: '#38BDF8',
             weight: 4,
             dashArray: '8, 6',
-            opacity: 0.9
+            opacity: 0.95
           }}
         />
 
@@ -221,34 +404,106 @@ export default function LeafletSpreadMap({
         {currentPoint && (
           <Circle
             center={[currentPoint.lat, currentPoint.lng]}
-            radius={currentPoint.radiusMeters}
+            radius={currentPoint.radiusMeters || 450}
             pathOptions={{
-              color: currentPoint.color,
-              fillColor: currentPoint.color,
-              fillOpacity: 0.22,
-              weight: 2
+              color: currentPoint.color || '#EF4444',
+              fillColor: currentPoint.color || '#EF4444',
+              fillOpacity: 0.24,
+              weight: 2.5
             }}
           />
         )}
 
-        {/* Epicenter Data Points */}
+        {/* AI HOTSPOTS LAYER (Interactive pulsing hotspots across Wagholi) */}
+        {(activeLayer === 'hotspots' || activeLayer === 'cluster' || activeLayer === 'spread') && WAGHOLI_AI_HOTSPOTS.map((hotspot) => {
+          const isSelected = selectedHotspot?.id === hotspot.id;
+          return (
+            <React.Fragment key={hotspot.id}>
+              {/* Hotspot Impact Radius */}
+              <Circle
+                center={[hotspot.lat, hotspot.lng]}
+                radius={hotspot.radiusMeters}
+                pathOptions={{
+                  color: hotspot.color,
+                  fillColor: hotspot.color,
+                  fillOpacity: isSelected ? 0.28 : 0.14,
+                  weight: isSelected ? 2.5 : 1.5,
+                  dashArray: '4, 4'
+                }}
+              />
+              <Marker
+                position={[hotspot.lat, hotspot.lng]}
+                icon={createHotspotIcon(hotspot, isSelected)}
+                eventHandlers={{
+                  click: () => {
+                    setSelectedHotspot(hotspot);
+                    setMapCenter([hotspot.lat, hotspot.lng]);
+                  }
+                }}
+              >
+                <Popup autoPan={true}>
+                  <div style={{ minWidth: '220px', padding: '4px', color: '#0F172A', fontFamily: 'sans-serif' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px', marginBottom: '4px' }}>
+                      <span style={{ 
+                        fontSize: '10px', 
+                        fontWeight: 800, 
+                        background: `${hotspot.color}22`, 
+                        color: hotspot.color, 
+                        padding: '2px 6px', 
+                        borderRadius: '4px',
+                        border: `1px solid ${hotspot.color}44`
+                      }}>
+                        {hotspot.severity} HOTSPOT
+                      </span>
+                      <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748B' }}>
+                        🔥 {hotspot.activeComplaints} Active
+                      </span>
+                    </div>
+
+                    <div style={{ fontWeight: 800, fontSize: '13px', color: '#0F172A', marginBottom: '2px' }}>
+                      {hotspot.name}
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#0284C7', fontWeight: 600, marginBottom: '6px' }}>
+                      📍 {hotspot.ward}
+                    </div>
+
+                    <div style={{ fontSize: '11px', background: '#F8FAFC', padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', marginBottom: '6px' }}>
+                      <div style={{ fontSize: '10px', color: '#64748B', fontWeight: 600 }}>DEPARTMENT IN CHARGE:</div>
+                      <strong style={{ fontSize: '11px', color: '#0F172A' }}>{hotspot.dept}</strong>
+                      <div style={{ fontSize: '10px', color: '#059669', marginTop: '3px' }}>
+                        ✓ {hotspot.action}
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#64748B' }}>
+                      <span>SLA Status: <strong>{hotspot.slaRisk}</strong></span>
+                      <span>Radius: <strong>{hotspot.radiusMeters}m</strong></span>
+                    </div>
+                  </div>
+                </Popup>
+              </Marker>
+            </React.Fragment>
+          );
+        })}
+
+        {/* Epicenter Data Points (Temporal Progression) */}
         {points.map((pt, idx) => {
           const isCurrent = idx === selectedDay;
           return (
             <Marker
-              key={pt.step}
+              key={pt.step || idx}
               position={[pt.lat, pt.lng]}
               icon={createEpicenterIcon(pt, isCurrent)}
             >
               <Popup autoPan={false}>
-                <div style={{ minWidth: '190px', padding: '2px', color: '#0F172A' }}>
+                <div style={{ minWidth: '200px', padding: '3px', color: '#0F172A', fontFamily: 'sans-serif' }}>
                   <div style={{ fontWeight: 800, fontSize: '13px', color: pt.color, marginBottom: '4px' }}>
                     {pt.step}
                   </div>
                   <div style={{ fontWeight: 700, fontSize: '11px', marginBottom: '4px' }}>
                     {pt.ward}
                   </div>
-                  <div style={{ fontSize: '10.5px', color: '#475569', marginBottom: '6px' }}>
+                  <div style={{ fontSize: '11px', color: '#475569', marginBottom: '6px', lineHeight: 1.35 }}>
                     {pt.label}
                   </div>
                   <div style={{ fontSize: '10px', background: '#F1F5F9', padding: '4px 6px', borderRadius: '4px' }}>
@@ -261,42 +516,104 @@ export default function LeafletSpreadMap({
         })}
 
         {/* Individual Citizen Report Signals */}
-        {activeLayer === 'signals' && signalCoords.map(sig => (
+        {(activeLayer === 'signals' || activeLayer === 'all') && signalCoords.map(sig => (
           <Marker
             key={sig.id}
             position={sig.pos}
             icon={createSignalIcon()}
           >
             <Popup autoPan={false}>
-              <div style={{ padding: '2px', color: '#0F172A', fontSize: '11px' }}>
-                <span style={{ fontWeight: 800, color: '#0284C7' }}>{sig.id} ({sig.time})</span>
-                <div style={{ marginTop: '2px', color: '#334155' }}>{sig.title}</div>
+              <div style={{ padding: '3px', color: '#0F172A', fontSize: '11.5px', minWidth: '180px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 800, color: '#0284C7' }}>{sig.id}</span>
+                  <span style={{ fontSize: '10px', color: '#64748B' }}>{sig.time}</span>
+                </div>
+                <div style={{ marginTop: '3px', color: '#1E293B', fontWeight: 600 }}>{sig.title}</div>
+                <div style={{ marginTop: '4px', fontSize: '10.5px', color: '#0E5E3A', background: '#DCFCE7', padding: '2px 6px', borderRadius: '4px', display: 'inline-block' }}>
+                  📍 {sig.ward} · {sig.dept}
+                </div>
               </div>
             </Popup>
           </Marker>
         ))}
       </MapContainer>
 
-      {/* Floating Indicator */}
+      {/* Top Floating Hotspot Indicator Badge */}
       <div style={{
         position: 'absolute',
         top: '10px',
         left: '10px',
         zIndex: 1000,
-        background: 'rgba(15, 23, 42, 0.92)',
+        background: 'rgba(15, 23, 42, 0.94)',
         backdropFilter: 'blur(8px)',
-        border: '1px solid rgba(255, 255, 255, 0.18)',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
         borderRadius: '999px',
-        padding: '4px 12px',
+        padding: '5px 14px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        fontSize: '11px',
+        fontWeight: 700,
+        color: '#FFFFFF',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.4)'
+      }}>
+        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: currentPoint?.color || '#EF4444', boxShadow: `0 0 8px ${currentPoint?.color || '#EF4444'}` }} />
+        <span>📍 Wagholi Pune · Corridor Radius: {currentPoint?.radiusMeters}m ({currentPoint?.step})</span>
+      </div>
+
+      {/* Bottom Quick Jump Bar for Wagholi Hotspots */}
+      <div style={{
+        position: 'absolute',
+        bottom: '10px',
+        left: '10px',
+        right: '10px',
+        zIndex: 1000,
         display: 'flex',
         alignItems: 'center',
         gap: '6px',
-        fontSize: '11px',
-        fontWeight: 700,
-        color: '#FFFFFF'
+        overflowX: 'auto',
+        padding: '6px 8px',
+        background: 'rgba(15, 23, 42, 0.9)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: '10px',
+        border: '1px solid rgba(255,255,255,0.18)',
+        scrollbarWidth: 'none'
       }}>
-        <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: currentPoint?.color || '#10B981' }} />
-        <span>Corridor Radius: {currentPoint?.radiusMeters}m ({currentPoint?.step})</span>
+        <span style={{ fontSize: '10px', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', whiteSpace: 'nowrap', marginRight: '2px' }}>
+          🔥 Wagholi Hotspots:
+        </span>
+        {WAGHOLI_AI_HOTSPOTS.map(h => {
+          const isSelected = selectedHotspot?.id === h.id;
+          return (
+            <button
+              key={h.id}
+              type="button"
+              onClick={() => {
+                setSelectedHotspot(h);
+                setMapCenter([h.lat, h.lng]);
+              }}
+              style={{
+                fontSize: '10.5px',
+                fontWeight: 700,
+                padding: '3px 9px',
+                borderRadius: '6px',
+                border: isSelected ? `1.5px solid ${h.color}` : '1px solid rgba(255,255,255,0.15)',
+                background: isSelected ? `${h.color}33` : 'rgba(255,255,255,0.06)',
+                color: isSelected ? '#FFFFFF' : '#CBD5E1',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                transition: 'all 120ms ease'
+              }}
+            >
+              <span>{h.icon}</span>
+              <span>{h.name.split(' ')[0]}</span>
+              <span style={{ fontSize: '9px', opacity: 0.8 }}>({h.activeComplaints})</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

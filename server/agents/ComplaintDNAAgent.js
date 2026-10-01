@@ -7,9 +7,9 @@ import { aiProvider } from './aiProvider.js';
 export class ComplaintDNAAgent {
   static async generateDNA(analysisResult, complaintInput) {
     const location = complaintInput.location || {};
-    const lat = Number(location.lat) || 28.7180;
-    const lng = Number(location.lng) || 77.1260;
-    const ward = location.ward || complaintInput.ward || 'Delhi Ward 14';
+    const lat = Number(location.lat) || 18.5785;
+    const lng = Number(location.lng) || 73.9820;
+    const ward = location.ward || complaintInput.ward || 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)';
 
     // Build dense semantic feature representation
     const textFeatures = [

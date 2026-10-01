@@ -164,9 +164,9 @@ export class CivicIntelligenceOrchestrator {
         // Create new cluster
         cluster = {
           id: clusterResult.clusterId,
-          title: `${complaint.location?.ward || 'Ward'} ${analysis.category} Cluster`,
-          leadDepartment: analysis.category.includes('Water') ? 'Delhi Jal Board (DJB)' : 'Public Works Department (PWD)',
-          centroid: clusterResult.initialCentroid || { lat: 28.7180, lng: 77.1260 },
+          title: `${complaint.location?.ward || 'Wagholi Ward 29'} ${analysis.category} Cluster`,
+          leadDepartment: analysis.category.includes('Water') ? 'PMC Water Supply Department' : 'Public Works Department (PWD Pune)',
+          centroid: clusterResult.initialCentroid || { lat: 18.5785, lng: 73.9820 },
           radiusMeters: 150,
           complaintIds: [complaint.id],
           incidentId: null,
@@ -275,16 +275,21 @@ export class CivicIntelligenceOrchestrator {
 
       // Generate spreadGeo observations from complaints
       if (allClusterComplaints.length > 0) {
-        synthesizedIncident.spreadGeo = allClusterComplaints.map((c, idx) => ({
-          step: `Signal ${idx + 1}`,
-          ward: c.location?.ward || synthesizedIncident.affectedArea,
-          lat: Number(c.location?.lat) || 28.7180,
-          lng: Number(c.location?.lng) || 77.1260,
-          radiusMeters: Math.round(100 + (idx * 50)),
-          signalCount: idx + 1,
-          label: c.descriptionRaw ? `${c.descriptionRaw.slice(0, 50)}...` : c.title,
-          color: idx === 0 ? '#10B981' : idx === allClusterComplaints.length - 1 ? '#EF4444' : '#F59E0B'
-        }));
+        synthesizedIncident.spreadGeo = allClusterComplaints.map((c, idx) => {
+          const lat = Number(c.location?.lat);
+          const lng = Number(c.location?.lng);
+          const isValidWagholi = !isNaN(lat) && !isNaN(lng) && lat >= 18.50 && lat <= 18.65 && lng >= 73.90 && lng <= 74.05;
+          return {
+            step: `Signal ${idx + 1}`,
+            ward: c.location?.ward || synthesizedIncident.affectedArea || 'Wagholi Ward 29',
+            lat: isValidWagholi ? lat : (18.5760 + (idx * 0.0012)),
+            lng: isValidWagholi ? lng : (73.9810 + (idx * 0.0010)),
+            radiusMeters: Math.round(140 + (idx * 120)),
+            signalCount: idx + 1,
+            label: c.descriptionRaw ? `${c.descriptionRaw.slice(0, 50)}...` : c.title,
+            color: idx === 0 ? '#10B981' : idx === allClusterComplaints.length - 1 ? '#EF4444' : '#F59E0B'
+          };
+        });
       }
 
       // Persist synthesized incident

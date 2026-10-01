@@ -18,32 +18,32 @@ import {
 } from 'lucide-react';
 
 export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
-  const [activeLayer, setActiveLayer] = useState('spread'); // 'spread' | 'signals' | 'cluster'
+  const [activeLayer, setActiveLayer] = useState('spread'); // 'spread' | 'signals' | 'hotspots' | 'cluster'
   const [selectedDay, setSelectedDay] = useState(2); // 0 = Day 1, 1 = Day 3, 2 = Day 5
-  const [mapMode, setMapMode] = useState('dark'); // 'dark' | 'satellite'
+  const [mapMode, setMapMode] = useState('satellite'); // 'dark' | 'satellite'
   const [useRealMap, setUseRealMap] = useState(true);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [hoveredPoint, setHoveredPoint] = useState(null);
   const [mobileLegendOpen, setMobileLegendOpen] = useState(false);
 
-  const dataPoints = spreadGeo.length > 0 ? spreadGeo : [
+  const defaultWagholiPoints = [
     { 
-      step: "Day 1 (Sep 12)", 
-      ward: "Ward 27 (Nagar Road & Raisoni Chowk)", 
-      lat: 18.5793, 
-      lng: 73.9785, 
+      step: "Day 1 (Sep 28)", 
+      ward: "Wagholi Ward 29 (Origin: Kesnand Road)", 
+      lat: 18.5760, 
+      lng: 73.9810, 
       radiusMeters: 140, 
       signalCount: 2, 
-      label: "Origin: Valve pit fracture near Raisoni Chowk booster station", 
+      label: "Origin: Subsurface valve fracture near Kesnand Road booster station", 
       color: "#10B981",
       posX: 28,
       posY: 48
     },
     { 
-      step: "Day 3 (Sep 14)", 
-      ward: "Ward 29 (Ivy Estate & Kesnand Rd)", 
-      lat: 18.5760, 
-      lng: 73.9810, 
+      step: "Day 3 (Sep 30)", 
+      ward: "Wagholi Ward 29 (Ivy Estate Loop)", 
+      lat: 18.5768, 
+      lng: 73.9818, 
       radiusMeters: 420, 
       signalCount: 18, 
       label: "Subsurface seep along Kesnand Road corridor to Ivy Estate", 
@@ -52,29 +52,55 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
       posY: 51
     },
     { 
-      step: "Day 5 (Sep 16-17)", 
+      step: "Day 5 (Oct 01)", 
       ward: "Corridor: Wagholi Wards 27, 28 & 29", 
-      lat: 18.5740, 
-      lng: 73.9920, 
-      radiusMeters: 920, 
+      lat: 18.5785, 
+      lng: 73.9830, 
+      radiusMeters: 850, 
       signalCount: 37, 
-      label: "Critical multi-ward impact across Wagholi distribution line", 
+      label: "Critical multi-ward impact across Wagholi distribution line & Highway", 
       color: "#EF4444",
       posX: 64,
       posY: 53
     }
   ];
 
-  // Specific citizen report signal points along actual streets
+  const sanitizeWagholiPoint = (pt, fallback) => {
+    if (!pt) return fallback;
+    const lat = Number(pt.lat);
+    const lng = Number(pt.lng);
+    const isValid = !isNaN(lat) && !isNaN(lng) && lat >= 18.50 && lat <= 18.65 && lng >= 73.90 && lng <= 74.05;
+    return {
+      ...pt,
+      lat: isValid ? lat : fallback.lat,
+      lng: isValid ? lng : fallback.lng,
+      radiusMeters: pt.radiusMeters || fallback.radiusMeters,
+      signalCount: pt.signalCount || fallback.signalCount,
+      color: pt.color || fallback.color,
+      step: pt.step || fallback.step,
+      ward: pt.ward || fallback.ward,
+      label: pt.label || fallback.label,
+      posX: pt.posX || fallback.posX,
+      posY: pt.posY || fallback.posY
+    };
+  };
+
+  const rawPoints = (spreadGeo && spreadGeo.length >= 3) 
+    ? spreadGeo 
+    : (incident?.spreadGeo && incident.spreadGeo.length >= 3 ? incident.spreadGeo : defaultWagholiPoints);
+
+  const dataPoints = rawPoints.map((p, i) => sanitizeWagholiPoint(p, defaultWagholiPoints[i] || defaultWagholiPoints[0]));
+
+  // Specific citizen report signal points along actual Wagholi streets
   const citizenSignals = [
-    { id: 'SIG-1', x: 27, y: 49, title: 'Low pressure & chlorine smell', time: 'Day 1' },
-    { id: 'SIG-2', x: 31, y: 46, title: 'Valve pit seeping water', time: 'Day 1' },
-    { id: 'SIG-3', x: 44, y: 53, title: 'Road dampness on Katju Marg', time: 'Day 2' },
-    { id: 'SIG-4', x: 48, y: 48, title: 'Turbid tap water in Pocket 1', time: 'Day 3' },
-    { id: 'SIG-5', x: 50, y: 56, title: 'Drain backflow near community center', time: 'Day 3' },
-    { id: 'SIG-6', x: 62, y: 50, title: 'Water puddle on arterial road', time: 'Day 4' },
-    { id: 'SIG-7', x: 66, y: 55, title: 'Contaminated supply in school zone', time: 'Day 5' },
-    { id: 'SIG-8', x: 68, y: 46, title: 'Road cavity under bus corridor', time: 'Day 5' }
+    { id: 'SIG-1', x: 27, y: 49, title: 'Low pressure & chlorine smell at Ivy Estate Gate #1', time: 'Day 1' },
+    { id: 'SIG-2', x: 31, y: 46, title: 'Valve pit seeping water near Kesnand Chowk', time: 'Day 1' },
+    { id: 'SIG-3', x: 44, y: 53, title: 'Road dampness on Nagar Road Highway', time: 'Day 2' },
+    { id: 'SIG-4', x: 48, y: 48, title: 'Turbid tap water in Ivy Estate Tower B', time: 'Day 3' },
+    { id: 'SIG-5', x: 50, y: 56, title: 'Drain backflow near Baif Road corner', time: 'Day 3' },
+    { id: 'SIG-6', x: 62, y: 50, title: 'Water puddle on arterial Kesnand road', time: 'Day 4' },
+    { id: 'SIG-7', x: 66, y: 55, title: 'Contaminated supply near Lexicon school zone', time: 'Day 5' },
+    { id: 'SIG-8', x: 68, y: 46, title: 'Road cavity near Wagheshwar temple chowk', time: 'Day 5' }
   ];
 
   const currentPoint = dataPoints[selectedDay] || dataPoints[dataPoints.length - 1];
@@ -235,6 +261,26 @@ export default function ProblemSpreadMap({ incident, spreadGeo = [] }) {
               }}
             >
               Citizen Complaints
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveLayer('hotspots')}
+              aria-label="AI Hotspots Layer"
+              style={{
+                fontSize: '11px',
+                fontWeight: activeLayer === 'hotspots' ? 700 : 500,
+                padding: '5px 10px',
+                minHeight: '36px',
+                borderRadius: '7px',
+                background: activeLayer === 'hotspots' ? '#FFFFFF' : 'transparent',
+                color: activeLayer === 'hotspots' ? '#0E5E3A' : '#64748B',
+                border: 'none',
+                cursor: 'pointer',
+                touchAction: 'manipulation',
+                boxShadow: activeLayer === 'hotspots' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+              }}
+            >
+              🔥 AI Hotspots
             </button>
             <button
               type="button"

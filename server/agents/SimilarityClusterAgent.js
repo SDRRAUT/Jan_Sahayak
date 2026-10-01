@@ -30,8 +30,8 @@ export class SimilarityClusterAgent {
   static async clusterComplaint(newComplaint, existingComplaints = [], existingClusters = []) {
     const newDna = newComplaint.dna || {};
     const newLocation = newComplaint.location || newDna.location || {};
-    const newLat = Number(newLocation.lat) || 28.7180;
-    const newLng = Number(newLocation.lng) || 77.1260;
+    const newLat = Number(newLocation.lat) || 18.5785;
+    const newLng = Number(newLocation.lng) || 73.9820;
     const newDesc = `${newComplaint.descriptionRaw || ''} ${newComplaint.title || ''}`;
 
     let postgisDistances = new Map();
@@ -83,7 +83,7 @@ export class SimilarityClusterAgent {
         continue;
       }
 
-      const clusterCentroid = cluster.centroid || { lat: 28.7180, lng: 77.1260 };
+      const clusterCentroid = cluster.centroid || { lat: 18.5785, lng: 73.9820 };
       const distMeters = AIProvider.calculateDistanceMeters(newLat, newLng, clusterCentroid.lat, clusterCentroid.lng);
 
       // Geographic score (decay over 800 meters)

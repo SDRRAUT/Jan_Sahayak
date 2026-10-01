@@ -171,32 +171,34 @@ export function AppProvider({ children }) {
   const [civicIncidents, setCivicIncidents] = useState(() => {
     try {
       localStorage.removeItem('jansahayk_incidents');
+      localStorage.removeItem('jansahayk_incidents_v7');
     } catch (e) {}
-    const saved = localStorage.getItem('jansahayk_incidents_v7');
+    const saved = localStorage.getItem('jansahayk_incidents_v8');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        const hasLegacy = Array.isArray(parsed) && parsed.some(inc => inc.id && inc.id.includes('DEL'));
+        const hasLegacy = Array.isArray(parsed) && parsed.some(inc => (inc.id && inc.id.includes('DEL')) || (inc.spreadGeo && inc.spreadGeo.some(p => p.lat > 20)));
         if (Array.isArray(parsed) && !hasLegacy) return parsed;
       } catch (e) {}
     }
-    localStorage.setItem('jansahayk_incidents_v7', JSON.stringify(CIVIC_INCIDENTS));
+    localStorage.setItem('jansahayk_incidents_v8', JSON.stringify(CIVIC_INCIDENTS));
     return CIVIC_INCIDENTS;
   });
 
   const [civicSignals, setCivicSignals] = useState(() => {
     try {
       localStorage.removeItem('jansahayk_signals');
+      localStorage.removeItem('jansahayk_signals_v7');
     } catch (e) {}
-    const saved = localStorage.getItem('jansahayk_signals_v7');
+    const saved = localStorage.getItem('jansahayk_signals_v8');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        const hasLegacy = Array.isArray(parsed) && parsed.some(sig => sig.id && sig.id.includes('2026-00'));
+        const hasLegacy = Array.isArray(parsed) && parsed.some(sig => (sig.id && sig.id.includes('2026-00')) || sig.lat > 20);
         if (Array.isArray(parsed) && !hasLegacy) return parsed;
       } catch (e) {}
     }
-    localStorage.setItem('jansahayk_signals_v7', JSON.stringify(CIVIC_SIGNALS));
+    localStorage.setItem('jansahayk_signals_v8', JSON.stringify(CIVIC_SIGNALS));
     return CIVIC_SIGNALS;
   });
 
@@ -275,11 +277,11 @@ export function AppProvider({ children }) {
   }, [clusters]);
 
   useEffect(() => {
-    localStorage.setItem('jansahayk_incidents_v7', JSON.stringify(civicIncidents));
+    localStorage.setItem('jansahayk_incidents_v8', JSON.stringify(civicIncidents));
   }, [civicIncidents]);
 
   useEffect(() => {
-    localStorage.setItem('jansahayk_signals_v7', JSON.stringify(civicSignals));
+    localStorage.setItem('jansahayk_signals_v8', JSON.stringify(civicSignals));
   }, [civicSignals]);
 
   useEffect(() => {
