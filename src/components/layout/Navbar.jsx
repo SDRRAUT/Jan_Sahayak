@@ -387,15 +387,9 @@ export default function Navbar() {
                 </Link>
                 <Link
                   to="/officer"
-                  className={`site-nav-link ${location.pathname === '/officer' && !location.search.includes('operations') ? 'active' : ''}`}
+                  className={`site-nav-link ${location.pathname === '/officer' ? 'active' : ''}`}
                 >
                   🛠️ Workspace
-                </Link>
-                <Link
-                  to="/officer?section=operations"
-                  className={`site-nav-link ${location.search.includes('operations') || location.pathname === '/admin/department' ? 'active' : ''}`}
-                >
-                  👷 Operations & Roster
                 </Link>
                 <Link
                   to="/admin"
@@ -952,28 +946,6 @@ export default function Navbar() {
                             <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
                           </Link>
                           <Link
-                            to="/officer?section=operations"
-                            onClick={() => setShowUserMenu(false)}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              padding: '7px 10px',
-                              borderRadius: 'var(--radius-sm)',
-                              fontSize: '12px',
-                              textDecoration: 'none',
-                              color: 'var(--color-text-primary)',
-                              background: '#F8FAFC',
-                              border: '1px solid rgba(15, 23, 42, 0.06)'
-                            }}
-                          >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <Building2 style={{ width: '14px', height: '14px', color: '#059669' }} />
-                              <span>Dept Operations & Roster</span>
-                            </div>
-                            <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
-                          </Link>
-                          <Link
                             to="/admin"
                             onClick={() => setShowUserMenu(false)}
                             style={{
@@ -1338,20 +1310,6 @@ export default function Navbar() {
                     }}
                   >
                     🏛️ Civic Workspace
-                  </Link>
-                  <Link
-                    to="/officer?section=operations"
-                    onClick={() => setMobileMenuOpen(false)}
-                    style={{
-                      padding: '10px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      color: location.search.includes('operations') ? '#059669' : 'var(--color-text-primary)',
-                      background: location.search.includes('operations') ? '#ECFDF5' : '#F8FAFC'
-                    }}
-                  >
-                    📋 Dept Operations & Roster
                   </Link>
                   <Link
                     to="/admin"
