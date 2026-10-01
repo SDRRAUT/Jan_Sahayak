@@ -63,6 +63,7 @@ import ActionSimulationCard from '../components/intelligence/ActionSimulationCar
 import LiveComplaintLinkageSection from '../components/intelligence/LiveComplaintLinkageSection';
 import EditorialComplaintCard, { ComplaintDetailModal } from '../components/common/EditorialComplaintCard';
 import JanSuchnaModal from '../components/officer/JanSuchnaModal';
+import TerritoryProblemModal from '../components/officer/TerritoryProblemModal';
 import { maskCitizenName, maskCitizenPhone } from '../utils/privacy';
 
 export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
@@ -2997,6 +2998,13 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
             }}
           />
         )}
+
+        {/* Territory Problem Explorer Modal */}
+        <TerritoryProblemModal
+          isOpen={showTerritoryModal}
+          onClose={() => setShowTerritoryModal(false)}
+          selectedWard="Wagholi Municipal Ward 27-31"
+        />
 
         {/* Jan Suchna (जन सूचना) Broadcast Modal */}
         <JanSuchnaModal

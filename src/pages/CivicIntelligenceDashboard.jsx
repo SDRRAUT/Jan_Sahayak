@@ -61,11 +61,11 @@ export default function CivicIntelligenceDashboard() {
         
         {/* ── Top Header Banner (Center Aligned & Refined Muted Styling) ── */}
         <div style={{
-          background: '#FFFFFF',
+          background: 'linear-gradient(135deg, #F0FDF4 0%, #F8FAFC 50%, #EFF6FF 100%)',
           borderRadius: '24px',
           padding: '28px 32px',
           border: '1.5px solid #E2E8F0',
-          boxShadow: '0 2px 12px rgba(15, 23, 42, 0.03)',
+          boxShadow: '0 4px 20px rgba(15, 23, 42, 0.04)',
           marginBottom: '24px',
           textAlign: 'center',
           display: 'flex',
@@ -83,10 +83,11 @@ export default function CivicIntelligenceDashboard() {
               fontWeight: 700,
               padding: '3px 11px',
               borderRadius: '999px',
-              background: '#F1F5F9',
+              background: '#FFFFFF',
               color: '#475569',
               border: '1px solid #CBD5E1',
-              letterSpacing: '0.02em'
+              letterSpacing: '0.02em',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
             }}>
               <Sparkles style={{ width: '12px', height: '12px', color: '#6366F1' }} />
               CIVIC INTELLIGENCE HUB
@@ -95,10 +96,11 @@ export default function CivicIntelligenceDashboard() {
               fontSize: '11px',
               fontWeight: 700,
               color: '#065F46',
-              background: '#F0FDF4',
+              background: '#FFFFFF',
               padding: '3px 10px',
               borderRadius: '999px',
-              border: '1px solid #A7F3D0'
+              border: '1px solid #A7F3D0',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
             }}>
               ● 100 Complaints → 1 Actionable Plan
             </span>
@@ -137,7 +139,7 @@ export default function CivicIntelligenceDashboard() {
             flexWrap: 'wrap',
             marginTop: '20px'
           }}>
-            {/* Button 1: Territory Problem Explorer */}
+            {/* Button 1: Territory Problem Explorer (Light Styled) */}
             <button
               type="button"
               onClick={() => setShowTerritoryModal(true)}
@@ -147,23 +149,23 @@ export default function CivicIntelligenceDashboard() {
                 fontWeight: 700,
                 padding: '0 18px',
                 borderRadius: '999px',
-                background: '#0F172A',
-                color: '#FFFFFF',
-                border: '1px solid #0F172A',
+                background: '#FFFFFF',
+                color: '#0369A1',
+                border: '1.5px solid #BAE6FD',
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '7px',
-                boxShadow: '0 2px 6px rgba(15, 23, 42, 0.12)',
+                boxShadow: '0 2px 6px rgba(2, 132, 199, 0.08)',
                 transition: 'all 150ms ease'
               }}
             >
-              <Compass style={{ width: '14px', height: '14px', color: '#38BDF8' }} />
+              <Compass style={{ width: '15px', height: '15px', color: '#0284C7' }} />
               <span>🗺️ Territory Problem Explorer</span>
             </button>
 
-            {/* Button 2: Jan Suchna Broadcast */}
+            {/* Button 2: Jan Suchna Broadcast (Light Styled) */}
             <button
               type="button"
               onClick={() => setShowJanSuchnaModal(true)}
@@ -185,7 +187,7 @@ export default function CivicIntelligenceDashboard() {
                 transition: 'all 150ms ease'
               }}
             >
-              <Radio style={{ width: '14px', height: '14px', color: '#D97706' }} />
+              <Radio style={{ width: '15px', height: '15px', color: '#D97706' }} />
               <span>📢 Create Jan Suchna Broadcast</span>
             </button>
           </div>
