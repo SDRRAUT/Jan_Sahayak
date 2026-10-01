@@ -952,37 +952,130 @@ export default function CitizenSubmit() {
                 </div>
               </div>
 
-              {/* B. GRIEVANCE DESCRIPTION & TITLE */}
+              {/* B. GRIEVANCE TITLE & DESCRIPTION WITH INDEPENDENT VOICE BUTTONS */}
               <div style={{ marginBottom: '22px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <label style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A' }}>
-                    What is the civic problem? <span style={{ color: '#EF4444' }}>*</span>
-                  </label>
-                  <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 600 }}>
-                    🌐 Hindi • Hinglish • English supported
-                  </span>
+                {/* 1. Problem Title with Dedicated Speak Button */}
+                <div style={{ marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px', flexWrap: 'wrap', gap: '6px' }}>
+                    <label style={{ fontSize: '13.5px', fontWeight: 700, color: '#0F172A' }}>
+                      Problem Title (Short Headline): <span style={{ color: '#EF4444' }}>*</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                        if (!SpeechRecognition) {
+                          setMicStatusMsg('Speech recognition not supported in this browser.');
+                          return;
+                        }
+                        const rec = new SpeechRecognition();
+                        rec.lang = 'hi-IN';
+                        rec.onstart = () => setMicStatusMsg('🎙️ Listening for Title... (बोलो शीर्षक)');
+                        rec.onresult = (e) => {
+                          const t = e.results?.[0]?.[0]?.transcript;
+                          if (t) {
+                            setTitle(t.trim());
+                            setMicStatusMsg(`Title recorded: "${t.trim()}"`);
+                          }
+                        };
+                        rec.onerror = () => setMicStatusMsg('Could not capture title voice.');
+                        rec.start();
+                      }}
+                      style={{
+                        padding: '4px 12px',
+                        borderRadius: '999px',
+                        background: '#EFF6FF',
+                        border: '1px solid #BFDBFE',
+                        color: '#2563EB',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Mic style={{ width: '13px', height: '13px' }} />
+                      <span>🎙️ Speak Title (बोलो शीर्षक)</span>
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="e.g. Dirty water pipeline leak near Raisoni Chowk"
+                    style={{
+                      width: '100%',
+                      height: '42px',
+                      padding: '0 14px',
+                      borderRadius: '10px',
+                      border: '1.5px solid #CBD5E1',
+                      fontSize: '14px',
+                      color: '#0F172A',
+                      boxSizing: 'border-box'
+                    }}
+                    required
+                  />
                 </div>
 
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="उदा: हमारे सेक्टर 14 में 3 दिन से गंदा पानी आ रहा है / Severe road pothole near Moolchand flyover causing accidents..."
-                  rows={saralMode ? 6 : 4}
-                  style={{
-                    width: '100%',
-                    padding: '14px 16px',
-                    borderRadius: '12px',
-                    border: '1.5px solid #CBD5E1',
-                    fontSize: saralMode ? '16px' : '14px',
-                    lineHeight: 1.6,
-                    background: '#FFFFFF',
-                    color: '#0F172A',
-                    boxShadow: 'inset 0 1px 2px rgba(15, 23, 42, 0.04)',
-                    outline: 'none',
-                    transition: 'border-color 150ms ease'
-                  }}
-                  required
-                />
+                {/* 2. Problem Description with Dedicated Voice Button */}
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <label style={{ fontSize: '13.5px', fontWeight: 700, color: '#0F172A' }}>
+                      Detailed Problem Description: <span style={{ color: '#EF4444' }}>*</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={isRecording ? handleStopVoice : handleStartVoice}
+                      style={{
+                        padding: '4px 12px',
+                        borderRadius: '999px',
+                        background: isRecording ? '#FEF2F2' : '#ECFDF5',
+                        border: isRecording ? '1.5px solid #FCA5A5' : '1px solid #A7F3D0',
+                        color: isRecording ? '#DC2626' : '#065F46',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {isRecording ? (
+                        <>
+                          <MicOff style={{ width: '13px', height: '13px' }} />
+                          <span>⏹ Stop Voice ({recordingSeconds}s)</span>
+                        </>
+                      ) : (
+                        <>
+                          <Mic style={{ width: '13px', height: '13px' }} />
+                          <span>🎙️ Speak Description (बोलो विवरण)</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="उदा: हमारे एरिया में 3 दिन से गंदा पानी आ रहा है / Severe road pothole near Wagholi Nagar Road..."
+                    rows={saralMode ? 6 : 4}
+                    style={{
+                      width: '100%',
+                      padding: '14px 16px',
+                      borderRadius: '12px',
+                      border: '1.5px solid #CBD5E1',
+                      fontSize: saralMode ? '16px' : '14px',
+                      lineHeight: 1.6,
+                      background: '#FFFFFF',
+                      color: '#0F172A',
+                      boxShadow: 'inset 0 1px 2px rgba(15, 23, 42, 0.04)',
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                    required
+                  />
+                </div>
 
                 {/* Status Messages for Microphone/GPS */}
                 {micStatusMsg && (
@@ -1485,34 +1578,40 @@ export default function CitizenSubmit() {
                   </span>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={!description.trim() || isSubmitting}
-                  className="btn-primary citizen-submit-btn"
-                  style={{
-                    borderRadius: '12px',
-                    background: 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)',
-                    boxShadow: '0 4px 16px rgba(14, 94, 58, 0.32)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    cursor: !description.trim() || isSubmitting ? 'not-allowed' : 'pointer',
-                    opacity: !description.trim() || isSubmitting ? 0.7 : 1,
-                    transition: 'all 150ms ease'
-                  }}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="animate-spin" style={{ width: '18px', height: '18px' }} />
-                      <span>Registering with Authority...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Submit Grievance & Dispatch Authority (शिकायत दर्ज करें)</span>
-                      <ArrowRight style={{ width: '18px', height: '18px' }} />
-                    </>
-                  )}
-                </button>
+                {(() => {
+                  const isFormValid = Boolean(title.trim().length >= 3 && description.trim().length >= 8 && (!photoPreview || (visionAnalysis && visionAnalysis.isValidCivic)));
+                  return (
+                    <button
+                      type="submit"
+                      disabled={!isFormValid || isSubmitting}
+                      className="btn-primary citizen-submit-btn"
+                      style={{
+                        borderRadius: '12px',
+                        background: isFormValid ? 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)' : '#94A3B8',
+                        boxShadow: isFormValid ? '0 4px 16px rgba(14, 94, 58, 0.32)' : 'none',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        cursor: !isFormValid || isSubmitting ? 'not-allowed' : 'pointer',
+                        opacity: !isFormValid || isSubmitting ? 0.65 : 1,
+                        transition: 'all 150ms ease'
+                      }}
+                      title={!isFormValid ? 'Please enter a Problem Title (min 3 chars) and Description (min 8 chars) to submit.' : ''}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="animate-spin" style={{ width: '18px', height: '18px' }} />
+                          <span>Registering with Authority...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Submit Grievance & Dispatch Authority (शिकायत दर्ज करें)</span>
+                          <ArrowRight style={{ width: '18px', height: '18px' }} />
+                        </>
+                      )}
+                    </button>
+                  );
+                })()}
               </div>
 
             </form>

@@ -34,6 +34,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [isRecording, setIsRecording] = useState(false);
+  const [recordingTarget, setRecordingTarget] = useState(null); // 'title' | 'description' | null
   const [recordingTimer, setRecordingTimer] = useState(0);
   const [speechMsg, setSpeechMsg] = useState(null);
   const [interimText, setInterimText] = useState('');   // live interim transcript shown while speaking
@@ -181,16 +182,20 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
 
 
   // ─── Real-time Speech-to-Text ───────────────────────────────────────────────
-  const handleToggleVoice = () => {
+  const handleToggleVoice = (target = 'description') => {
     if (isRecording) {
-      handleStopVoice();
-      return;
+      if (recordingTarget === target) {
+        handleStopVoice();
+        return;
+      } else {
+        handleStopVoice();
+      }
     }
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      // Fallback: show helpful message + open mic via MediaRecorder if available
+      // Fallback: show helpful message
       setSpeechMsg('⚠️ Your browser does not support live speech. Please use Chrome or Edge, or type your complaint below.');
       return;
     }
@@ -199,6 +204,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
       // Reset interim & accumulated before starting fresh
       setInterimText('');
       setFinalAccumulated('');
+      setRecordingTarget(target);
 
       const recognition = new SpeechRecognition();
       recognitionRef.current = recognition;
@@ -212,8 +218,8 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
         setIsRecording(true);
         setRecordingTimer(0);
         setSpeechMsg(speechLang === 'hi-IN'
-          ? '🎙️ Sun raha hoon... Hindi, Hinglish ya English mein bolein'
-          : '🎙️ Listening... Speak clearly in English');
+          ? `🎙️ ${target === 'title' ? 'शीर्षक बोलें' : 'समस्या का विवरण बोलें'}... Hindi/English mein bolein`
+          : `🎙️ Speaking for ${target === 'title' ? 'Title' : 'Description'}... Speak clearly`);
         timerIntervalRef.current = setInterval(() => {
           setRecordingTimer(prev => prev + 1);
         }, 1000);
@@ -236,13 +242,16 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
         setInterimText(interim);
 
         if (newFinal) {
-          // Append final text to description textarea + accumulated ref
           setFinalAccumulated(prev => {
             const updated = prev + newFinal;
-            setDescription(updated.trim());
-            // Auto-fill title from first few words if title is empty
-            if (!title) {
-              setTitle(updated.trim().slice(0, 50) + (updated.trim().length > 50 ? '...' : ''));
+            if (target === 'title') {
+              setTitle(updated.trim());
+            } else {
+              setDescription(updated.trim());
+              // Auto-fill title from first few words if title is empty
+              if (!title) {
+                setTitle(updated.trim().slice(0, 50) + (updated.trim().length > 50 ? '...' : ''));
+              }
             }
             return updated;
           });
@@ -251,14 +260,12 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
 
       recognition.onerror = (e) => {
         if (e.error === 'no-speech') {
-          // No speech detected — just show a gentle hint, keep going
           setSpeechMsg('🤫 Koi awaaz nahi aayi... phir se bolein / No speech detected, please speak again');
         } else if (e.error === 'not-allowed') {
           setSpeechMsg('❌ Microphone access denied. Please allow mic in browser settings.');
           handleStopVoice();
         } else if (e.error === 'network') {
           setSpeechMsg('⚠️ Network error. Retrying...');
-          // Auto-restart on network errors
           setTimeout(() => {
             if (recognitionRef.current) {
               try { recognitionRef.current.start(); } catch (_) {}
@@ -270,13 +277,10 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
       };
 
       recognition.onend = () => {
-        // Auto-restart if still in recording mode (continuous mode sometimes stops)
         if (isRecording) {
           try {
             if (recognitionRef.current) recognitionRef.current.start();
-          } catch (_) {
-            // recognition already started or modal closed
-          }
+          } catch (_) {}
         }
         setInterimText('');
       };
@@ -285,11 +289,13 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
     } catch (err) {
       setSpeechMsg('Could not start microphone. Please try again.');
       setIsRecording(false);
+      setRecordingTarget(null);
     }
   };
 
   const handleStopVoice = () => {
     setIsRecording(false);
+    setRecordingTarget(null);
     setInterimText('');
     setSpeechMsg(null);
     if (timerIntervalRef.current) {
@@ -926,21 +932,51 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
 
 
 
-                  <div style={{ marginBottom: '12px' }}>
-                    <label style={{ fontSize: '12px', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '4px' }}>
-                      Problem Title (Short Headline):
-                    </label>
+                  <div style={{ marginBottom: '14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px', flexWrap: 'wrap', gap: '6px' }}>
+                      <label style={{ fontSize: '12px', fontWeight: 700, color: '#334155' }}>
+                        2. Problem Title (Short Headline):
+                      </label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {/* Title Speak Button */}
+                        <button
+                          type="button"
+                          onClick={() => handleToggleVoice('title')}
+                          style={{
+                            background: isRecording && recordingTarget === 'title' ? '#FEF2F2' : '#EFF6FF',
+                            color: isRecording && recordingTarget === 'title' ? '#DC2626' : '#2563EB',
+                            border: isRecording && recordingTarget === 'title' ? '2px solid #FCA5A5' : '1px solid #BFDBFE',
+                            borderRadius: '999px',
+                            padding: '3px 10px',
+                            fontSize: '10.5px',
+                            fontWeight: 700,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            cursor: 'pointer',
+                            boxShadow: isRecording && recordingTarget === 'title' ? '0 0 0 3px rgba(220,38,38,0.15)' : 'none',
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          {isRecording && recordingTarget === 'title'
+                            ? <><MicOff style={{ width: '12px', height: '12px' }} /><span>⏹ Stop ({recordingTimer}s)</span></>
+                            : <><Mic style={{ width: '12px', height: '12px' }} /><span>🎙️ {speechLang === 'hi-IN' ? 'बोलो शीर्षक' : 'Speak Title'}</span></>
+                          }
+                        </button>
+                      </div>
+                    </div>
                     <input 
                       type="text"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      placeholder="e.g. Dirty contaminated tap water near Pocket 2"
+                      placeholder="e.g. Dirty contaminated tap water near Ivy Estate"
                       style={{
                         width: '100%',
                         height: '38px',
                         padding: '0 12px',
                         borderRadius: '10px',
-                        border: '1px solid #CBD5E1',
+                        border: isRecording && recordingTarget === 'title' ? '2px solid #2563EB' : '1px solid #CBD5E1',
+                        background: isRecording && recordingTarget === 'title' ? '#F0F7FF' : '#FFFFFF',
                         fontSize: '13px',
                         boxSizing: 'border-box'
                       }}
@@ -951,7 +987,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                     {/* Row: Label + Language Toggle + Mic Button */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px', flexWrap: 'wrap', gap: '6px' }}>
                       <label style={{ fontSize: '12px', fontWeight: 700, color: '#334155' }}>
-                        Description (Bol Kar Ya Likh Kar Batayein):
+                        3. Description (Bol Kar Ya Likh Kar Batayein):
                       </label>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         {/* Language Toggle */}
@@ -982,14 +1018,14 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                           </div>
                         )}
 
-                        {/* Mic Button */}
+                        {/* Mic Button for Description */}
                         <button
                           type="button"
-                          onClick={handleToggleVoice}
+                          onClick={() => handleToggleVoice('description')}
                           style={{
-                            background: isRecording ? '#FEF2F2' : '#EFF6FF',
-                            color: isRecording ? '#DC2626' : '#2563EB',
-                            border: isRecording ? '2px solid #FCA5A5' : '1px solid #BFDBFE',
+                            background: isRecording && recordingTarget === 'description' ? '#FEF2F2' : '#EFF6FF',
+                            color: isRecording && recordingTarget === 'description' ? '#DC2626' : '#2563EB',
+                            border: isRecording && recordingTarget === 'description' ? '2px solid #FCA5A5' : '1px solid #BFDBFE',
                             borderRadius: '999px',
                             padding: '4px 12px',
                             fontSize: '11px',
@@ -998,13 +1034,13 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                             alignItems: 'center',
                             gap: '5px',
                             cursor: 'pointer',
-                            boxShadow: isRecording ? '0 0 0 3px rgba(220,38,38,0.15)' : 'none',
+                            boxShadow: isRecording && recordingTarget === 'description' ? '0 0 0 3px rgba(220,38,38,0.15)' : 'none',
                             transition: 'all 0.2s'
                           }}
                         >
-                          {isRecording
+                          {isRecording && recordingTarget === 'description'
                             ? <><MicOff style={{ width: '13px', height: '13px' }} /><span>⏹ Stop ({recordingTimer}s)</span></>
-                            : <><Mic style={{ width: '13px', height: '13px' }} /><span>🎙️ {speechLang === 'hi-IN' ? 'Boliye Hindi/English' : 'Speak English'}</span></>
+                            : <><Mic style={{ width: '13px', height: '13px' }} /><span>🎙️ {speechLang === 'hi-IN' ? 'बोलो विवरण' : 'Speak Description'}</span></>
                           }
                         </button>
                       </div>
@@ -1524,75 +1560,97 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
               </button>
             )}
 
-            {currentStep < 4 ? (
-              <button
-                type="button"
-                onClick={() => {
-                  if (currentStep === 1 && !description.trim()) {
-                    setStepErrorMsg('⚠️ Please enter or speak a description of the problem.');
-                    return;
-                  }
-                  if (currentStep === 2 && photoPreview && visionAnalysis && !visionAnalysis.isValidCivic) {
-                    setStepErrorMsg('⚠️ The attached photo is a non-civic/UI image. Please retake a ground photo or remove it to proceed.');
-                    return;
-                  }
-                  setStepErrorMsg('');
-                  setCurrentStep(prev => prev + 1);
-                }}
-                style={{
-                  height: '44px',
-                  minHeight: '44px',
-                  padding: '0 20px',
-                  borderRadius: '10px',
-                  background: '#2563EB',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)'
-                }}
-              >
-                <span>{currentStep === 2 && !photoPreview ? 'Skip Photo / Next' : 'Next Step'}</span>
-                <ArrowRight style={{ width: '15px', height: '15px' }} />
-              </button>
-            ) : (
-              <button
-                id="btn-confirm-submit-grievance"
-                data-testid="btn-confirm-submit-grievance"
-                type="button"
-                onClick={handleFinalSubmit}
-                disabled={isSubmitting}
-                style={{
-                  height: '44px',
-                  minHeight: '44px',
-                  padding: '0 22px',
-                  borderRadius: '10px',
-                  background: 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  fontSize: '13.5px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  boxShadow: '0 4px 14px rgba(14, 94, 58, 0.35)'
-                }}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="animate-spin" style={{ width: '15px', height: '15px' }} />
-                    <span>Transmitting to Officials...</span>
-                  </>
-                ) : (
-                  <span>🚀 Confirm & Submit Grievance</span>
-                )}
-              </button>
-            )}
+            {currentStep < 4 ? (() => {
+              const isStep1Valid = Boolean(title.trim().length >= 3 && description.trim().length >= 8);
+              const isStep2Valid = Boolean(!photoPreview || (visionAnalysis && visionAnalysis.isValidCivic && visionAnalysis.isAligned));
+              const isStep3Valid = Boolean(ward.trim() && area.trim().length >= 3 && pincode.trim().length >= 5);
+              
+              const isCurrentStepValid = currentStep === 1 ? isStep1Valid : currentStep === 2 ? isStep2Valid : isStep3Valid;
+
+              return (
+                <button
+                  type="button"
+                  disabled={!isCurrentStepValid}
+                  onClick={() => {
+                    if (currentStep === 1 && !isStep1Valid) {
+                      setStepErrorMsg('⚠️ Please enter both a Problem Title and a clear Problem Description (min 8 chars).');
+                      return;
+                    }
+                    if (currentStep === 2 && !isStep2Valid) {
+                      setStepErrorMsg('⚠️ Photo must match the reported problem or be removed before proceeding.');
+                      return;
+                    }
+                    if (currentStep === 3 && !isStep3Valid) {
+                      setStepErrorMsg('⚠️ Please provide accurate Area and Ward location details.');
+                      return;
+                    }
+                    setStepErrorMsg('');
+                    setCurrentStep(prev => prev + 1);
+                  }}
+                  style={{
+                    height: '44px',
+                    minHeight: '44px',
+                    padding: '0 20px',
+                    borderRadius: '10px',
+                    background: isCurrentStepValid ? '#2563EB' : '#94A3B8',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: isCurrentStepValid ? 'pointer' : 'not-allowed',
+                    opacity: isCurrentStepValid ? 1 : 0.65,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: isCurrentStepValid ? '0 2px 8px rgba(37, 99, 235, 0.3)' : 'none',
+                    transition: 'all 150ms ease'
+                  }}
+                  title={!isCurrentStepValid ? 'Please fill required fields and verify photo proof to continue' : ''}
+                >
+                  <span>{currentStep === 2 && !photoPreview ? 'Skip Photo / Next' : 'Next Step'}</span>
+                  <ArrowRight style={{ width: '15px', height: '15px' }} />
+                </button>
+              );
+            })() : (() => {
+              const isStep4Valid = Boolean(citizenName.trim().length >= 2 && citizenPhone.trim().length >= 8);
+
+              return (
+                <button
+                  id="btn-confirm-submit-grievance"
+                  data-testid="btn-confirm-submit-grievance"
+                  type="button"
+                  onClick={handleFinalSubmit}
+                  disabled={isSubmitting || !isStep4Valid}
+                  style={{
+                    height: '44px',
+                    minHeight: '44px',
+                    padding: '0 22px',
+                    borderRadius: '10px',
+                    background: isStep4Valid ? 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)' : '#94A3B8',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    fontSize: '13.5px',
+                    fontWeight: 700,
+                    cursor: isStep4Valid && !isSubmitting ? 'pointer' : 'not-allowed',
+                    opacity: isStep4Valid && !isSubmitting ? 1 : 0.65,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: isStep4Valid ? '0 4px 14px rgba(14, 94, 58, 0.35)' : 'none',
+                    transition: 'all 150ms ease'
+                  }}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="animate-spin" style={{ width: '15px', height: '15px' }} />
+                      <span>Transmitting to Officials...</span>
+                    </>
+                  ) : (
+                    <span>🚀 Confirm & Submit Grievance</span>
+                  )}
+                </button>
+              );
+            })()}
           </div>
         )}
       </div>

@@ -1,8 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  Bot, 
-  Cpu, 
-  Sparkles, 
   ShieldCheck, 
   MapPin, 
   Layers, 
@@ -10,16 +7,14 @@ import {
   FileText, 
   CheckCircle2, 
   Loader2, 
-  Radio, 
   Activity, 
   Check, 
-  Terminal, 
   Zap, 
   Eye, 
   Volume2, 
-  Share2, 
   Building2,
-  Workflow
+  ArrowRight,
+  Sparkles
 } from 'lucide-react';
 
 const PIPELINE_DURATION_SEC = 15;
@@ -31,29 +26,27 @@ export const AGENT_SPECS = [
     marathiName: 'भाषा व उच्चार विश्लेषण दूत',
     role: 'Speech & Dialect Normalization',
     icon: Volume2,
-    color: '#3B82F6',
+    color: '#2563EB',
     bgLight: '#EFF6FF',
     borderLight: '#BFDBFE',
     startSec: 0.0,
-    endSec: 4.0,
-    activeDescription: 'Transcribing voice samples & extracting intent from Marathi/Hindi/English...',
-    completedDescription: 'Dialect normalized • Grievance intent indexed',
-    visualAnimation: 'voice-wave'
+    endSec: 2.0,
+    activeDescription: 'Transcribing voice tokens & extracting intent from Marathi/Hindi/English...',
+    completedDescription: 'Dialect normalized • Problem intent indexed'
   },
   {
     id: 2,
     name: 'Vision & Geotag Authenticator',
     marathiName: 'छायाचित्र व जीपीएस सत्यापन दूत',
-    role: 'EXIF & Damage Severity Detection',
+    role: 'EXIF & Physical Hazard Verification',
     icon: Eye,
-    color: '#8B5CF6',
+    color: '#7C3AED',
     bgLight: '#F5F3FF',
     borderLight: '#DDD6FE',
-    startSec: 1.5,
-    endSec: 5.5,
-    activeDescription: 'Analyzing image EXIF coordinates & anti-tamper authenticity...',
-    completedDescription: 'Geotag matched • Structural hazard detected',
-    visualAnimation: 'radar-scan'
+    startSec: 1.8,
+    endSec: 4.0,
+    activeDescription: 'Scanning image EXIF coordinates & validating problem authenticity...',
+    completedDescription: 'Geotag matched • Structural hazard verified'
   },
   {
     id: 3,
@@ -64,11 +57,10 @@ export const AGENT_SPECS = [
     color: '#059669',
     bgLight: '#ECFDF5',
     borderLight: '#A7F3D0',
-    startSec: 3.5,
-    endSec: 7.5,
+    startSec: 3.8,
+    endSec: 6.0,
     activeDescription: 'Pinpointing GPS coords to Wagholi Municipal Ward & PMRDA grid...',
-    completedDescription: 'Geofence locked: Wagholi Ward 29 (Ivy Estate & Kesnand Rd)',
-    visualAnimation: 'gps-lock'
+    completedDescription: 'Geofence locked: Wagholi Ward 29 (Ivy Estate & Kesnand Rd)'
   },
   {
     id: 4,
@@ -79,11 +71,10 @@ export const AGENT_SPECS = [
     color: '#D97706',
     bgLight: '#FFFBEB',
     borderLight: '#FDE68A',
-    startSec: 5.5,
-    endSec: 9.5,
-    activeDescription: 'Generating 128-dim Complaint DNA & searching 500+ historical clusters...',
-    completedDescription: 'Cosine similarity matched: Ward 29 Active Cluster',
-    visualAnimation: 'dna-pulse'
+    startSec: 5.8,
+    endSec: 8.0,
+    activeDescription: 'Generating 128-dim Complaint DNA & cross-checking 500+ past clusters...',
+    completedDescription: 'Cosine similarity matched: Ward 29 Active Cluster'
   },
   {
     id: 5,
@@ -94,11 +85,10 @@ export const AGENT_SPECS = [
     color: '#0284C7',
     bgLight: '#F0F9FF',
     borderLight: '#BAE6FD',
-    startSec: 7.5,
-    endSec: 11.5,
-    activeDescription: 'Triaging responsibility across PMC Water, PWD Road & MSEDCL...',
-    completedDescription: 'Primary: PMC Water Supply • Interlock: PWD Pune',
-    visualAnimation: 'triage-flow'
+    startSec: 7.8,
+    endSec: 10.0,
+    activeDescription: 'Triaging responsibility across PMC Water, PWD Road & MSEDCL Power...',
+    completedDescription: 'Primary: PMC Water Supply Dept • Interlock: PWD Pune'
   },
   {
     id: 6,
@@ -109,11 +99,10 @@ export const AGENT_SPECS = [
     color: '#DC2626',
     bgLight: '#FEF2F2',
     borderLight: '#FECACA',
-    startSec: 9.5,
-    endSec: 13.0,
-    activeDescription: 'Evaluating neighborhood impact score & weather vulnerability...',
-    completedDescription: 'Statutory 12-Hour Redressal SLA window minted',
-    visualAnimation: 'sla-clock'
+    startSec: 9.8,
+    endSec: 12.0,
+    activeDescription: 'Evaluating neighborhood risk score & weather vulnerability...',
+    completedDescription: 'Statutory 12-Hour Redressal SLA window minted'
   },
   {
     id: 7,
@@ -124,11 +113,10 @@ export const AGENT_SPECS = [
     color: '#0D9488',
     bgLight: '#F0FDFA',
     borderLight: '#99F6E4',
-    startSec: 11.5,
-    endSec: 14.2,
+    startSec: 11.8,
+    endSec: 13.5,
     activeDescription: 'Synthesizing standard repair procedure #14 & tooling specs...',
-    completedDescription: 'Engineering SOP #14 formulated • Crew alert queued',
-    visualAnimation: 'doc-sync'
+    completedDescription: 'Engineering SOP #14 formulated • Crew alert queued'
   },
   {
     id: 8,
@@ -139,26 +127,11 @@ export const AGENT_SPECS = [
     color: '#16A34A',
     bgLight: '#F0FDF4',
     borderLight: '#BBF7D0',
-    startSec: 13.0,
+    startSec: 13.3,
     endSec: 15.0,
     activeDescription: 'Minting immutable municipal grievance ID & Jan-Suchna broadcast...',
-    completedDescription: 'Ticket ID generated • SMS & Portal telemetry synced',
-    visualAnimation: 'token-mint'
+    completedDescription: 'Ticket ID minted • SMS & Portal telemetry synced'
   }
-];
-
-const TELEMETRY_LOGS = [
-  { atSec: 0.5, text: '[Agent 1] Indic Voice model v4.2 initialized. Processing phonetic stream...' },
-  { atSec: 2.0, text: '[Agent 1] Extracted entities: "Water contamination", "Low pressure", "Kesnand Road".' },
-  { atSec: 3.0, text: '[Agent 2] Photo authenticity confirmed. EXIF geotag timestamp validated.' },
-  { atSec: 4.8, text: '[Agent 3] Geofence boundary locked: Wagholi Ward 29 (Grid #WAG-29-E).' },
-  { atSec: 6.5, text: '[Agent 4] 128-dimensional Complaint DNA computed (Index: 0.941).' },
-  { atSec: 8.2, text: '[Agent 4] Linked to active systemic cluster: "Wagholi Kesnand Pipeline Ruptures".' },
-  { atSec: 9.8, text: '[Agent 5] Inter-agency triage complete: Dispatched to PMC Water Supply Dept.' },
-  { atSec: 11.2, text: '[Agent 6] Dynamic Citizen SLA calculated: 12 Hours (Target: Today by 18:00).' },
-  { atSec: 12.8, text: '[Agent 7] Repair SOP #14 synthesized. Required machinery: Valve Suction Rig.' },
-  { atSec: 14.1, text: '[Agent 8] Minting cryptographically signed Municipal Redressal Token...' },
-  { atSec: 14.9, text: '[Agent 8] Redressal token registered. Dispatched to Citizen & Field Engineer.' }
 ];
 
 export default function MultiAgentSubmissionPipeline({
@@ -166,8 +139,7 @@ export default function MultiAgentSubmissionPipeline({
   onComplete = () => {}
 }) {
   const [elapsedSec, setElapsedSec] = useState(0);
-  const [currentLogs, setCurrentLogs] = useState([]);
-  const telemetryBottomRef = useRef(null);
+  const [isDoneAll, setIsDoneAll] = useState(false);
 
   useEffect(() => {
     const startTime = Date.now();
@@ -177,55 +149,28 @@ export default function MultiAgentSubmissionPipeline({
       const elapsed = Math.min(PIPELINE_DURATION_SEC, (now - startTime) / 1000);
       setElapsedSec(elapsed);
 
-      // Add matching telemetry logs
-      const matchingLogs = TELEMETRY_LOGS.filter(l => l.atSec <= elapsed);
-      setCurrentLogs(matchingLogs);
-
       if (elapsed >= PIPELINE_DURATION_SEC) {
+        setIsDoneAll(true);
         clearInterval(interval);
-        // Small delay for smooth handoff
-        setTimeout(() => {
-          onComplete();
-        }, 300);
       }
     }, 50);
 
     return () => clearInterval(interval);
-  }, [onComplete]);
-
-  useEffect(() => {
-    if (telemetryBottomRef.current) {
-      telemetryBottomRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [currentLogs.length]);
+  }, []);
 
   const progressPercent = Math.min(100, Math.round((elapsedSec / PIPELINE_DURATION_SEC) * 100));
   const remainingSec = Math.max(0, (PIPELINE_DURATION_SEC - elapsedSec)).toFixed(1);
 
   return (
     <div style={{
-      padding: 'clamp(20px, 4vw, 36px)',
+      padding: 'clamp(18px, 3.5vw, 32px)',
       background: '#FFFFFF',
       borderRadius: '24px',
       color: '#0F172A',
-      position: 'relative',
-      overflow: 'hidden'
+      position: 'relative'
     }}>
-      {/* Background Subtle Gradient Glow */}
-      <div style={{
-        position: 'absolute',
-        top: '-10%',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '600px',
-        height: '300px',
-        background: 'radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.05) 50%, transparent 80%)',
-        pointerEvents: 'none',
-        zIndex: 0
-      }} />
-
       {/* Header Bar */}
-      <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', marginBottom: '24px' }}>
+      <div style={{ textAlign: 'center', marginBottom: '22px' }}>
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -237,359 +182,286 @@ export default function MultiAgentSubmissionPipeline({
           color: '#065F46',
           fontSize: '12px',
           fontWeight: 800,
-          marginBottom: '10px'
+          marginBottom: '8px'
         }}>
           <Activity style={{ width: '14px', height: '14px', animation: 'pulse 1.5s infinite', color: '#059669' }} />
           <span>8-AGENT AUTONOMOUS MUNICIPAL ORCHESTRATION</span>
         </div>
 
         <h2 style={{
-          fontSize: 'clamp(22px, 4.5vw, 28px)',
+          fontSize: 'clamp(20px, 4vw, 26px)',
           fontWeight: 900,
           color: '#0F172A',
-          margin: '0 0 6px 0',
+          margin: '0 0 4px 0',
           letterSpacing: '-0.02em'
         }}>
-          Processing Your Grievance with 8 AI Agents
+          Processing Grievance Across 8 AI Agents
         </h2>
 
         <p style={{
-          fontSize: '13.5px',
+          fontSize: '13px',
           color: '#64748B',
-          maxWidth: '680px',
+          maxWidth: '620px',
           margin: '0 auto',
-          lineHeight: 1.5
+          lineHeight: 1.45
         }}>
-          JanSahayak is mobilizing 8 specialized municipal AI agents to verify evidence, resolve jurisdiction in <strong>Wagholi, Pune</strong>, formulate SOPs, and mint your official redressal token.
+          Each specialized municipal agent processes one step sequentially in <strong>Wagholi, Pune</strong> before generating your official ticket.
         </p>
       </div>
 
-      {/* Live 15-Second Timer & Progress Section */}
+      {/* Live 15-Second Timer & Progress Bar */}
       <div style={{
-        position: 'relative',
-        zIndex: 1,
         background: '#F8FAFC',
         border: '1.5px solid #E2E8F0',
-        borderRadius: '18px',
-        padding: '16px 20px',
-        marginBottom: '24px',
-        boxShadow: '0 4px 16px rgba(15, 23, 42, 0.03)'
+        borderRadius: '16px',
+        padding: '14px 18px',
+        marginBottom: '20px'
       }}>
         <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           flexWrap: 'wrap',
-          gap: '12px',
-          marginBottom: '10px'
+          gap: '10px',
+          marginBottom: '8px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
               background: '#0F172A',
               color: '#10B981',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontWeight: 800,
-              fontSize: '13px'
+              fontWeight: 800
             }}>
-              <Zap style={{ width: '18px', height: '18px', fill: '#10B981' }} />
+              <Zap style={{ width: '16px', height: '16px', fill: '#10B981' }} />
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <strong style={{ fontSize: '13.5px', color: '#0F172A' }}>
-                  Live Multi-Agent Verification Pipeline
+                <strong style={{ fontSize: '13px', color: '#0F172A' }}>
+                  Sequential Pipeline
                 </strong>
                 <span style={{
-                  fontSize: '11px',
+                  fontSize: '10.5px',
                   fontWeight: 700,
                   padding: '1px 7px',
                   borderRadius: '6px',
-                  background: '#ECFDF5',
-                  color: '#047857'
+                  background: isDoneAll ? '#ECFDF5' : '#EFF6FF',
+                  color: isDoneAll ? '#047857' : '#1D4ED8'
                 }}>
                   {progressPercent}% Complete
                 </span>
               </div>
-              <span style={{ fontSize: '12px', color: '#64748B' }}>
-                Wagholi Sub-Division • PMRDA / PMC Pune Municipal Gateway
+              <span style={{ fontSize: '11.5px', color: '#64748B' }}>
+                Wagholi Ward 27-31 • PMC Pune Municipal Corporation
               </span>
             </div>
           </div>
 
-          {/* 15-Second Countdown Badge */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
+            gap: '6px',
             background: '#FFFFFF',
             border: '1.5px solid #CBD5E1',
             borderRadius: '999px',
-            padding: '6px 14px',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+            padding: '5px 12px'
           }}>
-            <Clock style={{ width: '15px', height: '15px', color: '#2563EB' }} />
-            <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A' }}>
-              {remainingSec}s Remaining
+            <Clock style={{ width: '14px', height: '14px', color: '#2563EB' }} />
+            <span style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A' }}>
+              {isDoneAll ? '0.0s' : `${remainingSec}s`}
             </span>
           </div>
         </div>
 
-        {/* Dynamic Progress Bar */}
+        {/* Linear Progress Bar */}
         <div style={{
           width: '100%',
-          height: '10px',
+          height: '8px',
           background: '#E2E8F0',
           borderRadius: '999px',
-          overflow: 'hidden',
-          position: 'relative'
+          overflow: 'hidden'
         }}>
           <div style={{
             width: `${progressPercent}%`,
             height: '100%',
             background: 'linear-gradient(90deg, #10B981 0%, #3B82F6 50%, #8B5CF6 100%)',
             borderRadius: '999px',
-            transition: 'width 60ms linear',
-            boxShadow: '0 0 12px rgba(16, 185, 129, 0.4)'
+            transition: 'width 60ms linear'
           }} />
         </div>
       </div>
 
-      {/* 8-Agent Grid */}
+      {/* 8-Agent Vertical Top-to-Bottom List (One by One) */}
       <div style={{
-        position: 'relative',
-        zIndex: 1,
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: '14px',
-        marginBottom: '24px'
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+        marginBottom: '22px'
       }}>
-        {AGENT_SPECS.map((agent) => {
+        {AGENT_SPECS.map((agent, index) => {
           const isStarted = elapsedSec >= agent.startSec;
           const isDone = elapsedSec >= agent.endSec;
           const isWorking = isStarted && !isDone;
           const IconComponent = agent.icon;
 
-          // Compute individual agent progress
-          const agentProgress = !isStarted ? 0 : isDone ? 100 : Math.round(((elapsedSec - agent.startSec) / (agent.endSec - agent.startSec)) * 100);
+          const agentProgress = !isStarted 
+            ? 0 
+            : isDone 
+            ? 100 
+            : Math.round(((elapsedSec - agent.startSec) / (agent.endSec - agent.startSec)) * 100);
 
           return (
             <div
               key={agent.id}
               style={{
-                borderRadius: '16px',
-                background: isWorking ? agent.bgLight : isDone ? '#FFFFFF' : '#F8FAFC',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '12px 16px',
+                borderRadius: '14px',
+                background: isWorking ? agent.bgLight : isDone ? '#F0FDF4' : '#F8FAFC',
                 border: `1.5px solid ${isWorking ? agent.color : isDone ? '#86EFAC' : '#E2E8F0'}`,
-                padding: '14px 16px',
+                boxShadow: isWorking ? `0 4px 14px ${agent.color}20` : 'none',
                 transition: 'all 200ms ease',
-                boxShadow: isWorking 
-                  ? `0 6px 20px ${agent.color}25, 0 1px 3px rgba(0,0,0,0.05)` 
-                  : isDone 
-                  ? '0 2px 8px rgba(16, 185, 129, 0.1)' 
-                  : 'none',
-                position: 'relative',
-                overflow: 'hidden'
+                gap: '12px'
               }}
             >
-              {/* Top Row: Icon + Agent Name & Status */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  {/* Agent Visual Avatar / Animated Icon */}
-                  <div style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '10px',
-                    background: isWorking ? agent.color : isDone ? '#10B981' : '#94A3B8',
-                    color: '#FFFFFF',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    boxShadow: isWorking ? `0 0 14px ${agent.color}80` : 'none',
-                    transition: 'all 250ms ease'
-                  }}>
-                    {isWorking ? (
-                      <Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1.5s linear infinite' }} />
-                    ) : isDone ? (
-                      <Check style={{ width: '18px', height: '18px', strokeWidth: 3 }} />
-                    ) : (
-                      <IconComponent style={{ width: '18px', height: '18px', opacity: 0.8 }} />
-                    )}
-                  </div>
-
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontSize: '10.5px', fontWeight: 800, color: '#64748B' }}>
-                        AGENT #{agent.id}
-                      </span>
-                      <strong style={{ fontSize: '13px', color: '#0F172A', lineHeight: 1.2 }}>
-                        {agent.name}
-                      </strong>
-                    </div>
-                    <span style={{ fontSize: '11px', color: '#64748B', display: 'block' }}>
-                      {agent.role}
-                    </span>
-                  </div>
+              {/* Left Column: Number + Icon + Name & Role */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: '220px' }}>
+                <div style={{
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '10px',
+                  background: isWorking ? agent.color : isDone ? '#10B981' : '#94A3B8',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  transition: 'all 200ms ease'
+                }}>
+                  {isWorking ? (
+                    <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1.5s linear infinite' }} />
+                  ) : isDone ? (
+                    <Check style={{ width: '16px', height: '16px', strokeWidth: 3 }} />
+                  ) : (
+                    <span style={{ fontSize: '12px', fontWeight: 800 }}>{agent.id}</span>
+                  )}
                 </div>
 
-                {/* Status Badge */}
                 <div>
-                  {isDone ? (
-                    <span style={{
-                      fontSize: '10.5px',
-                      fontWeight: 800,
-                      padding: '2px 8px',
-                      borderRadius: '999px',
-                      background: '#ECFDF5',
-                      color: '#047857',
-                      border: '1px solid #A7F3D0',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '3px'
-                    }}>
-                      <CheckCircle2 style={{ width: '11px', height: '11px' }} />
-                      Verified
-                    </span>
-                  ) : isWorking ? (
-                    <span style={{
-                      fontSize: '10.5px',
-                      fontWeight: 800,
-                      padding: '2px 8px',
-                      borderRadius: '999px',
-                      background: '#FFFFFF',
-                      color: agent.color,
-                      border: `1px solid ${agent.borderLight}`,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      animation: 'pulse 1s infinite'
-                    }}>
-                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: agent.color }} />
-                      Working ({agentProgress}%)
-                    </span>
-                  ) : (
-                    <span style={{
-                      fontSize: '10.5px',
-                      fontWeight: 600,
-                      padding: '2px 7px',
-                      borderRadius: '999px',
-                      background: '#F1F5F9',
-                      color: '#94A3B8'
-                    }}>
-                      Standby
-                    </span>
-                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <strong style={{ fontSize: '13px', color: '#0F172A', lineHeight: 1.2 }}>
+                      Agent {agent.id}: {agent.name}
+                    </strong>
+                  </div>
+                  <span style={{ fontSize: '11px', color: isWorking ? '#1E293B' : isDone ? '#065F46' : '#64748B', display: 'block' }}>
+                    {isDone ? agent.completedDescription : isWorking ? agent.activeDescription : agent.role}
+                  </span>
                 </div>
               </div>
 
-              {/* Status Description Text */}
-              <p style={{
-                fontSize: '11.5px',
-                color: isWorking ? '#1E293B' : isDone ? '#065F46' : '#94A3B8',
-                margin: '0 0 8px 0',
-                lineHeight: 1.35,
-                fontWeight: isWorking ? 600 : 400
-              }}>
-                {isDone 
-                  ? agent.completedDescription 
-                  : isWorking 
-                  ? agent.activeDescription 
-                  : 'Waiting for upstream pipeline signal...'}
-              </p>
-
-              {/* Mini Agent Progress Line */}
-              <div style={{
-                width: '100%',
-                height: '4px',
-                background: '#E2E8F0',
-                borderRadius: '999px',
-                overflow: 'hidden'
-              }}>
-                <div style={{
-                  width: `${agentProgress}%`,
-                  height: '100%',
-                  background: isDone ? '#10B981' : agent.color,
-                  borderRadius: '999px',
-                  transition: 'width 80ms linear'
-                }} />
+              {/* Right Column: Status Badge */}
+              <div style={{ flexShrink: 0 }}>
+                {isDone ? (
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    padding: '3px 10px',
+                    borderRadius: '999px',
+                    background: '#DCFCE7',
+                    color: '#15803D',
+                    border: '1px solid #86EFAC',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}>
+                    <CheckCircle2 style={{ width: '12px', height: '12px' }} />
+                    Done
+                  </span>
+                ) : isWorking ? (
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    padding: '3px 10px',
+                    borderRadius: '999px',
+                    background: '#FFFFFF',
+                    color: agent.color,
+                    border: `1.5px solid ${agent.borderLight}`,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+                  }}>
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: agent.color, animation: 'pulse 1s infinite' }} />
+                    Processing ({agentProgress}%)
+                  </span>
+                ) : (
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    padding: '3px 8px',
+                    borderRadius: '999px',
+                    background: '#F1F5F9',
+                    color: '#94A3B8'
+                  }}>
+                    Queued
+                  </span>
+                )}
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Live Telemetry Terminal Stream */}
-      <div style={{
-        position: 'relative',
-        zIndex: 1,
-        background: '#0B132B',
-        borderRadius: '16px',
-        border: '1.5px solid #1E293B',
-        padding: '14px 18px',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-        fontFamily: 'monospace'
-      }}>
+      {/* Action Submit Button that Appears When 15s Finishes */}
+      {isDoneAll ? (
+        <div style={{ textAlign: 'center', animation: 'fadeIn 300ms ease' }}>
+          <button
+            type="button"
+            onClick={onComplete}
+            style={{
+              width: '100%',
+              padding: '14px 24px',
+              borderRadius: '14px',
+              background: 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)',
+              color: '#FFFFFF',
+              border: 'none',
+              fontSize: '15px',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px',
+              boxShadow: '0 6px 20px rgba(14, 94, 58, 0.35)',
+              transition: 'all 200ms ease'
+            }}
+          >
+            <Sparkles style={{ width: '18px', height: '18px' }} />
+            <span>View Generated Municipal Ticket (#PN-2026-WAG)</span>
+            <ArrowRight style={{ width: '18px', height: '18px' }} />
+          </button>
+        </div>
+      ) : (
         <div style={{
+          textAlign: 'center',
+          padding: '10px',
+          fontSize: '12px',
+          color: '#64748B',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          borderBottom: '1px solid #1E293B',
-          paddingBottom: '8px',
-          marginBottom: '10px'
+          justifyContent: 'center',
+          gap: '6px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Terminal style={{ width: '14px', height: '14px', color: '#10B981' }} />
-            <span style={{ fontSize: '11px', fontWeight: 800, color: '#E2E8F0', letterSpacing: '0.04em' }}>
-              PUNE MUNICIPAL AI TELEMETRY STREAM
-            </span>
-          </div>
-          <span style={{ fontSize: '10px', color: '#10B981', fontWeight: 700 }}>
-            ● LIVE STREAMING
-          </span>
+          <Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1.5s linear infinite', color: '#2563EB' }} />
+          <span>All 8 AI agents are coordinating in parallel. Ticket button will unlock at 15.0s...</span>
         </div>
-
-        <div style={{
-          height: '92px',
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '5px',
-          fontSize: '11px',
-          color: '#94A3B8'
-        }}>
-          {currentLogs.map((log, idx) => (
-            <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', lineHeight: 1.35 }}>
-              <span style={{ color: '#64748B', flexShrink: 0 }}>
-                [{log.atSec.toFixed(1)}s]
-              </span>
-              <span style={{
-                color: idx === currentLogs.length - 1 ? '#38BDF8' : '#CBD5E1',
-                fontWeight: idx === currentLogs.length - 1 ? 700 : 400
-              }}>
-                {log.text}
-              </span>
-            </div>
-          ))}
-          <div ref={telemetryBottomRef} />
-        </div>
-      </div>
-
-      {/* Footer Guarantee Note */}
-      <div style={{
-        marginTop: '16px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '6px',
-        fontSize: '11.5px',
-        color: '#64748B'
-      }}>
-        <ShieldCheck style={{ width: '14px', height: '14px', color: '#059669' }} />
-        <span>End-to-end encrypted • Wagholi Municipal Jurisdiction • ISO 27001 Certified Redressal Gateway</span>
-      </div>
+      )}
     </div>
   );
 }

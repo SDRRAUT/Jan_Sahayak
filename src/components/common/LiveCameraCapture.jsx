@@ -114,16 +114,36 @@ export default function LiveCameraCapture({
     reader.readAsDataURL(file);
   };
 
+  const [scanProgress, setScanProgress] = useState(0);
+
   const processCapturedImage = async (base64Data, mimeType = 'image/jpeg') => {
     setPhotoPreview(base64Data);
     setIsAnalyzing(true);
+    setScanProgress(15);
     setVisionAnalysis(null);
+
+    // Simulate smooth scanning progress ticks
+    const progressTimer = setInterval(() => {
+      setScanProgress(prev => (prev < 90 ? prev + 15 : prev));
+    }, 120);
 
     try {
       const result = await analyzeCivicPhoto(base64Data, mimeType, contextText || category);
-      setVisionAnalysis(result);
+      clearInterval(progressTimer);
+      setScanProgress(100);
 
-      if (result.isValidCivic) {
+      // Perform problem & title alignment verification
+      const alignment = checkAlignment(result, contextText, category);
+      const enhancedResult = {
+        ...result,
+        isAligned: alignment.isAligned,
+        alignmentStatus: alignment.alignmentStatus,
+        alignmentMessage: alignment.alignmentMessage
+      };
+
+      setVisionAnalysis(enhancedResult);
+
+      if (enhancedResult.isValidCivic && enhancedResult.isAligned) {
         if (result.category && setCategory) {
           setCategory(result.category);
         }
@@ -134,9 +154,73 @@ export default function LiveCameraCapture({
       }
     } catch (err) {
       console.warn('Vision processing failed:', err);
+      clearInterval(progressTimer);
     } finally {
-      setIsAnalyzing(false);
+      setTimeout(() => {
+        setIsAnalyzing(false);
+      }, 300);
     }
+  };
+
+  const checkAlignment = (visionResult, userContext, userCategory) => {
+    if (!visionResult || !visionResult.isValidCivic) {
+      return {
+        isAligned: false,
+        alignmentStatus: 'INVALID_CIVIC',
+        alignmentMessage: visionResult?.rejectionReason || 'Photo is not a physical ground civic issue (e.g. UI/document/unrelated).'
+      };
+    }
+
+    const textToMatch = `${userContext} ${userCategory}`.toLowerCase();
+    const detectedCat = (visionResult.category || '').toLowerCase();
+
+    const isWater = /water|paani|leak|tap|pipe|contaminat/i.test(textToMatch);
+    const isRoad = /road|pothole|gaddha|sadak|footpath|crater/i.test(textToMatch);
+    const isWaste = /garbage|waste|kooda|kachra|trash|safai/i.test(textToMatch);
+    const isPower = /power|light|bijli|electric|wire|transformer/i.test(textToMatch);
+    const isDrain = /drain|nali|sewer|naala|overflow|waterlog/i.test(textToMatch);
+
+    if (isWater && (detectedCat.includes('road') || detectedCat.includes('power') || detectedCat.includes('waste'))) {
+      return {
+        isAligned: false,
+        alignmentStatus: 'MISMATCH',
+        alignmentMessage: `⚠️ Photo Mismatch: You reported a Water Supply problem, but this photo appears to show ${visionResult.category}. Please upload proof of the water issue.`
+      };
+    }
+    if (isRoad && (detectedCat.includes('water') || detectedCat.includes('power') || detectedCat.includes('drain'))) {
+      return {
+        isAligned: false,
+        alignmentStatus: 'MISMATCH',
+        alignmentMessage: `⚠️ Photo Mismatch: You reported a Road/Pothole problem, but this photo appears to show ${visionResult.category}. Please upload proof of the road issue.`
+      };
+    }
+    if (isWaste && (detectedCat.includes('power') || detectedCat.includes('road') || detectedCat.includes('water'))) {
+      return {
+        isAligned: false,
+        alignmentStatus: 'MISMATCH',
+        alignmentMessage: `⚠️ Photo Mismatch: You reported a Garbage/Waste problem, but this photo appears to show ${visionResult.category}. Please upload proof of the garbage dump.`
+      };
+    }
+    if (isPower && (detectedCat.includes('waste') || detectedCat.includes('water') || detectedCat.includes('road'))) {
+      return {
+        isAligned: false,
+        alignmentStatus: 'MISMATCH',
+        alignmentMessage: `⚠️ Photo Mismatch: You reported a Power/Streetlight problem, but this photo appears to show ${visionResult.category}. Please upload proof of the electrical hazard.`
+      };
+    }
+    if (isDrain && (detectedCat.includes('power') || detectedCat.includes('waste') || detectedCat.includes('road'))) {
+      return {
+        isAligned: false,
+        alignmentStatus: 'MISMATCH',
+        alignmentMessage: `⚠️ Photo Mismatch: You reported a Drainage/Sewage problem, but this photo appears to show ${visionResult.category}. Please upload proof of the drainage issue.`
+      };
+    }
+
+    return {
+      isAligned: true,
+      alignmentStatus: 'ALIGNED',
+      alignmentMessage: `✓ Verified Ground Proof: Photo matches reported ${visionResult.category || userCategory || 'problem'}.`
+    };
   };
 
   const handleRemovePhoto = () => {
@@ -434,22 +518,39 @@ export default function LiveCameraCapture({
             gap: '10px'
           }}>
             {isAnalyzing ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Loader2 className="animate-spin" size={16} style={{ color: '#2563EB' }} />
-                <span style={{ fontSize: '12.5px', color: '#2563EB', fontWeight: 600 }}>
-                  AI Vision is scanning image for physical civic hazards...
-                </span>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Loader2 className="animate-spin" size={16} style={{ color: '#2563EB' }} />
+                    <span style={{ fontSize: '12.5px', color: '#1D4ED8', fontWeight: 700 }}>
+                      AI Vision is scanning image & verifying problem alignment...
+                    </span>
+                  </div>
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#2563EB' }}>
+                    {scanProgress}%
+                  </span>
+                </div>
+                {/* Progress bar */}
+                <div style={{ width: '100%', height: '7px', background: '#DBEAFE', borderRadius: '999px', overflow: 'hidden' }}>
+                  <div style={{
+                    width: `${scanProgress}%`,
+                    height: '100%',
+                    background: 'linear-gradient(90deg, #2563EB 0%, #10B981 100%)',
+                    borderRadius: '999px',
+                    transition: 'width 100ms ease'
+                  }} />
+                </div>
               </div>
             ) : visionAnalysis ? (
-              visionAnalysis.isValidCivic ? (
-                /* Valid Civic Ground Issue */
+              visionAnalysis.isValidCivic && visionAnalysis.isAligned ? (
+                /* Valid & Aligned Civic Ground Issue */
                 <div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
                     <CheckCircle2 size={18} style={{ color: '#059669', flexShrink: 0, marginTop: '2px' }} />
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                         <strong style={{ fontSize: '13px', color: '#0F172A' }}>
-                          AI Civic Hazard Verified:
+                          AI Civic Hazard & Title Alignment Verified:
                         </strong>
                         <span style={{
                           fontSize: '10.5px',
@@ -466,10 +567,13 @@ export default function LiveCameraCapture({
                       <p style={{ fontSize: '12px', color: '#334155', margin: '2px 0 0 0', lineHeight: 1.4 }}>
                         {visionAnalysis.observedHazard}
                       </p>
+                      <div style={{ fontSize: '11.5px', color: '#065F46', fontWeight: 600, marginTop: '4px' }}>
+                        {visionAnalysis.alignmentMessage}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Option to Edit / Add Custom Text if AI Detected something different */}
+                  {/* Option to Edit / Add Custom Text */}
                   <div style={{
                     padding: '10px 12px',
                     borderRadius: '10px',
@@ -480,7 +584,7 @@ export default function LiveCameraCapture({
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                       <label style={{ fontSize: '11.5px', fontWeight: 700, color: '#475569', display: 'flex', alignItems: 'center', gap: '5px' }}>
                         <Edit3 size={13} style={{ color: '#2563EB' }} />
-                        <span>Add or edit specific problem details by typing:</span>
+                        <span>Add specific ground landmark or detail note:</span>
                       </label>
                       <span style={{ fontSize: '10.5px', color: '#64748B' }}>Optional</span>
                     </div>
@@ -488,7 +592,7 @@ export default function LiveCameraCapture({
                       type="text"
                       value={customDetailText}
                       onChange={handleTextCorrection}
-                      placeholder="e.g. Also near water pipeline junction; deep hole dangerous at night..."
+                      placeholder="e.g. Near Ivy Estate gate; high risk of slipping in rain..."
                       style={{
                         width: '100%',
                         padding: '6px 10px',
@@ -502,10 +606,10 @@ export default function LiveCameraCapture({
                   </div>
                 </div>
               ) : (
-                /* REJECTED / INVALID IMAGE (e.g. Website UI / Non-Civic screenshot) */
+                /* REJECTED / MISMATCHED IMAGE */
                 <div style={{
-                  padding: '10px 12px',
-                  borderRadius: '10px',
+                  padding: '12px 14px',
+                  borderRadius: '12px',
                   background: '#FEF2F2',
                   border: '1.5px solid #FECACA',
                   display: 'flex',
@@ -516,11 +620,14 @@ export default function LiveCameraCapture({
                     <AlertTriangle size={18} style={{ color: '#DC2626', flexShrink: 0, marginTop: '2px' }} />
                     <div>
                       <strong style={{ fontSize: '13px', color: '#991B1B', display: 'block' }}>
-                        ⚠️ Non-Civic Image Detected: Photo Not Accepted
+                        {!visionAnalysis.isValidCivic ? '⚠️ Non-Civic Image Detected' : '⚠️ Problem & Photo Alignment Mismatch'}
                       </strong>
-                      <p style={{ fontSize: '12px', color: '#B91C1C', margin: '2px 0 0 0', lineHeight: 1.4 }}>
-                        {visionAnalysis.rejectionReason || 'This image appears to be a website UI, software graphic, or unrelated file rather than a physical ground issue (road, garbage, water, etc.).'}
+                      <p style={{ fontSize: '12px', color: '#B91C1C', margin: '3px 0 0 0', lineHeight: 1.4 }}>
+                        {visionAnalysis.alignmentMessage || visionAnalysis.rejectionReason || 'The uploaded photo does not match the problem title or category you entered.'}
                       </p>
+                      <span style={{ fontSize: '11px', color: '#7F1D1D', fontWeight: 700, marginTop: '4px', display: 'block' }}>
+                        🛑 You must attach a matching photo or remove the photo to proceed to the next step.
+                      </span>
                     </div>
                   </div>
 
@@ -533,7 +640,7 @@ export default function LiveCameraCapture({
                         startCamera('environment');
                       }}
                       style={{
-                        padding: '6px 14px',
+                        padding: '7px 14px',
                         borderRadius: '8px',
                         background: '#DC2626',
                         color: '#FFFFFF',
@@ -554,7 +661,7 @@ export default function LiveCameraCapture({
                       type="button"
                       onClick={handleRemovePhoto}
                       style={{
-                        padding: '6px 14px',
+                        padding: '7px 14px',
                         borderRadius: '8px',
                         background: '#FFFFFF',
                         color: '#374151',
@@ -564,7 +671,7 @@ export default function LiveCameraCapture({
                         cursor: 'pointer'
                       }}
                     >
-                      <span>Describe by Typing Instead</span>
+                      <span>Remove Photo</span>
                     </button>
                   </div>
                 </div>
