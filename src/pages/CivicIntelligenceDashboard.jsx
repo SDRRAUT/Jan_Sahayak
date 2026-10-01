@@ -53,152 +53,161 @@ export default function CivicIntelligenceDashboard() {
     <div className="section-spacing" style={{ paddingTop: '24px', minHeight: '85vh', background: '#F8FAFC' }}>
       <div className="container" style={{ maxWidth: '1280px' }}>
         
-        {/* ── Top Header Banner ── */}
+        {/* ── Top Header Banner (Center Aligned & Refined Muted Styling) ── */}
         <div style={{
           background: '#FFFFFF',
-          borderRadius: '20px',
-          padding: '24px 28px',
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)',
-          marginBottom: '24px'
+          borderRadius: '24px',
+          padding: '28px 32px',
+          border: '1.5px solid #E2E8F0',
+          boxShadow: '0 2px 12px rgba(15, 23, 42, 0.03)',
+          marginBottom: '24px',
+          textAlign: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}>
+          {/* Overline Badges */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              fontSize: '11px',
+              fontWeight: 700,
+              padding: '3px 11px',
+              borderRadius: '999px',
+              background: '#F1F5F9',
+              color: '#475569',
+              border: '1px solid #CBD5E1',
+              letterSpacing: '0.02em'
+            }}>
+              <Sparkles style={{ width: '12px', height: '12px', color: '#6366F1' }} />
+              CIVIC INTELLIGENCE HUB
+            </span>
+            <span style={{
+              fontSize: '11px',
+              fontWeight: 700,
+              color: '#065F46',
+              background: '#F0FDF4',
+              padding: '3px 10px',
+              borderRadius: '999px',
+              border: '1px solid #A7F3D0'
+            }}>
+              ● 100 Complaints → 1 Actionable Plan
+            </span>
+          </div>
+
+          {/* Title */}
+          <h1 style={{
+            fontSize: 'clamp(22px, 3vw, 28px)',
+            fontWeight: 800,
+            color: '#0F172A',
+            letterSpacing: '-0.025em',
+            margin: '0 0 6px 0',
+            lineHeight: 1.25
+          }}>
+            Civic Intelligence & Emerging Problem Discovery
+          </h1>
+
+          {/* Subtitle */}
+          <p style={{
+            fontSize: '13.5px',
+            color: '#64748B',
+            margin: '0 auto',
+            maxWidth: '740px',
+            lineHeight: 1.5,
+            fontWeight: 500
+          }}>
+            Detects early community warning signals, clusters duplicate complaints into unified incidents, and coordinates joint municipal repair teams.
+          </p>
+
+          {/* Center-Aligned Action Buttons with Calmer, Refined Colors */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
+            gap: '10px',
             flexWrap: 'wrap',
-            gap: '16px'
+            marginTop: '20px'
           }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <span style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  padding: '3px 10px',
-                  borderRadius: '999px',
-                  background: '#EEF2FF',
-                  color: '#4338CA',
-                  border: '1px solid #C7D2FE',
-                  letterSpacing: '0.02em'
-                }}>
-                  <Sparkles style={{ width: '13px', height: '13px', color: '#4F46E5' }} />
-                  CIVIC INTELLIGENCE HUB
-                </span>
-                <span style={{
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  color: '#059669',
-                  background: '#ECFDF5',
-                  padding: '2px 8px',
-                  borderRadius: '999px',
-                  border: '1px solid #A7F3D0'
-                }}>
-                  ● 100 Complaints → 1 Actionable Plan
-                </span>
-              </div>
+            {/* Button 1: Territory Problem Explorer */}
+            <button
+              type="button"
+              onClick={() => setShowTerritoryModal(true)}
+              style={{
+                height: '40px',
+                fontSize: '12.5px',
+                fontWeight: 700,
+                padding: '0 18px',
+                borderRadius: '999px',
+                background: '#0F172A',
+                color: '#FFFFFF',
+                border: '1px solid #0F172A',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '7px',
+                boxShadow: '0 2px 6px rgba(15, 23, 42, 0.12)',
+                transition: 'all 150ms ease'
+              }}
+            >
+              <Compass style={{ width: '14px', height: '14px', color: '#38BDF8' }} />
+              <span>🗺️ Territory Problem Explorer</span>
+            </button>
 
-              <h1 style={{
-                fontSize: 'clamp(22px, 3.5vw, 30px)',
-                fontWeight: 800,
-                color: '#0F172A',
-                letterSpacing: '-0.025em',
-                margin: 0,
-                lineHeight: 1.2
-              }}>
-                Civic Intelligence & Emerging Problem Discovery
-              </h1>
+            {/* Button 2: Jan Suchna Broadcast */}
+            <button
+              type="button"
+              onClick={() => setShowJanSuchnaModal(true)}
+              style={{
+                height: '40px',
+                fontSize: '12.5px',
+                fontWeight: 700,
+                padding: '0 18px',
+                borderRadius: '999px',
+                background: '#FFFFFF',
+                color: '#334155',
+                border: '1.5px solid #CBD5E1',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '7px',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                transition: 'all 150ms ease'
+              }}
+            >
+              <Radio style={{ width: '14px', height: '14px', color: '#D97706' }} />
+              <span>📢 Create Jan Suchna Broadcast</span>
+            </button>
 
-              <p style={{
-                fontSize: '13.5px',
-                color: '#64748B',
-                marginTop: '6px',
-                marginBottom: 0,
-                maxWidth: '820px',
-                lineHeight: 1.5
-              }}>
-                Detects early community warning signals, clusters duplicate complaints into unified incidents, and coordinates joint municipal repair teams.
-              </p>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-              <button
-                type="button"
-                onClick={() => setShowTerritoryModal(true)}
-                style={{
-                  height: '42px',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  padding: '0 18px',
-                  borderRadius: '999px',
-                  background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)',
-                  transition: 'all 150ms ease'
-                }}
-              >
-                <Compass style={{ width: '15px', height: '15px', color: '#FFFFFF' }} />
-                <span>🗺️ Territory Problem Explorer</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowJanSuchnaModal(true)}
-                style={{
-                  height: '42px',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  padding: '0 18px',
-                  borderRadius: '999px',
-                  background: 'linear-gradient(135deg, #1E1B4B 0%, #4338CA 100%)',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  boxShadow: '0 2px 8px rgba(67, 56, 202, 0.25)',
-                  transition: 'all 150ms ease'
-                }}
-              >
-                <Radio style={{ width: '15px', height: '15px', color: '#F59E0B' }} />
-                <span>📢 Create Jan Suchna Broadcast</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowSignalModal(true)}
-                style={{
-                  height: '42px',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  padding: '0 18px',
-                  borderRadius: '999px',
-                  background: '#0F172A',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.15)',
-                  transition: 'all 150ms ease'
-                }}
-              >
-                <Radio style={{ width: '15px', height: '15px', color: '#10B981' }} />
-                <span>+ Report Signal</span>
-              </button>
-            </div>
+            {/* Button 3: Report Early Warning Signal */}
+            <button
+              type="button"
+              onClick={() => setShowSignalModal(true)}
+              style={{
+                height: '40px',
+                fontSize: '12.5px',
+                fontWeight: 700,
+                padding: '0 18px',
+                borderRadius: '999px',
+                background: '#F8FAFC',
+                color: '#475569',
+                border: '1.5px solid #E2E8F0',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '7px',
+                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)',
+                transition: 'all 150ms ease'
+              }}
+            >
+              <Radio style={{ width: '14px', height: '14px', color: '#059669' }} />
+              <span>+ Report Signal</span>
+            </button>
           </div>
         </div>
 
