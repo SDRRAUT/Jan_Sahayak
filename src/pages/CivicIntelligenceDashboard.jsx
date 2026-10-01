@@ -224,97 +224,97 @@ export default function CivicIntelligenceDashboard() {
           gap: '12px',
           marginBottom: '20px'
         }}>
-          {/* KPI 1 */}
+          {/* KPI 1 - Light Red/Rose */}
           <div style={{
             padding: '14px 16px',
-            borderRadius: '12px',
-            background: '#FFFFFF',
-            border: '1px solid #E2E8F0',
-            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)'
+            borderRadius: '14px',
+            background: 'linear-gradient(135deg, #FFF5F5 0%, #FEF2F2 100%)',
+            border: '1px solid #FECACA',
+            boxShadow: '0 2px 6px rgba(239, 68, 68, 0.05)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 600, color: '#64748B' }}>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#991B1B' }}>
                 Active Incidents
               </span>
-              <AlertTriangle style={{ width: '15px', height: '15px', color: '#EF4444' }} />
+              <AlertTriangle style={{ width: '15px', height: '15px', color: '#DC2626' }} />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A' }}>
+              <span style={{ fontSize: '24px', fontWeight: 800, color: '#7F1D1D' }}>
                 {civicIncidents.length}
               </span>
-              <span style={{ fontSize: '11px', fontWeight: 600, color: '#EF4444', background: '#FEF2F2', padding: '2px 8px', borderRadius: '6px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#DC2626', background: '#FFFFFF', border: '1px solid #FCA5A5', padding: '2px 8px', borderRadius: '6px' }}>
                 2 Multi-Ward
               </span>
             </div>
           </div>
 
-          {/* KPI 2 */}
+          {/* KPI 2 - Light Indigo/Purple */}
           <div style={{
             padding: '14px 16px',
-            borderRadius: '12px',
-            background: '#FFFFFF',
-            border: '1px solid #E2E8F0',
-            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)'
+            borderRadius: '14px',
+            background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
+            border: '1px solid #C7D2FE',
+            boxShadow: '0 2px 6px rgba(79, 70, 229, 0.05)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 600, color: '#64748B' }}>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#3730A3' }}>
                 Signals Detected
               </span>
-              <Radio style={{ width: '15px', height: '15px', color: '#6366F1' }} />
+              <Radio style={{ width: '15px', height: '15px', color: '#4F46E5' }} />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '24px', fontWeight: 800, color: '#4F46E5' }}>
+              <span style={{ fontSize: '24px', fontWeight: 800, color: '#312E81' }}>
                 {civicSignals.length + 42}
               </span>
-              <span style={{ fontSize: '11px', fontWeight: 600, color: '#059669', background: '#ECFDF5', padding: '2px 8px', borderRadius: '6px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669', background: '#FFFFFF', border: '1px solid #A7F3D0', padding: '2px 8px', borderRadius: '6px' }}>
                 +34% Early
               </span>
             </div>
           </div>
 
-          {/* KPI 3 */}
+          {/* KPI 3 - Light Amber/Orange */}
           <div style={{
             padding: '14px 16px',
-            borderRadius: '12px',
-            background: '#FFFFFF',
-            border: '1px solid #E2E8F0',
-            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)'
+            borderRadius: '14px',
+            background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)',
+            border: '1px solid #FDE68A',
+            boxShadow: '0 2px 6px rgba(217, 119, 6, 0.05)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 600, color: '#64748B' }}>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#92400E' }}>
                 Joint Operations
               </span>
-              <Building2 style={{ width: '15px', height: '15px', color: '#F59E0B' }} />
+              <Building2 style={{ width: '15px', height: '15px', color: '#D97706' }} />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '24px', fontWeight: 800, color: '#D97706' }}>
+              <span style={{ fontSize: '24px', fontWeight: 800, color: '#78350F' }}>
                 2
               </span>
-              <span style={{ fontSize: '11px', fontWeight: 600, color: '#B45309', background: '#FEF3C7', padding: '2px 8px', borderRadius: '6px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#B45309', background: '#FFFFFF', border: '1px solid #FCD34D', padding: '2px 8px', borderRadius: '6px' }}>
                 Multi-Agency
               </span>
             </div>
           </div>
 
-          {/* KPI 4 */}
+          {/* KPI 4 - Light Emerald/Green */}
           <div style={{
             padding: '14px 16px',
-            borderRadius: '12px',
-            background: '#FFFFFF',
-            border: '1px solid #E2E8F0',
-            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)'
+            borderRadius: '14px',
+            background: 'linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)',
+            border: '1px solid #A7F3D0',
+            boxShadow: '0 2px 6px rgba(16, 185, 129, 0.05)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 600, color: '#64748B' }}>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#065F46' }}>
                 Avg Discovery Speed
               </span>
-              <Clock style={{ width: '15px', height: '15px', color: '#10B981' }} />
+              <Clock style={{ width: '15px', height: '15px', color: '#059669' }} />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '24px', fontWeight: 800, color: '#059669' }}>
+              <span style={{ fontSize: '24px', fontWeight: 800, color: '#064E3B' }}>
                 6.2h
               </span>
-              <span style={{ fontSize: '11px', fontWeight: 600, color: '#059669', background: '#ECFDF5', padding: '2px 8px', borderRadius: '6px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669', background: '#FFFFFF', border: '1px solid #6EE7B7', padding: '2px 8px', borderRadius: '6px' }}>
                 93% Faster
               </span>
             </div>
