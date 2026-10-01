@@ -891,27 +891,29 @@ export function ComplaintDetailModal({
                   <ThumbsUp style={{ width: '14px', height: '14px' }} /> Upvote ({item.upvotes || 1})
                 </button>
               )}
-              <Link
-                to={`/citizen/complaints/${item.id}`}
-                onClick={onClose}
-                style={{
-                  flex: 2,
-                  height: '44px',
-                  borderRadius: '999px',
-                  background: '#0F172A',
-                  color: '#FFFFFF',
-                  fontWeight: 700,
-                  fontSize: '13px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  textDecoration: 'none',
-                  boxShadow: '0 2px 8px rgba(15,23,42,0.15)'
-                }}
-              >
-                {item.status === 'RESOLVED' ? 'Verify Resolution' : 'Full Investigation View'} <ArrowRight style={{ width: '15px', height: '15px' }} />
-              </Link>
+              {role !== 'citizen' && (
+                <Link
+                  to={`/citizen/complaints/${item.id}`}
+                  onClick={onClose}
+                  style={{
+                    flex: 2,
+                    height: '44px',
+                    borderRadius: '999px',
+                    background: '#0F172A',
+                    color: '#FFFFFF',
+                    fontWeight: 700,
+                    fontSize: '13px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    textDecoration: 'none',
+                    boxShadow: '0 2px 8px rgba(15,23,42,0.15)'
+                  }}
+                >
+                  {item.status === 'RESOLVED' ? 'Verify Resolution' : 'Full Investigation View'} <ArrowRight style={{ width: '15px', height: '15px' }} />
+                </Link>
+              )}
             </>
           )}
         </div>

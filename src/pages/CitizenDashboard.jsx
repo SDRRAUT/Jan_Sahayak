@@ -268,9 +268,11 @@ function GrievanceDetailPopup({ item, onClose, citizen, upvoteGrievance }) {
           <button onClick={()=>upvoteGrievance(item.id)} style={{flex:'1 1 120px',minHeight:'44px',height:'44px',borderRadius:'999px',border:'1px solid #E2E8F0',background:'#F8FAFC',cursor:'pointer',fontSize:'13px',fontWeight:700,color:'#334155',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}}>
             <ThumbsUp style={{width:'14px',height:'14px'}}/> Upvote ({item.upvotes||1})
           </button>
-          <Link to={`/citizen/complaints/${item.id}`} style={{flex:'2 1 180px',minHeight:'44px',height:'44px',borderRadius:'999px',background:'#0F172A',color:'#FFFFFF',fontWeight:700,fontSize:'13px',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px',textDecoration:'none',boxShadow:'0 2px 8px rgba(15,23,42,0.15)'}}>
-            {(item.status==='RESOLVED'||item.status==='ACTION_COMPLETED'||item.status==='VERIFICATION_PENDING')?'Verify Resolution':'Full Investigation View'} <ArrowRight style={{width:'15px',height:'15px'}}/>
-          </Link>
+          {citizen?.role && citizen.role !== 'citizen' && (
+            <Link to={`/citizen/complaints/${item.id}`} style={{flex:'2 1 180px',minHeight:'44px',height:'44px',borderRadius:'999px',background:'#0F172A',color:'#FFFFFF',fontWeight:700,fontSize:'13px',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px',textDecoration:'none',boxShadow:'0 2px 8px rgba(15,23,42,0.15)'}}>
+              {(item.status==='RESOLVED'||item.status==='ACTION_COMPLETED'||item.status==='VERIFICATION_PENDING')?'Verify Resolution':'Full Investigation View'} <ArrowRight style={{width:'15px',height:'15px'}}/>
+            </Link>
+          )}
         </div>
       </div>
     </div>
