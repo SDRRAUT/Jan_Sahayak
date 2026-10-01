@@ -289,51 +289,8 @@ export function AppProvider({ children }) {
       console.warn('Supabase Realtime channel init failed:', e.message);
     }
 
-    // 2. Fallback / supplementary SSE listener for all canonical events
-    let eventSource = null;
-    try {
-      eventSource = new EventSource('/api/events');
-      const handleServerEvent = () => {
-        fetchCivicIntelligence();
-        fetchGrievances();
-        fetchNotifications();
-      };
-
-      const eventsToListen = [
-        'complaint_created',
-        'complaint_updated',
-        'complaint_analyzed',
-        'dna_generated',
-        'cluster_updated',
-        'incident_created',
-        'incident_updated',
-        'status_changed',
-        'investigation_started',
-        'field_action_started',
-        'field_action_completed',
-        'verification_requested',
-        'verification_submitted',
-        'incident_resolved',
-        'incident_reopened',
-        'notification_created'
-      ];
-
-      eventsToListen.forEach(evt => {
-        eventSource.addEventListener(evt, handleServerEvent);
-      });
-
-      eventSource.onerror = () => {
-        if (eventSource && eventSource.readyState === EventSource.CONNECTING) {
-          eventSource.close();
-        }
-      };
-    } catch (err) {
-      console.warn('SSE connection unavailable, using standard sync:', err);
-    }
-
     return () => {
       if (realtimeChannel) supabase.removeChannel(realtimeChannel);
-      if (eventSource) eventSource.close();
     };
   }, []);
 
@@ -410,16 +367,39 @@ export function AppProvider({ children }) {
     setNotifications(prev => [newN, ...prev]);
   };
 
-  // Real-Time EventSource connection to backend SSE
+  // Single Authoritative Real-Time EventSource connection to backend SSE
   useEffect(() => {
     let es = null;
     try {
-      es = new EventSource('/api/events');
-      
-      es.addEventListener('complaint_created', () => {
+      const sseUrl = token ? `/api/events?token=${encodeURIComponent(token)}` : '/api/events';
+      es = new EventSource(sseUrl);
+
+      const handleRefresh = () => {
+        fetchCivicIntelligence();
         fetchGrievances();
         fetchNotifications();
-        fetchCivicIntelligence();
+      };
+
+      const canonicalEvents = [
+        'complaint_created',
+        'complaint_updated',
+        'complaint_analyzed',
+        'dna_generated',
+        'cluster_updated',
+        'incident_created',
+        'incident_updated',
+        'investigation_started',
+        'field_action_started',
+        'field_action_completed',
+        'verification_requested',
+        'verification_submitted',
+        'incident_resolved',
+        'incident_reopened',
+        'notification_created'
+      ];
+
+      canonicalEvents.forEach(evtName => {
+        es.addEventListener(evtName, handleRefresh);
       });
 
       es.addEventListener('status_changed', (evt) => {
@@ -430,20 +410,13 @@ export function AppProvider({ children }) {
             setGrievances(prev => prev.map(g => g.id === payload.grievanceId ? { ...g, status: payload.newStatus } : g));
           }
         } catch (err) {}
-        fetchGrievances();
-        fetchNotifications();
-      });
-
-      es.addEventListener('incident_created', () => {
-        fetchCivicIntelligence();
-      });
-
-      es.addEventListener('complaint_analyzed', () => {
-        fetchGrievances();
+        handleRefresh();
       });
 
       es.onerror = () => {
-        // Browser automatically retries SSE connection
+        if (es && es.readyState === EventSource.CONNECTING) {
+          // Automatic browser reconnection in progress
+        }
       };
     } catch (e) {
       console.warn('[SSE] EventSource init note:', e.message);
@@ -584,7 +557,7 @@ export function AppProvider({ children }) {
     if (cred) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 1500);
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
         const res = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -669,7 +642,7 @@ export function AppProvider({ children }) {
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1500);
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
       const res = await fetch('/api/grievances', {
         method: 'POST',
         headers: {
@@ -684,6 +657,8 @@ export function AppProvider({ children }) {
         const data = await res.json();
         const created = data.grievance;
         // Augment with rich DNA for UI display
+        created.timestamp = created.timestamp || new Date().toISOString();
+        created.createdAt = created.createdAt || 'Just now';
         created.grievanceDna = analysis;
         created.aiOfficerBrief = analysis.aiBrief || analysis.structuredSummary?.headline || analysis.coreIssue;
         created.officerName = created.officerName || assignedOfficer;
@@ -695,8 +670,37 @@ export function AppProvider({ children }) {
           citizenDraftHindi: analysis.aiRecommendation?.citizenDraftHindi || analysis.draftResponseHindi || 'आपकी शिकायत दर्ज कर ली गई है।',
           citizenDraftEnglish: analysis.aiRecommendation?.citizenDraftEnglish || analysis.draftResponseEnglish || 'Your grievance has been registered.'
         };
+
+        const officerNotif = {
+          id: `NOTIF-OFFICER-${Date.now()}`,
+          userId: 'USR-OFFICER-01',
+          userRole: 'officer',
+          title: `New Case Assigned: ${(formData.title || analysis.category).slice(0, 35)}...`,
+          message: `Ticket #${created.id} routed with ${analysis.urgency} priority to ${assignedOfficer}.`,
+          grievanceId: created.id,
+          link: `/officer?caseId=${created.id}`,
+          type: 'ASSIGNMENT',
+          read: false,
+          createdAt: 'Just now',
+          timestamp: new Date().toISOString()
+        };
+        const adminNotif = {
+          id: `NOTIF-ADMIN-${Date.now()}`,
+          userId: 'USR-SUPERADMIN-01',
+          userRole: 'super_admin',
+          title: `New Inbound Incident: ${created.id}`,
+          message: `Case ${created.id} logged in ${created.location?.ward || 'Ward 14'} under ${created.department}.`,
+          grievanceId: created.id,
+          link: `/admin?caseId=${created.id}`,
+          type: 'INCIDENT_ALERT',
+          read: false,
+          createdAt: 'Just now',
+          timestamp: new Date().toISOString()
+        };
+        setNotifications(prev => [officerNotif, adminNotif, ...prev]);
+
         setGrievances(prev => {
-          const updated = [created, ...prev];
+          const updated = [created, ...prev.filter(g => g.id !== created.id)];
           localStorage.setItem('jansahayk_grievances_v5', JSON.stringify(updated));
           return updated;
         });
@@ -714,6 +718,7 @@ export function AppProvider({ children }) {
       officerName: assignedOfficer,
       officerDesignation: 'Assistant Executive Engineer',
       createdAt: 'Just now',
+      timestamp: new Date().toISOString(),
       slaDeadline: '24 Hours from now',
       slaHoursLeft: analysis.slaTargetHours || analysis.targetSlaHours || 24,
       upvotes: 1,
@@ -739,7 +744,7 @@ export function AppProvider({ children }) {
       reopenedDispute: null
     };
 
-    // Create notifications for both citizen tracking and government officer desk
+    // Create notifications for both citizen tracking, government officer desk, and central administration
     const officerNotif = {
       id: `NOTIF-OFFICER-${Date.now()}`,
       userId: 'USR-OFFICER-01',
@@ -753,10 +758,23 @@ export function AppProvider({ children }) {
       createdAt: 'Just now',
       timestamp: new Date().toISOString()
     };
-    setNotifications(prev => [officerNotif, ...prev]);
+    const adminNotif = {
+      id: `NOTIF-ADMIN-${Date.now()}`,
+      userId: 'USR-SUPERADMIN-01',
+      userRole: 'super_admin',
+      title: `New Inbound Incident: ${fallbackId}`,
+      message: `Case ${fallbackId} logged in ${fallbackItem.location?.ward || 'Ward 14'} under ${fallbackItem.department}.`,
+      grievanceId: fallbackId,
+      link: `/admin?caseId=${fallbackId}`,
+      type: 'INCIDENT_ALERT',
+      read: false,
+      createdAt: 'Just now',
+      timestamp: new Date().toISOString()
+    };
+    setNotifications(prev => [officerNotif, adminNotif, ...prev]);
 
     setGrievances(prev => {
-      const updated = [fallbackItem, ...prev];
+      const updated = [fallbackItem, ...prev.filter(g => g.id !== fallbackId)];
       localStorage.setItem('jansahayk_grievances_v5', JSON.stringify(updated));
       return updated;
     });

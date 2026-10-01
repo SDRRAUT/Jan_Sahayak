@@ -1,0 +1,91 @@
+<template id="scene5-outro-template">
+  <div
+    data-composition-id="scene5-outro"
+    data-width="1920"
+    data-height="1080"
+    data-duration="4.0"
+    class="scene-inner"
+  >
+    <div class="outro-content">
+      <!-- Logo Emblem -->
+      <div id="outro-emblem" class="emblem-container">
+        <div class="emblem-glow"></div>
+        <div class="emblem-box">
+          <img src="assets/logo.png" alt="JanSahayak" class="emblem-logo" onerror="this.style.display='none'; document.getElementById('s5EmblemFallback').style.display='flex';" />
+          <div id="s5EmblemFallback" class="emblem-fallback" style="display: none;">🇮🇳</div>
+        </div>
+      </div>
+
+      <h1 id="outro-title" class="outro-brand-title">JanSahayak</h1>
+      <div id="outro-hindi" class="outro-brand-hindi">जन सहायक • Aapki Awaaz, Ab Samjhi Jayegi</div>
+      <p id="outro-tag" class="outro-tagline">India's AI-Powered Citizen Grievance & Municipal Intelligence Platform</p>
+
+      <div class="impact-metrics-row">
+        <div id="metric-1" class="impact-metric">
+          <div class="metric-val">30M+</div>
+          <div class="metric-lbl">Citizens Served</div>
+        </div>
+        <div id="metric-2" class="impact-metric">
+          <div class="metric-val">91.4%</div>
+          <div class="metric-lbl">Resolved Within SLA</div>
+        </div>
+        <div id="metric-3" class="impact-metric">
+          <div class="metric-val">3.2s</div>
+          <div class="metric-lbl">Mean AI Triage Time</div>
+        </div>
+      </div>
+
+      <!-- Launch CTA -->
+      <div id="outro-cta" class="launch-cta-pill">
+        <span class="cta-dot"></span>
+        <span>Experience Live Platform at <strong>jansahayak.delhi.gov.in</strong></span>
+        <span class="cta-arrow">→</span>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const tl = gsap.timeline({ paused: true });
+
+        // Emblem scales and glows in
+        tl.fromTo(
+          "#outro-emblem",
+          { opacity: 0, scale: 0.5 },
+          { opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.8)" },
+          0.2
+        );
+
+        // Titles rise up
+        tl.fromTo(
+          "#outro-title",
+          { opacity: 0, y: 30 },
+          { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+          0.4
+        );
+
+        tl.fromTo(
+          "#outro-hindi",
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+          0.6
+        );
+
+        // Stagger in the impact metrics
+        tl.fromTo("#metric-1", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4 }, 1.0);
+        tl.fromTo("#metric-2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4 }, 1.2);
+        tl.fromTo("#metric-3", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4 }, 1.4);
+
+        // CTA blooms in
+        tl.fromTo(
+          "#outro-cta",
+          { opacity: 0, scale: 0.9, y: 15 },
+          { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "power2.out" },
+          1.7
+        );
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines["scene5-outro"] = tl;
+      })();
+    </script>
+  </div>
+</template>

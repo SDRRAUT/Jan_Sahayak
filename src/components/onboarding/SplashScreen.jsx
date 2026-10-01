@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, ArrowRight, Volume2, Shield, CheckCircle2 } from 'lucide-react';
+import { Volume2, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
 
 export default function SplashScreen({ onStart }) {
   const [progress, setProgress] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(4);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const durationMs = 4000;
-    const intervalMs = 40;
+    const durationMs = 3600;
+    const intervalMs = 36;
     const increment = (intervalMs / durationMs) * 100;
 
     const timer = setInterval(() => {
@@ -23,27 +22,14 @@ export default function SplashScreen({ onStart }) {
       });
     }, intervalMs);
 
-    const countdownTimer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(countdownTimer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => {
-      clearInterval(timer);
-      clearInterval(countdownTimer);
-    };
+    return () => clearInterval(timer);
   }, []);
 
   const getStatusText = () => {
-    if (progress < 30) return 'Initializing Public Grievance Engine...';
-    if (progress < 65) return 'Connecting Municipal AI & Department DNA...';
-    if (progress < 95) return 'Calibrating Multilingual Voice & Image Triage...';
-    return 'System Ready • Click Start to Begin Audio Tour';
+    if (progress < 30) return 'Connecting Municipal AI Engine...';
+    if (progress < 70) return 'Mapping Multi-Department DNA & GIS Nodes...';
+    if (progress < 95) return 'Calibrating Multilingual Voice Triage...';
+    return 'Civic Network Ready';
   };
 
   return (
@@ -51,238 +37,529 @@ export default function SplashScreen({ onStart }) {
       position: 'fixed',
       inset: 0,
       zIndex: 99999,
-      background: 'linear-gradient(145deg, #070B14 0%, #0F172A 45%, #0B192C 100%)',
-      color: '#FFFFFF',
+      backgroundColor: '#FFFFFF',
       display: 'flex',
-      flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '24px',
       overflow: 'hidden',
-      fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
     }}>
-      {/* Ambient background glow orbs */}
-      <div style={{
-        position: 'absolute',
-        top: '15%',
-        left: '20%',
-        width: '380px',
-        height: '380px',
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(0,0,0,0) 70%)',
-        filter: 'blur(40px)',
-        pointerEvents: 'none'
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: '15%',
-        right: '20%',
-        width: '420px',
-        height: '420px',
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, rgba(0,0,0,0) 70%)',
-        filter: 'blur(50px)',
-        pointerEvents: 'none'
-      }} />
+      {/* Soft Ethereal Atmospheric Background Glows matching reference design */}
+      <div 
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: '-15%',
+          right: '-10%',
+          width: '600px',
+          height: '600px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(147, 197, 253, 0.45) 0%, rgba(199, 210, 254, 0.25) 40%, rgba(255, 255, 255, 0) 70%)',
+          filter: 'blur(60px)',
+          pointerEvents: 'none'
+        }}
+      />
+      <div 
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          bottom: '-15%',
+          left: '-10%',
+          width: '650px',
+          height: '650px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(196, 181, 253, 0.40) 0%, rgba(221, 214, 254, 0.20) 45%, rgba(255, 255, 255, 0) 70%)',
+          filter: 'blur(70px)',
+          pointerEvents: 'none'
+        }}
+      />
+      <div 
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: '30%',
+          left: '10%',
+          width: '350px',
+          height: '350px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(167, 243, 208, 0.35) 0%, rgba(255, 255, 255, 0) 70%)',
+          filter: 'blur(50px)',
+          pointerEvents: 'none'
+        }}
+      />
 
-      {/* Main Brand Card */}
+      {/* Main Interactive Stage Container */}
       <div style={{
         position: 'relative',
-        zIndex: 2,
-        maxWidth: '540px',
         width: '100%',
+        maxWidth: '1040px',
+        minHeight: '520px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        textAlign: 'center'
+        justifyContent: 'center',
+        padding: '20px',
+        zIndex: 2
       }}>
-        {/* National / Trust Badge */}
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '6px 16px',
-          borderRadius: '999px',
-          background: 'rgba(255, 255, 255, 0.08)',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-          backdropFilter: 'blur(12px)',
-          fontSize: '12px',
-          fontWeight: 600,
-          color: '#E2E8F0',
-          marginBottom: '28px',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
-          animation: 'fadeIn 0.8s ease'
-        }}>
-          <span style={{ fontSize: '14px' }}>🇮🇳</span>
-          <span>Digital India Civic Intelligence Platform</span>
-        </div>
 
-        {/* Logo Container with Smooth Reveal & Backlight */}
+        {/* SVG Network Circuit Lines branching from Title Box to Floating Integration Nodes */}
+        <svg 
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            pointerEvents: 'none',
+            overflow: 'visible'
+          }}
+          viewBox="0 0 1000 500"
+          fill="none"
+        >
+          {/* Left Branch Circuit Lines */}
+          <path d="M 330 220 L 240 220 L 170 150 L 150 150" stroke="#E2E8F0" strokeWidth="1.6" strokeDasharray="3 3" />
+          <path d="M 330 235 L 280 235 L 230 195 L 200 195" stroke="#CBD5E1" strokeWidth="1.8" />
+          <path d="M 330 250 L 250 250 L 190 290 L 170 290" stroke="#CBD5E1" strokeWidth="1.8" />
+          <path d="M 330 265 L 240 265 L 180 345 L 150 345" stroke="#E2E8F0" strokeWidth="1.6" strokeDasharray="3 3" />
+
+          {/* Right Branch Circuit Lines */}
+          <path d="M 670 220 L 760 220 L 830 145 L 850 145" stroke="#E2E8F0" strokeWidth="1.6" strokeDasharray="3 3" />
+          <path d="M 670 235 L 720 235 L 775 190 L 805 190" stroke="#CBD5E1" strokeWidth="1.8" />
+          <path d="M 670 250 L 730 250 L 785 285 L 815 285" stroke="#CBD5E1" strokeWidth="1.8" />
+          <path d="M 670 265 L 755 265 L 825 340 L 850 340" stroke="#E2E8F0" strokeWidth="1.6" strokeDasharray="3 3" />
+
+          {/* Circuit connection dots */}
+          <circle cx="330" cy="220" r="3" fill="#94A3B8" />
+          <circle cx="330" cy="235" r="3" fill="#10B981" />
+          <circle cx="330" cy="250" r="3" fill="#3B82F6" />
+          <circle cx="330" cy="265" r="3" fill="#94A3B8" />
+
+          <circle cx="670" cy="220" r="3" fill="#94A3B8" />
+          <circle cx="670" cy="235" r="3" fill="#F59E0B" />
+          <circle cx="670" cy="250" r="3" fill="#6366F1" />
+          <circle cx="670" cy="265" r="3" fill="#94A3B8" />
+        </svg>
+
+        {/* Floating Integration Node Pills (Left Side — Municipal Authorities) */}
+        {/* Node L1: DJB */}
         <div style={{
-          position: 'relative',
-          marginBottom: '24px',
+          position: 'absolute',
+          left: '10%',
+          top: '23%',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          gap: '8px',
+          padding: '6px 12px 6px 8px',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '999px',
+          boxShadow: '0 8px 22px rgba(15, 23, 42, 0.07)',
+          animation: 'floatSlow 4s ease-in-out infinite'
         }}>
-          {/* Logo Glow Ring */}
           <div style={{
-            position: 'absolute',
-            inset: '-16px',
+            width: '28px',
+            height: '28px',
             borderRadius: '50%',
-            background: 'conic-gradient(from 0deg, #10B981, #3B82F6, #F59E0B, #10B981)',
-            filter: 'blur(20px)',
-            opacity: 0.6,
-            animation: 'spin 10s linear infinite'
-          }} />
-
-          {/* Logo Card with Glassmorphism */}
-          <div style={{
-            position: 'relative',
-            width: '120px',
-            height: '120px',
-            borderRadius: '28px',
-            background: 'rgba(255, 255, 255, 0.96)',
-            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.5)',
+            background: '#EFF6FF',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '14px',
-            transform: 'scale(1)',
-            transition: 'transform 0.4s ease'
+            fontSize: '13px'
+          }}>
+            💧
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>DJB Water</span>
+        </div>
+
+        {/* Node L2: PWD */}
+        <div style={{
+          position: 'absolute',
+          left: '16%',
+          top: '35%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '6px 12px 6px 8px',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '999px',
+          boxShadow: '0 8px 22px rgba(15, 23, 42, 0.07)',
+          animation: 'floatSlow 4.5s ease-in-out infinite 0.5s'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#F0FDF4',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '13px'
+          }}>
+            🛣️
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>PWD Roads</span>
+        </div>
+
+        {/* Node L3: MCD */}
+        <div style={{
+          position: 'absolute',
+          left: '13%',
+          top: '55%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '6px 12px 6px 8px',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '999px',
+          boxShadow: '0 8px 22px rgba(15, 23, 42, 0.07)',
+          animation: 'floatSlow 4.2s ease-in-out infinite 1s'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#FEF3C7',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '13px'
+          }}>
+            ♻️
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>MCD Waste</span>
+        </div>
+
+        {/* Node L4: BSES */}
+        <div style={{
+          position: 'absolute',
+          left: '10%',
+          top: '68%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '6px 12px 6px 8px',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '999px',
+          boxShadow: '0 8px 22px rgba(15, 23, 42, 0.07)',
+          animation: 'floatSlow 5s ease-in-out infinite 1.5s'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#FEF2F2',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '13px'
+          }}>
+            ⚡
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>BSES Power</span>
+        </div>
+
+        {/* Floating Integration Node Pills (Right Side — Intelligence & AI Capabilities) */}
+        {/* Node R1: Gemini 9-Agent */}
+        <div style={{
+          position: 'absolute',
+          right: '9%',
+          top: '22%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '6px 12px 6px 8px',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '999px',
+          boxShadow: '0 8px 22px rgba(15, 23, 42, 0.07)',
+          animation: 'floatSlow 4.3s ease-in-out infinite 0.2s'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#F5F3FF',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '13px'
+          }}>
+            🤖
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>Gemini DNA</span>
+        </div>
+
+        {/* Node R2: Indic Voice */}
+        <div style={{
+          position: 'absolute',
+          right: '15%',
+          top: '34%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '6px 12px 6px 8px',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '999px',
+          boxShadow: '0 8px 22px rgba(15, 23, 42, 0.07)',
+          animation: 'floatSlow 4.6s ease-in-out infinite 0.7s'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#FDF2F8',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '13px'
+          }}>
+            🎙️
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>Indic Voice</span>
+        </div>
+
+        {/* Node R3: Real GIS Satellite */}
+        <div style={{
+          position: 'absolute',
+          right: '13%',
+          top: '54%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '6px 12px 6px 8px',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '999px',
+          boxShadow: '0 8px 22px rgba(15, 23, 42, 0.07)',
+          animation: 'floatSlow 4.8s ease-in-out infinite 1.2s'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#ECFEFF',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '13px'
+          }}>
+            🛰️
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>Satellite GIS</span>
+        </div>
+
+        {/* Node R4: Verified Resolution */}
+        <div style={{
+          position: 'absolute',
+          right: '9%',
+          top: '67%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '6px 12px 6px 8px',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '999px',
+          boxShadow: '0 8px 22px rgba(15, 23, 42, 0.07)',
+          animation: 'floatSlow 5.2s ease-in-out infinite 1.6s'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#ECFDF5',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '13px'
+          }}>
+            🛡️
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E293B' }}>Verified Fix</span>
+        </div>
+
+        {/* Central Card Hierarchy — Refined typography matching the reference design */}
+        <div style={{
+          position: 'relative',
+          zIndex: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          textAlign: 'center',
+          maxWidth: '560px',
+          fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+        }}>
+
+          {/* Large Brand Logo — Clean, Transparent, No Borders */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '18px'
           }}>
             <img 
               src="/logo.png" 
               alt="JanSahayak Logo" 
               style={{
-                width: '100%',
-                height: '100%',
+                width: '115px',
+                height: 'auto',
+                maxHeight: '115px',
                 objectFit: 'contain',
-                filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.12))'
+                filter: 'drop-shadow(0 10px 20px rgba(15, 23, 42, 0.06))'
               }}
             />
           </div>
-        </div>
 
-        {/* Platform Title & Slogan */}
-        <h1 style={{
-          fontSize: '36px',
-          fontWeight: 800,
-          letterSpacing: '-0.03em',
-          margin: '0 0 6px 0',
-          background: 'linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
-        }}>
-          JanSahayak
-        </h1>
-        <p style={{
-          fontSize: '15px',
-          fontWeight: 500,
-          color: '#38BDF8',
-          margin: '0 0 10px 0',
-          letterSpacing: '0.02em'
-        }}>
-          जन सहायक • Aapki Awaaz, Ab Samjhi Jayegi
-        </p>
-        <p style={{
-          fontSize: '13.5px',
-          color: '#94A3B8',
-          maxWidth: '420px',
-          lineHeight: 1.5,
-          margin: '0 0 32px 0'
-        }}>
-          Empowering citizens with AI problem discovery, instant department routing, and verified resolution tracking.
-        </p>
-
-        {/* 4-Second Animated Progress Bar */}
-        <div style={{ width: '100%', maxWidth: '380px', marginBottom: '28px' }}>
+          {/* Elegant Micro-Tag: { civic intelligence network } (Minimal, No bubble background) */}
           <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            fontSize: '11.5px',
-            fontWeight: 600,
-            color: '#94A3B8',
-            marginBottom: '8px'
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontSize: '12.5px',
+            fontWeight: 500,
+            color: '#7C3AED',
+            letterSpacing: '0.01em',
+            marginBottom: '14px'
           }}>
-            <span>{getStatusText()}</span>
-            <span style={{ color: isReady ? '#10B981' : '#38BDF8' }}>
-              {isReady ? '100%' : `${Math.round(progress)}%`}
-            </span>
+            {'{ civic intelligence network }'}
           </div>
 
+          {/* Central Pill Title Box with Refined Geometric Typography */}
           <div style={{
-            height: '6px',
-            width: '100%',
-            background: 'rgba(255, 255, 255, 0.12)',
-            borderRadius: '999px',
-            overflow: 'hidden',
-            position: 'relative'
-          }}>
-            <div style={{
-              height: '100%',
-              width: `${progress}%`,
-              background: 'linear-gradient(90deg, #10B981 0%, #3B82F6 50%, #6366F1 100%)',
-              borderRadius: '999px',
-              transition: 'width 60ms linear',
-              boxShadow: '0 0 12px rgba(59, 130, 246, 0.6)'
-            }} />
-          </div>
-        </div>
-
-        {/* Action Button: Start Experience + Audio */}
-        <button
-          type="button"
-          onClick={onStart}
-          style={{
-            height: '52px',
-            padding: '0 36px',
-            borderRadius: '999px',
-            background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-            color: '#FFFFFF',
-            border: 'none',
-            fontSize: '15px',
-            fontWeight: 700,
+            position: 'relative',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '10px',
-            cursor: 'pointer',
-            boxShadow: '0 10px 30px rgba(16, 185, 129, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2)',
-            transform: isReady ? 'scale(1.04)' : 'scale(1)',
-            transition: 'all 250ms ease',
-            letterSpacing: '-0.01em'
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.08)'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.transform = isReady ? 'scale(1.04)' : 'scale(1)'; }}
-        >
-          <Volume2 style={{ width: '18px', height: '18px' }} />
-          <span>Start Platform & Audio Tour</span>
-          <ArrowRight style={{ width: '16px', height: '16px' }} />
-        </button>
+            justifyContent: 'center',
+            padding: '10px 36px',
+            background: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '999px',
+            boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 0 0 1px rgba(243, 244, 246, 0.8)',
+            marginBottom: '16px'
+          }}>
+            <h1 style={{
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              fontSize: '32px',
+              fontWeight: 700,
+              letterSpacing: '-0.025em',
+              color: '#111827',
+              margin: 0,
+              lineHeight: 1.1
+            }}>
+              JanSahayak
+            </h1>
+          </div>
 
-        {/* Subtle helper note */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          marginTop: '16px',
-          fontSize: '11.5px',
-          color: '#64748B'
-        }}>
-          <Sparkles style={{ width: '12px', height: '12px', color: '#F59E0B' }} />
-          <span>Audio narration in Hindi/English will guide your tour</span>
+          {/* Hindi Slogan in Refined Typography */}
+          <div style={{
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontSize: '14px',
+            fontWeight: 600,
+            color: '#059669',
+            marginBottom: '14px',
+            letterSpacing: '-0.01em'
+          }}>
+            जन सहायक • Aapki Awaaz, Ab Samjhi Jayegi
+          </div>
+
+          {/* Clean Subtitle Paragraph matching reference typography */}
+          <p style={{
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontSize: '14px',
+            lineHeight: 1.65,
+            color: '#64748B',
+            maxWidth: '480px',
+            margin: '0 0 24px 0',
+            fontWeight: 400
+          }}>
+            Simplify and streamline public grievance resolution with AI-native problem discovery, 
+            instant multi-department routing, and verified field closure.
+          </p>
+
+          {/* Sleek Dark Pill CTA Button: simply "Start" */}
+          <button
+            type="button"
+            onClick={onStart}
+            style={{
+              height: '46px',
+              padding: '0 32px',
+              borderRadius: '999px',
+              background: '#0F172A',
+              color: '#FFFFFF',
+              border: 'none',
+              fontSize: '14px',
+              fontWeight: 600,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              boxShadow: '0 10px 25px rgba(15, 23, 42, 0.25)',
+              transition: 'all 200ms ease',
+              letterSpacing: '-0.01em'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 14px 30px rgba(15, 23, 42, 0.35)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 10px 25px rgba(15, 23, 42, 0.25)';
+            }}
+          >
+            <span>Start</span>
+            <ArrowRight style={{ width: '15px', height: '15px', color: '#94A3B8' }} />
+          </button>
+
+          {/* Subtle Live Status & Animated Pulse Bar */}
+          <div style={{
+            marginTop: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '8px',
+            width: '100%',
+            maxWidth: '320px'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#94A3B8'
+            }}>
+              <span>{getStatusText()}</span>
+              <span style={{ color: isReady ? '#059669' : '#6366F1', fontWeight: 700 }}>
+                {isReady ? 'Ready' : `${Math.round(progress)}%`}
+              </span>
+            </div>
+
+            <div style={{
+              width: '100%',
+              height: '4px',
+              background: '#F1F5F9',
+              borderRadius: '999px',
+              overflow: 'hidden',
+              position: 'relative'
+            }}>
+              <div style={{
+                height: '100%',
+                width: `${progress}%`,
+                background: 'linear-gradient(90deg, #6366F1 0%, #10B981 100%)',
+                borderRadius: '999px',
+                transition: 'width 60ms linear'
+              }} />
+            </div>
+          </div>
         </div>
       </div>
 
       <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+        @keyframes floatSlow {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
         }
       `}</style>
     </div>

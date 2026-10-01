@@ -28,6 +28,7 @@ import {
 import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
 import { uploadComplaintMedia, uploadVoiceRecording } from '../services/supabaseClient';
+import { analyzeCivicPhoto } from '../services/aiVisionService';
 
 const QUICK_PRESETS = [
   {
@@ -315,25 +316,21 @@ export default function CitizenSubmit() {
       setPhotoTag(`Uploaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
 
       try {
-        const res = await fetch('/api/complaints/vision-analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            imageBase64: base64Data,
-            mimeType: file.type || 'image/jpeg',
-            contextPrompt: description || 'Civic infrastructure complaint'
-          })
-        });
+        const result = await analyzeCivicPhoto(
+          base64Data, 
+          file.type || 'image/jpeg', 
+          description || manualCategory || 'Civic infrastructure complaint'
+        );
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.vision) {
-            setVisionAnalysis(data.vision);
-            setPhotoTag(`Gemini Vision: ${data.vision.observed_hazard} (${Math.round(data.vision.confidence * 100)}% confidence)`);
-            if (data.vision.category && !manualCategory) {
-              setManualCategory(data.vision.category);
-            }
+        setVisionAnalysis(result);
+        if (result.isValidCivic) {
+          const prefix = result.source === 'client_gemini' || result.source === 'gemini' ? 'Gemini Vision' : 'Visual Feature Scan';
+          setPhotoTag(`${prefix}: ${result.observedHazard} (${Math.round(result.confidence * 100)}% match)`);
+          if (result.category && !manualCategory) {
+            setManualCategory(result.category);
           }
+        } else {
+          setPhotoTag(`⚠️ Non-Civic Image Detected: ${result.rejectionReason || 'Please capture an authentic ground photo of the problem.'}`);
         }
       } catch (err) {
         console.warn('Vision analysis fallback notice:', err.message);
@@ -839,34 +836,8 @@ export default function CitizenSubmit() {
                     boxShadow: '0 4px 14px rgba(14, 94, 58, 0.28)'
                   }}
                 >
-                  <span>Track Timeline & Field Progress</span>
+                  <span>Track Complaint</span>
                   <ArrowRight style={{ width: '16px', height: '16px' }} />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await switchDemoRole('civic_officer');
-                    navigate(`/officer?caseId=${createdTicket.id}`);
-                  }}
-                  style={{
-                    height: '46px',
-                    padding: '0 20px',
-                    fontSize: '14px',
-                    borderRadius: 'var(--radius-md, 10px)',
-                    background: '#1E293B',
-                    color: '#FFFFFF',
-                    border: '1px solid #334155',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    boxShadow: '0 4px 12px rgba(30, 41, 59, 0.25)'
-                  }}
-                >
-                  <Building2 style={{ width: '16px', height: '16px', color: '#38BDF8' }} />
-                  <span>View on Govt Officer Desk</span>
                 </button>
 
                 <button
@@ -1038,39 +1009,68 @@ export default function CitizenSubmit() {
                     marginTop: '10px',
                     padding: '12px',
                     borderRadius: '12px',
-                    background: '#F8FAFC',
-                    border: '1px solid #E2E8F0',
+                    background: visionAnalysis && !visionAnalysis.isValidCivic ? '#FEF2F2' : '#F8FAFC',
+                    border: visionAnalysis && !visionAnalysis.isValidCivic ? '1.5px solid #FECACA' : '1px solid #E2E8F0',
                     display: 'flex',
-                    alignItems: 'center',
-                    gap: '14px'
+                    flexDirection: 'column',
+                    gap: '10px'
                   }}>
-                    <img 
-                      src={photoPreview} 
-                      alt="Complaint Evidence" 
-                      style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #CBD5E1' }} 
-                    />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <strong style={{ fontSize: '13px', color: '#0F172A' }}>Visual Evidence Attached</strong>
-                        {isAnalyzingImage && (
-                          <span style={{ fontSize: '11px', color: '#4F46E5', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <Loader2 className="animate-spin" style={{ width: '11px', height: '11px' }} />
-                            <span>Gemini analyzing...</span>
-                          </span>
-                        )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      <img 
+                        src={photoPreview} 
+                        alt="Complaint Evidence" 
+                        style={{ width: '64px', height: '64px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #CBD5E1' }} 
+                      />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <strong style={{ fontSize: '13px', color: visionAnalysis && !visionAnalysis.isValidCivic ? '#991B1B' : '#0F172A' }}>
+                            {visionAnalysis && !visionAnalysis.isValidCivic ? '⚠️ Non-Civic Image Detected' : 'Visual Evidence Attached'}
+                          </strong>
+                          {isAnalyzingImage && (
+                            <span style={{ fontSize: '11px', color: '#4F46E5', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <Loader2 className="animate-spin" style={{ width: '11px', height: '11px' }} />
+                              <span>AI analyzing...</span>
+                            </span>
+                          )}
+                        </div>
+                        <span style={{ fontSize: '12px', color: visionAnalysis && !visionAnalysis.isValidCivic ? '#B91C1C' : '#475569', display: 'block', marginTop: '2px', lineHeight: 1.4 }}>
+                          {photoTag || 'Photo ready for municipal verification.'}
+                        </span>
                       </div>
-                      <span style={{ fontSize: '12px', color: '#475569', display: 'block', marginTop: '2px' }}>
-                        {photoTag || 'Photo ready for municipal verification.'}
-                      </span>
+                      <button 
+                        type="button" 
+                        onClick={handleRemovePhoto} 
+                        style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#EF4444', padding: '6px' }}
+                        title="Remove Photo"
+                      >
+                        <Trash2 style={{ width: '16px', height: '16px' }} />
+                      </button>
                     </div>
-                    <button 
-                      type="button" 
-                      onClick={handleRemovePhoto} 
-                      style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#EF4444', padding: '6px' }}
-                      title="Remove Photo"
-                    >
-                      <Trash2 style={{ width: '16px', height: '16px' }} />
-                    </button>
+
+                    {/* Inline Correction Input if user wants to add/correct details */}
+                    {visionAnalysis?.isValidCivic && (
+                      <div style={{ borderTop: '1px solid #E2E8F0', paddingTop: '8px' }}>
+                        <input
+                          type="text"
+                          placeholder="Edit or add specific problem details if different from AI detection..."
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val && !description.includes(val)) {
+                              setDescription(prev => prev ? `${prev} (Photo Note: ${val})` : val);
+                            }
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: '6px 10px',
+                            borderRadius: '8px',
+                            border: '1px solid #CBD5E1',
+                            fontSize: '11.5px',
+                            background: '#FFFFFF',
+                            boxSizing: 'border-box'
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1338,7 +1338,7 @@ export default function CitizenSubmit() {
                         Live Grievance DNA™ & Authority Routing
                       </strong>
                       <span style={{ fontSize: '11.5px', color: '#64748B' }}>
-                        Automated multi-agent synthesis powered by Gemini 3.5
+                        Automated multi-agent synthesis (Gemini 2.5 Flash / Civic Rule Engine)
                       </span>
                     </div>
                   </div>

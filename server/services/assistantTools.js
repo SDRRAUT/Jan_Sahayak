@@ -291,7 +291,9 @@ export async function executeAssistantTool(toolName, args = {}, userContext = {}
       const fromPg = await postgresDB.getAllGrievances();
       if (fromPg && fromPg.length > 0) return fromPg;
     } catch (e) {}
-    return db.getGrievances();
+    if (typeof db.getGrievances === 'function') return db.getGrievances();
+    if (typeof db.getComplaints === 'function') return db.getComplaints();
+    return [];
   };
 
   // Helper to fetch incidents from DB

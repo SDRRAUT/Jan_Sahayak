@@ -4,31 +4,31 @@ import { Network, Droplets, Wrench, Building2, ArrowRight, ShieldCheck, CheckCir
 export default function CrossDepartmentMatrix({ crossDeptData, incidentTitle = 'Water Infrastructure Crisis' }) {
   const data = crossDeptData || {
     primaryDepartment: "Delhi Jal Board (DJB)",
-    sharedProblemSummary: "Underground water main rupture is softening road base and causing drain overflow — affecting 3 separate civic authorities.",
+    sharedProblemSummary: "A broken underground water pipe is softening the road foundation and causing the street drain to overflow. 3 departments need to work together to fix this completely.",
     departments: [
       {
         dept: "Delhi Jal Board (DJB)",
         cases: 24,
         icon: "Droplets",
         badgeColor: "#0E5E3A",
-        impactSummary: "Main potable water pressure loss & contamination risk across 650 households."
+        impactSummary: "Clean drinking water pressure is weak and dirty water is reaching 650 homes."
       },
       {
         dept: "Public Works Department (PWD)",
         cases: 9,
         icon: "Wrench",
         badgeColor: "#D97706",
-        impactSummary: "Road subgrade saturation causing 35cm asphalt depression. Acute accident risk for two-wheelers."
+        impactSummary: "Road has sunken by 35 cm due to wet soil. Dangerous for two-wheelers and cars."
       },
       {
         dept: "Municipal Corporation of Delhi (MCD)",
         cases: 4,
         icon: "Building2",
         badgeColor: "#7C3AED",
-        impactSummary: "Storm drain blockage and standing water pools near Mother Dairy market boundary."
+        impactSummary: "Street drain is clogged with mud. Dirty water is pooling near the market."
       }
     ],
-    coordinationRecommendation: "Initiate Unified Joint Action: DJB isolates feeder at 11:00 AM; PWD inspects road sub-base concurrently before asphalt re-bedding; MCD flushes storm drain barriers."
+    coordinationRecommendation: "Step 1: DJB turns off water pipe at 11:00 AM → Step 2: PWD checks the underground road base before paving → Step 3: MCD unblocks and flushes the drain."
   };
 
   const getDeptIcon = (iconName) => {
@@ -53,10 +53,10 @@ export default function CrossDepartmentMatrix({ crossDeptData, incidentTitle = '
           </div>
           <div>
             <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', letterSpacing: '0.05em', display: 'block' }}>
-              Multi-Agency Problem Discovery
+              🤝 TEAMS WORKING TOGETHER
             </span>
             <h3 style={{ fontSize: '18px', color: 'var(--color-text-primary)' }}>
-              Cross-Department Interdependency Matrix
+              Which Departments Need To Coordinate?
             </h3>
           </div>
         </div>
@@ -70,7 +70,7 @@ export default function CrossDepartmentMatrix({ crossDeptData, incidentTitle = '
           color: '#065F46',
           border: '1px solid #BBF7D0'
         }}>
-          3 Civic Agencies Correlated
+          3 Departments Linked
         </span>
       </div>
 
@@ -83,7 +83,7 @@ export default function CrossDepartmentMatrix({ crossDeptData, incidentTitle = '
         marginBottom: '16px'
       }}>
         <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '4px' }}>
-          Shared Underlying Civic Breakdown:
+          Why Multiple Teams Are Needed:
         </span>
         <p style={{ fontSize: '13.5px', color: 'var(--color-text-primary)', fontWeight: 600, lineHeight: 1.4 }}>
           {data.sharedProblemSummary}
@@ -130,16 +130,16 @@ export default function CrossDepartmentMatrix({ crossDeptData, incidentTitle = '
                   background: `${dept.badgeColor}15`,
                   color: dept.badgeColor
                 }}>
-                  {dept.cases} Cases
+                  {dept.cases} Citizen Reports
                 </span>
               </div>
-              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
+              <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
                 {dept.impactSummary}
               </p>
             </div>
 
             <div style={{ marginTop: '12px', paddingTop: '8px', borderTop: '1px solid var(--color-divider)', fontSize: '11px', color: 'var(--color-text-muted)' }}>
-              Jurisdiction: <strong>Active in Ward 12 & 14</strong>
+              Location: <strong>Ward 12 & 14</strong>
             </div>
           </div>
         ))}
@@ -157,7 +157,7 @@ export default function CrossDepartmentMatrix({ crossDeptData, incidentTitle = '
       }}>
         <CheckCircle2 style={{ width: '16px', height: '16px', color: '#4F46E5', flexShrink: 0, marginTop: '2px' }} />
         <div style={{ fontSize: '12px', color: '#312E81', lineHeight: 1.4 }}>
-          <strong>Cross-Department Coordination Recommendation:</strong> {data.coordinationRecommendation}
+          <strong>⭐ Suggested Step-by-Step Joint Plan:</strong> {data.coordinationRecommendation}
         </div>
       </div>
     </div>

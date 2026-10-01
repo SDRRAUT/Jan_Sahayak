@@ -19,14 +19,36 @@ import { VerificationAgent } from './VerificationAgent.js';
  */
 export class CivicIntelligenceOrchestrator {
   constructor() {
-    this.sseClients = new Set();
+    this.sseClients = new Map(); // res -> { user, clientId, connectedAt }
+    this.recentEventHashes = new Set();
   }
 
   /**
-   * Register an SSE client connection
+   * Register an authenticated SSE client connection
+   * Guarantees at most ONE active SSE connection per client ID / session
    */
-  addSSEClient(res) {
-    this.sseClients.add(res);
+  addSSEClient(res, user = null, clientId = null) {
+    // If client provided a unique clientId, close any existing stale connection
+    if (clientId) {
+      for (const [existingRes, meta] of this.sseClients.entries()) {
+        if (meta.clientId === clientId && existingRes !== res) {
+          try {
+            existingRes.write(`event: superseded\ndata: {"message":"New session connection established"}\n\n`);
+            existingRes.end();
+          } catch (e) {}
+          this.sseClients.delete(existingRes);
+        }
+      }
+    }
+
+    this.sseClients.set(res, {
+      user: user || null,
+      userId: user?.id || null,
+      role: (user?.role || 'guest').toLowerCase(),
+      department: user?.department || null,
+      clientId: clientId || null,
+      connectedAt: Date.now()
+    });
   }
 
   /**
@@ -37,18 +59,45 @@ export class CivicIntelligenceOrchestrator {
   }
 
   /**
-   * Broadcast real-time event to all connected clients
+   * Broadcast real-time event with deduplication and role/user scoping
    */
-  broadcastEvent(eventType, payload) {
-    const data = JSON.stringify({ eventType, payload, timestamp: new Date().toISOString() });
-    for (const client of this.sseClients) {
+  broadcastEvent(eventType, payload, options = {}) {
+    // Deduplication check: prevent identical events emitted within a 3-second window
+    const dedupeKey = `${eventType}:${payload?.complaintId || payload?.incidentId || payload?.id || ''}:${payload?.status || ''}`;
+    if (dedupeKey && this.recentEventHashes.has(dedupeKey)) {
+      return;
+    }
+    if (dedupeKey) {
+      this.recentEventHashes.add(dedupeKey);
+      setTimeout(() => this.recentEventHashes.delete(dedupeKey), 3000).unref();
+    }
+
+    const data = JSON.stringify({ 
+      eventType, 
+      payload, 
+      timestamp: new Date().toISOString() 
+    });
+
+    for (const [clientRes, meta] of this.sseClients.entries()) {
+      // Role & User Scope Filtering (Section 24)
+      if (options.targetUserId && meta.userId && meta.userId !== options.targetUserId && meta.role !== 'super_admin') {
+        continue;
+      }
+      if (options.targetDepartment && meta.role === 'officer' && meta.department && !meta.department.includes(options.targetDepartment.split(' ')[0]) && meta.role !== 'super_admin') {
+        continue;
+      }
+      if (options.targetRole && meta.role !== options.targetRole && meta.role !== 'super_admin') {
+        continue;
+      }
+
       try {
-        client.write(`event: ${eventType}\ndata: ${data}\n\n`);
+        clientRes.write(`event: ${eventType}\ndata: ${data}\n\n`);
       } catch (e) {
-        this.sseClients.delete(client);
+        this.sseClients.delete(clientRes);
       }
     }
   }
+
 
   /**
    * Main Pipeline Execution: Processes a citizen complaint through the 9 connected agents
@@ -101,7 +150,7 @@ export class CivicIntelligenceOrchestrator {
       const existingComplaints = db.getComplaints().filter(c => c.id !== complaint.id);
       const existingClusters = db.getClusters();
 
-      const clusterResult = SimilarityClusterAgent.clusterComplaint(complaint, existingComplaints, existingClusters);
+      const clusterResult = await SimilarityClusterAgent.clusterComplaint(complaint, existingComplaints, existingClusters);
       let cluster = null;
 
       if (clusterResult.action === 'JOIN_CLUSTER') {
@@ -129,6 +178,8 @@ export class CivicIntelligenceOrchestrator {
 
       complaint.clusterId = cluster.id;
       complaint.clusterConfidence = clusterResult.confidence;
+      complaint.relationship_score = clusterResult.relationship_score;
+      complaint.relationship_reason = clusterResult.relationship_reason;
       complaint.status = 'CLUSTERED';
       db.saveComplaint(complaint);
 
@@ -171,6 +222,7 @@ export class CivicIntelligenceOrchestrator {
       synthesizedIncident.participatingDepartments = routing.participatingDepartments;
       synthesizedIncident.crossDeptCoordination = routing.crossDeptCoordination;
       synthesizedIncident.crossDepartmentImpact = routing.crossDeptCoordination;
+      complaint.department = routing.leadDepartment;
 
       // Populate UI-compatible properties
       synthesizedIncident.signalCount = allClusterComplaints.length;

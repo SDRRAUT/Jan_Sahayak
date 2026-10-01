@@ -95,8 +95,8 @@ export default function Footer() {
                   <Link to="/citizen" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
                     My Grievances
                   </Link>
-                  <Link to="/citizen/submit" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
-                    File New Complaint
+                  <Link to="/citizen?fileGrievance=true" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
+                    File New Complaint (Popup)
                   </Link>
                 </>
               )}
@@ -145,8 +145,8 @@ export default function Footer() {
 
               {!user && (
                 <>
-                  <Link to="/citizen/submit" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
-                    Citizen Grievance Portal
+                  <Link to="/citizen?fileGrievance=true" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
+                    Citizen Grievance Portal (File Issue)
                   </Link>
                   <Link to="/login" style={{ transition: 'color 150ms ease' }} onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='var(--color-text-inverse-muted)'}>
                     Official Login

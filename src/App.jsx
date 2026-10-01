@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import MobileBottomNav from './components/layout/MobileBottomNav';
@@ -15,7 +15,6 @@ import CivicIncidentDetail from './pages/CivicIncidentDetail';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import CitizenDashboard from './pages/CitizenDashboard';
-import CitizenSubmit from './pages/CitizenSubmit';
 import CitizenDetail from './pages/CitizenDetail';
 import OfficerWorkspace from './pages/OfficerWorkspace';
 import AdminHeatmap from './pages/AdminHeatmap';
@@ -23,10 +22,32 @@ import DeptAdmin from './pages/DeptAdmin';
 import SuperAdmin from './pages/SuperAdmin';
 import Onboarding from './pages/Onboarding';
 import JanSahayakAssistant from './components/assistant/JanSahayakAssistant';
+import NewFeaturePopup from './components/common/NewFeaturePopup';
+import MobileDesktopBanner from './components/common/MobileDesktopBanner';
 
 function RoleHome() {
   // Logged-in citizen or officer opening root sees the Home page with their authenticated profile
   return <Home />;
+}
+
+function CitizenSubmitRedirect() {
+  const { user, token, switchDemoRole } = useApp();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // If not logged in as citizen, establish citizen session then open modal
+    if (!token || !user || (user.role !== 'citizen' && user.role !== 'super_admin')) {
+      switchDemoRole('citizen').then(() => {
+        navigate('/citizen?fileGrievance=true', { replace: true });
+      }).catch(() => {
+        navigate('/citizen?fileGrievance=true', { replace: true });
+      });
+    } else {
+      navigate('/citizen?fileGrievance=true', { replace: true });
+    }
+  }, [user, token, navigate, switchDemoRole]);
+
+  return null;
 }
 
 // Track whether the initial page reload/refresh redirect has already been processed in this runtime
@@ -34,7 +55,7 @@ let hasHandledInitialReload = false;
 
 export default function App() {
   const location = useLocation();
-  const { user, token, role } = useApp();
+  const { user, token, role, hasEnteredApp } = useApp();
 
   // For citizen: on every browser refresh / reload, always redirect to home page ('/')
   const [redirectOnReload] = useState(() => {
@@ -86,14 +107,24 @@ export default function App() {
     return <Navigate to="/" replace />;
   }
 
-  // Full Screen Onboarding Condition:
-  // 1. Explicitly navigating to /onboarding
-  // 2. Or landing at root '/' when user has not passed and logged in
-  const isFullScreenOnboarding = location.pathname === '/onboarding' || 
-    (location.pathname === '/' && (!token || !user));
+  const searchParams = new URLSearchParams(location.search);
+  const isDirectLogin = location.pathname === '/login' || searchParams.get('login') === 'true' || searchParams.get('step') === '4';
+
+  // Full Screen Onboarding / Direct Login Condition:
+  // 1. Explicitly navigating to /login (renders Step 4 Persona Login directly)
+  // 2. Explicitly navigating to /onboarding
+  // 3. Or landing at root '/' when user has not yet entered app and is not logged in
+  const isFullScreenOnboarding = location.pathname === '/login' ||
+    location.pathname === '/onboarding' || 
+    (location.pathname === '/' && (!token || !user) && !hasEnteredApp);
 
   if (isFullScreenOnboarding) {
-    return <Onboarding />;
+    return (
+      <>
+        <MobileDesktopBanner />
+        <Onboarding initialStep={isDirectLogin ? 4 : 1} skipSplash={isDirectLogin} />
+      </>
+    );
   }
 
   return (
@@ -128,9 +159,9 @@ export default function App() {
             } 
           />
           
-          {/* Authentication & Onboarding Gateway */}
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/login" element={<Login />} />
+          {/* Direct 1-Click Login Screen */}
+          <Route path="/login" element={<Onboarding initialStep={4} skipSplash={true} />} />
+          <Route path="/login/form" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
           {/* Citizen Routes (Role: citizen, super_admin) */}
@@ -144,11 +175,7 @@ export default function App() {
           />
           <Route 
             path="/citizen/submit" 
-            element={
-              <ProtectedRoute allowedRoles={['citizen', 'super_admin']}>
-                <CitizenSubmit />
-              </ProtectedRoute>
-            } 
+            element={<CitizenSubmitRedirect />} 
           />
           <Route 
             path="/citizen/complaints/:id" 
@@ -228,6 +255,9 @@ export default function App() {
 
       {/* Modern Fixed Mobile Bottom Navigation */}
       <MobileBottomNav />
+
+      {/* First-Time Feature Announcement Popup: Civic Workforce */}
+      <NewFeaturePopup />
     </div>
   );
 }

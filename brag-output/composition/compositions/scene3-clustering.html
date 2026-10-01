@@ -1,0 +1,112 @@
+<template id="scene3-clustering-template">
+  <div
+    data-composition-id="scene3-clustering"
+    data-width="1920"
+    data-height="1080"
+    data-duration="5.5"
+    class="scene-inner"
+  >
+    <div class="scene-header">
+      <div class="badge purple-badge">STAGE 02 • MUNICIPAL CORRELATION</div>
+      <h1 class="headline-purple">17 Scattered Reports → 1 Unified Incident</h1>
+      <p class="subheadline">AI connects isolated complaints into systemic infrastructure breakdowns.</p>
+    </div>
+
+    <div class="gis-map-viewport">
+      <!-- Satellite Map Underlay -->
+      <div class="map-satellite-canvas">
+        <div class="map-grid-overlay"></div>
+        <div class="radar-sweep" data-layout-allow-overflow></div>
+        
+        <!-- SVG Linkage Circuit Lines -->
+        <svg class="map-linkage-svg" viewBox="0 0 1200 500" fill="none">
+          <path id="circuit-1" d="M 320 220 L 580 250" stroke="#3B82F6" stroke-width="2.5" stroke-dasharray="6 6" />
+          <path id="circuit-2" d="M 450 140 L 580 250" stroke="#10B981" stroke-width="2.5" stroke-dasharray="6 6" />
+          <path id="circuit-3" d="M 720 180 L 580 250" stroke="#F59E0B" stroke-width="2.5" stroke-dasharray="6 6" />
+          <path id="circuit-4" d="M 820 310 L 580 250" stroke="#EF4444" stroke-width="2.5" stroke-dasharray="6 6" />
+          <path id="circuit-5" d="M 480 370 L 580 250" stroke="#8B5CF6" stroke-width="2.5" stroke-dasharray="6 6" />
+        </svg>
+
+        <!-- Hotspot Pins -->
+        <div id="pin-1" class="map-pin pin-sub1" style="top: 220px; left: 320px;">
+          <div class="pin-pulse"></div>
+          <div class="pin-tag">#DL-0892: Water Leak</div>
+        </div>
+        <div id="pin-2" class="map-pin pin-sub2" style="top: 140px; left: 450px;">
+          <div class="pin-pulse"></div>
+          <div class="pin-tag">#DL-0914: Low Pressure</div>
+        </div>
+        <div id="pin-3" class="map-pin pin-sub3" style="top: 180px; left: 720px;">
+          <div class="pin-pulse"></div>
+          <div class="pin-tag">#DL-0941: Road Cavity</div>
+        </div>
+        <div id="pin-4" class="map-pin pin-sub4" style="top: 310px; left: 820px;">
+          <div class="pin-pulse"></div>
+          <div class="pin-tag">#DL-0968: Sewage Overflow</div>
+        </div>
+
+        <!-- Master Cluster Node (Center) -->
+        <div id="master-node" class="master-cluster-node" style="top: 250px; left: 580px;">
+          <div class="cluster-beacon"></div>
+          <div class="cluster-badge">
+            <span class="cluster-icon">⚡</span>
+            <div class="cluster-details">
+              <div class="cluster-id">INCIDENT #INC-DEL-2026-0892</div>
+              <div class="cluster-title">Arterial 100mm Pipeline Cavitation Breach</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Telemetry Summary Sidebar -->
+      <div id="cluster-sidebar" class="cluster-telemetry-sidebar">
+        <div class="telemetry-panel">
+          <div class="panel-header">CLUSTER DIAGNOSTICS</div>
+          <div class="telemetry-stat">
+            <span class="stat-num">17</span>
+            <span class="stat-label">Complaints Correlated</span>
+          </div>
+          <div class="telemetry-stat">
+            <span class="stat-num">4</span>
+            <span class="stat-label">Departments Notified</span>
+          </div>
+          <div class="telemetry-divider"></div>
+          <div class="telemetry-rootcause">
+            <strong>Root Cause:</strong> High-pressure water main fracture eroded sub-grade roadbed. PWD + DJB Joint Action Required.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const tl = gsap.timeline({ paused: true });
+
+        // Stagger in pins
+        tl.fromTo("#pin-1", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.4 }, 0.2);
+        tl.fromTo("#pin-2", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.4 }, 0.5);
+        tl.fromTo("#pin-3", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.4 }, 0.8);
+        tl.fromTo("#pin-4", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.4 }, 1.1);
+
+        // Master Cluster Node blooms in
+        tl.fromTo(
+          "#master-node",
+          { opacity: 0, scale: 0.4 },
+          { opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.5)" },
+          1.6
+        );
+
+        // Sidebar diagnostics slide in
+        tl.fromTo(
+          "#cluster-sidebar",
+          { opacity: 0, x: 50 },
+          { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" },
+          1.8
+        );
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines["scene3-clustering"] = tl;
+      })();
+    </script>
+  </div>
+</template>

@@ -64,10 +64,12 @@ export class CivicMemoryAgent {
     return {
       previous_incidents: matchingMemories,
       recurrence_detected: recurrenceDetected,
+      recurrenceDetected: recurrenceDetected,
       similarity: Number(maxSimilarity.toFixed(2)),
       last_occurrence: lastOccurrence,
       previous_resolution: previousResolution,
       warranty_info: warrantyStatus,
+      warrantyRegistry: warrantyStatus,
       warranty_record: activeWarranty
     };
   }

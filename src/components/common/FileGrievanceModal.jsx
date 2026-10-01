@@ -11,16 +11,22 @@ import {
   CheckCircle2, 
   Loader2,
   Trash2,
-  Building2
+  Building2,
+  Copy,
+  Check,
+  ShieldCheck,
+  ExternalLink
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../../context/AppContext';
+import LiveCameraCapture from './LiveCameraCapture';
 
 export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = '' }) {
   const navigate = useNavigate();
   const { user, submitGrievance, switchDemoRole } = useApp();
 
   const [currentStep, setCurrentStep] = useState(1);
+  const [copiedId, setCopiedId] = useState(false);
 
   // Step 1: Problem Details
   const [category, setCategory] = useState(defaultCategory || 'Water Supply & Contamination');
@@ -541,43 +547,124 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
         {/* Content Body */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '18px 22px' }}>
           {createdTicket ? (
-            <div style={{ textAlign: 'center', padding: '12px 0 8px 0' }}>
+            <div style={{ textAlign: 'center', padding: '8px 4px 6px 4px' }}>
+              {/* Animated Success Badge */}
               <div style={{
-                width: '60px',
-                height: '60px',
+                width: '64px',
+                height: '64px',
                 borderRadius: '50%',
                 background: '#ECFDF5',
                 color: '#059669',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                margin: '0 auto 14px auto',
-                boxShadow: '0 0 0 8px #D1FAE5'
+                margin: '0 auto 12px auto',
+                boxShadow: '0 0 0 8px #D1FAE5, 0 8px 20px rgba(5, 150, 105, 0.2)'
               }}>
-                <CheckCircle2 style={{ width: '32px', height: '32px' }} />
+                <CheckCircle2 style={{ width: '36px', height: '36px' }} />
               </div>
 
-              <span style={{
-                display: 'inline-block',
-                background: '#EFF6FF',
-                color: '#2563EB',
-                fontSize: '11px',
-                fontWeight: 800,
-                padding: '3px 12px',
-                borderRadius: '999px',
-                marginBottom: '8px'
-              }}>
-                TICKET DISPATCHED TO MUNICIPAL LEDGER
-              </span>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '999px', padding: '4px 14px', marginBottom: '8px' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#2563EB', display: 'inline-block' }} />
+                <span style={{ fontSize: '11px', fontWeight: 800, color: '#1D4ED8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Successfully Submitted & Transmitted
+                </span>
+              </div>
 
-              <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}>
+              <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>
                 Ticket #{createdTicket.id}
               </h3>
 
-              <p style={{ fontSize: '13px', color: '#475569', maxWidth: '440px', margin: '0 auto 16px auto', lineHeight: 1.5 }}>
-                Your problem has been registered, linked to Complaint DNA, and assigned to <strong>{createdTicket.department || 'Delhi Municipal Authority'}</strong>.
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '14px' }}>
+                <span style={{ fontSize: '13px', color: '#64748B' }}>Tracking ID:</span>
+                <code style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', background: '#F1F5F9', padding: '3px 8px', borderRadius: '6px' }}>
+                  {createdTicket.id}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (createdTicket?.id) {
+                      navigator.clipboard.writeText(createdTicket.id);
+                      setCopiedId(true);
+                      setTimeout(() => setCopiedId(false), 2000);
+                    }
+                  }}
+                  title="Copy Ticket ID"
+                  style={{
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    background: copiedId ? '#ECFDF5' : '#F8FAFC',
+                    border: `1px solid ${copiedId ? '#A7F3D0' : '#E2E8F0'}`,
+                    color: copiedId ? '#059669' : '#475569',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  {copiedId ? <Check style={{ width: '12px', height: '12px' }} /> : <Copy style={{ width: '12px', height: '12px' }} />}
+                  <span>{copiedId ? 'Copied!' : 'Copy'}</span>
+                </button>
+              </div>
+
+              <p style={{ fontSize: '13px', color: '#475569', maxWidth: '480px', margin: '0 auto 16px auto', lineHeight: 1.5 }}>
+                Your grievance is officially registered and dispatched to <strong>{createdTicket.department || 'Delhi Municipal Authority'}</strong>. Real-time updates active.
               </p>
 
+              {/* Real-time Dispatch Dual Channel Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '10px', marginBottom: '16px', textAlign: 'left' }}>
+                {/* 1. Officer Desk Dispatch */}
+                <div style={{
+                  background: '#F0FDF4',
+                  border: '1.5px solid #BBF7D0',
+                  borderRadius: '14px',
+                  padding: '12px 14px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Building2 style={{ width: '16px', height: '16px', color: '#059669' }} />
+                      <strong style={{ fontSize: '12px', color: '#065F46' }}>Govt Officer Desk</strong>
+                    </div>
+                    <span style={{ fontSize: '10px', fontWeight: 800, background: '#10B981', color: '#FFFFFF', padding: '2px 8px', borderRadius: '999px' }}>
+                      #1 IN QUEUE
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#047857' }}>
+                    {createdTicket.officerName || 'Er. Sanjay Sharma (AEE)'}
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#065F46', marginTop: '2px' }}>
+                    Ready at the top of Officer Workspace for field work order.
+                  </div>
+                </div>
+
+                {/* 2. Central Administration Dispatch */}
+                <div style={{
+                  background: '#EFF6FF',
+                  border: '1.5px solid #BFDBFE',
+                  borderRadius: '14px',
+                  padding: '12px 14px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <ShieldCheck style={{ width: '16px', height: '16px', color: '#2563EB' }} />
+                      <strong style={{ fontSize: '12px', color: '#1E40AF' }}>Administration Panel</strong>
+                    </div>
+                    <span style={{ fontSize: '10px', fontWeight: 800, background: '#2563EB', color: '#FFFFFF', padding: '2px 8px', borderRadius: '999px' }}>
+                      LIVE AT TOP
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#1D4ED8' }}>
+                    Municipal Command Center
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#1E40AF', marginTop: '2px' }}>
+                    Broadcast to Ward 14 geospatial radar & executive incident ledger.
+                  </div>
+                </div>
+              </div>
+
+              {/* Ticket Details Summary Grid */}
               <div style={{
                 background: '#F8FAFC',
                 borderRadius: '14px',
@@ -592,7 +679,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                     <strong style={{ color: '#0F172A' }}>{createdTicket.category}</strong>
                   </div>
                   <div>
-                    <span style={{ color: '#64748B', display: 'block', fontSize: '11px' }}>Target SLA Timer</span>
+                    <span style={{ color: '#64748B', display: 'block', fontSize: '11px' }}>Target SLA Window</span>
                     <strong style={{ color: '#059669' }}>24 Hours Guaranteed</strong>
                   </div>
                   <div>
@@ -600,61 +687,13 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                     <strong style={{ color: '#0F172A' }}>{ward}</strong>
                   </div>
                   <div>
-                    <span style={{ color: '#64748B', display: 'block', fontSize: '11px' }}>WhatsApp Status</span>
+                    <span style={{ color: '#64748B', display: 'block', fontSize: '11px' }}>Live WhatsApp Updates</span>
                     <strong style={{ color: '#2563EB' }}>Active on {citizenPhone}</strong>
                   </div>
                 </div>
               </div>
 
-              {/* Officer Dispatch Verification Badge */}
-              <div style={{
-                background: '#F0FDF4',
-                border: '1.5px solid #BBF7D0',
-                borderRadius: '14px',
-                padding: '13px 16px',
-                marginBottom: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '12px',
-                textAlign: 'left'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '10px',
-                    background: '#DCFCE7',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#059669',
-                    flexShrink: 0
-                  }}>
-                    <Building2 style={{ width: '20px', height: '20px' }} />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '12.5px', fontWeight: 800, color: '#065F46' }}>
-                      Transmitted to Govt Officer: {createdTicket.officerName || 'Er. Sanjay Sharma (AEE DJB)'}
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#047857' }}>
-                      {createdTicket.department || 'Delhi Municipal Authority'} • Ready in Officer Workspace queue
-                    </div>
-                  </div>
-                </div>
-                <span style={{
-                  fontSize: '11px',
-                  fontWeight: 800,
-                  background: '#10B981',
-                  color: '#FFFFFF',
-                  padding: '3px 10px',
-                  borderRadius: '999px',
-                  whiteSpace: 'nowrap'
-                }}>
-                  ● Live on Officer Desk
-                </span>
-              </div>
-
+              {/* Fast Action Buttons */}
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
                 <button
                   id="btn-track-grievance-live"
@@ -668,12 +707,12 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                   }}
                   style={{
                     height: '42px',
-                    padding: '0 20px',
+                    padding: '0 22px',
                     borderRadius: '10px',
                     background: 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)',
                     color: '#FFFFFF',
                     border: 'none',
-                    fontSize: '13px',
+                    fontSize: '13.5px',
                     fontWeight: 700,
                     cursor: 'pointer',
                     display: 'inline-flex',
@@ -682,36 +721,32 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                     boxShadow: '0 4px 14px rgba(14, 94, 58, 0.35)'
                   }}
                 >
-                  <span>Track Grievance Live</span>
+                  <span>Track Complaint</span>
                   <ArrowRight style={{ width: '15px', height: '15px' }} />
                 </button>
 
                 <button
-                  id="btn-view-officer-desk"
                   type="button"
-                  onClick={async () => {
-                    onClose();
-                    await switchDemoRole('civic_officer');
-                    navigate(`/officer?caseId=${createdTicket.id}`);
+                  onClick={() => {
+                    setCreatedTicket(null);
+                    setCurrentStep(1);
+                    setTitle('');
+                    setDescription('');
+                    setPhotoPreview(null);
                   }}
                   style={{
                     height: '42px',
-                    padding: '0 20px',
+                    padding: '0 14px',
                     borderRadius: '10px',
-                    background: '#1E293B',
-                    color: '#FFFFFF',
-                    border: '1px solid #334155',
+                    background: '#F1F5F9',
+                    color: '#334155',
+                    border: '1px solid #CBD5E1',
                     fontSize: '13px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    boxShadow: '0 4px 14px rgba(30, 41, 59, 0.25)'
+                    fontWeight: 600,
+                    cursor: 'pointer'
                   }}
                 >
-                  <Building2 style={{ width: '15px', height: '15px', color: '#38BDF8' }} />
-                  <span>View on Govt Officer Desk</span>
+                  + File Another
                 </button>
 
                 <button
@@ -719,10 +754,10 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                   onClick={onClose}
                   style={{
                     height: '42px',
-                    padding: '0 16px',
+                    padding: '0 14px',
                     borderRadius: '10px',
-                    background: '#F1F5F9',
-                    color: '#334155',
+                    background: '#FFFFFF',
+                    color: '#64748B',
                     border: '1px solid #E2E8F0',
                     fontSize: '13px',
                     fontWeight: 600,
@@ -1094,125 +1129,45 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                 </div>
               )}
 
-              {/* STEP 2 */}
+              {/* STEP 2: LIVE CAMERA CAPTURE & AI HAZARD VERIFICATION */}
               {currentStep === 2 && (
                 <div>
                   <div style={{ textAlign: 'center', marginBottom: '14px' }}>
                     <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', margin: '0 0 4px 0' }}>
-                      Upload Ground Photo (Optional)
+                      Capture Ground Photo Evidence (Optional)
                     </h3>
                     <p style={{ fontSize: '12px', color: '#64748B', margin: 0 }}>
-                      Complaints with photos get resolved 2x faster by field engineers.
+                      Snap a live photo of the civic issue. AI will analyze authenticity and extract hazard details.
                     </p>
                   </div>
 
-                  {!photoPreview ? (
-                    <div 
-                      onClick={() => photoInputRef.current?.click()}
-                      style={{
-                        border: '2px dashed #94A3B8',
-                        borderRadius: '16px',
-                        padding: '28px 16px',
-                        textAlign: 'center',
-                        cursor: 'pointer',
-                        background: '#F8FAFC',
-                        marginBottom: '14px'
-                      }}
-                    >
-                      <div style={{
-                        width: '46px',
-                        height: '46px',
-                        borderRadius: '50%',
-                        background: '#EFF6FF',
-                        color: '#2563EB',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 10px auto'
-                      }}>
-                        <Camera style={{ width: '22px', height: '22px' }} />
-                      </div>
-                      <strong style={{ fontSize: '13px', color: '#1E2653', display: 'block', marginBottom: '3px' }}>
-                        Click to Take Photo or Upload Image
-                      </strong>
-                      <span style={{ fontSize: '11px', color: '#64748B' }}>
-                        Supports Camera capture or Gallery selection
-                      </span>
-                    </div>
-                  ) : (
+                  <LiveCameraCapture
+                    photoPreview={photoPreview}
+                    setPhotoPreview={setPhotoPreview}
+                    visionAnalysis={visionAnalysis}
+                    setVisionAnalysis={setVisionAnalysis}
+                    category={category}
+                    setCategory={setCategory}
+                    contextText={description || title}
+                    onDetailCorrection={(customText) => {
+                      if (customText && !description.includes(customText)) {
+                        setDescription(prev => prev ? `${prev} (Photo Note: ${customText})` : customText);
+                      }
+                    }}
+                  />
+
+                  {stepErrorMsg && (
                     <div style={{
-                      borderRadius: '14px',
-                      overflow: 'hidden',
-                      border: '1px solid #CBD5E1',
-                      background: '#0F172A',
-                      position: 'relative',
-                      marginBottom: '14px'
+                      marginBottom: '10px',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      background: '#FEF2F2',
+                      border: '1px solid #FECACA',
+                      color: '#DC2626',
+                      fontSize: '11.5px',
+                      fontWeight: 600
                     }}>
-                      <img 
-                        src={photoPreview} 
-                        alt="Evidence Preview" 
-                        style={{
-                          width: '100%',
-                          maxHeight: '210px',
-                          objectFit: 'cover',
-                          display: 'block'
-                        }} 
-                      />
-
-                      <button
-                        type="button"
-                        onClick={handleRemovePhoto}
-                        style={{
-                          position: 'absolute',
-                          top: '10px',
-                          right: '10px',
-                          background: 'rgba(0, 0, 0, 0.65)',
-                          color: '#FFFFFF',
-                          border: 'none',
-                          borderRadius: '50%',
-                          width: '32px',
-                          height: '32px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <Trash2 style={{ width: '15px', height: '15px' }} />
-                      </button>
-
-                      <div style={{
-                        padding: '8px 12px',
-                        background: '#FFFFFF',
-                        borderTop: '1px solid #E2E8F0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}>
-                        {isAnalyzingPhoto ? (
-                          <>
-                            <Loader2 className="animate-spin" style={{ width: '15px', height: '15px', color: '#2563EB' }} />
-                            <span style={{ fontSize: '11.5px', color: '#2563EB', fontWeight: 600 }}>
-                              Gemini Vision is scanning hazard features...
-                            </span>
-                          </>
-                        ) : visionAnalysis ? (
-                          <>
-                            <CheckCircle2 style={{ width: '15px', height: '15px', color: '#10B981', flexShrink: 0 }} />
-                            <div style={{ fontSize: '11.5px', color: '#334155' }}>
-                              <strong style={{ color: '#0F172A' }}>AI Hazard Identified: </strong>
-                              {visionAnalysis.observed_hazard} ({Math.round(visionAnalysis.confidence * 100)}% Match)
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle2 style={{ width: '15px', height: '15px', color: '#10B981' }} />
-                            <span style={{ fontSize: '11.5px', color: '#0F172A', fontWeight: 600 }}>
-                              Photo attached ({photoFile?.name})
-                            </span>
-                          </>
-                        )}
-                      </div>
+                      {stepErrorMsg}
                     </div>
                   )}
 
@@ -1224,7 +1179,7 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                     fontSize: '11.5px',
                     color: '#166534'
                   }}>
-                    💡 If you cannot take a photo right now, click "Skip Photo / Next" to proceed.
+                    💡 If you cannot take a photo right now, click <strong>"Skip Photo / Next"</strong> to proceed.
                   </div>
                 </div>
               )}
@@ -1552,6 +1507,10 @@ export default function FileGrievanceModal({ isOpen, onClose, defaultCategory = 
                 onClick={() => {
                   if (currentStep === 1 && !description.trim()) {
                     setStepErrorMsg('⚠️ Please enter or speak a description of the problem.');
+                    return;
+                  }
+                  if (currentStep === 2 && photoPreview && visionAnalysis && !visionAnalysis.isValidCivic) {
+                    setStepErrorMsg('⚠️ The attached photo is a non-civic/UI image. Please retake a ground photo or remove it to proceed.');
                     return;
                   }
                   setStepErrorMsg('');

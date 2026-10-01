@@ -520,7 +520,7 @@ export function ComplaintDetailModal({
         onClick={e => e.stopPropagation()}
         style={{
           width: '100%',
-          maxWidth: '580px',
+          maxWidth: '740px',
           maxHeight: '90vh',
           overflowY: 'auto',
           borderRadius: '26px',
@@ -604,57 +604,159 @@ export function ComplaintDetailModal({
           </div>
         </div>
 
-        {/* Status Timeline */}
-        <div style={{ padding: '22px 24px' }}>
-          <div style={{ fontSize: '12px', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '18px' }}>
-            📦 Resolution Timeline
+        {/* Horizontal Status Timeline */}
+        <div style={{ padding: '20px 24px 16px 24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+            <div style={{ fontSize: '12px', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              📦 Resolution Timeline
+            </div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#EFF6FF', padding: '3px 10px', borderRadius: '999px', border: '1px solid #BFDBFE' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#1D4ED8' }}>
+                Stage {stepIdx + 1} of {STATUS_STEPS.length}:
+              </span>
+              <strong style={{ fontSize: '11px', color: '#1E40AF' }}>
+                {STATUS_STEPS[stepIdx]?.label}
+              </strong>
+            </div>
           </div>
-          <div style={{ position: 'relative' }}>
-            <div style={{ position: 'absolute', left: '18px', top: '10px', width: '2px', height: 'calc(100% - 32px)', background: '#E2E8F0' }} />
-            <div style={{ position: 'absolute', left: '18px', top: '10px', width: '2px', height: `${(stepIdx / (STATUS_STEPS.length - 1)) * 100}%`, background: '#2563EB', transition: 'height 0.4s ease' }} />
-            {STATUS_STEPS.map((step, idx) => {
-              const done = idx <= stepIdx;
-              const active = idx === stepIdx;
-              return (
-                <div key={step.key} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', marginBottom: idx < STATUS_STEPS.length - 1 ? '20px' : '0', position: 'relative' }}>
-                  <div style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    flexShrink: 0,
-                    background: active ? '#2563EB' : done ? '#EFF6FF' : '#F8FAFC',
-                    border: active ? '3px solid #BFDBFE' : done ? '2px solid #2563EB' : '2px solid #CBD5E1',
-                    color: active ? '#FFFFFF' : done ? '#2563EB' : '#94A3B8',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '15px',
-                    zIndex: 1,
-                    transition: 'all 0.2s'
-                  }}>
-                    {done ? (active ? step.icon : '✓') : idx + 1}
-                  </div>
-                  <div style={{ paddingTop: '4px', flex: 1 }}>
-                    <div style={{ fontSize: '13px', fontWeight: active ? 800 : done ? 700 : 500, color: active ? '#1D4ED8' : done ? '#0F172A' : '#94A3B8' }}>
-                      {step.label}
+
+          {/* Horizontal Track & Steps */}
+          <div style={{ overflowX: 'auto', paddingBottom: '8px', WebkitOverflowScrolling: 'touch' }}>
+            <div style={{ minWidth: '580px', position: 'relative', padding: '10px 4px 4px 4px' }}>
+              {/* Background Connecting Bar */}
+              <div style={{
+                position: 'absolute',
+                top: '26px',
+                left: 'calc(100% / 14)',
+                right: 'calc(100% / 14)',
+                height: '3px',
+                background: '#E2E8F0',
+                borderRadius: '999px',
+                zIndex: 0
+              }} />
+
+              {/* Active Progress Bar */}
+              <div style={{
+                position: 'absolute',
+                top: '26px',
+                left: 'calc(100% / 14)',
+                width: `calc((100% - (100% / 7)) * ${stepIdx / (STATUS_STEPS.length - 1)})`,
+                height: '3px',
+                background: 'linear-gradient(90deg, #2563EB, #10B981)',
+                borderRadius: '999px',
+                zIndex: 1,
+                transition: 'width 0.4s ease'
+              }} />
+
+              {/* Horizontal Step Nodes */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: `repeat(${STATUS_STEPS.length}, 1fr)`,
+                position: 'relative',
+                zIndex: 2,
+                gap: '4px'
+              }}>
+                {STATUS_STEPS.map((step, idx) => {
+                  const done = idx <= stepIdx;
+                  const active = idx === stepIdx;
+
+                  return (
+                    <div key={step.key} style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      {/* Step Circle Node */}
+                      <div style={{
+                        width: '34px',
+                        height: '34px',
+                        borderRadius: '50%',
+                        background: active ? '#2563EB' : done ? '#ECFDF5' : '#F8FAFC',
+                        border: active ? '3px solid #BFDBFE' : done ? '2px solid #10B981' : '2px solid #CBD5E1',
+                        color: active ? '#FFFFFF' : done ? '#059669' : '#94A3B8',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '13px',
+                        fontWeight: 800,
+                        boxShadow: active ? '0 0 0 4px rgba(37, 99, 235, 0.2), 0 4px 8px rgba(37, 99, 235, 0.25)' : 'none',
+                        marginBottom: '8px',
+                        transition: 'all 0.2s ease'
+                      }}>
+                        {done ? (active ? step.icon : '✓') : idx + 1}
+                      </div>
+
+                      {/* Step Label */}
+                      <div style={{
+                        fontSize: '11px',
+                        fontWeight: active ? 800 : done ? 700 : 500,
+                        color: active ? '#1D4ED8' : done ? '#0F172A' : '#94A3B8',
+                        lineHeight: 1.25,
+                        maxWidth: '82px',
+                        margin: '0 auto'
+                      }}>
+                        {step.label}
+                      </div>
+
+                      {/* Active Pill Badge */}
                       {active && (
-                        <span style={{ marginLeft: '8px', fontSize: '10px', background: '#DBEAFE', color: '#1D4ED8', padding: '2px 8px', borderRadius: '999px', fontWeight: 800 }}>
-                          ACTIVE STAGE
+                        <span style={{
+                          marginTop: '4px',
+                          fontSize: '9px',
+                          fontWeight: 800,
+                          background: '#DBEAFE',
+                          color: '#1D4ED8',
+                          padding: '1px 6px',
+                          borderRadius: '999px',
+                          letterSpacing: '0.02em'
+                        }}>
+                          ACTIVE
                         </span>
                       )}
                     </div>
-                    <div style={{ fontSize: '12px', color: done ? '#64748B' : '#94A3B8', marginTop: '2px' }}>
-                      {step.desc}
-                    </div>
-                    {active && item.updatedAt && (
-                      <div style={{ fontSize: '11px', color: '#2563EB', marginTop: '3px', fontWeight: 600 }}>
-                        Updated: {item.updatedAt}
-                      </div>
-                    )}
-                  </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Active Stage Callout Card */}
+          <div style={{
+            marginTop: '14px',
+            padding: '12px 16px',
+            borderRadius: '14px',
+            background: 'linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)',
+            border: '1px solid #DBEAFE',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            flexWrap: 'wrap'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                background: '#DBEAFE',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '16px',
+                flexShrink: 0
+              }}>
+                {STATUS_STEPS[stepIdx]?.icon || '📋'}
+              </div>
+              <div>
+                <div style={{ fontSize: '12.5px', fontWeight: 800, color: '#1E40AF' }}>
+                  Current Status: {STATUS_STEPS[stepIdx]?.label}
                 </div>
-              );
-            })}
+                <div style={{ fontSize: '11.5px', color: '#475569', marginTop: '1px' }}>
+                  {STATUS_STEPS[stepIdx]?.desc}
+                </div>
+              </div>
+            </div>
+            {item.updatedAt && (
+              <span style={{ fontSize: '11px', color: '#2563EB', fontWeight: 600, background: '#FFFFFF', padding: '3px 8px', borderRadius: '6px', border: '1px solid #E2E8F0' }}>
+                Updated: {item.updatedAt}
+              </span>
+            )}
           </div>
         </div>
 

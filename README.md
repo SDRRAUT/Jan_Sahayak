@@ -296,22 +296,52 @@ cd Jan_Sahayak
 ```
 
 ### Step 2: Configure Environment Variables
-Create a `.env` file in the root directory:
+Copy the template `.env.example` to `.env` in the root directory:
+```bash
+cp .env.example .env
+```
+Fill in your configuration variables:
 ```env
+# Server Configuration
 PORT=3001
 VITE_PORT=3737
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-SUPABASE_DATABASE_URL=postgresql://user:password@host:5432/postgres
+NODE_ENV=development
+DEMO_MODE=false
+
+# Supabase Auth & Storage
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-supabase-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
+
+# Authoritative PostgreSQL Database (PostGIS + pgvector)
+DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT].supabase.co:5432/postgres
+
+# Google Gemini Multi-Agent AI
 GEMINI_API_KEY=your-gemini-api-key
+
+# Production Domain Whitelist (CORS)
+ALLOWED_ORIGINS=http://localhost:3737,http://localhost:3000,http://127.0.0.1:3737
 ```
 
-### Step 3: Install Dependencies
+### Step 3: Database & Migrations Setup
+The PostgreSQL schema requires the `postgis` and `vector` extensions:
+1. In your Supabase SQL Editor or `psql` connection, run:
+```sql
+\i database/migrations/001_initial_schema.sql
+```
+This automatically initializes:
+- `extensions.postgis` (Geographic coordinates, distance calculations, spatial buffering)
+- `extensions.vector` (768-dimensional embeddings with HNSW indexing for cosine similarity)
+- All 18 relational tables with strict foreign keys, timestamps, and indexes
+- Row Level Security (RLS) policies for Citizen, Officer, and Super Admin roles
+- Stored procedures: `search_nearby_complaints`, `search_similar_complaints`, `search_civic_memory`
+
+### Step 4: Install Dependencies
 ```bash
 npm install
 ```
 
-### Step 4: Start the Full Platform
+### Step 5: Start the Full Platform
 ```bash
 npm start
 ```
@@ -319,7 +349,7 @@ This automatically starts:
 - 📡 **Backend API Server**: `http://localhost:3001`
 - ⚡ **Frontend Client**: `http://localhost:3737` (or `http://localhost:3000`)
 
-### Step 5: Build for Production
+### Step 6: Build for Production
 ```bash
 npm run build
 ```
@@ -330,30 +360,47 @@ npm run build
 
 Jan_Sahayak includes a comprehensive, multi-layer validation suite:
 
-### 1. Cross-Role End-to-End Test Suite (`scripts/test_cross_role_sync.js`)
-Validates the entire lifecycle across Citizen, Officer, and Super Admin roles:
+### 1. Unit Test Suite (`npm test`)
+```bash
+npm test
+```
+**Results: 11 PASSED, 0 FAILED**
+- ✔ `Gemini AI Assistant - Role-segregated tool declarations`
+- ✔ `Gemini AI Assistant - Citizen tools execution against real/fallback data`
+- ✔ `Gemini AI Assistant - Civic officer tools operational structure`
+- ✔ `Gemini AI Assistant - Super admin live citywide metrics`
+- ✔ `Gemini AI Assistant - High-impact action confirmation detection`
+- ✔ `Gemini AI Assistant - Hinglish grounding & response processing`
+- ✔ `Canonical Events - Completeness (23 canonical event types)`
+- ✔ `Orchestrator - Ingests and processes complaint into Incident entity`
+- ✔ `Canonical Statuses - Normalization`
+- ✔ `Canonical Statuses - Valid Transitions`
+- ✔ `Canonical Statuses - Role-Specific Labels`
+
+### 2. Multi-Agent Pipeline Verification (`npm run test:pipeline`)
+Simulates 5 realistic school waterlogging complaints through the 9-agent pipeline:
+```bash
+npm run test:pipeline
+```
+- Ingests 5 citizen signals ➔ Generates 5 Complaint DNAs
+- Clusters complaints spatially (PostGIS) and semantically (pgvector) into 1 Civic Incident
+- Runs forensic Root Cause Analysis and Resolution Simulations
+- Generates Cross-Department Coordination Graph
+- Executes Section 20 closed-loop verification and logs to Civic Memory
+
+### 3. Cross-Role End-to-End Suite (`node scripts/test_cross_role_sync.js`)
+Validates the full operational lifecycle across Citizen, Officer, and Super Admin:
 ```bash
 node scripts/test_cross_role_sync.js
 ```
 **Results: 24 PASSED, 0 FAILED**
 - ✅ Database & System Health Check
-- ✅ Citizen Submission & Multi-Agent Pipeline Execution
+- ✅ Citizen Ingestion & AI Pipeline Execution
 - ✅ Officer Incident Visibility & Status Transition (`INVESTIGATION`)
-- ✅ Officer Resolution & Photo Evidence Persistence
-- ✅ Citizen Dispute (`DISPUTE_REOPENED`) ➔ Resolution ➔ Confirmation (`RESOLVED_CONFIRMED`)
+- ✅ Officer Action & Completion Evidence (`ACTION_COMPLETED`)
+- ✅ Citizen Dispute (`DISPUTE_REOPENED`) ➔ Re-escalation ➔ Confirmation (`RESOLVED_CONFIRMED`)
 - ✅ Authoritative Shared Timeline Retrieval
 - ✅ Super Admin Audit Trail & Live Analytics
-
-### 2. Unit Test Suite (`npm test`)
-```bash
-npm test
-```
-**Results: 5 PASSED, 0 FAILED**
-- ✔ `Canonical Events - Completeness`
-- ✔ `Canonical Statuses - Normalization`
-- ✔ `Canonical Statuses - Valid Transitions`
-- ✔ `Canonical Statuses - Role-Specific Labels`
-- ✔ `Orchestrator - Ingests and processes complaint into Incident entity`
 
 ---
 
@@ -361,19 +408,39 @@ npm test
 
 | Category | Method & Path | Access | Description |
 |---|---|---|---|
-| **Health** | `GET /api/health` | Public | System status and PostgreSQL connection health |
-| **Auth** | `POST /api/auth/login` | Public | Role-based authentication (Citizen, Officer, Admin) |
+| **Health** | `GET /api/health` | Public | System status and uptime |
+| **Health** | `GET /api/health/db` | Public | PostgreSQL/Supabase connectivity status |
+| **Auth** | `POST /api/auth/register` | Public | Citizen registration with role-based profile |
+| **Auth** | `POST /api/auth/login` | Public | Authentication with Supabase JWT & demo support |
+| **Auth** | `POST /api/auth/logout` | Authenticated | Terminate session |
 | **Grievances** | `GET /api/grievances` | Authenticated | Fetch authoritative grievances (role-scoped) |
 | **Grievances** | `POST /api/grievances` | Citizen | Ingest complaint through the 8-Agent AI mesh |
 | **Grievances** | `GET /api/grievances/:id/timeline` | Authenticated | Fetch unified chronological timeline from DB |
-| **Grievances** | `PATCH /api/grievances/:id/transition-status` | Officer / Admin | Transition canonical status with event broadcast |
-| **Grievances** | `POST /api/grievances/:id/resolve` | Officer | Mark action completed with required photo evidence |
-| **Grievances** | `POST /api/grievances/:id/verify` | Citizen | Citizen closed-loop satisfaction verification / dispute |
+| **Grievances** | `POST /api/grievances/:id/transition-status` | Officer / Admin | Transition canonical status with strict validation |
+| **Grievances** | `POST /api/grievances/:id/resolve` | Officer / Admin | Mark field action completed with required photo evidence |
+| **Grievances** | `POST /api/grievances/:id/verify` | Citizen | Closed-loop citizen satisfaction verification / dispute |
+| **Field Actions** | `GET /api/field-actions` | Officer / Admin | List operational field actions with photos & GPS |
+| **Field Actions** | `POST /api/field-actions` | Officer / Admin | Dispatch repair squad, record before/after photos & coordinates |
+| **Verifications**| `GET /api/verifications` | Authenticated | List citizen verification records (role-filtered) |
+| **Verifications**| `POST /api/verifications` | Citizen | Submit closed-loop rating, ground feedback, or dispute |
+| **Evidence** | `POST /api/evidence/upload` | Authenticated | Secure file upload with MIME & size validation |
 | **Incidents** | `GET /api/incidents` | Officer / Admin | Fetch synthesized civic incidents with linked tickets |
 | **Incidents** | `GET /api/incidents/:id` | Officer / Admin | Fetch full incident detail with graph nodes & SOPs |
-| **Admin** | `GET /api/admin/audit-logs` | Super Admin | Query immutable PostgreSQL audit logs |
+| **Admin** | `GET /api/admin/audit-logs` | Super Admin | Query immutable audit logs (`public.audit_logs`) |
 | **Admin** | `GET /api/admin/analytics` | Super Admin | Query live aggregation metrics across all wards |
-| **Realtime** | `GET /api/events` | Public / App | Server-Sent Events stream for 23 canonical event types |
+| **Realtime** | `GET /api/events` | Authenticated / App | Server-Sent Events stream for 23 canonical event types |
+
+---
+
+## 🔒 9. Security Architecture
+
+1. **No Insecure Hardcoded Secrets**: All database connection strings, Supabase JWTs, and Gemini API keys are externalized into environment variables (`.env`).
+2. **Strict Domain-Restricted CORS**: Unrestricted CORS disabled. Express enforces origins whitelist configured via `ALLOWED_ORIGINS`.
+3. **Sliding-Window Rate Limiting**: In-memory rate limiting applied to `/api/auth/*` (15 req/15min), `/api/complaints` and `/api/grievances` (20 req/15min), `/api/ai/*` (30 req/min), and `/api/evidence/upload` (20 req/15min).
+4. **Secure File Uploads**: MIME-type sniffing validation, file extension whitelist (`.jpg`, `.jpeg`, `.png`, `.webp`, `.pdf`, `.mp3`, `.wav`, `.m4a`, `.webm`), file size caps (10MB for photos, 20MB for audio), and unique filename hashing.
+5. **Authenticated, Deduplicated SSE**: Server-Sent Events endpoint (`/api/events`) enforces session-token authorization, role-based event filtering, and single-connection-per-client deduplication.
+6. **Strict Canonical Status Validation**: Backend rejects illegal workflow status transitions with HTTP 422 unless authorized with Super Admin override.
+7. **Database Row Level Security (RLS)**: PostgreSQL tables enforce role isolation: citizens query only their submissions; officers access departmental incidents; super admins access systemwide audit records.
 
 ---
 

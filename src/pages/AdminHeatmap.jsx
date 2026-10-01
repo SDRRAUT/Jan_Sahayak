@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { 
   MapPin, 
   Layers, 
@@ -23,12 +23,17 @@ import {
 import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
 import WhyExplainer from '../components/common/WhyExplainer';
+import LeafletMap from '../components/common/LeafletMap';
 
 export default function AdminHeatmap() {
-  const { grievances, clusters, metrics } = useApp();
+  const [searchParams] = useSearchParams();
+  const { grievances = [], clusters = [], metrics } = useApp();
+  const targetCaseId = searchParams.get('caseId');
+  const latestGrievance = (targetCaseId ? grievances.find(g => g.id === targetCaseId) : null) || grievances[0];
   const [selectedWard, setSelectedWard] = useState('Ward 14 (Rohini Sector 14)');
   const [selectedCluster, setSelectedCluster] = useState(clusters[0]);
   const [categoryFilter, setCategoryFilter] = useState('ALL');
+  const [useRealMap, setUseRealMap] = useState(true);
   const [broadcastSent, setBroadcastSent] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
@@ -36,11 +41,11 @@ export default function AdminHeatmap() {
   const [legendOpen, setLegendOpen] = useState(false);
 
   const wardStats = [
-    { ward: 'Ward 14 (Rohini)', category: 'Water Supply', active: 18, critical: 1, resolved: 14, status: 'HIGH_ALERT', trend: '+48% this week' },
-    { ward: 'Ward 8 (Lajpat Nagar)', category: 'Electricity', active: 7, critical: 0, resolved: 22, status: 'NORMAL', trend: '+12% this week' },
-    { ward: 'Ward 22 (Mayur Vihar)', category: 'Roads', active: 11, critical: 0, resolved: 31, status: 'NORMAL', trend: '-8% this week' },
-    { ward: 'Ward 5 (Kalkaji)', category: 'Water Supply', active: 9, critical: 1, resolved: 19, status: 'HIGH_ALERT', trend: '+22% this week' },
-    { ward: 'Ward 19 (Karol Bagh)', category: 'Sanitation', active: 4, critical: 0, resolved: 28, status: 'RESOLVED', trend: '-40% this week' }
+    { ward: 'Ward 14 (Rohini)', category: 'Water Supply', active: 18, critical: 1, resolved: 14, status: 'HIGH_ALERT', trend: '+48% this week', lat: 28.7175, lng: 77.1248 },
+    { ward: 'Ward 8 (Lajpat Nagar)', category: 'Electricity', active: 7, critical: 0, resolved: 22, status: 'NORMAL', trend: '+12% this week', lat: 28.5677, lng: 77.2433 },
+    { ward: 'Ward 22 (Mayur Vihar)', category: 'Roads', active: 11, critical: 0, resolved: 31, status: 'NORMAL', trend: '-8% this week', lat: 28.6096, lng: 77.2965 },
+    { ward: 'Ward 5 (Kalkaji)', category: 'Water Supply', active: 9, critical: 1, resolved: 19, status: 'HIGH_ALERT', trend: '+22% this week', lat: 28.5367, lng: 77.2570 },
+    { ward: 'Ward 19 (Karol Bagh)', category: 'Sanitation', active: 4, critical: 0, resolved: 28, status: 'RESOLVED', trend: '-40% this week', lat: 28.6517, lng: 77.1906 }
   ];
 
   const categories = ['ALL', 'Water', 'Roads', 'Sanitation', 'Electricity', 'Other'];
@@ -105,6 +110,63 @@ export default function AdminHeatmap() {
             </Link>
           </div>
         </div>
+
+        {/* TOP OF ADMINISTRATION PANEL: LIVE INBOUND INCIDENT QUEUE */}
+        {latestGrievance && (
+          <div style={{
+            padding: '16px 20px',
+            borderRadius: 'var(--radius-lg)',
+            background: 'linear-gradient(90deg, #F0FDF4 0%, #EFF6FF 100%)',
+            border: '1.5px solid #86EFAC',
+            marginBottom: '20px',
+            boxShadow: '0 4px 14px rgba(16, 185, 129, 0.08)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '14px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                background: '#10B981',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}>
+                <Shield style={{ width: '20px', height: '20px' }} />
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '10px', fontWeight: 800, padding: '2px 8px', borderRadius: '999px', background: '#059669', color: '#FFFFFF' }}>
+                    ● TOP OF ADMINISTRATION QUEUE
+                  </span>
+                  <strong style={{ fontSize: '13px', color: '#065F46' }}>
+                    #{latestGrievance.id}: {latestGrievance.title}
+                  </strong>
+                  <span style={{ fontSize: '11px', color: '#047857' }}>
+                    ({latestGrievance.createdAt || 'Just now'})
+                  </span>
+                </div>
+                <div style={{ fontSize: '12px', color: '#047857', marginTop: '3px' }}>
+                  Reported in <strong>{latestGrievance.location?.ward || 'Ward 14'}</strong> by {latestGrievance.citizenName || 'Citizen'} • Assigned to <strong>{latestGrievance.officerName || latestGrievance.department || 'DJB'}</strong> • Target SLA: 24h
+                </div>
+              </div>
+            </div>
+
+            <Link
+              to={`/officer?caseId=${latestGrievance.id}`}
+              className="btn-primary btn-sm"
+              style={{ background: '#059669', borderColor: '#059669', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <span>Inspect in Officer Workspace →</span>
+            </Link>
+          </div>
+        )}
 
         {/* SECTION 17: EMERGING THIS WEEK CALLOUT BANNER */}
         <div style={{
@@ -248,9 +310,79 @@ export default function AdminHeatmap() {
                 </div>
               </div>
 
-              {/* Graphical Ward Map Simulator with Touch-Optimized Leaflet Controls */}
-              <div 
-                className="gis-map-viewport"
+              {/* Map Engine Toggle Bar */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '8px',
+                marginBottom: '12px',
+                padding: '6px 12px',
+                background: '#F8FAFC',
+                borderRadius: '8px',
+                border: '1px solid var(--color-border-subtle, #E2E8F0)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Layers style={{ width: '14px', height: '14px', color: 'var(--color-primary, #10B981)' }} />
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)' }}>
+                    Map Engine:
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setUseRealMap(true)}
+                    style={{
+                      padding: '3px 10px',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      border: useRealMap ? '1px solid var(--color-primary, #10B981)' : '1px solid #CBD5E1',
+                      background: useRealMap ? 'var(--color-primary, #10B981)' : '#FFFFFF',
+                      color: useRealMap ? '#FFFFFF' : '#475569',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      transition: 'all 150ms ease'
+                    }}
+                  >
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: useRealMap ? '#FFFFFF' : '#10B981' }} />
+                    Live Leaflet / OSM
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUseRealMap(false)}
+                    style={{
+                      padding: '3px 10px',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      border: !useRealMap ? '1px solid var(--color-primary, #10B981)' : '1px solid #CBD5E1',
+                      background: !useRealMap ? 'var(--color-primary, #10B981)' : '#FFFFFF',
+                      color: !useRealMap ? '#FFFFFF' : '#475569',
+                      cursor: 'pointer',
+                      transition: 'all 150ms ease'
+                    }}
+                  >
+                    Simulated Canvas
+                  </button>
+                </div>
+              </div>
+
+              {useRealMap ? (
+                <LeafletMap
+                  wards={filteredWards}
+                  selectedWard={selectedWard}
+                  onSelectWard={handleSelectWard}
+                  height="clamp(360px, 55vh, 600px)"
+                  initialLayer="osm"
+                />
+              ) : (
+                /* Graphical Ward Map Simulator with Touch-Optimized Leaflet Controls */
+                <div 
+                  className="gis-map-viewport"
                 style={{
                   height: 'clamp(340px, 55vh, 600px)',
                   borderRadius: 'var(--radius-md)',
@@ -742,6 +874,7 @@ export default function AdminHeatmap() {
                   </button>
                 )}
               </div>
+              )}
 
               {/* Desktop Ward Breakdown Grid */}
               <div 

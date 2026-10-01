@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>JanSahayak — Product Launch Video</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  </head>
+  <body>
+    <div
+      id="root"
+      class="stage"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="23.5"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- Background Canvas Grid & Telemetry -->
+      <div class="bg-layer">
+        <div class="stars-grid" data-layout-allow-overflow></div>
+        <div class="ambient-orb orb-1" data-layout-allow-overflow></div>
+        <div class="ambient-orb orb-2" data-layout-allow-overflow></div>
+        <div class="telemetry-hud">
+          <div class="hud-item hud-tl">SYS://DELHI-MUNICIPAL-INTELLIGENCE • V2.4</div>
+          <div class="hud-item hud-tr">AI AGENT CLUSTER: 9 ACTIVE • 142K LOGGED</div>
+          <div class="hud-item hud-bl">WARD 14 TELEMETRY: 28.7041° N, 77.1025° E</div>
+          <div class="hud-item hud-br">SLA COMPLIANCE: 94.2% • REALTIME</div>
+        </div>
+      </div>
+
+      <!-- Scene 1: The Bureaucracy Trap (0.0s – 3.8s) -->
+      <div
+        id="scene-1"
+        class="scene clip"
+        data-composition-id="scene1-bureaucracy"
+        data-composition-src="compositions/scene1-bureaucracy.html"
+        data-start="0"
+        data-duration="3.8"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+
+      <!-- Scene 2: Voice to AI Grievance DNA™ (3.8s – 9.0s) -->
+      <div
+        id="scene-2"
+        class="scene clip"
+        data-composition-id="scene2-voice-triage"
+        data-composition-src="compositions/scene2-voice-triage.html"
+        data-start="3.8"
+        data-duration="5.2"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+
+      <!-- Scene 3: Spatial Clustering (9.0s – 14.5s) -->
+      <div
+        id="scene-3"
+        class="scene clip"
+        data-composition-id="scene3-clustering"
+        data-composition-src="compositions/scene3-clustering.html"
+        data-start="9.0"
+        data-duration="5.5"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+
+      <!-- Scene 4: Field Dispatch & Verification (14.5s – 19.5s) -->
+      <div
+        id="scene-4"
+        class="scene clip"
+        data-composition-id="scene4-field-action"
+        data-composition-src="compositions/scene4-field-action.html"
+        data-start="14.5"
+        data-duration="5.0"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+
+      <!-- Scene 5: Launch Outro (19.5s – 23.5s) -->
+      <div
+        id="scene-5"
+        class="scene clip"
+        data-composition-id="scene5-outro"
+        data-composition-src="compositions/scene5-outro.html"
+        data-start="19.5"
+        data-duration="4.0"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+
+      <!-- Playback Progress Bar -->
+      <div class="playback-bar-container">
+        <div id="timelineProgress" class="playback-bar"></div>
+      </div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const mainTl = gsap.timeline({ paused: true });
+      mainTl.to("#timelineProgress", { width: "100%", duration: 23.5, ease: "none" }, 0);
+      window.__timelines["main"] = mainTl;
+    </script>
+  </body>
+</html>

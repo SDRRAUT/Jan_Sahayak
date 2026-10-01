@@ -10,11 +10,16 @@
 
 export class AIProvider {
   constructor() {
-    this.modelName = process.env.AI_MODEL || 'gemini-3.5-flash';
+    this.modelName = process.env.AI_MODEL || 'gemini-1.5-flash';
+    this.lastEmbeddingSource = 'deterministic_fallback';
   }
 
   getApiKey() {
     return process.env.AI_API_KEY || process.env.GEMINI_API_KEY || null;
+  }
+
+  getLastEmbeddingSource() {
+    return this.lastEmbeddingSource;
   }
 
   /**
@@ -23,7 +28,7 @@ export class AIProvider {
   async generateStructuredJSON(prompt, systemInstruction = '', fallbackData = {}) {
     const apiKey = this.getApiKey();
     if (apiKey) {
-      const modelsToTry = [this.modelName, 'gemini-3.5-flash-lite', 'gemini-flash-latest'];
+      const modelsToTry = [this.modelName, 'gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest'];
       for (const m of modelsToTry) {
         try {
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`;
@@ -44,7 +49,12 @@ export class AIProvider {
             const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
             if (rawText) {
               const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-              return JSON.parse(cleanText);
+              const parsed = JSON.parse(cleanText);
+              return {
+                ...parsed,
+                _source: 'gemini',
+                _model: m
+              };
             }
           } else {
             const errBody = await response.json().catch(() => ({}));
@@ -56,8 +66,13 @@ export class AIProvider {
       }
     }
 
-    // Return deterministic fallback if remote provider is unreachable
-    return typeof fallbackData === 'function' ? fallbackData() : fallbackData;
+    // Return deterministic fallback if remote provider is unreachable or key not configured
+    const baseFallback = typeof fallbackData === 'function' ? fallbackData() : fallbackData;
+    return {
+      ...baseFallback,
+      _source: 'deterministic_fallback',
+      _reason: apiKey ? 'Gemini API unreachable or failed' : 'GEMINI_API_KEY not configured'
+    };
   }
 
   /**
@@ -70,13 +85,15 @@ export class AIProvider {
         observed_hazard: 'Visual evidence attached for on-site field verification',
         confidence: 0.85,
         verification_required: true,
-        features_detected: ['Visual evidence logged']
+        features_detected: ['Visual evidence logged for field survey'],
+        source: 'deterministic_fallback',
+        reason: apiKey ? 'No image data provided' : 'GEMINI_API_KEY not configured'
       };
     }
 
     // Clean base64 header if present (e.g. data:image/jpeg;base64,...)
     const cleanBase64 = base64Data.includes('base64,') ? base64Data.split('base64,')[1] : base64Data;
-    const modelsToTry = [this.modelName, 'gemini-3.5-flash-lite'];
+    const modelsToTry = [this.modelName, 'gemini-1.5-flash', 'gemini-2.0-flash'];
 
     for (const m of modelsToTry) {
       try {
@@ -94,15 +111,25 @@ export class AIProvider {
                   }
                 },
                 {
-                  text: `Analyze this municipal/civic complaint evidence photo. Context: "${contextPrompt}".
+                  text: `You are an AI Civic Infrastructure Inspector for Jan Sahayak.
+Carefully examine this submitted photo. Context: "${contextPrompt}".
+
+FIRST, determine if this image depicts a REAL-WORLD PHYSICAL CIVIC/MUNICIPAL PROBLEM (such as: road potholes, broken asphalt, damaged footpath, water leakage, pipeline burst, contaminated tap water, sewer overflow, drainage waterlogging, overflowing garbage dump, open solid waste, dangling power cables, damaged streetlight pole, unhygienic public toilet, fallen tree/debris).
+
+If the image is a WEBSITE SCREENSHOT, SOFTWARE UI, APP INTERFACE, MEME, CARTOON, CELEBRITY/SELFIE, INDOOR ROOM/BEDROOM FURNITURE, INVOICE/DOCUMENT, OR UNRELATED OBJECT:
+Set "is_valid_civic_issue" to FALSE, and explain exactly what was detected in "rejection_reason".
+
 Respond ONLY with valid JSON with this exact structure:
 {
-  "observed_hazard": string (concise description of visible issue e.g. "Severe waterlogging with foul wastewater accumulation" or "Asphalt road cave-in with exposed debris"),
-  "category": string ("Water Supply & Contamination" | "Roads & Infrastructure" | "Sanitation & Solid Waste" | "Electricity & Power Grid"),
+  "is_valid_civic_issue": boolean,
+  "rejection_reason": string | null,
+  "observed_hazard": string (concise description of visible civic hazard if valid, or what was seen if invalid e.g. "Software interface screenshot / web mockup"),
+  "category": "Water Supply & Contamination" | "Roads & Infrastructure" | "Sanitation & Solid Waste" | "Electricity & Power Grid" | "Drainage & Waterlogging",
   "severity": "CRITICAL" | "HIGH" | "MEDIUM" | "LOW",
-  "confidence": number (between 0.70 and 0.99),
+  "confidence": number (between 0.50 and 0.99),
   "verification_required": boolean,
-  "features_detected": string[] (up to 4 visual characteristics observed in the image)
+  "features_detected": string[] (up to 4 visual characteristics observed),
+  "user_clarification_suggested": boolean
 }`
                 }
               ]
@@ -119,7 +146,20 @@ Respond ONLY with valid JSON with this exact structure:
           const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
           if (rawText) {
             const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-            return JSON.parse(cleanText);
+            const parsed = JSON.parse(cleanText);
+            return {
+              is_valid_civic_issue: parsed.is_valid_civic_issue ?? true,
+              rejection_reason: parsed.rejection_reason || null,
+              observed_hazard: parsed.observed_hazard || 'Visual evidence scanned',
+              category: parsed.category || 'Roads & Infrastructure',
+              severity: parsed.severity || 'MEDIUM',
+              confidence: parsed.confidence || 0.88,
+              verification_required: parsed.verification_required ?? true,
+              features_detected: parsed.features_detected || [],
+              user_clarification_suggested: parsed.user_clarification_suggested ?? false,
+              source: 'gemini',
+              model: m
+            };
           }
         }
       } catch (err) {
@@ -128,10 +168,16 @@ Respond ONLY with valid JSON with this exact structure:
     }
 
     return {
-      observed_hazard: 'Visual evidence logged; field inspection requested',
-      confidence: 0.88,
+      is_valid_civic_issue: true,
+      rejection_reason: null,
+      observed_hazard: 'Visual evidence logged for field survey',
+      category: 'Roads & Infrastructure',
+      severity: 'MEDIUM',
+      confidence: 0.85,
       verification_required: true,
-      features_detected: ['Image evidence received']
+      features_detected: ['Visual evidence logged for field survey'],
+      source: 'deterministic_fallback',
+      reason: apiKey ? 'Gemini Vision request failed' : 'GEMINI_API_KEY not configured'
     };
   }
 
@@ -142,14 +188,16 @@ Respond ONLY with valid JSON with this exact structure:
     const apiKey = this.getApiKey();
     if (!apiKey || !base64Audio) {
       return {
-        transcript: 'Voice recording received and queued for field operator listening.',
+        transcript: 'Voice recording received and queued for field operator review.',
         language: 'Hindi / English',
-        key_concerns: ['Civic issue reported via voice note']
+        key_concerns: ['Civic issue reported via voice note'],
+        source: 'deterministic_fallback',
+        reason: apiKey ? 'No audio data provided' : 'GEMINI_API_KEY not configured'
       };
     }
 
     const cleanBase64 = base64Audio.includes('base64,') ? base64Audio.split('base64,')[1] : base64Audio;
-    const modelsToTry = [this.modelName, 'gemini-3.5-flash-lite', 'gemini-flash-latest'];
+    const modelsToTry = [this.modelName, 'gemini-1.5-flash', 'gemini-2.0-flash'];
 
     for (const m of modelsToTry) {
       try {
@@ -189,7 +237,12 @@ Respond ONLY with valid JSON with this exact structure:
           const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
           if (rawText) {
             const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-            return JSON.parse(cleanText);
+            const parsed = JSON.parse(cleanText);
+            return {
+              ...parsed,
+              source: 'gemini',
+              model: m
+            };
           }
         }
       } catch (err) {
@@ -200,7 +253,9 @@ Respond ONLY with valid JSON with this exact structure:
     return {
       transcript: 'Citizen audio recording captured for municipal operator review.',
       language: 'Multilingual / Hinglish',
-      key_concerns: ['Voice grievance submitted']
+      key_concerns: ['Voice grievance submitted'],
+      source: 'deterministic_fallback',
+      reason: apiKey ? 'Gemini Audio request failed' : 'GEMINI_API_KEY not configured'
     };
   }
 
@@ -224,6 +279,7 @@ Respond ONLY with valid JSON with this exact structure:
         if (res.ok) {
           const data = await res.json();
           if (data.embedding?.values && data.embedding.values.length === 768) {
+            this.lastEmbeddingSource = 'gemini';
             return data.embedding.values;
           }
         }
@@ -231,6 +287,8 @@ Respond ONLY with valid JSON with this exact structure:
         console.warn('[AIProvider Embedding] Gemini text-embedding-004 failed:', err.message);
       }
     }
+
+    this.lastEmbeddingSource = 'deterministic_fallback';
 
     // Deterministic 768-dim semantic projection for zero-downtime offline fallback
     const vector = new Array(768).fill(0);
@@ -268,53 +326,6 @@ Respond ONLY with valid JSON with this exact structure:
     return Math.round(R * c);
   }
 
-  /**
-   * Generates a semantic embedding vector for the given text.
-   * Uses Gemini text-embedding-004 (768 dims) when API key is available.
-   * Falls back to a deterministic sparse TF-IDF-inspired vector offline.
-   */
-  async generateEmbedding(text) {
-    const apiKey = this.getApiKey();
-    if (apiKey && text) {
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${apiKey}`;
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'models/text-embedding-004',
-            content: { parts: [{ text: text.slice(0, 2000) }] }
-          })
-        });
-        if (response.ok) {
-          const data = await response.json();
-          const values = data?.embedding?.values;
-          if (Array.isArray(values) && values.length > 0) {
-            return values;
-          }
-        }
-      } catch (err) {
-        console.warn('[AIProvider] Gemini embedding failed, using fallback:', err.message);
-      }
-    }
-
-    // Deterministic 768-dim sparse vector fallback
-    const tokens = (text || '')
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, ' ')
-      .split(/\s+/)
-      .filter((w) => w.length > 1);
-    const vec = new Array(768).fill(0);
-    tokens.forEach((token) => {
-      let h = 5381;
-      for (let i = 0; i < token.length; i++) {
-        h = ((h * 33) ^ token.charCodeAt(i)) >>> 0;
-      }
-      vec[h % 768] += 1;
-    });
-    const norm = Math.sqrt(vec.reduce((s, v) => s + v * v, 0)) || 1;
-    return vec.map((v) => v / norm);
-  }
 
   /**
    * Calculates TF-IDF / Token Cosine Semantic Similarity between two texts

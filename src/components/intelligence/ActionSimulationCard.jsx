@@ -5,45 +5,45 @@ export default function ActionSimulationCard({ simulations = [], onSelectAction,
   const defaultSims = simulations.length > 0 ? simulations : [
     {
       id: "SIM-A",
-      title: "Option A: Rapid Temporary Clamping (Split-Sleeve)",
-      description: "Excavate single 1.5m pit at Mother Dairy booth and install emergency stainless steel split-sleeve clamp.",
+      title: "Option A: Quick Temporary Patch (Clamp)",
+      description: "Dig a small hole at the booth and put a quick metal clamp on the pipe. Fast, but high chance it starts leaking again.",
       timeToIntervention: "4–6 Hours",
       expectedResolutionTime: "Same Day (6 Hours)",
-      affectedPopulationReduction: "80% immediate relief",
-      recurrenceRisk: "HIGH (65% probability of recurrence within 6 months)",
-      resourceRequirement: "Low (1 Repair Squad + 4 Technicians)",
+      affectedPopulationReduction: "Temporary relief for 80% of homes",
+      recurrenceRisk: "HIGH (65% chance of leaking again within 6 months)",
+      resourceRequirement: "Low (1 repair crew + 4 workers)",
       costScore: "₹18,000",
       coordinationRequired: "DJB only",
       confidence: "High",
-      recommendationVerdict: "SUB-OPTIMAL: High risk of repeated pavement collapse and secondary contamination."
+      recommendationVerdict: "NOT RECOMMENDED: Road and pipe likely to break again soon."
     },
     {
       id: "SIM-B",
-      title: "Option B: Full 24-Meter Ductile Iron Segment Replacement & PWD Road Re-bedding",
-      description: "Comprehensive replacement of aged 1988 line with modern polyurethane-lined ductile iron + PWD granular sub-base reconstruction.",
+      title: "Option B: Permanent Pipe Replacement (Recommended)",
+      description: "Replace the old broken 24-meter pipe with a brand new strong iron pipe, and rebuild the road base properly.",
       timeToIntervention: "18–24 Hours",
-      expectedResolutionTime: "36 Hours (Temporary water tankers provided)",
-      affectedPopulationReduction: "98% permanent fix",
-      recurrenceRisk: "LOW (< 5% recurrence over 15 years)",
-      resourceRequirement: "High (DJB Trenching Unit + PWD Roller Squad)",
+      expectedResolutionTime: "36 Hours (Free water tankers sent to homes)",
+      affectedPopulationReduction: "Permanent solution for all homes",
+      recurrenceRisk: "VERY LOW (< 5% chance in 15 years)",
+      resourceRequirement: "Medium (DJB pipe team + PWD road roller)",
       costScore: "₹1,45,000",
-      coordinationRequired: "DJB + PWD + Delhi Traffic Police",
+      coordinationRequired: "DJB + PWD + Traffic Police",
       confidence: "High",
-      recommendationVerdict: "RECOMMENDED: Eliminates long-term civic disruption and complies with Zero Dead-End mandate."
+      recommendationVerdict: "RECOMMENDED: Permanent fix, prevents digging road again."
     },
     {
       id: "SIM-C",
-      title: "Option C: Multi-Department Joint Field Inspection & Pressure Testing",
-      description: "Before mechanical excavation, run acoustic leak correlation and dye testing across DJB and MCD assets.",
+      title: "Option C: Acoustic Leak Test (Test First)",
+      description: "Send a sound sensor team to confirm the exact underground crack location before digging up the street.",
       timeToIntervention: "2–3 Hours",
-      expectedResolutionTime: "8 Hours (Diagnostic phase only)",
-      affectedPopulationReduction: "0% (Diagnostic only)",
+      expectedResolutionTime: "8 Hours (Testing only, no digging)",
+      affectedPopulationReduction: "Diagnostic check only",
       recurrenceRisk: "N/A",
-      resourceRequirement: "Medium (Diagnostic Engineers from DJB & PWD)",
+      resourceRequirement: "Low (2 diagnostic engineers)",
       costScore: "₹6,500",
       coordinationRequired: "DJB + MCD",
       confidence: "Very High",
-      recommendationVerdict: "Essential first step before executing Option B."
+      recommendationVerdict: "Recommended as first step before starting Option B."
     }
   ];
 
@@ -66,10 +66,10 @@ export default function ActionSimulationCard({ simulations = [], onSelectAction,
           </div>
           <div>
             <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', letterSpacing: '0.05em', display: 'block' }}>
-              Decision Support System
+              ⚡ COMPARE WAYS TO FIX THIS
             </span>
             <h3 style={{ fontSize: '18px', color: 'var(--color-text-primary)' }}>
-              Action Simulation & Scenario Projection Sandbox
+              Pick The Best Fix For Your Team
             </h3>
           </div>
         </div>
@@ -83,7 +83,7 @@ export default function ActionSimulationCard({ simulations = [], onSelectAction,
           color: '#475569',
           border: '1px solid #CBD5E1'
         }}>
-          {defaultSims.length} Action Scenarios Modeled
+          {defaultSims.length} Fix Options Available
         </span>
       </div>
 
@@ -102,7 +102,7 @@ export default function ActionSimulationCard({ simulations = [], onSelectAction,
       }}>
         <ShieldCheck style={{ width: '15px', height: '15px', color: 'var(--color-primary)', flexShrink: 0 }} />
         <span>
-          <strong>Estimated Scenario Projection:</strong> Outcomes are calculated by the Decision Engine based on Delhi infrastructure history and SCADA logs. Requires human officer authorization.
+          <strong>Estimated Time & Costs:</strong> Based on past Delhi repair records. The officer always decides the final action.
         </span>
       </div>
 
@@ -129,7 +129,8 @@ export default function ActionSimulationCard({ simulations = [], onSelectAction,
                 border: isSelected ? '2px solid var(--color-primary)' : '1px solid var(--color-border-subtle)',
                 textAlign: 'left',
                 transition: 'all 150ms ease',
-                position: 'relative'
+                position: 'relative',
+                cursor: 'pointer'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
@@ -183,7 +184,7 @@ export default function ActionSimulationCard({ simulations = [], onSelectAction,
           }}>
             <div style={{ padding: '10px 12px', borderRadius: 'var(--radius-md)', background: '#FFFFFF', border: '1px solid var(--color-border-subtle)' }}>
               <span style={{ fontSize: '10.5px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block' }}>
-                Time to Intervention
+                Time to Start Crew
               </span>
               <strong style={{ fontSize: '14px', color: 'var(--color-text-primary)' }}>
                 {activeSim.timeToIntervention}
@@ -192,7 +193,7 @@ export default function ActionSimulationCard({ simulations = [], onSelectAction,
 
             <div style={{ padding: '10px 12px', borderRadius: 'var(--radius-md)', background: '#FFFFFF', border: '1px solid var(--color-border-subtle)' }}>
               <span style={{ fontSize: '10.5px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block' }}>
-                Resolution Time
+                Time to Finish Repair
               </span>
               <strong style={{ fontSize: '14px', color: 'var(--color-text-primary)' }}>
                 {activeSim.expectedResolutionTime}
@@ -201,10 +202,10 @@ export default function ActionSimulationCard({ simulations = [], onSelectAction,
 
             <div style={{ padding: '10px 12px', borderRadius: 'var(--radius-md)', background: '#FFFFFF', border: '1px solid var(--color-border-subtle)' }}>
               <span style={{ fontSize: '10.5px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block' }}>
-                Recurrence Risk
+                Risk of Leaking Again
               </span>
               <strong style={{
-                fontSize: '13px',
+                fontSize: '12.5px',
                 color: activeSim.recurrenceRisk.includes('HIGH') || activeSim.recurrenceRisk.includes('CRITICAL') ? '#DC2626' : '#10B981'
               }}>
                 {activeSim.recurrenceRisk}
@@ -213,7 +214,7 @@ export default function ActionSimulationCard({ simulations = [], onSelectAction,
 
             <div style={{ padding: '10px 12px', borderRadius: 'var(--radius-md)', background: '#FFFFFF', border: '1px solid var(--color-border-subtle)' }}>
               <span style={{ fontSize: '10.5px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block' }}>
-                Estimated Cost Score
+                Estimated Total Cost
               </span>
               <strong style={{ fontSize: '14px', color: 'var(--color-text-primary)', fontFamily: 'var(--font-mono)' }}>
                 {activeSim.costScore}
@@ -232,7 +233,7 @@ export default function ActionSimulationCard({ simulations = [], onSelectAction,
             borderTop: '1px solid var(--color-divider)'
           }}>
             <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
-              Coordination: <strong>{activeSim.coordinationRequired}</strong> • Confidence: <strong>{activeSim.confidence}</strong>
+              Teams Involved: <strong>{activeSim.coordinationRequired}</strong> • AI Confidence: <strong>{activeSim.confidence}</strong>
             </div>
 
             {onSelectAction && (
@@ -242,7 +243,7 @@ export default function ActionSimulationCard({ simulations = [], onSelectAction,
                 className="btn-primary"
                 style={{ height: '36px', fontSize: '12.5px', padding: '0 16px', borderRadius: 'var(--radius-full)' }}
               >
-                <span>Adopt Scenario for Verification</span>
+                <span>Use This Solution</span>
                 <ArrowRight style={{ width: '13px', height: '13px' }} />
               </button>
             )}

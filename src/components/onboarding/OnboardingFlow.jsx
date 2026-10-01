@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   ArrowRight, 
   ArrowLeft, 
@@ -7,7 +7,7 @@ import {
   Building2, 
   Briefcase, 
   User, 
-  ShieldCheck,
+  ShieldCheck, 
   Activity, 
   Zap,
   Lock,
@@ -30,21 +30,21 @@ const STEP_THEMES = {
     dotInactive: '#FDBA74'
   },
   2: {
-    name: 'fresh_mint',
+    name: 'fresh_emerald',
     bg: 'linear-gradient(155deg, #F0FDF4 0%, #DCFCE7 100%)',
     border: '#86EFAC',
-    shadow: '0 25px 60px -10px rgba(5, 150, 105, 0.20), 0 0 0 1px rgba(16, 185, 129, 0.22)',
-    divider: 'rgba(5, 150, 105, 0.16)',
+    shadow: '0 25px 60px -10px rgba(16, 185, 129, 0.20), 0 0 0 1px rgba(52, 211, 153, 0.22)',
+    divider: 'rgba(16, 185, 129, 0.16)',
     accent: '#059669',
     buttonBg: '#059669',
     dotActive: '#059669',
     dotInactive: '#86EFAC'
   },
   3: {
-    name: 'soft_lavender',
+    name: 'royal_indigo',
     bg: 'linear-gradient(155deg, #FAF5FF 0%, #EDE9FE 100%)',
-    border: '#DDD6FE',
-    shadow: '0 25px 60px -10px rgba(124, 58, 237, 0.20), 0 0 0 1px rgba(139, 92, 246, 0.22)',
+    border: '#C4B5FD',
+    shadow: '0 25px 60px -10px rgba(124, 58, 237, 0.20), 0 0 0 1px rgba(167, 139, 250, 0.22)',
     divider: 'rgba(124, 58, 237, 0.16)',
     accent: '#7C3AED',
     buttonBg: '#7C3AED',
@@ -52,9 +52,9 @@ const STEP_THEMES = {
     dotInactive: '#C4B5FD'
   },
   4: {
-    name: 'sky_slate',
+    name: 'clean_sky',
     bg: 'linear-gradient(155deg, #F0F9FF 0%, #E0F2FE 100%)',
-    border: '#BAE6FD',
+    border: '#93C5FD',
     shadow: '0 25px 60px -10px rgba(2, 132, 199, 0.20), 0 0 0 1px rgba(56, 189, 248, 0.22)',
     divider: 'rgba(2, 132, 199, 0.16)',
     accent: '#0284C7',
@@ -64,11 +64,16 @@ const STEP_THEMES = {
   }
 };
 
-export default function OnboardingFlow({ onComplete }) {
+export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { switchDemoRole, enterApp } = useApp();
 
-  const [currentStep, setCurrentStep] = useState(1);
+  const resolvedInitialStep = (searchParams.get('login') === 'true' || searchParams.get('step') === '4' || initialStep === 4)
+    ? 4 
+    : (parseInt(searchParams.get('step')) || initialStep);
+
+  const [currentStep, setCurrentStep] = useState(resolvedInitialStep);
   const currentTheme = STEP_THEMES[currentStep] || STEP_THEMES[1];
 
   // Persona Selection State for Step 4

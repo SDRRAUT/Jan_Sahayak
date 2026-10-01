@@ -18,13 +18,13 @@ export default function Impact() {
     {
       dimension: 'Department Routing',
       legacy: 'Citizen must guess from 60+ departments (58% misrouting rate)',
-      jansahayk: 'AI auto-routes via dialect NLP with 94.8% validated accuracy',
+      jansahayk: 'AI auto-routes via dialect NLP (Projected 94.8% accuracy in pilot simulation)',
       highlight: true
     },
     {
       dimension: 'Duplicate Handling',
       legacy: 'Each caller creates a new isolated ticket (200+ duplicates per water pipe leak)',
-      jansahayk: 'Geospatial DBSCAN engine groups all nearby reports into 1 Root-Cause Cluster',
+      jansahayk: 'Geospatial clustering engine groups all nearby reports into 1 Root-Cause Cluster',
       highlight: true
     },
     {
@@ -55,7 +55,7 @@ export default function Impact() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}>
             <span className="category-pill">PUBLIC TRANSPARENCY</span>
             <span className="pilot-tag" style={{ background: '#F1F5F9', color: '#475569' }}>
-              Prototype Pilot Dataset
+              Simulated Pilot Benchmarks
             </span>
           </div>
           <h2>Transforming Public Grievance Governance</h2>
@@ -68,13 +68,13 @@ export default function Impact() {
         <div className="impact-stats-grid">
           <div className="card impact-stat-card">
             <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-              Avg. Resolution Window
+              Avg. Resolution Window (Target)
             </span>
             <div className="impact-stat-num" style={{ fontSize: '48px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-primary)', margin: '8px 0' }}>
               3.2 Days
             </div>
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
-              Down from <strong>18.4 Days</strong> baseline on legacy citizen portals.
+              Simulated target SLA vs <strong>18.4 Days</strong> historical baseline.
             </p>
           </div>
 
@@ -171,8 +171,8 @@ export default function Impact() {
               <span>Inspect Live Case Record</span>
               <ArrowRight className="btn-arrow" style={{ width: '14px', height: '14px' }} />
             </Link>
-            <Link to="/citizen/submit" className="btn-secondary btn-sm" style={{ background: 'rgba(255,255,255,0.08)', color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.15)' }}>
-              <span>File a New Issue</span>
+            <Link to="/citizen?fileGrievance=true" className="btn-secondary btn-sm" style={{ background: 'rgba(255,255,255,0.08)', color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.15)' }}>
+              <span>File a New Issue (Popup)</span>
             </Link>
           </div>
         </div>

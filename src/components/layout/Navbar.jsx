@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   ChevronDown,
   Sparkles,
+  Megaphone,
   Plus,
   MapPin,
   Settings,
@@ -268,8 +269,9 @@ export default function Navbar() {
                 alignItems: 'center',
                 gap: '4px',
                 padding: '2px 8px',
-                background: '#F1F5F9',
-                color: '#475569',
+                background: 'rgba(255, 255, 255, 0.85)',
+                color: '#0369A1',
+                border: '1px solid rgba(186, 230, 253, 0.90)',
                 borderRadius: '9999px',
                 fontSize: '10px',
                 fontWeight: 600,
@@ -712,9 +714,12 @@ export default function Navbar() {
                             </div>
                             <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
                           </Link>
-                          <Link
-                            to="/citizen/submit"
-                            onClick={() => setShowUserMenu(false)}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowUserMenu(false);
+                              setShowFileGrievanceModal(true);
+                            }}
                             style={{
                               display: 'flex',
                               alignItems: 'center',
@@ -722,18 +727,20 @@ export default function Navbar() {
                               padding: '7px 10px',
                               borderRadius: 'var(--radius-sm)',
                               fontSize: '12px',
-                              textDecoration: 'none',
                               color: 'var(--color-text-primary)',
                               background: '#F8FAFC',
-                              border: '1px solid rgba(15, 23, 42, 0.06)'
+                              border: '1px solid rgba(15, 23, 42, 0.06)',
+                              cursor: 'pointer',
+                              width: '100%',
+                              textAlign: 'left'
                             }}
                           >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <Plus style={{ width: '14px', height: '14px', color: 'var(--color-primary)' }} />
-                              <span>File New Grievance</span>
+                              <span>File New Grievance (Popup)</span>
                             </div>
                             <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>+</span>
-                          </Link>
+                          </button>
                         </>
                       )}
 
@@ -860,9 +867,49 @@ export default function Navbar() {
                       )}
                     </div>
 
-                    {/* Profile Settings */}
+                    {/* Announcements & Profile Settings */}
                     <div style={{ height: '1px', background: 'var(--color-divider)', margin: '8px 0' }} />
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          window.dispatchEvent(new CustomEvent('open-jansahayak-announcement', { detail: { manual: true } }));
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          width: '100%',
+                          padding: '7px 8px',
+                          borderRadius: 'var(--radius-sm)',
+                          fontSize: '12px',
+                          color: '#0284C7',
+                          background: '#F0F9FF',
+                          border: '1px solid #BAE6FD',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <Megaphone style={{ width: '13px', height: '13px', color: '#0284C7' }} />
+                          <span>What's New & Updates</span>
+                        </div>
+                        <span style={{
+                          fontSize: '9.5px',
+                          fontWeight: 700,
+                          background: '#0284C7',
+                          color: '#FFFFFF',
+                          padding: '1px 6px',
+                          borderRadius: '999px',
+                          letterSpacing: '0.02em'
+                        }}>
+                          NEW
+                        </span>
+                      </button>
+
                       <button
                         type="button"
                         onClick={() => {
@@ -916,7 +963,7 @@ export default function Navbar() {
                     <div style={{ paddingTop: '8px', borderTop: '1px solid var(--color-divider)' }}>
                       <button
                         type="button"
-                        onClick={() => { logout(); setShowUserMenu(false); navigate('/'); }}
+                        onClick={() => { logout(); setShowUserMenu(false); navigate('/login'); }}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -1319,9 +1366,12 @@ export default function Navbar() {
                       <span>Track Ticket</span>
                     </button>
 
-                    <Link
-                      to="/citizen/submit"
-                      onClick={() => setMobileMenuOpen(false)}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setShowFileGrievanceModal(true);
+                      }}
                       className="btn-primary"
                       style={{
                         flex: 1,
@@ -1331,17 +1381,59 @@ export default function Navbar() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '6px'
+                        gap: '6px',
+                        border: 'none',
+                        cursor: 'pointer'
                       }}
                     >
                       <span>Report Issue</span>
                       <ArrowRight style={{ width: '14px', height: '14px' }} />
-                    </Link>
+                    </button>
                   </div>
                 )}
 
+                {/* Mobile Announcements & What's New */}
+                <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--color-divider)' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      window.dispatchEvent(new CustomEvent('open-jansahayak-announcement', { detail: { manual: true } }));
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      width: '100%',
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      color: '#0284C7',
+                      background: '#F0F9FF',
+                      border: '1.5px solid #BAE6FD',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Megaphone style={{ width: '15px', height: '15px', color: '#0284C7' }} />
+                      <span>What's New & Announcements</span>
+                    </div>
+                    <span style={{
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      background: '#0284C7',
+                      color: '#FFFFFF',
+                      padding: '2px 7px',
+                      borderRadius: '999px'
+                    }}>
+                      NEW
+                    </span>
+                  </button>
+                </div>
+
                 {/* Mobile Profile & Settings Quick Buttons */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--color-divider)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
                   <button
                     type="button"
                     onClick={() => {
@@ -1398,7 +1490,7 @@ export default function Navbar() {
                 <div style={{ marginTop: '8px' }}>
                   <button
                     type="button"
-                    onClick={() => { logout(); setMobileMenuOpen(false); navigate('/'); }}
+                    onClick={() => { logout(); setMobileMenuOpen(false); navigate('/login'); }}
                     style={{
                       display: 'flex',
                       alignItems: 'center',

@@ -11,23 +11,23 @@ export default function CivicMemoryCard({ memories = [] }) {
       year: "2025",
       date: "14 June 2025",
       incidentId: "DJB-HIST-2025-081",
-      title: "100mm Cast-Iron Main Joint Failure (Pocket 1)",
-      actionTaken: "Emergency split-sleeve repair clamp + sodium hypochlorite flush",
-      outcome: "Resolved immediate pressure deficit for 7 months, but thermal expansion stressed adjacent pipe segment.",
-      lessonsLearned: "Clamping older cast iron without cathodic protection creates galvanic stress 40-50m downstream within 12 months."
+      title: "Emergency Pipe Clamp Installed (Pocket 1)",
+      actionTaken: "Installed temporary metal clamp on old cast-iron pipe",
+      outcome: "Stopped the leak for 7 months, but pipe cracked again nearby due to water pressure.",
+      lessonsLearned: "Clamping old iron pipes without replacing the section causes another leak within a year."
     },
     {
       year: "2024",
       date: "22 March 2024",
       incidentId: "DJB-HIST-2024-412",
-      title: "Sewer Cross-Infiltration at Mother Dairy Crossing",
-      actionTaken: "Temporary bitumen patch over road surface without underground pipe realignment",
-      outcome: "Pavement recaved after 8 weeks following heavy monsoon runoff.",
-      lessonsLearned: "Patching road surface without replacing defective pipe guarantees structural pavement collapse."
+      title: "Tar Paved Over Sunken Road (Mother Dairy Crossing)",
+      actionTaken: "Paved fresh tar over sunken road without fixing the leaking pipe below",
+      outcome: "Road sank and cracked open again after 8 weeks during monsoon rain.",
+      lessonsLearned: "Never pave tar over a street before fixing the leaking pipe underneath."
     }
   ];
 
-  const warrantyStatus = memories?.warranty_info || 'Warranty information unavailable';
+  const warrantyStatus = memories?.warranty_info || 'No active warranty recorded';
 
   return (
     <div style={{
@@ -45,10 +45,10 @@ export default function CivicMemoryCard({ memories = [] }) {
           </div>
           <div>
             <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', letterSpacing: '0.05em', display: 'block' }}>
-              Institutional Knowledge Layer
+              📚 STREET REPAIR HISTORY
             </span>
             <h3 style={{ fontSize: '18px', color: 'var(--color-text-primary)' }}>
-              Civic Memory & Historical Resolution Precedents
+              What Worked & What Failed Here Before
             </h3>
           </div>
         </div>
@@ -62,7 +62,7 @@ export default function CivicMemoryCard({ memories = [] }) {
           color: '#475569',
           border: '1px solid #CBD5E1'
         }}>
-          {records.length} Historical Precedents Retrieved
+          {records.length} Past Repairs Found
         </span>
       </div>
 
@@ -78,8 +78,8 @@ export default function CivicMemoryCard({ memories = [] }) {
         gap: '10px'
       }}>
         <AlertCircle style={{ width: '16px', height: '16px', color: '#DC2626', flexShrink: 0, marginTop: '2px' }} />
-        <div style={{ fontSize: '12px', color: '#991B1B', lineHeight: 1.4 }}>
-          <strong>Recurrence Risk Warning:</strong> Historical records prove that previous temporary surface patches at this junction failed within 2 to 7 months. The institutional memory engine strongly flags that permanent pipe replacement is required to avoid ongoing public expenditure waste.
+        <div style={{ fontSize: '12.5px', color: '#991B1B', lineHeight: 1.4 }}>
+          <strong>⚠️ Past Lesson Warning:</strong> Quick road surface patches on this street failed within 2 to 7 months in the past. Replacing the broken pipe section once prevents the road from sinking again and saves public money.
         </div>
       </div>
 
@@ -113,7 +113,7 @@ export default function CivicMemoryCard({ memories = [] }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '10px' }}>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '2px' }}>
-                  Action Taken:
+                  What Was Done:
                 </span>
                 <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
                   {rec.actionTaken}
@@ -122,7 +122,7 @@ export default function CivicMemoryCard({ memories = [] }) {
 
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '2px' }}>
-                  Observed Outcome:
+                  What Happened After:
                 </span>
                 <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
                   {rec.outcome}
@@ -142,7 +142,7 @@ export default function CivicMemoryCard({ memories = [] }) {
               gap: '6px'
             }}>
               <CheckCircle2 style={{ width: '14px', height: '14px', flexShrink: 0 }} />
-              <span>Institutional Takeaway: {rec.lessonsLearned}</span>
+              <span>Key Lesson for Officers: {rec.lessonsLearned}</span>
             </div>
           </div>
         ))}
@@ -161,7 +161,7 @@ export default function CivicMemoryCard({ memories = [] }) {
         fontSize: '11px',
         color: 'var(--color-text-muted)'
       }}>
-        <span>Official Contractor / Asset Warranty Registry:</span>
+        <span>Contractor Warranty Check:</span>
         <span style={{
           fontWeight: 600,
           padding: '2px 8px',
