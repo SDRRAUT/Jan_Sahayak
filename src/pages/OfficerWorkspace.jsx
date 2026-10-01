@@ -90,12 +90,18 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
   const [showJanSuchnaModal, setShowJanSuchnaModal] = useState(false);
   
   // Unified Civic Officer Profile (combines field engineer + department admin credentials)
-  const currentOfficer = (user && user.role !== 'citizen') ? user : {
+  const rawOfficer = (user && user.role !== 'citizen') ? user : {
     name: 'Er. Sanjay Sharma',
     designation: 'Executive Engineer & Department Administrator',
     department: 'PMC Water Supply Department',
     zone: 'Zone East (Wagholi Sub-Division, Pune)',
     role: 'civic_officer'
+  };
+  const currentOfficer = {
+    ...rawOfficer,
+    department: (rawOfficer.department && !rawOfficer.department.includes('Delhi') && !rawOfficer.department.includes('DJB'))
+      ? rawOfficer.department
+      : 'PMC Water Supply Department'
   };
 
   // 7 Logical Workspace Sections per Architecture Mandate:
@@ -504,28 +510,16 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
     <div style={{ minHeight: 'calc(100vh - 72px)', background: 'linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%)', padding: '24px 0 110px 0' }}>
       <div className="container">
 
-        {/* 1. GOVERNMENT OFFICER COMMAND CARD (Clean, Professional & Executive) */}
+        {/* 1. GOVERNMENT OFFICER COMMAND CARD (Minimalist, Professional & Well-Arranged) */}
         <div style={{
-          background: 'linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%)',
-          borderRadius: '20px',
+          background: '#FFFFFF',
+          borderRadius: '16px',
           border: '1px solid #E2E8F0',
-          boxShadow: '0 4px 20px rgba(15, 23, 42, 0.04)',
-          padding: '22px 24px',
-          marginBottom: '20px',
-          position: 'relative',
-          overflow: 'hidden'
+          boxShadow: '0 2px 10px rgba(15, 23, 42, 0.04)',
+          padding: '18px 22px',
+          marginBottom: '20px'
         }}>
-          {/* Top color accent gradient bar */}
-          <div style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '3px',
-            background: 'linear-gradient(90deg, #059669 0%, #2563EB 50%, #4338CA 100%)'
-          }} />
-
-          {/* Top Row: Officer Identity & Civic Grade */}
+          {/* Top Row: Officer Identity & Performance Summary */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -534,152 +528,81 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
             gap: '16px',
             marginBottom: '16px'
           }}>
+            {/* Officer Profile Info */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
               <div style={{
-                width: '48px',
-                height: '48px',
+                width: '44px',
+                height: '44px',
                 borderRadius: '12px',
-                background: activeSection === 'operations'
-                  ? 'linear-gradient(135deg, #312E81 0%, #4338CA 100%)'
-                  : 'linear-gradient(135deg, #0E5E3A 0%, #059669 100%)',
-                color: '#FFFFFF',
+                background: '#F1F5F9',
+                color: '#0F172A',
+                border: '1px solid #E2E8F0',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '22px',
-                boxShadow: activeSection === 'operations'
-                  ? '0 4px 12px rgba(67, 56, 202, 0.25)'
-                  : '0 4px 12px rgba(5, 150, 105, 0.2)',
+                fontSize: '20px',
                 flexShrink: 0
               }}>
-                {activeSection === 'operations' ? '👷' : '🛠️'}
+                🛠️
               </div>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px', flexWrap: 'wrap' }}>
+                  <h1 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', margin: 0, lineHeight: 1.2 }}>
+                    {currentOfficer.name}
+                  </h1>
                   <span style={{
                     fontSize: '11px',
-                    fontWeight: 800,
-                    background: activeSection === 'operations' ? '#EEF2FF' : '#ECFDF5',
-                    color: activeSection === 'operations' ? '#3730A3' : '#065F46',
-                    border: `1px solid ${activeSection === 'operations' ? '#C7D2FE' : '#A7F3D0'}`,
+                    fontWeight: 700,
+                    background: '#ECFDF5',
+                    color: '#065F46',
+                    border: '1px solid #A7F3D0',
                     padding: '2px 8px',
-                    borderRadius: '6px',
-                    letterSpacing: '0.03em'
-                  }}>
-                    {activeSection === 'operations' ? '👷 FIELD OPERATIONS & ROSTER HUB' : '🛠️ CASE INVESTIGATION & RESOLUTION HUB'}
-                  </span>
-                  <span style={{
-                    fontSize: '11px',
-                    background: '#EFF6FF',
-                    color: '#1E40AF',
-                    border: '1px solid #BFDBFE',
-                    padding: '2px 8px',
-                    borderRadius: '6px',
-                    fontWeight: 700
+                    borderRadius: '6px'
                   }}>
                     {currentOfficer.department || 'PMC Water Supply Department'}
                   </span>
                 </div>
-                <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A', margin: 0, lineHeight: 1.25 }}>
-                  {activeSection === 'operations' ? 'Workforce & Field Squad Control' : currentOfficer.name}
-                </h1>
-                <div style={{ fontSize: '12.5px', color: '#64748B', marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                  <MapPin style={{ width: '13px', height: '13px', color: activeSection === 'operations' ? '#4338CA' : '#059669' }} />
-                  <span>Territory: <strong style={{ color: '#1E293B' }}>Wagholi Sub-Division (Wards 27-31, Pune)</strong></span>
-                  <span style={{ opacity: 0.5 }}>•</span>
-                  <span>Focus: <strong style={{ color: '#1E293B' }}>{activeSection === 'operations' ? 'Staff shifts, duty status & squad dispatch' : 'Solve city complaints & verify repairs'}</strong></span>
+                <div style={{ fontSize: '12.5px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                  <MapPin style={{ width: '13px', height: '13px', color: '#059669', flexShrink: 0 }} />
+                  <span>Wagholi Sub-Division (Wards 27–31, Pune)</span>
+                  <span style={{ opacity: 0.4 }}>•</span>
+                  <span>Executive Engineer</span>
                 </div>
               </div>
             </div>
 
-            {/* ⭐ Civic Intelligence Performance Grade & Reward Card */}
-            {(() => {
-              const gradeInfo = calculateOfficerGrade ? calculateOfficerGrade(currentOfficer) : {
-                score: '94.8',
-                letterGrade: 'A+',
-                honorTitle: 'Executive Civic Champion',
-                shieldTier: 'Platinum Civic Champion Shield'
-              };
-
-              return (
-                <div style={{
-                  padding: '12px 16px',
-                  borderRadius: '14px',
-                  background: 'linear-gradient(135deg, #F8FAFC 0%, #EEF2FF 100%)',
-                  border: '1px solid #C7D2FE',
-                  boxShadow: '0 2px 10px rgba(67, 56, 202, 0.06)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  flexShrink: 0
-                }}>
-                  <div style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '10px',
-                    background: 'linear-gradient(135deg, #4338CA 0%, #312E81 100%)',
-                    color: '#FFFFFF',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '19px',
-                    boxShadow: '0 2px 6px rgba(67, 56, 202, 0.25)',
-                    flexShrink: 0
-                  }}>
-                    🏅
+            {/* Clean, Minimalist Performance Score Chip */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '8px 14px',
+              background: '#F8FAFC',
+              borderRadius: '10px',
+              border: '1px solid #E2E8F0'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '16px' }}>🏅</span>
+                <div>
+                  <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Civic Score
                   </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
-                      <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', color: '#4338CA', letterSpacing: '0.05em' }}>
-                        CIVIC INTELLIGENCE GRADE
-                      </span>
-                      <span style={{
-                        fontSize: '9.5px',
-                        fontWeight: 800,
-                        background: '#4338CA',
-                        color: '#FFFFFF',
-                        padding: '1px 6px',
-                        borderRadius: '4px',
-                        letterSpacing: '0.04em'
-                      }}>
-                        TOP TIER
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
-                      <span style={{ fontSize: '20px', fontWeight: 900, color: '#1E1B4B', lineHeight: 1 }}>
-                        {gradeInfo.letterGrade}
-                      </span>
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#475569' }}>
-                        ({gradeInfo.score}/100)
-                      </span>
-                      <span style={{
-                        fontSize: '10.5px',
-                        fontWeight: 700,
-                        color: '#059669',
-                        background: '#ECFDF5',
-                        border: '1px solid #A7F3D0',
-                        padding: '1px 7px',
-                        borderRadius: '6px'
-                      }}>
-                        🛡️ {gradeInfo.shieldTier}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                      <span style={{ color: '#0E5E3A', fontWeight: 600 }}>96% SLA Speed</span>
-                      <span style={{ opacity: 0.4 }}>•</span>
-                      <span style={{ color: '#D97706', fontWeight: 600 }}>4.9★ Citizen Trust</span>
-                      <span style={{ opacity: 0.4 }}>•</span>
-                      <span style={{ color: '#2563EB', fontWeight: 600 }}>92% Repeat Prevention</span>
-                    </div>
+                  <div style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A', lineHeight: 1 }}>
+                    A+ <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748B' }}>(95.8)</span>
                   </div>
                 </div>
-              );
-            })()}
+              </div>
+              <div style={{ width: '1px', height: '24px', background: '#E2E8F0' }} />
+              <div style={{ fontSize: '11.5px', color: '#475569', display: 'flex', gap: '10px' }}>
+                <span>⚡ <strong>96%</strong> SLA Speed</span>
+                <span>★ <strong>4.9</strong> Trust</span>
+              </div>
+            </div>
           </div>
 
-          {/* Bottom Action Bar: Territory Explorer + Jan Suchna + Map (Uniform 36px Height) */}
+          {/* Bottom Row: Minimalist, Well-Arranged Action Bar */}
           <div style={{
-            paddingTop: '14px',
+            paddingTop: '12px',
             borderTop: '1px solid #F1F5F9',
             display: 'flex',
             alignItems: 'center',
@@ -687,84 +610,62 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
             flexWrap: 'wrap',
             gap: '10px'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-              {/* Button 1: Territory Problem Explorer Modal Trigger */}
+            {/* Primary Action Group */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 onClick={() => setShowTerritoryModal(true)}
                 style={{
                   height: '36px',
                   padding: '0 14px',
-                  borderRadius: '10px',
-                  background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+                  borderRadius: '9px',
+                  background: '#0F172A',
                   color: '#FFFFFF',
                   fontSize: '12.5px',
-                  fontWeight: 700,
-                  border: '1px solid #334155',
+                  fontWeight: 600,
+                  border: 'none',
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  boxShadow: '0 2px 6px rgba(15, 23, 42, 0.12)',
-                  transition: 'all 150ms ease'
+                  gap: '7px',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  transition: 'background 120ms ease'
                 }}
               >
-                <Compass style={{ width: '15px', height: '15px', color: '#38BDF8' }} />
+                <Compass style={{ width: '14px', height: '14px', color: '#38BDF8' }} />
                 <span>Territory Problem Explorer</span>
-                <span style={{
-                  fontSize: '10.5px',
-                  fontWeight: 700,
-                  background: 'rgba(56, 189, 248, 0.18)',
-                  color: '#BAE6FD',
-                  padding: '2px 7px',
-                  borderRadius: '6px',
-                  letterSpacing: '0.01em'
-                }}>
-                  Today · Pending · Solved
-                </span>
               </button>
 
-              {/* Button 2: Jan Suchna Broadcast Trigger */}
               <button
                 type="button"
                 onClick={() => setShowJanSuchnaModal(true)}
                 style={{
                   height: '36px',
                   padding: '0 14px',
-                  borderRadius: '10px',
-                  background: 'linear-gradient(135deg, #312E81 0%, #4338CA 100%)',
-                  color: '#FFFFFF',
+                  borderRadius: '9px',
+                  background: '#FFFFFF',
+                  color: '#2563EB',
                   fontSize: '12.5px',
-                  fontWeight: 700,
-                  border: '1px solid #4F46E5',
+                  fontWeight: 600,
+                  border: '1px solid #BFDBFE',
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  boxShadow: '0 2px 8px rgba(67, 56, 202, 0.22)',
-                  transition: 'all 150ms ease'
+                  gap: '7px',
+                  transition: 'all 120ms ease'
                 }}
               >
-                <Radio style={{ width: '15px', height: '15px', color: '#FBBF24' }} />
-                <span>Create Jan Suchna</span>
-                <span style={{
-                  fontSize: '10.5px',
-                  fontWeight: 700,
-                  background: 'rgba(251, 191, 36, 0.2)',
-                  color: '#FDE68A',
-                  padding: '2px 7px',
-                  borderRadius: '6px'
-                }}>
-                  📢 Broadcast
-                </span>
+                <Radio style={{ width: '14px', height: '14px', color: '#2563EB' }} />
+                <span>Create Jan Suchna Broadcast</span>
               </button>
             </div>
 
+            {/* Utility / Status Group */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               <div style={{
                 height: '36px',
                 padding: '0 12px',
-                borderRadius: '10px',
+                borderRadius: '9px',
                 background: slaStatus === 'AT_RISK' ? '#FFFBEB' : (slaStatus === 'OVERDUE' ? '#FEF2F2' : '#F0FDF4'),
                 border: `1px solid ${slaStatus === 'AT_RISK' ? '#FDE68A' : (slaStatus === 'OVERDUE' ? '#FECACA' : '#BBF7D0')}`,
                 color: slaStatus === 'AT_RISK' ? '#B45309' : (slaStatus === 'OVERDUE' ? '#991B1B' : '#15803D'),
@@ -774,7 +675,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 alignItems: 'center',
                 gap: '6px'
               }}>
-                <Clock style={{ width: '14px', height: '14px' }} />
+                <Clock style={{ width: '13px', height: '13px' }} />
                 <span>Fix Target: <strong>{remainingHours}h Left</strong></span>
               </div>
 
@@ -784,7 +685,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 style={{
                   height: '36px',
                   padding: '0 12px',
-                  borderRadius: '10px',
+                  borderRadius: '9px',
                   background: '#FFFFFF',
                   border: '1px solid #CBD5E1',
                   color: '#334155',
@@ -794,11 +695,10 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
-                  boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)',
-                  transition: 'all 150ms ease'
+                  transition: 'all 120ms ease'
                 }}
               >
-                <Download style={{ width: '14px', height: '14px', color: '#64748B' }} />
+                <Download style={{ width: '13px', height: '13px', color: '#64748B' }} />
                 <span>{reportExported ? 'Report Downloaded ✓' : 'Download Report'}</span>
               </button>
 
@@ -807,7 +707,7 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                 style={{
                   height: '36px',
                   padding: '0 12px',
-                  borderRadius: '10px',
+                  borderRadius: '9px',
                   background: '#FFFFFF',
                   border: '1px solid #CBD5E1',
                   color: '#334155',
@@ -817,12 +717,11 @@ export default function OfficerWorkspace({ defaultSection = 'dashboard' }) {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
-                  boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)',
-                  transition: 'all 150ms ease'
+                  transition: 'all 120ms ease'
                 }}
               >
-                <MapPin style={{ width: '14px', height: '14px', color: '#059669' }} />
-                <span>City Problem Map</span>
+                <MapPin style={{ width: '13px', height: '13px', color: '#059669' }} />
+                <span>Ward Heatmap</span>
               </Link>
             </div>
           </div>
