@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   Plus, Search, MapPin, ThumbsUp, ArrowRight,
-  Sparkles, Bell, FileText, X, Radio
+  Sparkles, Bell, FileText, X
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { INITIAL_GRIEVANCES } from '../data/mockGrievances';
 import { normalizeStatus, getRoleStatusLabel, getStatusConfig } from '../utils/statuses';
 import WhyExplainer from '../components/common/WhyExplainer';
-import CivicSignalModal from '../components/intelligence/CivicSignalModal';
 import FileGrievanceModal from '../components/common/FileGrievanceModal';
 
 const PROBLEM_CATEGORIES = [
@@ -532,7 +531,6 @@ export default function CitizenDashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab,setActiveTab]             = useState('all');
   const [searchQuery,setSearchQuery]         = useState('');
-  const [showSignalModal,setShowSignalModal] = useState(false);
   const [showFileModal,setShowFileModal]     = useState(false);
   const [fileModalCategory,setFileModalCategory] = useState('');
   const [selectedGrievance,setSelectedGrievance] = useState(null);
@@ -652,19 +650,6 @@ export default function CitizenDashboard() {
               >
                 <Plus style={{ width:'16px', height:'16px' }} />
                 File Grievance
-              </button>
-              <button
-                onClick={() => setShowSignalModal(true)}
-                style={{
-                  height:'42px', minHeight:'42px', padding:'0 16px', borderRadius:'12px',
-                  background:'#FFFFFF', color:'#334155', border:'1px solid #CBD5E1',
-                  fontWeight:600, fontSize:'13px', cursor:'pointer',
-                  display:'flex', alignItems:'center', gap:'8px',
-                  boxShadow:'0 1px 3px rgba(0,0,0,0.04)'
-                }}
-              >
-                <Radio style={{ width:'14px', height:'14px', color:'#2563EB' }} />
-                Civic Signal
               </button>
             </div>
           </div>
@@ -839,7 +824,6 @@ export default function CitizenDashboard() {
       <style>{`@keyframes livepulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(1.3)}}`}</style>
 
       {selectedGrievance&&<GrievanceDetailPopup item={selectedGrievance} onClose={()=>setSelectedGrievance(null)} citizen={citizen} upvoteGrievance={upvoteGrievance}/>}
-      {showSignalModal&&<CivicSignalModal isOpen={showSignalModal} onClose={()=>setShowSignalModal(false)}/>}
       <FileGrievanceModal isOpen={showFileModal} onClose={()=>setShowFileModal(false)} defaultCategory={fileModalCategory}/>
     </div>
   );
