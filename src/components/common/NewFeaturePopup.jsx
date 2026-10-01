@@ -62,11 +62,12 @@ export default function NewFeaturePopup() {
   }, []);
 
   // Popup schedule:
-  //  Show #1  → 30s after login
-  //  Show #2  → 30s after show #1 closes  (i.e. 30 + 5 + 30 ≈ 65s)
-  //  Show #3+ → every 2 min after each auto-close, forever
+  //  Show #1  → 10 min after login
+  //  Show #2+ → every 10 min after each close, forever
   const showCounterRef = useRef(0);
   const repeatTimerRef = useRef(null);
+
+  const TEN_MINUTES_MS = 10 * 60 * 1000; // 10 minutes in milliseconds (600,000 ms)
 
   const showPopupAutomatic = () => {
     setIsManual(false);
@@ -83,10 +84,9 @@ export default function NewFeaturePopup() {
         clearInterval(countdownIntervalRef.current);
         setIsOpen(false);
 
-        // Schedule next appearance
+        // Schedule next appearance (every 10 minutes)
         showCounterRef.current += 1;
-        const nextDelay = showCounterRef.current >= 2 ? 120000 : 30000; // 2 min after 2nd show, else 30s
-        repeatTimerRef.current = setTimeout(showPopupAutomatic, nextDelay);
+        repeatTimerRef.current = setTimeout(showPopupAutomatic, TEN_MINUTES_MS);
       }
     }, 1000);
   };
@@ -95,11 +95,11 @@ export default function NewFeaturePopup() {
     // Only schedule popup when user is logged in
     if (!token && !user) return;
 
-    // First appearance: 30 seconds after login
+    // First appearance: 10 minutes after login
     showTimerRef.current = setTimeout(() => {
       showCounterRef.current = 1;
       showPopupAutomatic();
-    }, 30000);
+    }, TEN_MINUTES_MS);
 
     return () => {
       if (showTimerRef.current) clearTimeout(showTimerRef.current);
@@ -115,10 +115,9 @@ export default function NewFeaturePopup() {
     if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
     setIsOpen(false);
 
-    // If manually closed, still schedule the next auto-show at the appropriate interval
-    const nextDelay = showCounterRef.current >= 2 ? 120000 : 30000;
+    // If manually closed, schedule the next auto-show after 10 minutes
     if (repeatTimerRef.current) clearTimeout(repeatTimerRef.current);
-    repeatTimerRef.current = setTimeout(showPopupAutomatic, nextDelay);
+    repeatTimerRef.current = setTimeout(showPopupAutomatic, TEN_MINUTES_MS);
   };
 
   const [hoveredCard, setHoveredCard] = useState(null);
