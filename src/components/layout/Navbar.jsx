@@ -24,7 +24,8 @@ import {
   Lock,
   Volume2,
   VolumeX,
-  Radio
+  Radio,
+  Wrench
 } from 'lucide-react';
 import { useApp, DEMO_CREDENTIALS } from '../../context/AppContext';
 import FileGrievanceModal from '../common/FileGrievanceModal';
@@ -332,6 +333,12 @@ export default function Navbar() {
                 >
                   My Grievances
                 </Link>
+                <Link
+                  to="/citizen/find-worker"
+                  className={`site-nav-link ${location.pathname === '/citizen/find-worker' ? 'active' : ''}`}
+                >
+                  Find Worker
+                </Link>
                 <button
                   type="button"
                   onClick={() => setShowFileGrievanceModal(true)}
@@ -387,9 +394,17 @@ export default function Navbar() {
                 </Link>
                 <Link
                   to="/officer"
-                  className={`site-nav-link ${location.pathname === '/officer' ? 'active' : ''}`}
+                  className={`site-nav-link ${location.pathname === '/officer' && !location.search.includes('workers') ? 'active' : ''}`}
                 >
                   🛠️ Workspace
+                </Link>
+                <Link
+                  to="/officer?section=investigation&subtab=workers"
+                  className={`site-nav-link ${location.pathname === '/officer' && location.search.includes('workers') ? 'active' : ''}`}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                >
+                  <Wrench style={{ width: '13px', height: '13px', color: '#059669' }} />
+                  <span>Field Workers</span>
                 </Link>
                 <Link
                   to="/admin"
@@ -407,7 +422,7 @@ export default function Navbar() {
                   to="/admin/super"
                   className={`site-nav-link ${location.pathname === '/admin/super' ? 'active' : ''}`}
                 >
-                  Super Admin Console
+                  PMC City Command
                 </Link>
                 <Link
                   to="/admin/department"
@@ -890,6 +905,29 @@ export default function Navbar() {
                             </div>
                             <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
                           </Link>
+                          <Link
+                            to="/worker"
+                            onClick={() => setShowUserMenu(false)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '7px 10px',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '12px',
+                              textDecoration: 'none',
+                              color: '#065F46',
+                              background: '#ECFDF5',
+                              border: '1px solid rgba(16, 185, 129, 0.25)',
+                              fontWeight: 600
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <Wrench style={{ width: '14px', height: '14px', color: '#065F46' }} />
+                              <span>Wagholi Worker Portal</span>
+                            </div>
+                            <span style={{ fontSize: '10.5px', color: '#065F46' }}>→</span>
+                          </Link>
                           <button
                             type="button"
                             onClick={() => {
@@ -944,6 +982,29 @@ export default function Navbar() {
                               <span>Civic Officer Workspace</span>
                             </div>
                             <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
+                          </Link>
+                          <Link
+                            to="/officer?section=investigation&subtab=workers"
+                            onClick={() => setShowUserMenu(false)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '7px 10px',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '12px',
+                              textDecoration: 'none',
+                              color: '#065F46',
+                              background: '#ECFDF5',
+                              border: '1px solid rgba(16, 185, 129, 0.25)',
+                              fontWeight: 600
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <Wrench style={{ width: '14px', height: '14px', color: '#065F46' }} />
+                              <span>Field Worker Dispatch Hub</span>
+                            </div>
+                            <span style={{ fontSize: '10.5px', color: '#065F46' }}>→</span>
                           </Link>
                           <Link
                             to="/admin"
@@ -1087,6 +1148,30 @@ export default function Navbar() {
                       >
                         <User style={{ width: '13px', height: '13px' }} />
                         <span>My Profile</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          setProfileModalTab('worker');
+                          setShowProfileModal(true);
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          width: '100%',
+                          padding: '7px 8px',
+                          borderRadius: 'var(--radius-sm)',
+                          fontSize: '12px',
+                          color: '#065F46',
+                          background: 'transparent',
+                          textAlign: 'left',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <Wrench style={{ width: '13px', height: '13px', color: '#065F46' }} />
+                        <span>Worker Profile & Portal</span>
                       </button>
                       <button
                         type="button"
@@ -1248,6 +1333,34 @@ export default function Navbar() {
                   >
                     📋 My Grievances
                   </Link>
+                  <Link
+                    to="/citizen/find-worker"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname === '/citizen/find-worker' ? 'var(--color-primary)' : 'var(--color-text-primary)',
+                      background: location.pathname === '/citizen/find-worker' ? '#F0FDF4' : '#F8FAFC'
+                    }}
+                  >
+                    🔍 Find Worker
+                  </Link>
+                  <Link
+                    to="/worker"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname === '/worker' ? 'var(--color-primary)' : 'var(--color-text-primary)',
+                      background: location.pathname === '/worker' ? '#F0FDF4' : '#F8FAFC'
+                    }}
+                  >
+                    🛠️ Worker Dashboard
+                  </Link>
                   <button
                     type="button"
                     onClick={() => { setShowFileGrievanceModal(true); setMobileMenuOpen(false); }}
@@ -1305,11 +1418,29 @@ export default function Navbar() {
                       borderRadius: 'var(--radius-md)',
                       fontSize: '14px',
                       fontWeight: 600,
-                      color: location.pathname === '/officer' && !location.search.includes('operations') ? '#059669' : 'var(--color-text-primary)',
-                      background: location.pathname === '/officer' && !location.search.includes('operations') ? '#ECFDF5' : '#F8FAFC'
+                      color: location.pathname === '/officer' && !location.search.includes('operations') && !location.search.includes('workers') ? '#059669' : 'var(--color-text-primary)',
+                      background: location.pathname === '/officer' && !location.search.includes('operations') && !location.search.includes('workers') ? '#ECFDF5' : '#F8FAFC'
                     }}
                   >
                     🏛️ Civic Workspace
+                  </Link>
+                  <Link
+                    to="/officer?section=investigation&subtab=workers"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname === '/officer' && location.search.includes('workers') ? '#065F46' : 'var(--color-text-primary)',
+                      background: location.pathname === '/officer' && location.search.includes('workers') ? '#ECFDF5' : '#F8FAFC',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <Wrench style={{ width: '15px', height: '15px', color: '#059669' }} />
+                    <span>👷 Field Worker Dispatch</span>
                   </Link>
                   <Link
                     to="/admin"
@@ -1573,7 +1704,7 @@ export default function Navbar() {
                 </div>
 
                 {/* Mobile Profile & Settings Quick Buttons */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: role === 'citizen' ? 'repeat(3, 1fr)' : '1fr 1fr', gap: '6px', marginTop: '8px' }}>
                   <button
                     type="button"
                     onClick={() => {
@@ -1585,10 +1716,10 @@ export default function Navbar() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '6px',
-                      padding: '9px',
+                      gap: '5px',
+                      padding: '9px 6px',
                       borderRadius: 'var(--radius-md)',
-                      fontSize: '12.5px',
+                      fontSize: '12px',
                       fontWeight: 600,
                       color: 'var(--color-text-primary)',
                       background: '#F8FAFC',
@@ -1597,8 +1728,36 @@ export default function Navbar() {
                     }}
                   >
                     <User style={{ width: '13px', height: '13px', color: '#2563EB' }} />
-                    <span>My Profile</span>
+                    <span>Profile</span>
                   </button>
+
+                  {role === 'citizen' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setProfileModalTab('worker');
+                        setShowProfileModal(true);
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '5px',
+                        padding: '9px 6px',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        color: '#065F46',
+                        background: '#ECFDF5',
+                        border: '1px solid #A7F3D0',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Wrench style={{ width: '13px', height: '13px', color: '#065F46' }} />
+                      <span>Worker</span>
+                    </button>
+                  )}
 
                   <button
                     type="button"
@@ -1611,10 +1770,10 @@ export default function Navbar() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '6px',
-                      padding: '9px',
+                      gap: '5px',
+                      padding: '9px 6px',
                       borderRadius: 'var(--radius-md)',
-                      fontSize: '12.5px',
+                      fontSize: '12px',
                       fontWeight: 600,
                       color: 'var(--color-text-primary)',
                       background: '#F8FAFC',

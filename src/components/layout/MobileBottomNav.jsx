@@ -11,7 +11,8 @@ import {
   ShieldCheck, 
   Sparkles, 
   BarChart3, 
-  LogIn 
+  LogIn,
+  Wrench
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import FileGrievanceModal from '../common/FileGrievanceModal';
@@ -133,11 +134,11 @@ export default function MobileBottomNav() {
 
     rightItems = [
       {
-        id: 'map',
-        label: 'Civic Map',
-        to: '/admin',
-        icon: MapPin,
-        isActive: location.pathname === '/admin'
+        id: 'workers',
+        label: 'Workers',
+        to: '/citizen/find-worker',
+        icon: Wrench,
+        isActive: location.pathname === '/citizen/find-worker' || location.pathname === '/worker'
       },
       {
         id: 'profile',
@@ -197,7 +198,7 @@ export default function MobileBottomNav() {
     leftItems = [
       {
         id: 'console',
-        label: 'Console',
+        label: 'Command',
         to: '/admin/super',
         icon: ShieldCheck,
         isActive: location.pathname === '/admin/super'

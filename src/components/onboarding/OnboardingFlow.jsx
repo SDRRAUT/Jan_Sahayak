@@ -117,7 +117,7 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
       key: 'super_admin',
       label: 'Administrator / Admin',
       name: 'Dr. Meenakshi, IAS',
-      badge: 'Municipal Head / Boss',
+      badge: 'PMC Municipal Commissioner',
       email: DEMO_CREDENTIALS.super_admin.email,
       password: DEMO_CREDENTIALS.super_admin.password,
       icon: ShieldCheck,

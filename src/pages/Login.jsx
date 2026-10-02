@@ -340,12 +340,12 @@ export default function Login() {
                   <ShieldCheck style={{ width: '16px', height: '16px', color: '#0E5E3A' }} />
                 </div>
                 <div>
-                  <strong style={{ fontSize: '14px', color: '#0E5E3A', display: 'block' }}>🛡️ Administrator / Admin</strong>
-                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Municipal Boss & Citywide Head</span>
+                  <strong style={{ fontSize: '14px', color: '#0E5E3A', display: 'block' }}>🛡️ Municipal Commissioner & Administrator</strong>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>PMC Headquarters & District Command</span>
                 </div>
               </div>
               <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.4 }}>
-                Dr. Meenakshi Sundaram, IAS • Department audits, citywide performance monitoring & overall governance.
+                Dr. Meenakshi Sundaram, IAS • Whole city dashboard, all 8 departments, 15 administrative wards & officer rosters.
               </p>
             </button>
           </div>
