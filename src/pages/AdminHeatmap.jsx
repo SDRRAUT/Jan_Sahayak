@@ -11,7 +11,6 @@ import {
   Radio, 
   Send,
   Eye,
-  Shield,
   Filter,
   Flame,
   ArrowRight,
@@ -24,13 +23,11 @@ import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
 import WhyExplainer from '../components/common/WhyExplainer';
 import LeafletMap from '../components/common/LeafletMap';
-import { maskCitizenName } from '../utils/privacy';
 
 export default function AdminHeatmap() {
   const [searchParams] = useSearchParams();
   const { grievances = [], clusters = [], metrics } = useApp();
   const targetCaseId = searchParams.get('caseId');
-  const latestGrievance = (targetCaseId ? grievances.find(g => g.id === targetCaseId) : null) || grievances[0];
   const [selectedWard, setSelectedWard] = useState('Ward 27 (Nagar Road Highway)');
   const [selectedCluster, setSelectedCluster] = useState(clusters[0]);
   const [categoryFilter, setCategoryFilter] = useState('ALL');
@@ -100,74 +97,7 @@ export default function AdminHeatmap() {
               Answering <strong>WHERE</strong> public problems are emerging with real-time ward clustering & root-cause detection.
             </p>
           </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '9999px', background: '#ECFDF5', border: '1px solid #A7F3D0', color: '#065F46', fontSize: '12px', fontWeight: 700 }}>
-              <span className="status-dot active"></span>
-              <span>SCADA & Municipal GIS Feed Online</span>
-            </div>
-            <Link to="/officer" className="btn-secondary btn-sm">
-              Open Officer Triage Queue →
-            </Link>
-          </div>
         </div>
-
-        {/* TOP OF ADMINISTRATION PANEL: LIVE INBOUND INCIDENT QUEUE */}
-        {latestGrievance && (
-          <div style={{
-            padding: '16px 20px',
-            borderRadius: 'var(--radius-lg)',
-            background: 'linear-gradient(90deg, #F0FDF4 0%, #EFF6FF 100%)',
-            border: '1.5px solid #86EFAC',
-            marginBottom: '20px',
-            boxShadow: '0 4px 14px rgba(16, 185, 129, 0.08)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '14px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '50%',
-                background: '#10B981',
-                color: '#FFFFFF',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0
-              }}>
-                <Shield style={{ width: '20px', height: '20px' }} />
-              </div>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '10px', fontWeight: 800, padding: '2px 8px', borderRadius: '999px', background: '#059669', color: '#FFFFFF' }}>
-                    ● TOP OF ADMINISTRATION QUEUE
-                  </span>
-                  <strong style={{ fontSize: '13px', color: '#065F46' }}>
-                    #{latestGrievance.id}: {latestGrievance.title}
-                  </strong>
-                  <span style={{ fontSize: '11px', color: '#047857' }}>
-                    ({latestGrievance.createdAt || 'Just now'})
-                  </span>
-                </div>
-                <div style={{ fontSize: '12px', color: '#047857', marginTop: '3px' }}>
-                  Reported in <strong>{latestGrievance.location?.ward || 'Ward 27 (Wagholi)'}</strong> by {maskCitizenName(latestGrievance.citizenName || 'Citizen')} • Assigned to <strong>{latestGrievance.officerName || latestGrievance.department || 'PMC Water Supply Department'}</strong> • Target SLA: 24h
-                </div>
-              </div>
-            </div>
-
-            <Link
-              to={`/officer?caseId=${latestGrievance.id}`}
-              className="btn-primary btn-sm"
-              style={{ background: '#059669', borderColor: '#059669', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-            >
-              <span>Inspect in Officer Workspace →</span>
-            </Link>
-          </div>
-        )}
 
         {/* SECTION 17: EMERGING THIS WEEK CALLOUT BANNER */}
         <div style={{
@@ -220,53 +150,6 @@ export default function AdminHeatmap() {
           </Link>
         </div>
 
-        {/* 4 Summary Stat Cards */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-          gap: '12px',
-          marginBottom: '28px'
-        }}>
-          <div className="card" style={{ padding: '16px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-              Active Macro Clusters
-            </span>
-            <div style={{ fontSize: '28px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-primary)', marginTop: '4px' }}>
-              {clusters.length}
-            </div>
-            <span style={{ fontSize: '11px', color: 'var(--color-accent)' }}>Grouping 36 Individual Cases</span>
-          </div>
-
-          <div className="card" style={{ padding: '16px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-              Deduplication Rate
-            </span>
-            <div style={{ fontSize: '28px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#059669', marginTop: '4px' }}>
-              64.2%
-            </div>
-            <span style={{ fontSize: '11px', color: '#059669' }}>Eliminated Redundant Dispatches</span>
-          </div>
-
-          <div className="card" style={{ padding: '16px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-              Predicted SLA Breaches
-            </span>
-            <div style={{ fontSize: '28px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#EF4444', marginTop: '4px' }}>
-              2 Wards
-            </div>
-            <span style={{ fontSize: '11px', color: '#EF4444' }}>Ward 27 (PMC Water) & Ward 31 (MSEDCL)</span>
-          </div>
-
-          <div className="card" style={{ padding: '16px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-              Citizen Satisfaction Index
-            </span>
-            <div style={{ fontSize: '28px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-text-primary)', marginTop: '4px' }}>
-              91.6%
-            </div>
-            <span style={{ fontSize: '11px', color: 'var(--color-primary)' }}>Based on Verified Case Audits</span>
-          </div>
-        </div>
 
         {/* Geospatial Map Visualizer & Ward Selection */}
         <div style={{
