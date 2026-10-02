@@ -12,7 +12,8 @@ import {
   Sparkles, 
   BarChart3, 
   LogIn,
-  Wrench
+  Wrench,
+  Building2
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import FileGrievanceModal from '../common/FileGrievanceModal';
@@ -201,14 +202,14 @@ export default function MobileBottomNav() {
         label: 'Command',
         to: '/admin/super',
         icon: ShieldCheck,
-        isActive: location.pathname === '/admin/super'
+        isActive: location.pathname === '/admin/super' && (!location.search || !location.search.includes('tab=departments'))
       },
       {
-        id: 'workspace',
-        label: 'Workspace',
-        to: '/officer',
-        icon: Briefcase,
-        isActive: location.pathname.startsWith('/officer')
+        id: 'departments',
+        label: 'Depts & Staff',
+        to: '/admin/super?tab=departments',
+        icon: Building2,
+        isActive: location.pathname === '/admin/super' && location.search.includes('tab=departments')
       }
     ];
 

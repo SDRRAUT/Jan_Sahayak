@@ -420,33 +420,21 @@ export default function Navbar() {
               <>
                 <Link
                   to="/admin/super"
-                  className={`site-nav-link ${location.pathname === '/admin/super' ? 'active' : ''}`}
+                  className={`site-nav-link ${location.pathname === '/admin/super' && (!location.search || !location.search.includes('tab=departments')) ? 'active' : ''}`}
                 >
                   PMC City Command
                 </Link>
                 <Link
-                  to="/admin/department"
-                  className={`site-nav-link ${location.pathname === '/admin/department' ? 'active' : ''}`}
+                  to="/admin/super?tab=departments"
+                  className={`site-nav-link ${location.pathname === '/admin/super' && location.search.includes('tab=departments') ? 'active' : ''}`}
                 >
-                  Departments
-                </Link>
-                <Link
-                  to="/officer"
-                  className={`site-nav-link ${location.pathname.startsWith('/officer') ? 'active' : ''}`}
-                >
-                  Officers
+                  Departments & Officers
                 </Link>
                 <Link
                   to="/admin"
                   className={`site-nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
                 >
-                  Heatmap
-                </Link>
-                <Link
-                  to="/intelligence"
-                  className={`site-nav-link ${location.pathname.startsWith('/intelligence') ? 'active' : ''}`}
-                >
-                  Intelligence
+                  Ward Heatmap
                 </Link>
               </>
             )}
@@ -1057,7 +1045,7 @@ export default function Navbar() {
                             <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
                           </Link>
                           <Link
-                            to="/admin/department"
+                            to="/admin/super?tab=departments"
                             onClick={() => setShowUserMenu(false)}
                             style={{
                               display: 'flex',
@@ -1073,8 +1061,8 @@ export default function Navbar() {
                             }}
                           >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <Building2 style={{ width: '14px', height: '14px', color: '#4338CA' }} />
-                              <span>Department Directory</span>
+                              <Building2 style={{ width: '14px', height: '14px', color: '#065F46' }} />
+                              <span>Departments & Officers</span>
                             </div>
                             <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
                           </Link>
@@ -1470,39 +1458,25 @@ export default function Navbar() {
                       borderRadius: 'var(--radius-md)',
                       fontSize: '14px',
                       fontWeight: 600,
-                      color: location.pathname === '/admin/super' ? '#4338CA' : 'var(--color-text-primary)',
-                      background: location.pathname === '/admin/super' ? '#EEF2FF' : '#F8FAFC'
+                      color: location.pathname === '/admin/super' && (!location.search || !location.search.includes('tab=departments')) ? '#065F46' : 'var(--color-text-primary)',
+                      background: location.pathname === '/admin/super' && (!location.search || !location.search.includes('tab=departments')) ? '#ECFDF5' : '#F8FAFC'
                     }}
                   >
-                    🏛️ City Administrator Console
+                    🏛️ PMC City Command
                   </Link>
                   <Link
-                    to="/admin/department"
+                    to="/admin/super?tab=departments"
                     onClick={() => setMobileMenuOpen(false)}
                     style={{
                       padding: '10px 14px',
                       borderRadius: 'var(--radius-md)',
                       fontSize: '14px',
                       fontWeight: 600,
-                      color: location.pathname === '/admin/department' ? '#4338CA' : 'var(--color-text-primary)',
-                      background: location.pathname === '/admin/department' ? '#EEF2FF' : '#F8FAFC'
+                      color: location.pathname === '/admin/super' && location.search.includes('tab=departments') ? '#065F46' : 'var(--color-text-primary)',
+                      background: location.pathname === '/admin/super' && location.search.includes('tab=departments') ? '#ECFDF5' : '#F8FAFC'
                     }}
                   >
-                    🏢 Departments
-                  </Link>
-                  <Link
-                    to="/officer"
-                    onClick={() => setMobileMenuOpen(false)}
-                    style={{
-                      padding: '10px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      color: location.pathname.startsWith('/officer') ? '#4338CA' : 'var(--color-text-primary)',
-                      background: location.pathname.startsWith('/officer') ? '#EEF2FF' : '#F8FAFC'
-                    }}
-                  >
-                    👥 Officer Workspaces
+                    🏢 Departments & Officers
                   </Link>
                   <Link
                     to="/admin"
@@ -1512,11 +1486,11 @@ export default function Navbar() {
                       borderRadius: 'var(--radius-md)',
                       fontSize: '14px',
                       fontWeight: 600,
-                      color: location.pathname === '/admin' ? '#4338CA' : 'var(--color-text-primary)',
-                      background: location.pathname === '/admin' ? '#EEF2FF' : '#F8FAFC'
+                      color: location.pathname === '/admin' ? '#065F46' : 'var(--color-text-primary)',
+                      background: location.pathname === '/admin' ? '#ECFDF5' : '#F8FAFC'
                     }}
                   >
-                    🗺️ Heatmap
+                    🗺️ Ward Heatmap
                   </Link>
                 </>
               )}

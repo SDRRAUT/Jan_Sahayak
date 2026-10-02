@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { 
   Building2, 
   Users, 
@@ -277,10 +278,21 @@ const INITIAL_DIRECTIVES = [
 
 export default function SuperAdmin() {
   const { user } = useApp();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'city_dashboard';
+  const [activeTab, setActiveTab] = useState(initialTab);
 
-  // Active Tab State (city_dashboard is the default executive view)
-  const [activeTab, setActiveTab] = useState('city_dashboard'); 
-  // 'city_dashboard' | 'departments' | 'officers' | 'wards' | 'directives' | 'audit'
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl && tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    setSearchParams(tabId === 'city_dashboard' ? {} : { tab: tabId });
+  };
 
   // Data States
   const [departments, setDepartments] = useState(INITIAL_DEPARTMENTS);
@@ -479,8 +491,7 @@ export default function SuperAdmin() {
         }}>
           {[
             { id: 'city_dashboard', label: 'Whole City Dashboard', icon: BarChart3, count: '15 Wards' },
-            { id: 'departments', label: 'All Municipal Departments', icon: Building2, count: departments.length },
-            { id: 'officers', label: 'City Officers Directory', icon: Users, count: officers.length },
+            { id: 'departments', label: 'Departments & Officers', icon: Building2, count: `${departments.length} Depts` },
             { id: 'wards', label: '15 Administrative Wards', icon: MapPin, count: '5 Zones' },
             { id: 'directives', label: 'Executive Directives', icon: FileText, count: directives.length },
             { id: 'audit', label: 'Cryptographic Audit Trail', icon: ShieldCheck, count: 'SHA-256' }
@@ -490,7 +501,7 @@ export default function SuperAdmin() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -779,41 +790,63 @@ export default function SuperAdmin() {
         )}
 
         {/* ===================================================================
-            TAB 2: ALL MUNICIPAL DEPARTMENTS CONSOLE
+            TAB 2: DEPARTMENTS & OFFICERS CONSOLE (MERGED)
             =================================================================== */}
         {activeTab === 'departments' && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
               <div>
                 <h2 style={{ fontSize: '20px', color: '#0F172A', margin: '0 0 4px 0' }}>
-                  All Connected Municipal Departments (8 Core Verticals)
+                  Municipal Departments & Officer Workforce Console
                 </h2>
                 <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>
-                  Strategic oversight, annual budget utilization, officer staffing, and SLA turnaround tracking.
+                  Strategic oversight of all 8 PMC departments, budget utilizations, SLAs, and active officer deployment rosters.
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setShowAddDeptModal(true)}
-                className="btn-primary"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  background: '#065F46',
-                  color: '#FFFFFF',
-                  padding: '8px 18px',
-                  borderRadius: '999px',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  border: 'none',
-                  cursor: 'pointer'
-                }}
-              >
-                <Plus style={{ width: '15px', height: '15px' }} />
-                <span>Register Department</span>
-              </button>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAddDeptModal(true)}
+                  className="btn-primary"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: '#065F46',
+                    color: '#FFFFFF',
+                    padding: '8px 18px',
+                    borderRadius: '999px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <Plus style={{ width: '15px', height: '15px' }} />
+                  <span>Register Department</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAddOfficerModal(true)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: '#FFFFFF',
+                    color: '#065F46',
+                    border: '1px solid #065F46',
+                    padding: '8px 18px',
+                    borderRadius: '999px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  <Users style={{ width: '15px', height: '15px' }} />
+                  <span>Deploy Officer</span>
+                </button>
+              </div>
             </div>
 
             <div style={{
@@ -928,7 +961,8 @@ export default function SuperAdmin() {
                       type="button"
                       onClick={() => {
                         setOfficerDeptFilter(dept.code);
-                        setActiveTab('officers');
+                        const rosterElem = document.getElementById('departments-officer-roster');
+                        if (rosterElem) rosterElem.scrollIntoView({ behavior: 'smooth' });
                       }}
                       style={{
                         flex: 1,
@@ -948,174 +982,175 @@ export default function SuperAdmin() {
                 </div>
               ))}
             </div>
-          </div>
-        )}
 
-        {/* ===================================================================
-            TAB 3: CITY OFFICERS & WORKFORCE DIRECTORY
-            =================================================================== */}
-        {activeTab === 'officers' && (
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
-              <div>
-                <h2 style={{ fontSize: '20px', color: '#0F172A', margin: '0 0 4px 0' }}>
-                  City Municipal Officers & Workforce Directory
-                </h2>
-                <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>
-                  Active engineers, ward officers, and inspectors across all 15 Pune administrative wards.
-                </p>
-              </div>
+            {/* Integrated Department Officers & Workforce Roster */}
+            <div id="departments-officer-roster" style={{ marginTop: '36px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <Users style={{ width: '22px', height: '22px', color: '#065F46' }} />
+                  <div>
+                    <h3 style={{ fontSize: '18px', color: '#0F172A', margin: 0 }}>
+                      {officerDeptFilter === 'ALL' ? 'All Municipal Officers & Field Workforce Roster' : `${officerDeptFilter} — Deployed Officer Roster`}
+                    </h3>
+                    <p style={{ fontSize: '12.5px', color: '#64748B', margin: '2px 0 0 0' }}>
+                      Filter officers by department vertical, active duty status, and ward jurisdictions.
+                    </p>
+                  </div>
+                </div>
 
-              <button
-                type="button"
-                onClick={() => setShowAddOfficerModal(true)}
-                className="btn-primary"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  background: '#065F46',
-                  color: '#FFFFFF',
-                  padding: '8px 18px',
-                  borderRadius: '999px',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  border: 'none',
-                  cursor: 'pointer'
-                }}
-              >
-                <Plus style={{ width: '15px', height: '15px' }} />
-                <span>Deploy New Officer</span>
-              </button>
-            </div>
-
-            {/* Filter Bar */}
-            <div className="card" style={{ padding: '16px 20px', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#64748B' }}>Department:</span>
-                  {['ALL', 'PMC Water', 'PWD Pune', 'PMC SWM', 'MSEDCL & Light', 'PMC Health'].map((dep) => (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {officerDeptFilter !== 'ALL' && (
                     <button
-                      key={dep}
                       type="button"
-                      onClick={() => setOfficerDeptFilter(dep)}
+                      onClick={() => setOfficerDeptFilter('ALL')}
                       style={{
                         padding: '4px 12px',
                         borderRadius: '999px',
                         fontSize: '11.5px',
                         fontWeight: 700,
-                        border: officerDeptFilter === dep ? 'none' : '1px solid #CBD5E1',
-                        background: officerDeptFilter === dep ? '#065F46' : '#FFFFFF',
-                        color: officerDeptFilter === dep ? '#FFFFFF' : '#475569',
+                        border: '1px solid #CBD5E1',
+                        background: '#F1F5F9',
+                        color: '#334155',
                         cursor: 'pointer'
                       }}
                     >
-                      {dep}
+                      ✕ Show All Depts
                     </button>
-                  ))}
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#64748B' }}>Status:</span>
-                  {['ALL', 'ON_DUTY', 'FIELD_INSPECTION'].map((st) => (
-                    <button
-                      key={st}
-                      type="button"
-                      onClick={() => setOfficerStatusFilter(st)}
-                      style={{
-                        padding: '4px 10px',
-                        borderRadius: '999px',
-                        fontSize: '11px',
-                        fontWeight: 700,
-                        border: officerStatusFilter === st ? 'none' : '1px solid #CBD5E1',
-                        background: officerStatusFilter === st ? '#1E293B' : '#FFFFFF',
-                        color: officerStatusFilter === st ? '#FFFFFF' : '#64748B',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {st === 'ALL' ? 'ALL STATUS' : st.replace('_', ' ')}
-                    </button>
-                  ))}
+                  )}
+                  <span style={{ fontSize: '12px', color: '#065F46', fontWeight: 700, background: '#ECFDF5', padding: '4px 12px', borderRadius: '999px', border: '1px solid #A7F3D0' }}>
+                    {filteredOfficers.length} Officers Showing
+                  </span>
                 </div>
               </div>
 
-              {/* Search input */}
-              <div style={{ position: 'relative', marginTop: '12px' }}>
-                <Search style={{ position: 'absolute', left: '12px', top: '12px', width: '16px', height: '16px', color: '#94A3B8' }} />
-                <input
-                  type="text"
-                  value={officerSearch}
-                  onChange={(e) => setOfficerSearch(e.target.value)}
-                  placeholder="Search officers by name, badge ID, ward jurisdiction, or designation..."
-                  style={{
-                    width: '100%',
-                    height: '40px',
-                    borderRadius: '8px',
-                    border: '1px solid #CBD5E1',
-                    padding: '0 12px 0 38px',
-                    fontSize: '13px'
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Officers Table */}
-            <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
-                  <thead>
-                    <tr style={{ background: '#F8FAFC', borderBottom: '2px solid #E2E8F0' }}>
-                      <th style={{ padding: '12px 16px', color: '#64748B', fontWeight: 700 }}>OFFICER / BADGE</th>
-                      <th style={{ padding: '12px 16px', color: '#64748B', fontWeight: 700 }}>DESIGNATION</th>
-                      <th style={{ padding: '12px 16px', color: '#64748B', fontWeight: 700 }}>DEPARTMENT</th>
-                      <th style={{ padding: '12px 16px', color: '#64748B', fontWeight: 700 }}>ASSIGNED WARD</th>
-                      <th style={{ padding: '12px 16px', color: '#64748B', fontWeight: 700 }}>CONTACT</th>
-                      <th style={{ padding: '12px 16px', color: '#64748B', fontWeight: 700 }}>STATUS</th>
-                      <th style={{ padding: '12px 16px', color: '#64748B', fontWeight: 700, textAlign: 'right' }}>RATING & SLA</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredOfficers.map((off) => (
-                      <tr key={off.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
-                        <td style={{ padding: '14px 16px' }}>
-                          <strong style={{ fontSize: '13.5px', color: '#0F172A', display: 'block' }}>{off.name}</strong>
-                          <span style={{ fontSize: '10.5px', color: '#64748B', fontFamily: 'var(--font-mono)' }}>{off.badge}</span>
-                        </td>
-                        <td style={{ padding: '14px 16px', color: '#334155', fontWeight: 600 }}>
-                          {off.designation}
-                        </td>
-                        <td style={{ padding: '14px 16px' }}>
-                          <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '4px', background: '#F1F5F9', color: '#065F46' }}>
-                            {off.department}
-                          </span>
-                        </td>
-                        <td style={{ padding: '14px 16px', color: '#475569', fontSize: '12.5px' }}>
-                          {off.ward}
-                        </td>
-                        <td style={{ padding: '14px 16px', fontSize: '11.5px', color: '#64748B' }}>
-                          <div>{off.phone}</div>
-                          <div style={{ color: '#0284C7' }}>{off.email}</div>
-                        </td>
-                        <td style={{ padding: '14px 16px' }}>
-                          <span style={{
-                            fontSize: '11px',
-                            fontWeight: 700,
-                            padding: '3px 8px',
-                            borderRadius: '999px',
-                            background: off.status === 'ON_DUTY' ? '#ECFDF5' : '#FEF3C7',
-                            color: off.status === 'ON_DUTY' ? '#065F46' : '#92400E'
-                          }}>
-                            ● {off.status.replace('_', ' ')}
-                          </span>
-                        </td>
-                        <td style={{ padding: '14px 16px', textAlign: 'right' }}>
-                          <div style={{ fontWeight: 800, color: '#0F172A' }}>★ {off.rating}</div>
-                          <span style={{ fontSize: '11px', color: '#059669', fontWeight: 700 }}>{off.slaRate} SLA</span>
-                        </td>
-                      </tr>
+              {/* Filter Bar */}
+              <div className="card" style={{ padding: '16px 20px', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#64748B', marginRight: '4px' }}>Department:</span>
+                    {['ALL', 'PMC Water', 'PWD Pune', 'PMC SWM', 'MSEDCL & Light', 'PMC Health'].map((dep) => (
+                      <button
+                        key={dep}
+                        type="button"
+                        onClick={() => setOfficerDeptFilter(dep)}
+                        style={{
+                          padding: '4px 12px',
+                          borderRadius: '999px',
+                          fontSize: '11.5px',
+                          fontWeight: 700,
+                          border: officerDeptFilter === dep ? 'none' : '1px solid #CBD5E1',
+                          background: officerDeptFilter === dep ? '#065F46' : '#FFFFFF',
+                          color: officerDeptFilter === dep ? '#FFFFFF' : '#475569',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {dep}
+                      </button>
                     ))}
-                  </tbody>
-                </table>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#64748B' }}>Status:</span>
+                    {['ALL', 'ON_DUTY', 'FIELD_INSPECTION'].map((st) => (
+                      <button
+                        key={st}
+                        type="button"
+                        onClick={() => setOfficerStatusFilter(st)}
+                        style={{
+                          padding: '4px 10px',
+                          borderRadius: '999px',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          border: officerStatusFilter === st ? 'none' : '1px solid #CBD5E1',
+                          background: officerStatusFilter === st ? '#1E293B' : '#FFFFFF',
+                          color: officerStatusFilter === st ? '#FFFFFF' : '#64748B',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {st === 'ALL' ? 'ALL STATUS' : st.replace('_', ' ')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Search input */}
+                <div style={{ position: 'relative', marginTop: '12px' }}>
+                  <Search style={{ position: 'absolute', left: '12px', top: '12px', width: '16px', height: '16px', color: '#94A3B8' }} />
+                  <input
+                    type="text"
+                    value={officerSearch}
+                    onChange={(e) => setOfficerSearch(e.target.value)}
+                    placeholder="Search officers by name, badge ID, ward jurisdiction, or designation..."
+                    style={{
+                      width: '100%',
+                      height: '40px',
+                      borderRadius: '8px',
+                      border: '1px solid #CBD5E1',
+                      padding: '0 12px 0 38px',
+                      fontSize: '13px'
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Officers Table */}
+              <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
+                    <thead>
+                      <tr style={{ background: '#F8FAFC', borderBottom: '2px solid #E2E8F0' }}>
+                        <th style={{ padding: '12px 16px', color: '#64748B', fontWeight: 700 }}>OFFICER / BADGE</th>
+                        <th style={{ padding: '12px 16px', color: '#64748B', fontWeight: 700 }}>DESIGNATION</th>
+                        <th style={{ padding: '12px 16px', color: '#64748B', fontWeight: 700 }}>DEPARTMENT</th>
+                        <th style={{ padding: '12px 16px', color: '#64748B', fontWeight: 700 }}>ASSIGNED WARD</th>
+                        <th style={{ padding: '12px 16px', color: '#64748B', fontWeight: 700 }}>CONTACT</th>
+                        <th style={{ padding: '12px 16px', color: '#64748B', fontWeight: 700 }}>STATUS</th>
+                        <th style={{ padding: '12px 16px', color: '#64748B', fontWeight: 700, textAlign: 'right' }}>RATING & SLA</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredOfficers.map((off) => (
+                        <tr key={off.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                          <td style={{ padding: '14px 16px' }}>
+                            <strong style={{ fontSize: '13.5px', color: '#0F172A', display: 'block' }}>{off.name}</strong>
+                            <span style={{ fontSize: '10.5px', color: '#64748B', fontFamily: 'var(--font-mono)' }}>{off.badge}</span>
+                          </td>
+                          <td style={{ padding: '14px 16px', color: '#334155', fontWeight: 600 }}>
+                            {off.designation}
+                          </td>
+                          <td style={{ padding: '14px 16px' }}>
+                            <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '4px', background: '#F1F5F9', color: '#065F46' }}>
+                              {off.department}
+                            </span>
+                          </td>
+                          <td style={{ padding: '14px 16px', color: '#475569', fontSize: '12.5px' }}>
+                            {off.ward}
+                          </td>
+                          <td style={{ padding: '14px 16px', fontSize: '11.5px', color: '#64748B' }}>
+                            <div>{off.phone}</div>
+                            <div style={{ color: '#0284C7' }}>{off.email}</div>
+                          </td>
+                          <td style={{ padding: '14px 16px' }}>
+                            <span style={{
+                              fontSize: '11px',
+                              fontWeight: 700,
+                              padding: '3px 8px',
+                              borderRadius: '999px',
+                              background: off.status === 'ON_DUTY' ? '#ECFDF5' : '#FEF3C7',
+                              color: off.status === 'ON_DUTY' ? '#065F46' : '#92400E'
+                            }}>
+                              ● {off.status.replace('_', ' ')}
+                            </span>
+                          </td>
+                          <td style={{ padding: '14px 16px', textAlign: 'right' }}>
+                            <div style={{ fontWeight: 800, color: '#0F172A' }}>★ {off.rating}</div>
+                            <span style={{ fontSize: '11px', color: '#059669', fontWeight: 700 }}>{off.slaRate} SLA</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
