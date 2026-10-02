@@ -1307,63 +1307,6 @@ export default function Home() {
             const currentScenario = systemicScenarios[systemicScenarioIndex];
             return (
               <div>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '12px',
-                  marginBottom: '24px',
-                  padding: '12px 18px',
-                  borderRadius: '16px',
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#94A3B8' }}>
-                    <span style={{ color: '#10B981', fontWeight: 700 }}>Active Case:</span>
-                    <strong style={{ color: '#FFFFFF' }}>{currentScenario.title}</strong>
-                    <span>•</span>
-                    <span>{currentScenario.location}</span>
-                    <span>({currentScenario.dept})</span>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '6px', background: 'rgba(0,0,0,0.3)', padding: '3px', borderRadius: '10px' }}>
-                    <button
-                      type="button"
-                      onClick={() => setSystemicViewMode('steps')}
-                      style={{
-                        padding: '6px 14px',
-                        borderRadius: '8px',
-                        fontSize: '12px',
-                        fontWeight: systemicViewMode === 'steps' ? 700 : 500,
-                        border: 'none',
-                        cursor: 'pointer',
-                        background: systemicViewMode === 'steps' ? '#10B981' : 'transparent',
-                        color: systemicViewMode === 'steps' ? '#FFFFFF' : '#94A3B8',
-                        transition: 'all 150ms ease'
-                      }}
-                    >
-                      📖 3-Step Story
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSystemicViewMode('compare')}
-                      style={{
-                        padding: '6px 14px',
-                        borderRadius: '8px',
-                        fontSize: '12px',
-                        fontWeight: systemicViewMode === 'compare' ? 700 : 500,
-                        border: 'none',
-                        cursor: 'pointer',
-                        background: systemicViewMode === 'compare' ? '#10B981' : 'transparent',
-                        color: systemicViewMode === 'compare' ? '#FFFFFF' : '#94A3B8',
-                        transition: 'all 150ms ease'
-                      }}
-                    >
-                      ⚡ Old Way vs Smart Way
-                    </button>
-                  </div>
-                </div>
 
                 {/* VIEW 1: 3-STEP INTERACTIVE STORY */}
                 {systemicViewMode === 'steps' && (
