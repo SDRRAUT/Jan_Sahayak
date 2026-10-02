@@ -100,8 +100,83 @@ const FOUR_STEPS = [
   }
 ];
 
+const HERO_LANGUAGES = [
+  {
+    code: 'hinglish',
+    label: 'Hinglish',
+    prefix: 'Aapki Awaaz, Ab ',
+    accent: 'Samjhi',
+    suffix: ' Jayegi.'
+  },
+  {
+    code: 'hi',
+    label: 'हिंदी',
+    prefix: 'आपकी आवाज़, अब ',
+    accent: 'समझी',
+    suffix: ' जाएगी।'
+  },
+  {
+    code: 'mr',
+    label: 'मराठी',
+    prefix: 'तुमचा आवाज, आता ',
+    accent: 'समजून',
+    suffix: ' घेतला जाईल.'
+  },
+  {
+    code: 'en',
+    label: 'English',
+    prefix: 'Your Voice, Truly ',
+    accent: 'Understood',
+    suffix: '.'
+  },
+  {
+    code: 'bn',
+    label: 'বাংলা',
+    prefix: 'আপনার অভিযোগ, এবার ',
+    accent: 'গুরুত্ব',
+    suffix: ' পাবে।'
+  },
+  {
+    code: 'te',
+    label: 'తెలుగు',
+    prefix: 'మీ సమస్య, ఇక ',
+    accent: 'పరిష్కారం',
+    suffix: ' అవుతుంది.'
+  },
+  {
+    code: 'ta',
+    label: 'தமிழ்',
+    prefix: 'உங்கள் குரல், இனி ',
+    accent: 'தீர்க்கப்படும்',
+    suffix: '.'
+  },
+  {
+    code: 'gu',
+    label: 'ગુજરાતી',
+    prefix: 'તમારો અવાજ, હવે ',
+    accent: 'સમજવામાં',
+    suffix: ' આવશે.'
+  },
+  {
+    code: 'kn',
+    label: 'ಕನ್ನಡ',
+    prefix: 'ನಿಮ್ಮ ಧ್ವನಿ, ಇನ್ನು ',
+    accent: 'ಆಲಿಸಲಾಗುವುದು',
+    suffix: '.'
+  }
+];
+
 export default function Home() {
   const { user } = useApp();
+  const [heroLangIdx, setHeroLangIdx] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroLangIdx((prev) => (prev + 1) % HERO_LANGUAGES.length);
+    }, 3200);
+    return () => clearInterval(timer);
+  }, []);
+
   const [showGrievanceModal, setShowGrievanceModal] = useState(false);
   const [mapCategory, setMapCategory] = useState('ALL');
   const [activeWardIndex, setActiveWardIndex] = useState(0);
@@ -563,7 +638,7 @@ export default function Home() {
         />
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <div style={{
-            maxWidth: '840px',
+            maxWidth: '960px',
             margin: '0 auto',
             textAlign: 'center',
             display: 'flex',
@@ -573,7 +648,7 @@ export default function Home() {
             {/* Hero Narrative */}
             <div className="hero-left-col" style={{ width: '100%' }}>
               {/* Category Overline: Professional Public Civic Intelligence */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '22px', flexWrap: 'wrap' }}>
                 <img 
                   src="/logo.png" 
                   alt="JanSahayak Official Logo" 
@@ -588,22 +663,86 @@ export default function Home() {
                   <ShieldCheck style={{ width: '13px', height: '13px' }} />
                   <span>PUBLIC GRIEVANCE INTELLIGENCE</span>
                 </span>
-                <span className="pilot-tag">
-                  Interactive Pilot Demonstration
-                </span>
               </div>
 
-              {/* Core Hero Headline */}
-              <h1 className="hero-headline" style={{ marginBottom: '20px', fontSize: '38px', lineHeight: 1.2 }}>
-                Aapki Awaaz, Ab <span className="headline-accent">Samjhi</span> Jayegi.
+              {/* Core Hero Headline - Substantially Bigger & Multilingual */}
+              <h1 
+                className="hero-headline" 
+                style={{ 
+                  fontSize: 'clamp(44px, 5.8vw, 72px)', 
+                  lineHeight: 1.12,
+                  letterSpacing: '-0.03em',
+                  maxWidth: '920px',
+                  margin: '0 auto 16px auto',
+                  minHeight: '1.22em'
+                }}
+              >
+                {HERO_LANGUAGES[heroLangIdx].prefix}
+                <span className="headline-accent">
+                  {HERO_LANGUAGES[heroLangIdx].accent}
+                </span>
+                {HERO_LANGUAGES[heroLangIdx].suffix}
               </h1>
+
+              {/* Multilingual Quick Switcher Strip */}
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
+                flexWrap: 'wrap',
+                marginBottom: '26px',
+                background: 'rgba(255, 255, 255, 0.92)',
+                backdropFilter: 'blur(10px)',
+                padding: '4px 8px',
+                borderRadius: '999px',
+                border: '1px solid var(--color-border-subtle)',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.04)'
+              }}>
+                <span style={{ 
+                  fontSize: '11px', 
+                  fontWeight: 700, 
+                  color: '#0E5E3A', 
+                  padding: '2px 8px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  <span>🇮🇳</span>
+                  <span>22 Languages:</span>
+                </span>
+                {HERO_LANGUAGES.map((lang, lIdx) => {
+                  const isActive = heroLangIdx === lIdx;
+                  return (
+                    <button
+                      key={lang.code}
+                      type="button"
+                      onClick={() => setHeroLangIdx(lIdx)}
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: '999px',
+                        fontSize: '11.5px',
+                        fontWeight: isActive ? 700 : 500,
+                        border: 'none',
+                        cursor: 'pointer',
+                        background: isActive ? '#0E5E3A' : 'transparent',
+                        color: isActive ? '#FFFFFF' : '#475569',
+                        boxShadow: isActive ? '0 2px 8px rgba(14, 94, 58, 0.28)' : 'none',
+                        transition: 'all 150ms ease'
+                      }}
+                    >
+                      {lang.label}
+                    </button>
+                  );
+                })}
+              </div>
 
               {/* Supporting Copy */}
               <p style={{
                 fontSize: '17px',
                 lineHeight: 1.6,
                 color: 'var(--color-text-secondary)',
-                maxWidth: '640px',
+                maxWidth: '680px',
                 margin: '0 auto 32px auto'
               }}>
                 A public grievance intelligence platform that turns everyday citizen voices into structured insights, connected evidence, and actionable resolution recommendations.
