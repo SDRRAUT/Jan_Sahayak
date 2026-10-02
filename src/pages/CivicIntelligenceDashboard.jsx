@@ -25,26 +25,253 @@ import {
   LayoutGrid,
   Table2,
   AlignJustify,
-  Rows3
+  Rows3,
+  ChevronDown,
+  ChevronUp,
+  GitFork,
+  Check,
+  CornerDownRight,
+  Boxes
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import ProblemSpreadMap from '../components/intelligence/ProblemSpreadMap';
-import CrossDepartmentMatrix from '../components/intelligence/CrossDepartmentMatrix';
-import CivicMemoryCard from '../components/intelligence/CivicMemoryCard';
 import CivicSignalModal from '../components/intelligence/CivicSignalModal';
-import LiveComplaintLinkageSection from '../components/intelligence/LiveComplaintLinkageSection';
 import TerritoryProblemModal from '../components/officer/TerritoryProblemModal';
 import JanSuchnaModal from '../components/officer/JanSuchnaModal';
 
+// Clean, realistic live data for Smart Department Routing
+const ROUTED_COMPLAINTS_DATA = [
+  {
+    id: 'GRV-2026-8912',
+    timestamp: '4 mins ago',
+    citizenInput: 'Kesnand Road chowk pe underground main pipeline phat gayi hai, bohot tez paani road pe beh raha hai aur traffic ruk gaya hai.',
+    channel: '🎙 Voice (Hindi/Marathi)',
+    category: 'Water Supply & Sewerage',
+    categoryKey: 'WATER',
+    department: 'PMC Water Supply Department',
+    deptIcon: '💧',
+    deptColor: '#0284C7',
+    deptBg: '#F0F9FF',
+    deptBorder: '#BAE6FD',
+    ward: 'Ward 29 (Kesnand Corridor)',
+    officer: 'Er. Sanjay Sharma (EE Water)',
+    confidence: '98.8%',
+    routingRule: 'Pipeline Burst Keyword + Ward 29 Geo-Fence',
+    priority: 'CRITICAL',
+    sla: '4 Hours',
+    status: 'Auto-Dispatched'
+  },
+  {
+    id: 'GRV-2026-8909',
+    timestamp: '11 mins ago',
+    citizenInput: 'Ivy Estate gate no 2 ke paas dumper 3 din se nahi aaya. Kachre ka bada dher lag gaya hai aur badboo fail rahi hai.',
+    channel: '📷 Photo + Text',
+    category: 'Solid Waste Management',
+    categoryKey: 'WASTE',
+    department: 'PMC Solid Waste Management',
+    deptIcon: '🗑️',
+    deptColor: '#059669',
+    deptBg: '#ECFDF5',
+    deptBorder: '#A7F3D0',
+    ward: 'Ward 29 (Ivy Estate)',
+    officer: 'V. K. Shinde (Sanitary Inspector)',
+    confidence: '97.4%',
+    routingRule: 'Garbage Dump Detection + SWM Roster Match',
+    priority: 'HIGH',
+    sla: '8 Hours',
+    status: 'Auto-Dispatched'
+  },
+  {
+    id: 'GRV-2026-8904',
+    timestamp: '28 mins ago',
+    citizenInput: 'Pune-Nagar Highway left lane bridge approach pe 2 deep potholes ban gaye hain. Bike girte girte bachi.',
+    channel: '✍ Portal Web',
+    category: 'Roads & Infrastructure',
+    categoryKey: 'ROADS',
+    department: 'Public Works Department (PWD)',
+    deptIcon: '🛣️',
+    deptColor: '#D97706',
+    deptBg: '#FFFBEB',
+    deptBorder: '#FDE68A',
+    ward: 'Ward 28 (Highway Corridor)',
+    officer: 'A. P. Deshmukh (PWD Asst. Engineer)',
+    confidence: '96.2%',
+    routingRule: 'State Highway Corridor GPS + Asphalt Pothole Tag',
+    priority: 'CRITICAL',
+    sla: '12 Hours',
+    status: 'Dispatched to PWD'
+  },
+  {
+    id: 'GRV-2026-8898',
+    timestamp: '42 mins ago',
+    citizenInput: 'Wagholi vegetable market transformer pole se sparks nikal rahe hain aur live cable neeche latak rahi hai.',
+    channel: '🎙 Voice Note',
+    category: 'Electrical & Power Grid',
+    categoryKey: 'POWER',
+    department: 'MSEDCL Wagholi Sub-Division',
+    deptIcon: '⚡',
+    deptColor: '#7C3AED',
+    deptBg: '#F5F3FF',
+    deptBorder: '#DDD6FE',
+    ward: 'Ward 27 (Central Market)',
+    officer: 'R. B. Patil (MSEDCL Feeder Officer)',
+    confidence: '99.2%',
+    routingRule: 'High-Voltage Spark Hazard + Emergency Intercept',
+    priority: 'EMERGENCY',
+    sla: '2 Hours',
+    status: 'Dispatched (Priority 1)'
+  },
+  {
+    id: 'GRV-2026-8885',
+    timestamp: '1 hour ago',
+    citizenInput: 'Ubale Nagar underpass culvert completely choked with silt, mild rainfall me bhi 1.5 feet paani bhar gaya.',
+    channel: '📷 Photo Evidence',
+    category: 'Drainage & Stormwater',
+    categoryKey: 'DRAINAGE',
+    department: 'PMC Drainage Department',
+    deptIcon: '🌊',
+    deptColor: '#2563EB',
+    deptBg: '#EFF6FF',
+    deptBorder: '#BFDBFE',
+    ward: 'Ward 30 (Ubale Nagar)',
+    officer: 'M. S. Kulkarni (Drainage Inspector)',
+    confidence: '95.6%',
+    routingRule: 'Culvert Choke Vision Model + Monsoon Hotspot',
+    priority: 'HIGH',
+    sla: '6 Hours',
+    status: 'Auto-Dispatched'
+  },
+  {
+    id: 'GRV-2026-8879',
+    timestamp: '1.5 hours ago',
+    citizenInput: 'Primary health center lane me stagnant dirty water pool ban gaya hai, dengue mosquito breeding ho rahi hai.',
+    channel: '✍ Citizen App',
+    category: 'Public Health & Sanitation',
+    categoryKey: 'HEALTH',
+    department: 'PMC Health Department',
+    deptIcon: '🏥',
+    deptColor: '#E11D48',
+    deptBg: '#FFF1F2',
+    deptBorder: '#FECDD3',
+    ward: 'Ward 27 (Health Clinic Lane)',
+    officer: 'Dr. Neha Joshi (Ward Medical Officer)',
+    confidence: '94.8%',
+    routingRule: 'Vector Control Keywords + Ward Clinic Geo-Tag',
+    priority: 'MEDIUM',
+    sla: '24 Hours',
+    status: 'Auto-Dispatched'
+  }
+];
+
+// Clean, realistic live data for Duplicate & Similar Complaint Clusters
+const DUPLICATE_CLUSTERS_DATA = [
+  {
+    id: 'CLUSTER-WAG-WATER-01',
+    masterTicket: 'INC-CORE-1 / GRV-2026-001',
+    title: 'Wagholi Baif Road & Kesnand Feeder Main Rupture',
+    leadDept: 'PMC Water Supply Department',
+    deptIcon: '💧',
+    severity: 'CRITICAL',
+    similarityScore: '96% Semantic & Geospatial Match',
+    geoRadius: '65m Radius (Ward 29 & 27)',
+    totalReportsMerged: 18,
+    dispatchesSaved: '17 Redundant Dispatches Eliminated',
+    impactSummary: '450 Households across Baif Road & Kesnand Corridor',
+    actionSummary: '1 Combined Excavator & Valve Repair Crew dispatched. All 18 citizens linked to unified SMS timeline.',
+    groupedSignals: [
+      { id: 'SIG-001', time: '08:15', citizen: 'Sunita Mehra (Ivy Estate)', input: 'Water pressure very low, yellow tint in tap water.', type: '🎙 Voice', score: 98 },
+      { id: 'SIG-002', time: '11:30', citizen: 'Rajesh Gupta (Raisoni Chowk)', input: 'Water trickling continuously from under road asphalt.', type: '📷 Photo', score: 95 },
+      { id: 'SIG-003', time: '12:10', citizen: 'Kavita Roy (Kesnand Road)', input: 'Zero water pressure on 1st floor, pump drawing air.', type: '✍ Text', score: 92 },
+      { id: 'SIG-004', time: '14:45', citizen: 'Mohd. Tariq (Main Arterial)', input: 'Road depression forming, asphalt wet and spongy.', type: '📷 Photo', score: 96 }
+    ]
+  },
+  {
+    id: 'CLUSTER-WAG-GARBAGE-02',
+    masterTicket: 'INC-CORE-3 / GRV-2026-014',
+    title: 'Ivy Estate Commercial Market Garbage Overflow Backlog',
+    leadDept: 'PMC Solid Waste Management',
+    deptIcon: '🗑️',
+    severity: 'HIGH',
+    similarityScore: '93% Visual Embedding Match',
+    geoRadius: '30m Radius (Market Chowk)',
+    totalReportsMerged: 16,
+    dispatchesSaved: '15 Redundant Dispatches Eliminated',
+    impactSummary: '80 Retail Shops & 1,500 daily market shoppers',
+    actionSummary: 'Heavy hydraulic compactor truck scheduled for emergency clearance; commercial waste notice issued.',
+    groupedSignals: [
+      { id: 'SIG-008', time: '09:00', citizen: 'Anil K. (Shopkeeper #12)', input: 'Large plastic trash pile blocking customer parking.', type: '📷 Photo', score: 97 },
+      { id: 'SIG-009', time: '10:15', citizen: 'Pooja Patil (Resident)', input: 'Bins overflowing, cows scattering waste on carriageway.', type: '✍ Text', score: 94 },
+      { id: 'SIG-010', time: '11:50', citizen: 'Vikram Joshi (Ivy Gate 2)', input: 'Severe stench reaching 2nd floor balconies.', type: '🎙 Voice', score: 91 }
+    ]
+  },
+  {
+    id: 'CLUSTER-WAG-DRAIN-03',
+    masterTicket: 'INC-CORE-5 / GRV-2026-022',
+    title: 'Ubale Nagar Monsoon Stormwater Culvert Choke',
+    leadDept: 'PMC Drainage Department',
+    deptIcon: '🌊',
+    severity: 'CRITICAL',
+    similarityScore: '94% Spatial & Audio Proximity Match',
+    geoRadius: '45m Radius (Ubale Nagar Junction)',
+    totalReportsMerged: 19,
+    dispatchesSaved: '18 Redundant Dispatches Eliminated',
+    impactSummary: 'Arterial road underpass connecting Nagar Road to Ubale Nagar',
+    actionSummary: 'High-capacity suction jetting machine mobilized; de-silting crew clearing subterranean manhole.',
+    groupedSignals: [
+      { id: 'SIG-014', time: '07:30', citizen: 'Suresh More', input: 'Underpass flooded with black drainage water.', type: '📷 Photo', score: 96 },
+      { id: 'SIG-015', time: '08:40', citizen: 'Deepak Sawant', input: 'Manhole chamber cover dislodged under water.', type: '🎙 Voice', score: 93 },
+      { id: 'SIG-016', time: '10:05', citizen: 'Prakash Shinde', input: 'Two wheeler slipped in open storm drain.', type: '✍ Text', score: 95 }
+    ]
+  },
+  {
+    id: 'CLUSTER-WAG-POWER-04',
+    masterTicket: 'INC-CORE-7 / GRV-2026-031',
+    title: 'Wagholi Chowk Loose Overhead High-Tension Cables',
+    leadDept: 'MSEDCL Wagholi Sub-Division',
+    deptIcon: '⚡',
+    severity: 'CRITICAL',
+    similarityScore: '98% Geo-Coordinate & Hazard Tag Match',
+    geoRadius: '50m Corridor (Main Vegetable Market)',
+    totalReportsMerged: 16,
+    dispatchesSaved: '15 Redundant Dispatches Eliminated',
+    impactSummary: '1,200 pedestrians and 45 roadside vendors under live line',
+    actionSummary: 'Emergency line isolator opened; MSEDCL ground tower squad replacing worn tension clamp.',
+    groupedSignals: [
+      { id: 'SIG-020', time: '13:10', citizen: 'Ramesh K. (Vendor)', input: 'Cables hanging 6 feet from ground, sparking in wind.', type: '🎙 Voice', score: 99 },
+      { id: 'SIG-021', time: '13:25', citizen: 'Dr. Nitin Rao', input: 'Hazardous sparking wire near clinic entrance.', type: '✍ Text', score: 98 }
+    ]
+  },
+  {
+    id: 'CLUSTER-WAG-ROADS-05',
+    masterTicket: 'INC-CORE-8 / GRV-2026-039',
+    title: 'Pune-Nagar Highway Pothole Cluster & Broken Grating',
+    leadDept: 'Public Works Department (PWD Pune)',
+    deptIcon: '🛣️',
+    severity: 'HIGH',
+    similarityScore: '95% GPS Corridor Match',
+    geoRadius: '120m Highway Corridor',
+    totalReportsMerged: 15,
+    dispatchesSaved: '14 Redundant Dispatches Eliminated',
+    impactSummary: 'Arterial Highway Junction & Lexicon International School Entrance',
+    actionSummary: 'Cold-mix asphalt patch truck and iron grating fabrication unit scheduled for night shift.',
+    groupedSignals: [
+      { id: 'SIG-025', time: '09:20', citizen: 'Sanjay Thorat', input: 'Three severe rim-bending potholes right after toll bridge.', type: '📷 Photo', score: 96 },
+      { id: 'SIG-026', time: '11:00', citizen: 'Amitabh Sen', input: 'Broken storm grate creating puncture hazard for buses.', type: '✍ Text', score: 94 }
+    ]
+  }
+];
+
 export default function CivicIntelligenceDashboard() {
   const { civicIncidents = [], civicSignals = [], intelligenceMetrics = {} } = useApp();
-  const [activeTab, setActiveTab] = useState('incidents'); // 'incidents' | 'map' | 'clustering' | 'coordination'
+  const [activeTab, setActiveTab] = useState('incidents'); // 'incidents' | 'map' | 'routing' | 'deduplication'
   const [selectedStage, setSelectedStage] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSignalModal, setShowSignalModal] = useState(false);
   const [showTerritoryModal, setShowTerritoryModal] = useState(false);
   const [showJanSuchnaModal, setShowJanSuchnaModal] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' (default) | 'detail' | 'compact' | 'table' | 'minimal'
+  const [routingFilter, setRoutingFilter] = useState('ALL');
+  const [expandedClusterId, setExpandedClusterId] = useState('CLUSTER-WAG-WATER-01');
 
   const filteredIncidents = civicIncidents.filter(inc => {
     const matchesStage = selectedStage === 'ALL' || inc.stage === selectedStage;
@@ -314,8 +541,8 @@ export default function CivicIntelligenceDashboard() {
           {[
             { id: 'incidents', label: '🚨 Active Incidents & Radar', badge: filteredIncidents.length },
             { id: 'map', label: '🗺️ Problem Spread Map', badge: 'Live GIS' },
-            { id: 'clustering', label: '⚡ How AI Clusters Complaints', badge: '3-Step Flow' },
-            { id: 'coordination', label: '🤝 Multi-Agency Coordination', badge: 'RACI Matrix' }
+            { id: 'routing', label: '🎯 Smart Department Routing', badge: 'Auto-Dispatch' },
+            { id: 'deduplication', label: '🔍 Duplicate & Similar Detection', badge: '68% Merged' }
           ].map((tab) => {
             const isActive = activeTab === tab.id;
             return (

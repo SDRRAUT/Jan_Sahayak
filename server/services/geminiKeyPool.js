@@ -8,7 +8,31 @@
  * - Round-robin and immediate failover execution wrapper.
  */
 
-// Known active API keys are loaded strictly from environment variables
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const envFilePath = path.resolve(__dirname, '../../.env');
+if (fs.existsSync(envFilePath)) {
+  try {
+    const rawEnv = fs.readFileSync(envFilePath, 'utf8');
+    for (const line of rawEnv.split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
+        const eqIdx = trimmed.indexOf('=');
+        const envKey = trimmed.substring(0, eqIdx).trim();
+        const envVal = trimmed.substring(eqIdx + 1).trim();
+        if (!process.env[envKey]) {
+          process.env[envKey] = envVal;
+        }
+      }
+    }
+  } catch (e) {}
+}
+
+// Default key pool is loaded strictly from environment variables and local .env
 const DEFAULT_KEY_POOL = [];
 
 export class GeminiKeyPool {
