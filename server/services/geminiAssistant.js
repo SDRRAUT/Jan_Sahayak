@@ -10,6 +10,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { getToolsForRole, executeAssistantTool } from './assistantTools.js';
+import { geminiKeyPool } from './geminiKeyPool.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,7 +45,7 @@ export class GeminiAssistantService {
   }
 
   getApiKey() {
-    return process.env.AI_API_KEY || process.env.GEMINI_API_KEY || null;
+    return geminiKeyPool.getPrimaryApiKey();
   }
 
   /**
@@ -120,9 +121,16 @@ CAPABILITIES:
     actionProposal = this.detectActionProposal(message, context, role);
 
     // ------------------------------------------------------------------------
-    // REMOTE GEMINI API CALL WITH FUNCTION CALLING
+    // REMOTE GEMINI API CALL WITH MULTI-KEY FAILOVER & ROTATION
     // ------------------------------------------------------------------------
-    if (apiKey) {
+    const keysCount = geminiKeyPool.getKeys().length;
+
+    for (let kAttempt = 0; kAttempt < keysCount; kAttempt++) {
+      const keyEntry = geminiKeyPool.getActiveKeyEntry();
+      if (!keyEntry) break;
+      const apiKey = keyEntry.key;
+      let shiftedKey = false;
+
       for (const model of this.modelsToTry) {
         try {
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
@@ -148,8 +156,16 @@ CAPABILITIES:
 
           if (!res.ok) {
             const errJson = await res.json().catch(() => ({}));
-            console.warn(`[GeminiAssistant] Model ${model} returned ${res.status}:`, errJson?.error?.message?.slice(0, 120));
-            continue; // try next model
+            const errMsg = errJson?.error?.message || '';
+            console.warn(`[GeminiAssistant] ${keyEntry.id} (${keyEntry.masked}) Model ${model} returned ${res.status}:`, errMsg.slice(0, 120));
+
+            // Rate limit / Quota Exceeded (429 / 403 / RESOURCE_EXHAUSTED) -> shift to next key immediately
+            if (res.status === 429 || res.status === 403 || errMsg.includes('RESOURCE_EXHAUSTED') || errMsg.includes('Quota exceeded') || errMsg.includes('rate limit')) {
+              geminiKeyPool.markRateLimited(apiKey, 60000, `Chat Model ${model} ${res.status} ${errMsg.slice(0, 60)}`);
+              shiftedKey = true;
+              break; // shift to next key
+            }
+            continue; // try next model with same key
           }
 
           const resData = await res.json();
@@ -200,11 +216,13 @@ CAPABILITIES:
                 turn2Data = await turn2Res.json();
               } else {
                 const turn2Err = await turn2Res.json().catch(() => ({}));
-                console.warn(`[GeminiAssistant] Turn 2 status ${turn2Res.status}:`, turn2Err?.error?.message?.slice(0, 100));
+                console.warn(`[GeminiAssistant] ${keyEntry.id} Turn 2 status ${turn2Res.status}:`, turn2Err?.error?.message?.slice(0, 100));
               }
             } catch (t2Err) {
-              console.warn('[GeminiAssistant] Turn 2 network/timeout:', t2Err.message);
+              console.warn(`[GeminiAssistant] ${keyEntry.id} Turn 2 network/timeout:`, t2Err.message);
             }
+
+            geminiKeyPool.markSuccess(apiKey);
 
             if (turn2Data) {
               const candidate2 = turn2Data.candidates?.[0];
@@ -234,6 +252,7 @@ CAPABILITIES:
 
           // CASE 2: Direct conversational response from Gemini
           if (part && part.text) {
+            geminiKeyPool.markSuccess(apiKey);
             return {
               reply: part.text,
               toolsCalled,
@@ -241,8 +260,12 @@ CAPABILITIES:
             };
           }
         } catch (err) {
-          console.warn(`[GeminiAssistant] Model ${model} execution error:`, err.message);
+          console.warn(`[GeminiAssistant] ${keyEntry.id} Model ${model} execution error:`, err.message);
         }
+      }
+
+      if (!shiftedKey) {
+        geminiKeyPool.currentIndex = (geminiKeyPool.currentIndex + 1) % geminiKeyPool.getKeys().length;
       }
     }
 

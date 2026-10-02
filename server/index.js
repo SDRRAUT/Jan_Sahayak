@@ -30,6 +30,7 @@ import { postgresDB, isPostgresActive } from './db/postgres.js';
 import { CANONICAL_STATUSES, ALLOWED_STATUS_TRANSITIONS, normalizeStatus, isValidTransition, getRoleStatusLabel } from './constants/statuses.js';
 import { CANONICAL_EVENTS } from './constants/events.js';
 import { geminiAssistant } from './services/geminiAssistant.js';
+import { geminiKeyPool } from './services/geminiKeyPool.js';
 import { configureCors } from './middleware/cors.js';
 import { authLimiter, aiEndpointLimiter, complaintSubmitLimiter, fileUploadLimiter } from './middleware/rateLimiter.js';
 import { ApiError, sendError, errorHandler } from './middleware/errorHandler.js';
@@ -359,13 +360,17 @@ function requireRole(allowedRoles) {
 // ============================================================================
 
 app.get('/api/health', (req, res) => {
+  const poolStatus = geminiKeyPool.getPoolStatus();
   res.json({
     status: 'healthy',
     mode: isDemoMode ? 'demo' : 'production',
     persistence: isPostgresActive() ? 'postgresql' : (supabaseServer ? 'supabase' : 'local_json_store'),
     aiEngine: {
-      geminiConfigured: Boolean(process.env.GEMINI_API_KEY),
-      activeProvider: Boolean(process.env.GEMINI_API_KEY) ? 'gemini' : 'deterministic_fallback',
+      geminiConfigured: poolStatus.totalKeys > 0,
+      activeProvider: poolStatus.totalKeys > 0 ? 'gemini' : 'deterministic_fallback',
+      totalKeysInPool: poolStatus.totalKeys,
+      availableKeys: poolStatus.availableKeys,
+      activeKeyMasked: poolStatus.activeKeyMasked,
       embeddingDimension: 768
     },
     uptimeSeconds: Math.floor(process.uptime()),
@@ -373,6 +378,14 @@ app.get('/api/health', (req, res) => {
     service: 'JanSahayak Civic Intelligence API',
     version: '1.0.0',
     environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+app.get('/api/ai/pool-status', (req, res) => {
+  res.json({
+    success: true,
+    keyPool: geminiKeyPool.getPoolStatus(),
+    timestamp: new Date().toISOString()
   });
 });
 

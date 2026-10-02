@@ -546,23 +546,7 @@ export default function Home() {
                 A public grievance intelligence platform that turns everyday citizen voices across multiple languages into structured insights, connected evidence, and actionable resolution recommendations.
               </p>
 
-              {/* Subtle Trust Indicators */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '28px', flexWrap: 'wrap', paddingTop: '18px', borderTop: '1px solid var(--color-divider)' }}>
-                <div>
-                  <strong style={{ fontSize: '16px', color: 'var(--color-text-primary)', display: 'block' }}>3.2 Days</strong>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Avg. Resolution SLA</span>
-                </div>
-                <div style={{ width: '1px', height: '24px', background: 'var(--color-divider)' }} />
-                <div>
-                  <strong style={{ fontSize: '16px', color: 'var(--color-text-primary)', display: 'block' }}>94.8%</strong>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>First-Time Routing Accuracy</span>
-                </div>
-                <div style={{ width: '1px', height: '24px', background: 'var(--color-divider)' }} />
-                <div>
-                  <strong style={{ fontSize: '16px', color: 'var(--color-text-primary)', display: 'block' }}>Multiple Languages</strong>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Multilingual Voice Intake</span>
-                </div>
-              </div>
+
             </div>
           </div>
         </div>
@@ -1632,21 +1616,22 @@ export default function Home() {
         <div className="container">
           <div
             style={{
-              background: 'var(--color-surface-inset-dark)',
+              background: 'linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 50%, #F8FAFC 100%)',
               borderRadius: 'var(--radius-2xl)',
               padding: '64px 36px',
               textAlign: 'center',
-              color: '#FFFFFF',
-              border: '1px solid var(--color-border-dark)'
+              color: '#0F172A',
+              border: '1px solid #D1FAE5',
+              boxShadow: '0 12px 36px rgba(16, 185, 129, 0.08)'
             }}
           >
-            <span className="category-pill" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10B981', borderColor: 'rgba(16, 185, 129, 0.3)', marginBottom: '16px' }}>
+            <span className="category-pill" style={{ background: '#DCFCE7', color: '#059669', borderColor: '#86EFAC', fontWeight: 700, marginBottom: '16px' }}>
               PUBLIC SERVICE ACCESS
             </span>
-            <h2 style={{ fontSize: '36px', color: '#FFFFFF', marginBottom: '14px' }}>
+            <h2 style={{ fontSize: '36px', color: '#0F172A', marginBottom: '14px', fontWeight: 800 }}>
               Have a Public Grievance to Report?
             </h2>
-            <p style={{ color: 'var(--color-text-inverse-muted)', fontSize: '16px', maxWidth: '540px', margin: '0 auto 32px auto', lineHeight: 1.6 }}>
+            <p style={{ color: '#475569', fontSize: '16px', maxWidth: '540px', margin: '0 auto 32px auto', lineHeight: 1.6 }}>
               Speak or write in your local language. JanSahayak will structure it, connect it to ward evidence, and keep you informed until resolution is verified.
             </p>
 
@@ -1655,13 +1640,17 @@ export default function Home() {
                 type="button" 
                 onClick={() => setShowGrievanceModal(true)} 
                 className="btn-primary" 
-                style={{ background: 'var(--color-accent)', color: '#0B1914', fontWeight: 700, border: 'none', cursor: 'pointer' }}
+                style={{ background: '#059669', color: '#FFFFFF', fontWeight: 700, border: 'none', cursor: 'pointer', padding: '12px 24px', borderRadius: '999px', boxShadow: '0 4px 14px rgba(5, 150, 105, 0.35)', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
               >
                 <span>Report a Problem Now</span>
                 <ArrowRight className="btn-arrow" style={{ width: '16px', height: '16px' }} />
               </button>
 
-              <Link to="/officer" className="btn-secondary" style={{ background: 'rgba(255,255,255,0.08)', color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.18)' }}>
+              <Link 
+                to="/officer" 
+                className="btn-secondary" 
+                style={{ background: '#FFFFFF', color: '#0F172A', border: '1px solid #CBD5E1', padding: '12px 22px', borderRadius: '999px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)', display: 'inline-flex', alignItems: 'center', gap: '8px', fontWeight: 600 }}
+              >
                 <span>Explore Officer Workspace</span>
                 <ArrowUpRight style={{ width: '16px', height: '16px' }} />
               </Link>

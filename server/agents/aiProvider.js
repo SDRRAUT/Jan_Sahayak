@@ -8,6 +8,8 @@
  * - Strict security: Never exposes API keys to client responses or log outputs
  */
 
+import { geminiKeyPool } from '../services/geminiKeyPool.js';
+
 export class AIProvider {
   constructor() {
     this.modelName = process.env.AI_MODEL || 'gemini-flash-lite-latest';
@@ -15,7 +17,7 @@ export class AIProvider {
   }
 
   getApiKey() {
-    return process.env.AI_API_KEY || process.env.GEMINI_API_KEY || null;
+    return geminiKeyPool.getPrimaryApiKey();
   }
 
   getLastEmbeddingSource() {
@@ -26,9 +28,15 @@ export class AIProvider {
    * Generates structured JSON from prompt and schema
    */
   async generateStructuredJSON(prompt, systemInstruction = '', fallbackData = {}) {
-    const apiKey = this.getApiKey();
-    if (apiKey) {
-      const modelsToTry = [this.modelName, 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.7-flash', 'gemini-3.5-flash'].filter((v, i, a) => a.indexOf(v) === i);
+    const keysCount = geminiKeyPool.getKeys().length;
+    const modelsToTry = [this.modelName, 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.7-flash', 'gemini-3.5-flash'].filter((v, i, a) => a.indexOf(v) === i);
+
+    for (let kAttempt = 0; kAttempt < keysCount; kAttempt++) {
+      const keyEntry = geminiKeyPool.getActiveKeyEntry();
+      if (!keyEntry) break;
+      const apiKey = keyEntry.key;
+      let shiftedKey = false;
+
       for (const m of modelsToTry) {
         try {
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`;
@@ -51,19 +59,33 @@ export class AIProvider {
             if (rawText) {
               const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
               const parsed = JSON.parse(cleanText);
+              geminiKeyPool.markSuccess(apiKey);
               return {
                 ...parsed,
                 _source: 'gemini',
-                _model: m
+                _model: m,
+                _keyId: keyEntry.id
               };
             }
           } else {
             const errBody = await response.json().catch(() => ({}));
-            console.warn(`[AIProvider] Model ${m} returned ${response.status}:`, errBody?.error?.message?.slice(0, 100));
+            const errMsg = errBody?.error?.message || '';
+            console.warn(`[AIProvider] ${keyEntry.id} (${keyEntry.masked}) Model ${m} returned ${response.status}:`, errMsg.slice(0, 100));
+
+            // Rate limit / Quota Exceeded (429 / 403 / RESOURCE_EXHAUSTED) -> shift to next key immediately
+            if (response.status === 429 || response.status === 403 || errMsg.includes('RESOURCE_EXHAUSTED') || errMsg.includes('Quota exceeded') || errMsg.includes('rate limit')) {
+              geminiKeyPool.markRateLimited(apiKey, 60000, `Model ${m} ${response.status} ${errMsg.slice(0, 60)}`);
+              shiftedKey = true;
+              break; // shift to next key
+            }
           }
         } catch (err) {
-          console.warn(`[AIProvider] Model ${m} request failed:`, err.message);
+          console.warn(`[AIProvider] ${keyEntry.id} (${keyEntry.masked}) Model ${m} request failed:`, err.message);
         }
+      }
+
+      if (!shiftedKey) {
+        geminiKeyPool.currentIndex = (geminiKeyPool.currentIndex + 1) % geminiKeyPool.getKeys().length;
       }
     }
 
@@ -72,7 +94,7 @@ export class AIProvider {
     return {
       ...baseFallback,
       _source: 'deterministic_fallback',
-      _reason: apiKey ? 'Gemini API unreachable or failed' : 'GEMINI_API_KEY not configured'
+      _reason: 'All Gemini API keys in pool failed or exhausted quota'
     };
   }
 
@@ -99,9 +121,15 @@ export class AIProvider {
 
     // Clean base64 header if present (e.g. data:image/jpeg;base64,...)
     const cleanBase64 = base64Data.includes('base64,') ? base64Data.split('base64,')[1] : base64Data;
+    const keysCount = geminiKeyPool.getKeys().length;
     const modelsToTry = [this.modelName, 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.7-flash', 'gemini-3.5-flash'].filter((v, i, a) => a.indexOf(v) === i);
 
-    if (apiKey) {
+    for (let kAttempt = 0; kAttempt < keysCount; kAttempt++) {
+      const keyEntry = geminiKeyPool.getActiveKeyEntry();
+      if (!keyEntry) break;
+      const apiKey = keyEntry.key;
+      let shiftedKey = false;
+
       for (const m of modelsToTry) {
         try {
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`;
@@ -175,6 +203,7 @@ Respond ONLY with valid JSON with this exact structure:
               const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
               const parsed = JSON.parse(cleanText);
               const isValid = parsed.is_valid_civic_issue !== false && parsed.matches_complaint !== false;
+              geminiKeyPool.markSuccess(apiKey);
               return {
                 is_valid_civic_issue: isValid,
                 matches_complaint: isValid,
@@ -187,13 +216,29 @@ Respond ONLY with valid JSON with this exact structure:
                 features_detected: parsed.features_detected || [],
                 user_clarification_suggested: parsed.user_clarification_suggested ?? false,
                 source: 'gemini',
-                model: m
+                model: m,
+                keyId: keyEntry.id
               };
+            }
+          } else {
+            const errBody = await response.json().catch(() => ({}));
+            const errMsg = errBody?.error?.message || '';
+            console.warn(`[AIProvider Vision] ${keyEntry.id} (${keyEntry.masked}) Model ${m} returned ${response.status}:`, errMsg.slice(0, 100));
+
+            // Rate limit / Quota Exceeded -> shift to next key immediately
+            if (response.status === 429 || response.status === 403 || errMsg.includes('RESOURCE_EXHAUSTED') || errMsg.includes('Quota exceeded') || errMsg.includes('rate limit')) {
+              geminiKeyPool.markRateLimited(apiKey, 60000, `Vision Model ${m} ${response.status} ${errMsg.slice(0, 60)}`);
+              shiftedKey = true;
+              break;
             }
           }
         } catch (err) {
-          console.warn(`[AIProvider Vision] Model ${m} failed:`, err.message);
+          console.warn(`[AIProvider Vision] ${keyEntry.id} (${keyEntry.masked}) Model ${m} failed:`, err.message);
         }
+      }
+
+      if (!shiftedKey) {
+        geminiKeyPool.currentIndex = (geminiKeyPool.currentIndex + 1) % geminiKeyPool.getKeys().length;
       }
     }
 
@@ -249,69 +294,92 @@ Respond ONLY with valid JSON with this exact structure:
    * Real Speech-To-Text Audio Transcription via Gemini Multimodal Audio
    */
   async transcribeAudioEvidence(base64Audio, mimeType = 'audio/webm') {
-    const apiKey = this.getApiKey();
-    if (!apiKey || !base64Audio) {
+    if (!base64Audio) {
       return {
         transcript: 'Voice recording received and queued for field operator review.',
         language: 'Hindi / English',
         key_concerns: ['Civic issue reported via voice note'],
         source: 'deterministic_fallback',
-        reason: apiKey ? 'No audio data provided' : 'GEMINI_API_KEY not configured'
+        reason: 'No audio data provided'
       };
     }
 
     const cleanBase64 = base64Audio.includes('base64,') ? base64Audio.split('base64,')[1] : base64Audio;
+    const keysCount = geminiKeyPool.getKeys().length;
     const modelsToTry = [this.modelName, 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.7-flash', 'gemini-3.5-flash'].filter((v, i, a) => a.indexOf(v) === i);
 
-    for (const m of modelsToTry) {
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`;
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          signal: AbortSignal.timeout(10000),
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                {
-                  inlineData: {
-                    mimeType: mimeType || 'audio/webm',
-                    data: cleanBase64
-                  }
-                },
-                {
-                  text: `Listen to this citizen civic complaint voice recording carefully. Transcribe the spoken words accurately into text. If spoken in Hindi or Hinglish, provide the transcription in clear Latin script (Hinglish/English) capturing the exact problem, infrastructure asset, location landmarks, and urgency.
+    for (let kAttempt = 0; kAttempt < keysCount; kAttempt++) {
+      const keyEntry = geminiKeyPool.getActiveKeyEntry();
+      if (!keyEntry) break;
+      const apiKey = keyEntry.key;
+      let shiftedKey = false;
+
+      for (const m of modelsToTry) {
+        try {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`;
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: AbortSignal.timeout(10000),
+            body: JSON.stringify({
+              contents: [{
+                parts: [
+                  {
+                    inlineData: {
+                      mimeType: mimeType || 'audio/webm',
+                      data: cleanBase64
+                    }
+                  },
+                  {
+                    text: `Listen to this citizen civic complaint voice recording carefully. Transcribe the spoken words accurately into text. If spoken in Hindi or Hinglish, provide the transcription in clear Latin script (Hinglish/English) capturing the exact problem, infrastructure asset, location landmarks, and urgency.
 Respond ONLY with valid JSON with this exact structure:
 {
   "transcript": string (the exact transcription of the spoken words),
   "language": string (e.g. "Hindi", "Hinglish", "English"),
   "key_concerns": string[] (up to 3 main problem points mentioned by the citizen)
 }`
-                }
-              ]
-            }],
-            generationConfig: {
-              responseMimeType: 'application/json',
-              temperature: 0.1
-            }
-          })
-        });
+                  }
+                ]
+              }],
+              generationConfig: {
+                responseMimeType: 'application/json',
+                temperature: 0.1
+              }
+            })
+          });
 
-        if (response.ok) {
-          const data = await response.json();
-          const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (rawText) {
-            const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-            const parsed = JSON.parse(cleanText);
-            return {
-              ...parsed,
-              source: 'gemini',
-              model: m
-            };
+          if (response.ok) {
+            const data = await response.json();
+            const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (rawText) {
+              const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+              const parsed = JSON.parse(cleanText);
+              geminiKeyPool.markSuccess(apiKey);
+              return {
+                ...parsed,
+                source: 'gemini',
+                model: m,
+                keyId: keyEntry.id
+              };
+            }
+          } else {
+            const errBody = await response.json().catch(() => ({}));
+            const errMsg = errBody?.error?.message || '';
+            console.warn(`[AIProvider Audio] ${keyEntry.id} (${keyEntry.masked}) Model ${m} returned ${response.status}:`, errMsg.slice(0, 100));
+
+            if (response.status === 429 || response.status === 403 || errMsg.includes('RESOURCE_EXHAUSTED') || errMsg.includes('Quota exceeded') || errMsg.includes('rate limit')) {
+              geminiKeyPool.markRateLimited(apiKey, 60000, `Audio Model ${m} ${response.status} ${errMsg.slice(0, 60)}`);
+              shiftedKey = true;
+              break;
+            }
           }
+        } catch (err) {
+          console.warn(`[AIProvider Audio] ${keyEntry.id} (${keyEntry.masked}) Model ${m} transcription failed:`, err.message);
         }
-      } catch (err) {
-        console.warn(`[AIProvider Audio] Model ${m} transcription failed:`, err.message);
+      }
+
+      if (!shiftedKey) {
+        geminiKeyPool.currentIndex = (geminiKeyPool.currentIndex + 1) % geminiKeyPool.getKeys().length;
       }
     }
 
@@ -320,7 +388,7 @@ Respond ONLY with valid JSON with this exact structure:
       language: 'Multilingual / Hinglish',
       key_concerns: ['Voice grievance submitted'],
       source: 'deterministic_fallback',
-      reason: apiKey ? 'Gemini Audio request failed' : 'GEMINI_API_KEY not configured'
+      reason: 'All Gemini API keys in pool failed or exhausted quota'
     };
   }
 
@@ -328,31 +396,55 @@ Respond ONLY with valid JSON with this exact structure:
    * Generates a 768-dimensional semantic vector embedding for Complaint DNA / pgvector
    */
   async generateEmbedding(text = '') {
-    const apiKey = this.getApiKey();
-    if (apiKey && text.trim().length > 0) {
+    if (text.trim().length > 0) {
+      const keysCount = geminiKeyPool.getKeys().length;
       const models = ['gemini-embedding-001', 'gemini-embedding-2-preview'];
-      for (const m of models) {
-        try {
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:embedContent?key=${apiKey}`;
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: `models/${m}`,
-              content: { parts: [{ text: text.slice(0, 2048) }] },
-              outputDimensionality: 768
-            })
-          });
 
-          if (res.ok) {
-            const data = await res.json();
-            if (data.embedding?.values && data.embedding.values.length === 768) {
-              this.lastEmbeddingSource = 'gemini';
-              return data.embedding.values;
+      for (let kAttempt = 0; kAttempt < keysCount; kAttempt++) {
+        const keyEntry = geminiKeyPool.getActiveKeyEntry();
+        if (!keyEntry) break;
+        const apiKey = keyEntry.key;
+        let shiftedKey = false;
+
+        for (const m of models) {
+          try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:embedContent?key=${apiKey}`;
+            const res = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              signal: AbortSignal.timeout(6000),
+              body: JSON.stringify({
+                model: `models/${m}`,
+                content: { parts: [{ text: text.slice(0, 2048) }] },
+                outputDimensionality: 768
+              })
+            });
+
+            if (res.ok) {
+              const data = await res.json();
+              if (data.embedding?.values && data.embedding.values.length === 768) {
+                geminiKeyPool.markSuccess(apiKey);
+                this.lastEmbeddingSource = 'gemini';
+                return data.embedding.values;
+              }
+            } else {
+              const errBody = await res.json().catch(() => ({}));
+              const errMsg = errBody?.error?.message || '';
+              console.warn(`[AIProvider Embedding] ${keyEntry.id} (${keyEntry.masked}) Model ${m} returned ${res.status}:`, errMsg.slice(0, 100));
+
+              if (res.status === 429 || res.status === 403 || errMsg.includes('RESOURCE_EXHAUSTED') || errMsg.includes('Quota exceeded') || errMsg.includes('rate limit')) {
+                geminiKeyPool.markRateLimited(apiKey, 60000, `Embedding Model ${m} ${res.status}`);
+                shiftedKey = true;
+                break;
+              }
             }
+          } catch (err) {
+            console.warn(`[AIProvider Embedding] ${keyEntry.id} (${keyEntry.masked}) Model ${m} failed:`, err.message);
           }
-        } catch (err) {
-          console.warn(`[AIProvider Embedding] Gemini ${m} failed:`, err.message);
+        }
+
+        if (!shiftedKey) {
+          geminiKeyPool.currentIndex = (geminiKeyPool.currentIndex + 1) % geminiKeyPool.getKeys().length;
         }
       }
     }
