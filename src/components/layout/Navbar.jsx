@@ -75,9 +75,9 @@ export default function Navbar() {
       email: DEMO_CREDENTIALS.citizen.email,
       password: DEMO_CREDENTIALS.citizen.password,
       icon: User,
-      color: '#2563EB',
-      bg: '#EFF6FF',
-      activeBorder: '#2563EB'
+      color: '#059669',
+      bg: '#ECFDF5',
+      activeBorder: '#059669'
     },
     {
       key: 'civic_officer',
@@ -99,21 +99,9 @@ export default function Navbar() {
       email: DEMO_CREDENTIALS.super_admin.email,
       password: DEMO_CREDENTIALS.super_admin.password,
       icon: ShieldCheck,
-      color: '#4338CA',
-      bg: '#EEF2FF',
-      activeBorder: '#4338CA'
-    },
-    {
-      key: 'worker',
-      label: 'Technician',
-      name: 'Ramesh Jadhav',
-      badge: 'Certified Plumber',
-      email: DEMO_CREDENTIALS.worker.email,
-      password: DEMO_CREDENTIALS.worker.password,
-      icon: Wrench,
-      color: '#D97706',
-      bg: '#FFFBEB',
-      activeBorder: '#D97706'
+      color: '#059669',
+      bg: '#ECFDF5',
+      activeBorder: '#059669'
     }
   ];
   const currentLoginRole = loginRoleOptions.find(r => r.key === loginSelectedRole) || loginRoleOptions[0];
@@ -2032,21 +2020,22 @@ export default function Navbar() {
               flexDirection: 'column',
               gap: '7px'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#FFFFFF', padding: '6px 10px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                <Mail style={{ width: '13px', height: '13px', color: '#94A3B8', flexShrink: 0 }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#FFFFFF', padding: '7px 10px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                <Mail style={{ width: '14px', height: '14px', color: '#059669', flexShrink: 0 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <span style={{ fontSize: '9px', color: '#64748B', display: 'block', textTransform: 'uppercase', fontWeight: 700 }}>Email / Username</span>
-                  <span style={{ fontSize: '11.5px', fontWeight: 600, color: '#0F172A', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#0F172A', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {currentLoginRole.email}
                   </span>
                 </div>
-                <span style={{ fontSize: '9px', color: '#10B981', fontWeight: 700, background: '#ECFDF5', padding: '2px 6px', borderRadius: '4px', flexShrink: 0 }}>Demo ID</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#FFFFFF', padding: '6px 10px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                <Lock style={{ width: '13px', height: '13px', color: '#94A3B8', flexShrink: 0 }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#FFFFFF', padding: '7px 10px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                <Lock style={{ width: '14px', height: '14px', color: '#059669', flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
                   <span style={{ fontSize: '9px', color: '#64748B', display: 'block', textTransform: 'uppercase', fontWeight: 700 }}>Password</span>
-                  <span style={{ fontSize: '11.5px', fontWeight: 600, color: '#0F172A', display: 'block', fontFamily: 'monospace', letterSpacing: '2px' }}>••••••••</span>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#0F172A', display: 'block', fontFamily: 'monospace' }}>
+                    {currentLoginRole.password}
+                  </span>
                 </div>
               </div>
             </div>
@@ -2058,7 +2047,7 @@ export default function Navbar() {
                   <div style={{
                     height: '100%',
                     width: `${loginVerifyProgress}%`,
-                    background: `linear-gradient(90deg, ${currentLoginRole.color}, ${currentLoginRole.activeBorder})`,
+                    background: 'linear-gradient(90deg, #059669, #10B981)',
                     borderRadius: '999px',
                     transition: 'width 600ms ease'
                   }} />
@@ -2076,17 +2065,17 @@ export default function Navbar() {
                 width: '100%',
                 height: '42px',
                 borderRadius: '999px',
-                background: loginIsVerifying ? '#94A3B8' : '#1E2653',
+                background: loginIsVerifying ? '#94A3B8' : '#059669',
                 color: '#FFFFFF',
                 border: 'none',
-                fontSize: '13px',
+                fontSize: '13.5px',
                 fontWeight: 700,
                 cursor: loginIsVerifying ? 'not-allowed' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                boxShadow: loginIsVerifying ? 'none' : '0 4px 14px rgba(30, 38, 83, 0.3)',
+                boxShadow: loginIsVerifying ? 'none' : '0 4px 14px rgba(5, 150, 105, 0.35)',
                 transition: 'all 150ms ease'
               }}
             >
@@ -2094,7 +2083,7 @@ export default function Navbar() {
                 <span>Verifying... ({Math.round(loginVerifyProgress)}%)</span>
               ) : (
                 <>
-                  <span>⚡ Login as {currentLoginRole.label}</span>
+                  <span>Login as {currentLoginRole.label}</span>
                   <ArrowRight style={{ width: '14px', height: '14px' }} />
                 </>
               )}
