@@ -226,7 +226,7 @@ export default function Navbar() {
       case 'civic_officer':
       case 'officer':
       case 'dept_admin': return 'Government Officer';
-      case 'super_admin': return 'Administrator / Admin';
+      case 'super_admin': return 'Administrator';
       default: return 'User';
     }
   };
@@ -1052,7 +1052,7 @@ export default function Navbar() {
                           >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <ShieldCheck style={{ width: '14px', height: '14px', color: '#4338CA' }} />
-                              <span>Super Admin Console</span>
+                              <span>City Administrator Console</span>
                             </div>
                             <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
                           </Link>
@@ -1474,7 +1474,7 @@ export default function Navbar() {
                       background: location.pathname === '/admin/super' ? '#EEF2FF' : '#F8FAFC'
                     }}
                   >
-                    🛡️ Super Admin Console
+                    🏛️ City Administrator Console
                   </Link>
                   <Link
                     to="/admin/department"
