@@ -27,7 +27,6 @@ import {
   Search, 
   Check, 
   X,
-  Shield,
   Layers,
   FileCheck2,
   Info,
@@ -392,7 +391,7 @@ function resolveIncidentData(rawIncident, requestedId) {
 
 export default function CivicIncidentDetail() {
   const { id } = useParams();
-  const { civicIncidents = [], recordIncidentDecision, verifyIncidentResolution, user } = useApp();
+  const { civicIncidents = [], recordIncidentDecision, user } = useApp();
   
   // Aggregate incidents from AppContext and canonical seed data
   const allIncidents = [...(civicIncidents || []), ...CIVIC_INCIDENTS];
@@ -414,16 +413,10 @@ export default function CivicIncidentDetail() {
   const [actionChoice, setActionChoice] = useState(
     incident?.simulations?.[1]?.title || (isDelhi ? 'Option B: 24-Meter Ductile Iron Replacement & PWD Road Re-bedding' : 'Option B: Full 24-Meter Electrofusion HDPE Replacement & PWD Road Re-bedding')
   );
-  const [selectedSimId, setSelectedSimId] = useState(isDelhi ? 'SIM-DEL-B' : 'SIM-WAG-B');
   const [selectedHypothesisId, setSelectedHypothesisId] = useState(null);
   const [officerNote, setOfficerNote] = useState('');
   const [decisionSuccess, setDecisionSuccess] = useState(false);
   const [actionSuccessMessage, setActionSuccessMessage] = useState('');
-
-  // Closed-loop verification state
-  const [verificationNotes, setVerificationNotes] = useState('');
-  const [verificationSubmitting, setVerificationSubmitting] = useState(false);
-  const [verificationMessage, setVerificationMessage] = useState('');
   const [isStartSolvingOpen, setIsStartSolvingOpen] = useState(false);
 
   if (!incident) {
@@ -448,127 +441,6 @@ export default function CivicIncidentDetail() {
     setDecisionSuccess(true);
     setTimeout(() => setDecisionSuccess(false), 4500);
   };
-
-  const handleSelectSimAction = (sim) => {
-    setSelectedSimId(sim.id);
-    setActionChoice(sim.title);
-    setSelectedDecision('ACCEPT_RECOMMENDATION');
-    setActionSuccessMessage(`✓ Selected ${sim.title.split(':')[0]} for municipal execution.`);
-    setTimeout(() => setActionSuccessMessage(''), 4000);
-  };
-
-  const handleVerify = async (isConfirmed) => {
-    setVerificationSubmitting(true);
-    await verifyIncidentResolution(incident.id, isConfirmed, verificationNotes);
-    setVerificationSubmitting(false);
-    setVerificationMessage(
-      isConfirmed
-        ? '✓ Ground resolution confirmed! Incident verified and closed with citizen consensus.'
-        : '⚠ Issue persistence logged! Incident reopened for immediate municipal re-intervention.'
-    );
-    setTimeout(() => setVerificationMessage(''), 6000);
-  };
-
-  // Simulations data tailored to incident
-  const simulationList = incident.simulations && incident.simulations.length > 0 ? incident.simulations : (isDelhi ? [
-    {
-      id: 'SIM-DEL-A',
-      optionKey: 'A',
-      title: 'A. External Emergency Clamping',
-      shortTitle: 'External Emergency Clamping',
-      time: '4–6h',
-      risk: 'High (65%)',
-      riskLevel: 'high',
-      cost: '₹18,000',
-      verdict: 'Sub-optimal',
-      verdictType: 'suboptimal'
-    },
-    {
-      id: 'SIM-DEL-B',
-      optionKey: 'B',
-      title: 'B. Ductile Iron Replacement & PWD Road Re-bedding',
-      shortTitle: 'Ductile Iron Replacement',
-      time: '24–36h',
-      risk: 'Very Low (<5%)',
-      riskLevel: 'low',
-      cost: '₹1.45L',
-      verdict: 'Recommended',
-      verdictType: 'recommended'
-    },
-    {
-      id: 'SIM-DEL-C',
-      optionKey: 'C',
-      title: 'C. Acoustic & Ground Radar Probe',
-      shortTitle: 'Acoustic & Ground Radar Probe',
-      time: '2–3h',
-      risk: 'N/A',
-      riskLevel: 'neutral',
-      cost: '₹8,000',
-      verdict: 'Essential (1st step)',
-      verdictType: 'essential'
-    },
-    {
-      id: 'SIM-DEL-D',
-      optionKey: 'D',
-      title: 'D. Valve Rationing Only',
-      shortTitle: 'Valve Rationing Only',
-      time: 'Immediate',
-      risk: 'Critical (100%)',
-      riskLevel: 'critical',
-      cost: '₹3,000',
-      verdict: 'Rejected',
-      verdictType: 'rejected'
-    }
-  ] : [
-    {
-      id: 'SIM-WAG-A',
-      optionKey: 'A',
-      title: 'A. Split-Sleeve Clamp',
-      shortTitle: 'Split-Sleeve Clamp',
-      time: '4–6h',
-      risk: 'High (60–65%)',
-      riskLevel: 'high',
-      cost: '₹18k–22k',
-      verdict: 'Sub-optimal',
-      verdictType: 'suboptimal'
-    },
-    {
-      id: 'SIM-WAG-B',
-      optionKey: 'B',
-      title: 'B. Electrofusion Replacement',
-      shortTitle: 'Electrofusion Replacement',
-      time: '18–24h',
-      risk: 'Very Low (<4%)',
-      riskLevel: 'low',
-      cost: '₹1.45L–1.65L',
-      verdict: 'Recommended',
-      verdictType: 'recommended'
-    },
-    {
-      id: 'SIM-WAG-C',
-      optionKey: 'C',
-      title: 'C. Acoustic Test',
-      shortTitle: 'Acoustic Test',
-      time: '2–3h',
-      risk: 'N/A',
-      riskLevel: 'neutral',
-      cost: '₹6.5k–8.5k',
-      verdict: 'Essential (1st step)',
-      verdictType: 'essential'
-    },
-    {
-      id: 'SIM-WAG-D',
-      optionKey: 'D',
-      title: 'D. Monitoring + Rationing',
-      shortTitle: 'Monitoring + Rationing',
-      time: 'Immediate',
-      risk: 'Critical (100%)',
-      riskLevel: 'critical',
-      cost: '₹2.5k',
-      verdict: 'Rejected',
-      verdictType: 'rejected'
-    }
-  ]);
 
   return (
     <div style={{ background: '#F8FAFC', minHeight: '100vh', padding: '24px 16px 60px 16px', color: '#0F172A', fontFamily: 'inherit' }}>
@@ -1445,205 +1317,106 @@ export default function CivicIncidentDetail() {
         </div>
 
         {/* ════════════════════════════════════════════════════════════════
-            ROW 3: ROOT CAUSE HYPOTHESES VS ACTION SIMULATION & TRADE-OFFS
+            ROW 3: ROOT CAUSE HYPOTHESES
            ════════════════════════════════════════════════════════════════ */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: '16px',
+          background: '#FFFFFF',
+          borderRadius: '16px',
+          border: '1px solid #E2E8F0',
+          borderTop: '3px solid #E11D48',
+          padding: '20px 24px',
+          boxShadow: '0 2px 8px rgba(225,29,72,0.04)',
           marginBottom: '16px'
         }}>
-          {/* Left Column: Root Cause Hypotheses */}
-          <div style={{
-            background: '#FFFFFF',
-            borderRadius: '16px',
-            border: '1px solid #E2E8F0',
-            borderTop: '3px solid #E11D48',
-            padding: '20px 24px',
-            boxShadow: '0 2px 8px rgba(225,29,72,0.04)'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Target style={{ width: '16px', height: '16px', color: '#E11D48' }} />
-                <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', margin: 0 }}>Root Cause Hypotheses</h3>
-              </div>
-              <span style={{ fontSize: '11px', color: '#64748B' }}>Evidence-Ranked Reasoning</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Target style={{ width: '16px', height: '16px', color: '#E11D48' }} />
+              <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', margin: 0 }}>Root Cause Hypotheses</h3>
             </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {incident.rootCauseHypotheses.map((hyp, index) => {
-                const isSelected = selectedHypothesisId === hyp.id;
-                const isHigh = hyp.confidenceScore >= 80 || hyp.confidence === 'HIGH';
-                return (
-                  <div 
-                    key={hyp.id || index}
-                    onClick={() => setSelectedHypothesisId(isSelected ? null : hyp.id)}
-                    style={{
-                      padding: '14px 16px',
-                      borderRadius: '12px',
-                      background: isSelected ? (isHigh ? '#FFF1F2' : '#FFFBEB') : '#F8FAFC',
-                      border: isSelected ? (isHigh ? '1.5px solid #FDA4AF' : '1.5px solid #FCD34D') : '1px solid #E2E8F0',
-                      cursor: 'pointer',
-                      transition: 'all 120ms ease'
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                      {/* Circular Percentage Badge */}
-                      <div style={{
-                        width: '44px',
-                        height: '44px',
-                        borderRadius: '50%',
-                        background: isHigh ? '#FFE4E6' : '#FEF3C7',
-                        color: isHigh ? '#E11D48' : '#D97706',
-                        fontSize: '13px',
-                        fontWeight: 800,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0
-                      }}>
-                        {hyp.confidenceScore || (isHigh ? 91 : 72)}%
-                      </div>
-
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-                          <span style={{ fontSize: '10.5px', fontFamily: 'monospace', fontWeight: 700, color: '#64748B' }}>{hyp.id}</span>
-                          <span style={{
-                            fontSize: '10px',
-                            fontWeight: 800,
-                            background: isHigh ? '#FEF2F2' : '#FFFBEB',
-                            color: isHigh ? '#DC2626' : '#D97706',
-                            padding: '1px 6px',
-                            borderRadius: '4px'
-                          }}>
-                            {hyp.confidence || (isHigh ? 'HIGH' : 'MEDIUM')}
-                          </span>
-                        </div>
-                        <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block', lineHeight: 1.3 }}>
-                          {hyp.title}
-                        </strong>
-                        <span style={{ fontSize: '11px', color: '#64748B', display: 'block', marginTop: '2px' }}>
-                          {hyp.evidence?.[0] || 'Corridor telemetry and ground signal clustering'}
-                        </span>
-                      </div>
-
-                      <ChevronRight style={{ width: '16px', height: '16px', color: '#94A3B8', transform: isSelected ? 'rotate(90deg)' : 'none', transition: 'transform 120ms ease' }} />
-                    </div>
-
-                    {/* Expandable Evidence Details */}
-                    {isSelected && (
-                      <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
-                        <span style={{ fontSize: '10.5px', fontWeight: 800, color: '#475569', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
-                          Telemetry Evidence:
-                        </span>
-                        <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '11.5px', color: '#334155', lineHeight: 1.5 }}>
-                          {hyp.evidence?.map((ev, evIdx) => (
-                            <li key={evIdx}>{ev}</li>
-                          ))}
-                        </ul>
-                        {hyp.recommendedVerification && (
-                          <div style={{ marginTop: '8px', fontSize: '11px', color: '#0369A1', background: '#F0F9FF', padding: '6px 8px', borderRadius: '6px' }}>
-                            <strong>Field Verification:</strong> {hyp.recommendedVerification}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            <span style={{ fontSize: '11px', color: '#64748B' }}>Evidence-Ranked Reasoning</span>
           </div>
 
-          {/* Right Column: Action Simulation & Trade-offs */}
-          <div style={{
-            background: '#FFFFFF',
-            borderRadius: '16px',
-            border: '1px solid #E2E8F0',
-            borderTop: '3px solid #10B981',
-            padding: '20px 24px',
-            boxShadow: '0 2px 8px rgba(16,185,129,0.04)'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <ScaleIcon />
-                <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', margin: 0 }}>Action Simulation & Trade-offs</h3>
-              </div>
-              <span style={{ fontSize: '11px', color: '#64748B' }}>Tap Row to Authorize</span>
-            </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {incident.rootCauseHypotheses.map((hyp, index) => {
+              const isSelected = selectedHypothesisId === hyp.id;
+              const isHigh = hyp.confidenceScore >= 80 || hyp.confidence === 'HIGH';
+              return (
+                <div 
+                  key={hyp.id || index}
+                  onClick={() => setSelectedHypothesisId(isSelected ? null : hyp.id)}
+                  style={{
+                    padding: '14px 16px',
+                    borderRadius: '12px',
+                    background: isSelected ? (isHigh ? '#FFF1F2' : '#FFFBEB') : '#F8FAFC',
+                    border: isSelected ? (isHigh ? '1.5px solid #FDA4AF' : '1.5px solid #FCD34D') : '1px solid #E2E8F0',
+                    cursor: 'pointer',
+                    transition: 'all 120ms ease'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    {/* Circular Percentage Badge */}
+                    <div style={{
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '50%',
+                      background: isHigh ? '#FFE4E6' : '#FEF3C7',
+                      color: isHigh ? '#E11D48' : '#D97706',
+                      fontSize: '13px',
+                      fontWeight: 800,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}>
+                      {hyp.confidenceScore || (isHigh ? 91 : 72)}%
+                    </div>
 
-            {/* Simulation Table matching reference design */}
-            <div style={{ overflowX: 'auto', scrollbarWidth: 'none' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left' }}>
-                <thead>
-                  <tr style={{ color: '#64748B', borderBottom: '1px solid #E2E8F0', fontSize: '11px', fontWeight: 700 }}>
-                    <th style={{ padding: '8px 6px' }}>Option</th>
-                    <th style={{ padding: '8px 6px' }}>Time</th>
-                    <th style={{ padding: '8px 6px' }}>Recurrence Risk</th>
-                    <th style={{ padding: '8px 6px' }}>Est. Cost</th>
-                    <th style={{ padding: '8px 6px', textAlign: 'right' }}>Verdict</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {simulationList.map((sim, sIdx) => {
-                    const isSelected = selectedSimId === sim.id;
-                    const optionLetter = sim.optionKey || String.fromCharCode(65 + sIdx);
-                    return (
-                      <tr
-                        key={sim.id}
-                        onClick={() => handleSelectSimAction(sim)}
-                        style={{
-                          borderBottom: '1px solid #F1F5F9',
-                          cursor: 'pointer',
-                          background: isSelected ? '#F0FDF4' : 'transparent',
-                          transition: 'background 120ms ease'
-                        }}
-                      >
-                        <td style={{ padding: '10px 6px', fontWeight: 700, color: '#0F172A', whiteSpace: 'nowrap' }}>
-                          <span style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '20px',
-                            height: '20px',
-                            borderRadius: '4px',
-                            background: isSelected ? '#DCFCE7' : '#F1F5F9',
-                            color: isSelected ? '#15803D' : '#475569',
-                            fontSize: '11px',
-                            fontWeight: 800,
-                            marginRight: '6px'
-                          }}>
-                            {optionLetter}
-                          </span>
-                          {sim.shortTitle ? sim.shortTitle : sim.title}
-                        </td>
-                        <td style={{ padding: '10px 6px', color: '#475569', whiteSpace: 'nowrap' }}>
-                          {sim.time || sim.expectedResolutionTime || sim.estimatedDuration}
-                        </td>
-                        <td style={{ padding: '10px 6px', fontWeight: 600, color: sim.riskLevel === 'high' || sim.riskLevel === 'critical' ? '#DC2626' : (sim.riskLevel === 'low' ? '#16A34A' : '#64748B'), whiteSpace: 'nowrap' }}>
-                          {sim.risk || sim.recurrenceRisk}
-                        </td>
-                        <td style={{ padding: '10px 6px', color: '#475569', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
-                          {sim.cost || sim.costScore || sim.estimatedCost}
-                        </td>
-                        <td style={{ padding: '10px 6px', textAlign: 'right', whiteSpace: 'nowrap' }}>
-                          <span style={{
-                            fontSize: '10.5px',
-                            fontWeight: 700,
-                            padding: '3px 8px',
-                            borderRadius: '999px',
-                            background: sim.verdictType === 'recommended' || sim.recommendationVerdict?.includes('RECOMMENDED') ? '#DCFCE7' : (sim.verdictType === 'essential' ? '#EFF6FF' : (sim.verdictType === 'suboptimal' ? '#FEF2F2' : '#F1F5F9')),
-                            color: sim.verdictType === 'recommended' || sim.recommendationVerdict?.includes('RECOMMENDED') ? '#15803D' : (sim.verdictType === 'essential' ? '#1D4ED8' : (sim.verdictType === 'suboptimal' ? '#DC2626' : '#64748B')),
-                            border: sim.verdictType === 'recommended' || sim.recommendationVerdict?.includes('RECOMMENDED') ? '1px solid #BBF7D0' : (sim.verdictType === 'essential' ? '1px solid #BFDBFE' : (sim.verdictType === 'suboptimal' ? '1px solid #FECACA' : '1px solid #E2E8F0'))
-                          }}>
-                            {sim.verdict || (sim.recommendationVerdict?.includes('RECOMMENDED') ? 'Recommended' : 'Sub-optimal')}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
+                        <span style={{ fontSize: '10.5px', fontFamily: 'monospace', fontWeight: 700, color: '#64748B' }}>{hyp.id}</span>
+                        <span style={{
+                          fontSize: '10px',
+                          fontWeight: 800,
+                          background: isHigh ? '#FEF2F2' : '#FFFBEB',
+                          color: isHigh ? '#DC2626' : '#D97706',
+                          padding: '1px 6px',
+                          borderRadius: '4px'
+                        }}>
+                          {hyp.confidence || (isHigh ? 'HIGH' : 'MEDIUM')}
+                        </span>
+                      </div>
+                      <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block', lineHeight: 1.3 }}>
+                        {hyp.title}
+                      </strong>
+                      <span style={{ fontSize: '11px', color: '#64748B', display: 'block', marginTop: '2px' }}>
+                        {hyp.evidence?.[0] || 'Corridor telemetry and ground signal clustering'}
+                      </span>
+                    </div>
+
+                    <ChevronRight style={{ width: '16px', height: '16px', color: '#94A3B8', transform: isSelected ? 'rotate(90deg)' : 'none', transition: 'transform 120ms ease' }} />
+                  </div>
+
+                  {/* Expandable Evidence Details */}
+                  {isSelected && (
+                    <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+                      <span style={{ fontSize: '10.5px', fontWeight: 800, color: '#475569', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
+                        Telemetry Evidence:
+                      </span>
+                      <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '11.5px', color: '#334155', lineHeight: 1.5 }}>
+                        {hyp.evidence?.map((ev, evIdx) => (
+                          <li key={evIdx}>{ev}</li>
+                        ))}
+                      </ul>
+                      {hyp.recommendedVerification && (
+                        <div style={{ marginTop: '8px', fontSize: '11px', color: '#0369A1', background: '#F0F9FF', padding: '6px 8px', borderRadius: '6px' }}>
+                          <strong>Field Verification:</strong> {hyp.recommendedVerification}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -1804,113 +1577,6 @@ export default function CivicIncidentDetail() {
           </div>
         </div>
 
-        {/* ════════════════════════════════════════════════════════════════
-            ROW 5: BOTTOM FULL-WIDTH VERIFICATION BAR
-           ════════════════════════════════════════════════════════════════ */}
-        <div style={{
-          background: '#FFFFFF',
-          borderRadius: '16px',
-          border: '1px solid #E2E8F0',
-          padding: '14px 20px',
-          boxShadow: '0 2px 8px rgba(15,23,42,0.04)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px'
-        }}>
-          {/* Left: Verification Status */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Shield style={{ width: '15px', height: '15px', color: '#059669' }} />
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>Verification Status:</span>
-            </div>
-            <span style={{
-              fontSize: '11px',
-              fontWeight: 800,
-              padding: '3px 10px',
-              borderRadius: '999px',
-              background: incident.verificationStatus === 'VERIFIED' ? '#DCFCE7' : '#FEF3C7',
-              color: incident.verificationStatus === 'VERIFIED' ? '#15803D' : '#92400E',
-              border: incident.verificationStatus === 'VERIFIED' ? '1px solid #BBF7D0' : '1px solid #FDE68A'
-            }}>
-              {incident.verificationStatus || 'PENDING_FIELD_WORK'}
-            </span>
-          </div>
-
-          {/* Center: Consensus Requirement */}
-          <div style={{ fontSize: '11.5px', color: '#64748B' }}>
-            Physical ground audit + citizen consensus required to close.
-          </div>
-
-          {/* Right: Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <button
-              type="button"
-              disabled={verificationSubmitting}
-              onClick={() => handleVerify(false)}
-              style={{
-                height: '34px',
-                padding: '0 14px',
-                borderRadius: '8px',
-                border: '1px solid #FECACA',
-                background: '#FFFFFF',
-                color: '#DC2626',
-                fontSize: '12px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 120ms ease'
-              }}
-            >
-              Issue Persists
-            </button>
-
-            <button
-              type="button"
-              disabled={verificationSubmitting}
-              onClick={() => handleVerify(true)}
-              style={{
-                height: '34px',
-                padding: '0 16px',
-                borderRadius: '8px',
-                border: '1px solid #86EFAC',
-                background: '#F0FDF4',
-                color: '#166534',
-                fontSize: '12px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                transition: 'all 120ms ease'
-              }}
-            >
-              <Check style={{ width: '13px', height: '13px', color: '#16A34A' }} />
-              <span>Verify Ground Resolution</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Verification Message Toast */}
-        {verificationMessage && (
-          <div style={{
-            marginTop: '12px',
-            padding: '10px 14px',
-            borderRadius: '10px',
-            background: verificationMessage.includes('confirmed') ? '#ECFDF5' : '#FEF2F2',
-            border: `1px solid ${verificationMessage.includes('confirmed') ? '#A7F3D0' : '#FECACA'}`,
-            color: verificationMessage.includes('confirmed') ? '#065F46' : '#991B1B',
-            fontSize: '12.5px',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}>
-            <CheckCircle2 style={{ width: '15px', height: '15px' }} />
-            <span>{verificationMessage}</span>
-          </div>
-        )}
-
         {/* ── Start Solving Guided Modal ── */}
         <StartSolvingModal
           incident={incident}
@@ -1921,18 +1587,5 @@ export default function CivicIncidentDetail() {
         />
       </div>
     </div>
-  );
-}
-
-// Scale icon helper
-function ScaleIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
-      <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
-      <path d="M7 21h10"/>
-      <path d="M12 3v18"/>
-      <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>
-    </svg>
   );
 }
