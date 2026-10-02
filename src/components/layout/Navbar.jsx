@@ -141,7 +141,7 @@ export default function Navbar() {
       setLoginVerifyProgress(0);
       const targetRole = logged?.role || roleKey;
       if (targetRole === 'citizen') navigate('/');
-      else if (targetRole === 'civic_officer' || targetRole === 'officer' || targetRole === 'dept_admin') navigate('/intelligence');
+      else if (targetRole === 'civic_officer' || targetRole === 'officer' || targetRole === 'dept_admin') navigate('/officer');
       else if (targetRole === 'super_admin') navigate('/admin/super');
       else navigate('/');
     } catch (e) {
@@ -151,7 +151,7 @@ export default function Navbar() {
       setLoginIsVerifying(false);
       setLoginVerifyProgress(0);
       if (roleKey === 'citizen') navigate('/');
-      else if (roleKey === 'civic_officer' || roleKey === 'officer' || roleKey === 'dept_admin') navigate('/intelligence');
+      else if (roleKey === 'civic_officer' || roleKey === 'officer' || roleKey === 'dept_admin') navigate('/officer');
       else if (roleKey === 'super_admin') navigate('/admin/super');
       else navigate('/');
     }
@@ -234,7 +234,7 @@ export default function Navbar() {
   const getHomeLink = () => {
     if (!user) return '/';
     if (role === 'citizen') return '/';
-    if (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') return '/intelligence';
+    if (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') return '/officer';
     if (role === 'super_admin') return '/admin/super';
     return '/';
   };
@@ -362,49 +362,35 @@ export default function Navbar() {
             {user && (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') && (
               <>
                 <Link
-                  to="/intelligence"
-                  className={`site-nav-link ${location.pathname.startsWith('/intelligence') ? 'active' : ''}`}
+                  to="/officer"
+                  className={`site-nav-link ${location.pathname.startsWith('/officer') ? 'active' : ''}`}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
                     padding: '6px 14px',
                     borderRadius: '999px',
-                    background: location.pathname.startsWith('/intelligence')
-                      ? 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)'
-                      : 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
-                    color: location.pathname.startsWith('/intelligence') ? '#FFFFFF' : '#4338CA',
-                    border: '1.5px solid #818CF8',
-                    boxShadow: location.pathname.startsWith('/intelligence')
-                      ? '0 4px 12px rgba(79, 70, 229, 0.35)'
-                      : '0 2px 8px rgba(99, 102, 241, 0.16)',
+                    background: location.pathname.startsWith('/officer')
+                      ? '#065F46'
+                      : '#ECFDF5',
+                    color: location.pathname.startsWith('/officer') ? '#FFFFFF' : '#065F46',
+                    border: '1px solid #A7F3D0',
                     fontWeight: 700,
                     fontSize: '13px',
-                    transition: 'all 200ms ease',
-                    marginRight: '4px'
+                    boxShadow: location.pathname.startsWith('/officer')
+                      ? '0 2px 8px rgba(6, 95, 70, 0.25)'
+                      : 'none',
+                    transition: 'all 150ms ease'
                   }}
                 >
-                  <Sparkles style={{ 
-                    width: '14px', 
-                    height: '14px', 
-                    color: location.pathname.startsWith('/intelligence') ? '#FFFFFF' : '#4F46E5', 
-                    flexShrink: 0 
-                  }} />
+                  <Briefcase style={{ width: '14px', height: '14px', flexShrink: 0 }} />
+                  <span>Officer Workspace</span>
+                </Link>
+                <Link
+                  to="/intelligence"
+                  className={`site-nav-link ${location.pathname.startsWith('/intelligence') ? 'active' : ''}`}
+                >
                   <span>Civic Intelligence</span>
-                </Link>
-                <Link
-                  to="/officer"
-                  className={`site-nav-link ${location.pathname === '/officer' && !location.search.includes('workers') ? 'active' : ''}`}
-                >
-                  🛠️ Workspace
-                </Link>
-                <Link
-                  to="/officer?section=investigation&subtab=workers"
-                  className={`site-nav-link ${location.pathname === '/officer' && location.search.includes('workers') ? 'active' : ''}`}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}
-                >
-                  <Wrench style={{ width: '13px', height: '13px', color: '#059669' }} />
-                  <span>Field Workers</span>
                 </Link>
                 <Link
                   to="/admin"
@@ -1378,57 +1364,42 @@ export default function Navbar() {
               {user && (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') && (
                 <>
                   <Link
-                    to="/intelligence"
-                    onClick={() => setMobileMenuOpen(false)}
-                    style={{
-                      padding: '10px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '14px',
-                      fontWeight: 700,
-                      color: '#4338CA',
-                      background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
-                      border: '1.5px solid #818CF8',
-                      boxShadow: '0 2px 8px rgba(99, 102, 241, 0.16)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      marginBottom: '4px'
-                    }}
-                  >
-                    <Sparkles style={{ width: '16px', height: '16px', color: '#4F46E5' }} />
-                    <span>Civic Intelligence</span>
-                  </Link>
-                  <Link
                     to="/officer"
                     onClick={() => setMobileMenuOpen(false)}
                     style={{
                       padding: '10px 14px',
                       borderRadius: 'var(--radius-md)',
                       fontSize: '14px',
-                      fontWeight: 600,
-                      color: location.pathname === '/officer' && !location.search.includes('operations') && !location.search.includes('workers') ? '#059669' : 'var(--color-text-primary)',
-                      background: location.pathname === '/officer' && !location.search.includes('operations') && !location.search.includes('workers') ? '#ECFDF5' : '#F8FAFC'
+                      fontWeight: 700,
+                      color: '#065F46',
+                      background: '#ECFDF5',
+                      border: '1px solid #A7F3D0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      marginBottom: '4px'
                     }}
                   >
-                    🏛️ Civic Workspace
+                    <Briefcase style={{ width: '16px', height: '16px', color: '#059669' }} />
+                    <span>🏛️ Officer Workspace</span>
                   </Link>
                   <Link
-                    to="/officer?section=investigation&subtab=workers"
+                    to="/intelligence"
                     onClick={() => setMobileMenuOpen(false)}
                     style={{
                       padding: '10px 14px',
                       borderRadius: 'var(--radius-md)',
                       fontSize: '14px',
                       fontWeight: 600,
-                      color: location.pathname === '/officer' && location.search.includes('workers') ? '#065F46' : 'var(--color-text-primary)',
-                      background: location.pathname === '/officer' && location.search.includes('workers') ? '#ECFDF5' : '#F8FAFC',
+                      color: location.pathname.startsWith('/intelligence') ? '#4338CA' : 'var(--color-text-primary)',
+                      background: location.pathname.startsWith('/intelligence') ? '#EEF2FF' : '#F8FAFC',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '8px'
                     }}
                   >
-                    <Wrench style={{ width: '15px', height: '15px', color: '#059669' }} />
-                    <span>👷 Field Worker Dispatch</span>
+                    <Sparkles style={{ width: '16px', height: '16px', color: '#6366F1' }} />
+                    <span>Civic Intelligence</span>
                   </Link>
                   <Link
                     to="/admin"

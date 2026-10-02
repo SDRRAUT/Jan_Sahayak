@@ -21,15 +21,17 @@ import AdminHeatmap from './pages/AdminHeatmap';
 import DeptAdmin from './pages/DeptAdmin';
 import SuperAdmin from './pages/SuperAdmin';
 import Onboarding from './pages/Onboarding';
+import FindWorker from './pages/FindWorker';
+import WorkerDashboard from './pages/WorkerDashboard';
 import JanSahayakAssistant from './components/assistant/JanSahayakAssistant';
 import NewFeaturePopup from './components/common/NewFeaturePopup';
 import MobileDesktopBanner from './components/common/MobileDesktopBanner';
 
 function RoleHome() {
   const { user, role } = useApp();
-  // Government officer opening root or logging in goes directly to Civic Intelligence
+  // Government officer opening root or logging in goes directly to Officer Workspace
   if (user && (role === 'civic_officer' || role === 'officer' || role === 'dept_admin')) {
-    return <Navigate to="/intelligence" replace />;
+    return <Navigate to="/officer" replace />;
   }
   if (user && role === 'super_admin') {
     return <Navigate to="/admin/super" replace />;
@@ -191,6 +193,24 @@ export default function App() {
                 <CitizenDetail />
               </ProtectedRoute>
             } 
+          />
+
+          {/* Wagholi Worker Network & Technician Marketplace */}
+          <Route 
+            path="/citizen/find-worker" 
+            element={<FindWorker />} 
+          />
+          <Route 
+            path="/find-worker" 
+            element={<FindWorker />} 
+          />
+          <Route 
+            path="/worker" 
+            element={<WorkerDashboard />} 
+          />
+          <Route 
+            path="/worker-dashboard" 
+            element={<WorkerDashboard />} 
           />
 
           {/* Civic Officer Unified Workspace Routes (Role: civic_officer, officer, dept_admin, super_admin) */}

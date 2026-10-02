@@ -154,18 +154,18 @@ export default function MobileBottomNav() {
     // ─── Civic Officer / Dept Admin ───────────────────────────────────────
     leftItems = [
       {
+        id: 'workspace',
+        label: 'Workspace',
+        to: '/officer',
+        icon: Briefcase,
+        isActive: location.pathname === '/officer'
+      },
+      {
         id: 'intelligence',
         label: 'Intelligence',
         to: '/intelligence',
         icon: Sparkles,
         isActive: location.pathname.startsWith('/intelligence')
-      },
-      {
-        id: 'workspace',
-        label: 'Workspace',
-        to: '/officer',
-        icon: Briefcase,
-        isActive: location.pathname === '/officer' && !location.search.includes('operations')
       }
     ];
 
