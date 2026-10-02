@@ -13,12 +13,18 @@ function getAuthHeaders(token) {
 
 export const NotificationService = {
   async getNotifications(token) {
-    const res = await fetch('/api/notifications', {
-      headers: getAuthHeaders(token)
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.notifications || [];
+    const t = token || (typeof localStorage !== 'undefined' ? localStorage.getItem('jansahayk_token') : null);
+    if (!t) return [];
+    try {
+      const res = await fetch('/api/notifications', {
+        headers: getAuthHeaders(t)
+      });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.notifications || [];
+    } catch {
+      return [];
+    }
   },
 
   async markAsRead(id, token) {

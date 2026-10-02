@@ -5,7 +5,14 @@ import {
   Activity, 
   Zap, 
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Volume2,
+  Eye,
+  MapPin,
+  Layers,
+  Building2,
+  FileText,
+  ShieldCheck
 } from 'lucide-react';
 
 const PIPELINE_DURATION_SEC = 15;
