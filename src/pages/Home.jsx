@@ -721,20 +721,12 @@ export default function Home() {
                     <h3 style={{
                       fontSize: '18px',
                       fontWeight: 700,
-                      marginBottom: '10px',
+                      margin: 0,
                       color: '#0F172A',
                       letterSpacing: '-0.01em'
                     }}>
                       {s.title}
                     </h3>
-                    <p style={{
-                      fontSize: '14px',
-                      color: '#475569',
-                      lineHeight: 1.65,
-                      margin: 0
-                    }}>
-                      {s.desc}
-                    </p>
                   </div>
                 </div>
               );
