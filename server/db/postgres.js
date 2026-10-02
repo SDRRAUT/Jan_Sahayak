@@ -63,8 +63,10 @@ export function writeLocalStore(store) {
 
 let pool = null;
 let isConnected = false;
+let connectionFailedPermanently = false;
 
 export function getPool() {
+  if (connectionFailedPermanently) return null;
   const connStr = getConnectionString();
   if (!connStr) return null;
   if (!pool) {
@@ -72,19 +74,24 @@ export function getPool() {
     pool = new Pool({
       connectionString: connStr,
       ssl: isLocal ? false : { rejectUnauthorized: false },
-      max: 15,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 10000
+      max: 10,
+      idleTimeoutMillis: 15000,
+      connectionTimeoutMillis: 2000
     });
 
     pool.on('error', (err) => {
-      console.error('[Supabase PostgreSQL] Idle client error:', err.message);
+      console.warn('[Supabase PostgreSQL] Idle client error:', err.message);
+      if (err.message && (err.message.includes('ENOTFOUND') || err.message.includes('ECONNREFUSED') || err.message.includes('timeout'))) {
+        connectionFailedPermanently = true;
+        isConnected = false;
+      }
     });
   }
   return pool;
 }
 
 export async function checkPostgresConnection() {
+  if (connectionFailedPermanently) return false;
   const p = getPool();
   if (!p) return false;
   try {
@@ -92,17 +99,21 @@ export async function checkPostgresConnection() {
     const res = await client.query('SELECT current_user, current_database(), version();');
     client.release();
     isConnected = true;
+    connectionFailedPermanently = false;
     console.log(`🐘 Connected to Supabase PostgreSQL: user=${res.rows[0].current_user}, db=${res.rows[0].current_database}`);
     return true;
   } catch (err) {
     console.warn('⚠️ Supabase PostgreSQL connection failed:', err.message);
     isConnected = false;
+    if (err.message && (err.message.includes('ENOTFOUND') || err.message.includes('ECONNREFUSED') || err.message.includes('timeout') || err.message.includes('password authentication'))) {
+      connectionFailedPermanently = true;
+    }
     return false;
   }
 }
 
 export function isPostgresActive() {
-  return Boolean(getConnectionString() && isConnected);
+  return Boolean(getConnectionString() && isConnected && !connectionFailedPermanently);
 }
 
 /**
@@ -110,18 +121,28 @@ export function isPostgresActive() {
  */
 export const postgresDB = {
   async query(text, params) {
+    if (connectionFailedPermanently || !isConnected) return null;
     const p = getPool();
     if (!p) return null;
-    return p.query(text, params);
+    try {
+      return await p.query(text, params);
+    } catch (err) {
+      if (err.message && (err.message.includes('ENOTFOUND') || err.message.includes('ECONNREFUSED'))) {
+        connectionFailedPermanently = true;
+        isConnected = false;
+      }
+      return null;
+    }
   },
 
   // --- Grievances (Complaints) ---
   async getAllGrievances() {
     let result = [];
-    const p = getPool();
-    if (p) {
-      try {
-        const res = await p.query(`
+    if (isConnected && !connectionFailedPermanently) {
+      const p = getPool();
+      if (p) {
+        try {
+          const res = await p.query(`
           SELECT 
             g.*,
             extensions.ST_Y(g.geom::extensions.geometry) AS lat_val,
@@ -178,6 +199,7 @@ export const postgresDB = {
         console.warn('[PostgreSQL Pool] Connection failed, falling back to Supabase REST:', err.message);
       }
     }
+  }
 
     // High-Reliability Fallback: Supabase REST API (via HTTPS, works on Vercel)
     const restClient = getSupabaseRestClient() || supabaseRestClient;

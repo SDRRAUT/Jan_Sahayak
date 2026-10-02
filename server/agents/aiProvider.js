@@ -10,7 +10,7 @@
 
 export class AIProvider {
   constructor() {
-    this.modelName = process.env.AI_MODEL || 'gemini-3.5-flash';
+    this.modelName = process.env.AI_MODEL || 'gemini-flash-lite-latest';
     this.lastEmbeddingSource = 'deterministic_fallback';
   }
 
@@ -28,13 +28,14 @@ export class AIProvider {
   async generateStructuredJSON(prompt, systemInstruction = '', fallbackData = {}) {
     const apiKey = this.getApiKey();
     if (apiKey) {
-      const modelsToTry = [this.modelName, 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.8-flash'].filter((v, i, a) => a.indexOf(v) === i);
+      const modelsToTry = [this.modelName, 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.7-flash', 'gemini-3.5-flash'].filter((v, i, a) => a.indexOf(v) === i);
       for (const m of modelsToTry) {
         try {
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`;
           const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            signal: AbortSignal.timeout(8000),
             body: JSON.stringify({
               contents: [{ parts: [{ text: `${systemInstruction}\n\nIMPORTANT: Respond ONLY with valid JSON. No markdown backticks.\n\n${prompt}` }] }],
               generationConfig: {
@@ -98,7 +99,7 @@ export class AIProvider {
 
     // Clean base64 header if present (e.g. data:image/jpeg;base64,...)
     const cleanBase64 = base64Data.includes('base64,') ? base64Data.split('base64,')[1] : base64Data;
-    const modelsToTry = [this.modelName, 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.8-flash'].filter((v, i, a) => a.indexOf(v) === i);
+    const modelsToTry = [this.modelName, 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.7-flash', 'gemini-3.5-flash'].filter((v, i, a) => a.indexOf(v) === i);
 
     if (apiKey) {
       for (const m of modelsToTry) {
@@ -107,6 +108,7 @@ export class AIProvider {
           const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            signal: AbortSignal.timeout(10000),
             body: JSON.stringify({
               contents: [{
                 parts: [
@@ -259,7 +261,7 @@ Respond ONLY with valid JSON with this exact structure:
     }
 
     const cleanBase64 = base64Audio.includes('base64,') ? base64Audio.split('base64,')[1] : base64Audio;
-    const modelsToTry = [this.modelName, 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.8-flash'].filter((v, i, a) => a.indexOf(v) === i);
+    const modelsToTry = [this.modelName, 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.7-flash', 'gemini-3.5-flash'].filter((v, i, a) => a.indexOf(v) === i);
 
     for (const m of modelsToTry) {
       try {
@@ -267,6 +269,7 @@ Respond ONLY with valid JSON with this exact structure:
         const response = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          signal: AbortSignal.timeout(10000),
           body: JSON.stringify({
             contents: [{
               parts: [

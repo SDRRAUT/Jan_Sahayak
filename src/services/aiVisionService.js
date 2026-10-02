@@ -65,13 +65,14 @@ export async function analyzeCivicPhoto(base64Data, mimeType = 'image/jpeg', con
   if (GEMINI_API_KEY) {
     try {
       const cleanBase64 = base64Data.includes('base64,') ? base64Data.split('base64,')[1] : base64Data;
-      const models = ['gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.8-flash'];
+      const models = ['gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.7-flash', 'gemini-3.5-flash'];
 
       for (const model of models) {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
         const response = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          signal: AbortSignal.timeout(8000),
           body: JSON.stringify({
             contents: [{
               parts: [

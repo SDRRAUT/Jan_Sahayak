@@ -33,17 +33,14 @@ if (fs.existsSync(envFilePath)) {
 
 export class GeminiAssistantService {
   constructor() {
-    this.defaultModel = process.env.AI_MODEL || 'gemini-2.5-flash';
+    this.defaultModel = process.env.AI_MODEL || 'gemini-flash-lite-latest';
     this.modelsToTry = [
-      process.env.AI_MODEL,
-      'gemini-2.5-flash',
-      'gemini-3.8-flash',
-      'gemini-3.5-flash',
-      'gemini-flash-latest',
+      this.defaultModel,
       'gemini-flash-lite-latest',
-      'gemini-2.5-flash-lite',
-      'gemini-2.5-pro'
-    ].filter(Boolean);
+      'gemini-3.5-flash-lite',
+      'gemini-3.7-flash',
+      'gemini-3.5-flash'
+    ].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i);
   }
 
   getApiKey() {
@@ -145,6 +142,7 @@ CAPABILITIES:
           const res = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            signal: AbortSignal.timeout(8000),
             body: JSON.stringify(requestBody)
           });
 
@@ -184,19 +182,31 @@ CAPABILITIES:
               }
             ];
 
-            const turn2Res = await fetch(url, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                systemInstruction: { parts: [{ text: systemInstruction }] },
-                contents: turn2Contents,
-                tools: [{ functionDeclarations: tools }],
-                generationConfig: { temperature: 0.2, maxOutputTokens: 800 }
-              })
-            });
+            let turn2Data = null;
+            try {
+              const turn2Res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                signal: AbortSignal.timeout(6000),
+                body: JSON.stringify({
+                  systemInstruction: { parts: [{ text: systemInstruction }] },
+                  contents: turn2Contents,
+                  tools: [{ functionDeclarations: tools }],
+                  generationConfig: { temperature: 0.2, maxOutputTokens: 800 }
+                })
+              });
 
-            if (turn2Res.ok) {
-              const turn2Data = await turn2Res.json();
+              if (turn2Res.ok) {
+                turn2Data = await turn2Res.json();
+              } else {
+                const turn2Err = await turn2Res.json().catch(() => ({}));
+                console.warn(`[GeminiAssistant] Turn 2 status ${turn2Res.status}:`, turn2Err?.error?.message?.slice(0, 100));
+              }
+            } catch (t2Err) {
+              console.warn('[GeminiAssistant] Turn 2 network/timeout:', t2Err.message);
+            }
+
+            if (turn2Data) {
               const candidate2 = turn2Data.candidates?.[0];
               const textParts = (candidate2?.content?.parts || [])
                 .filter(p => p.text)
@@ -211,9 +221,6 @@ CAPABILITIES:
                   groundedData: toolResult
                 };
               }
-            } else {
-              const turn2Err = await turn2Res.json().catch(() => ({}));
-              console.warn(`[GeminiAssistant] Turn 2 status ${turn2Res.status}:`, turn2Err?.error?.message?.slice(0, 100));
             }
 
             // If turn 2 had an issue or quota delay, formulate direct grounded summary
