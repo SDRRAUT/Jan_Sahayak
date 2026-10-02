@@ -11,16 +11,23 @@ import crypto from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const UPLOAD_ROOT = path.resolve(__dirname, '../../public/uploads');
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.LAMBDA_TASK_ROOT);
+const UPLOAD_ROOT = isServerless 
+  ? path.join('/tmp', 'uploads')
+  : path.resolve(__dirname, '../../public/uploads');
 
-// Ensure local upload directories exist
+// Ensure local upload directories exist safely without throwing on read-only environments
 const BUCKETS = ['complaints', 'voice', 'field-actions', 'verification', 'documents'];
-BUCKETS.forEach(b => {
-  const dir = path.join(UPLOAD_ROOT, b);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-});
+try {
+  BUCKETS.forEach(b => {
+    const dir = path.join(UPLOAD_ROOT, b);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  });
+} catch (e) {
+  // Silent fallback in read-only / serverless container initialization
+}
 
 const ALLOWED_MIME_TYPES = {
   // Images
@@ -77,8 +84,26 @@ export class StorageService {
     const targetDir = path.join(UPLOAD_ROOT, bucket);
     const targetFilePath = path.join(targetDir, safeFilename);
 
-    // Save to local public upload directory
-    await fs.promises.writeFile(targetFilePath, fileBuffer);
+    // Save to local upload directory or fallback to data URL
+    try {
+      if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+      await fs.promises.writeFile(targetFilePath, fileBuffer);
+    } catch (writeErr) {
+      console.warn('[StorageService] Disk write skipped or failed, using base64 data URI:', writeErr.message);
+      const dataUri = `data:${mimeType};base64,${fileBuffer.toString('base64')}`;
+      return {
+        success: true,
+        storagePath: dataUri,
+        publicUrl: dataUri,
+        fileName: safeFilename,
+        mimeType,
+        sizeBytes: fileBuffer.length,
+        category: bucket,
+        uploadedAt: new Date().toISOString()
+      };
+    }
 
     const publicUrl = `/uploads/${bucket}/${safeFilename}`;
     const storagePath = `${bucket}/${safeFilename}`;

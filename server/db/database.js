@@ -9,8 +9,12 @@ const DATA_DIR = path.resolve(__dirname, '../data');
 const DB_FILE = path.join(DATA_DIR, 'store.json');
 
 // Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+try {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+} catch (e) {
+  // Silent fallback in read-only / serverless container
 }
 
 // Initial seed template if store.json does not exist

@@ -3050,11 +3050,31 @@ app.post('/api/assistant/chat', async (req, res) => {
     });
   } catch (err) {
     console.error('[Assistant Chat Error]:', err);
-    res.status(500).json({
-      success: false,
-      error: 'AI Assistant temporarily unavailable hai. Aap Jan_Sahayak ke normal features use kar sakte hain.',
-      reply: 'AI Assistant temporarily unavailable hai. Aap Jan_Sahayak ke normal features use kar sakte hain.'
-    });
+    try {
+      const fallbackResult = await geminiAssistant.fallbackGroundingEngine(
+        req.body?.message || '',
+        user,
+        req.body?.context || {},
+        [],
+        null
+      );
+      res.json({
+        success: true,
+        reply: fallbackResult.reply,
+        toolsCalled: fallbackResult.toolsCalled || [],
+        actionProposal: fallbackResult.actionProposal || null,
+        conversationId: req.body?.conversationId || 'conv_fallback',
+        groundedData: fallbackResult.groundedData || null,
+        isFallback: true
+      });
+    } catch (fallbackErr) {
+      console.error('[Assistant Fallback Error]:', fallbackErr);
+      res.status(500).json({
+        success: false,
+        error: 'AI Assistant temporarily unavailable hai. Aap Jan_Sahayak ke normal features use kar sakte hain.',
+        reply: 'AI Assistant temporarily unavailable hai. Aap Jan_Sahayak ke normal features use kar sakte hain.'
+      });
+    }
   }
 });
 

@@ -33,8 +33,17 @@ if (fs.existsSync(envFilePath)) {
 
 export class GeminiAssistantService {
   constructor() {
-    this.defaultModel = process.env.AI_MODEL || 'gemini-3.5-flash';
-    this.modelsToTry = ['gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-flash-lite-latest'];
+    this.defaultModel = process.env.AI_MODEL || 'gemini-2.5-flash';
+    this.modelsToTry = [
+      process.env.AI_MODEL,
+      'gemini-2.5-flash',
+      'gemini-3.8-flash',
+      'gemini-3.5-flash',
+      'gemini-flash-latest',
+      'gemini-flash-lite-latest',
+      'gemini-2.5-flash-lite',
+      'gemini-2.5-pro'
+    ].filter(Boolean);
   }
 
   getApiKey() {
@@ -296,21 +305,46 @@ CAPABILITIES:
 
     // 1. Citizen queries
     if (role === 'citizen') {
-      if (text.includes('status') || text.includes('kya hua') || text.includes('scene') || text.includes('kahan pahunchi')) {
-        const toolRes = await executeAssistantTool('get_my_complaint_details', {}, { ...user, ...context });
-        toolsCalled.push({ name: 'get_my_complaint_details', args: {} });
-        if (toolRes.error) {
+      // Greetings
+      if (/^(hi|hii|hello|hey|namaste|pranam|good\s*(morning|afternoon|evening))/i.test(text.trim())) {
+        return {
+          reply: `Namaste **${user.name || 'Citizen'}**! 👋 Main hoon aapka **Jan_Sahayak AI Assistant**.\n\nAap mujhse apni complaints ka live status, department updates, Grievance DNA™ analysis, ya koi bhi general sawaal pooch sakte hain.\n\nAap aaj kis vishay mein sahayata chahte hain?`,
+          toolsCalled: []
+        };
+      }
+
+      if (text.includes('status') || text.includes('kya hua') || text.includes('scene') || text.includes('kahan pahunchi') || text.includes('meri complaint') || text.includes('meri complaints')) {
+        const targetId = context.current_entity_id;
+        if (targetId) {
+          const toolRes = await executeAssistantTool('get_my_complaint_details', { complaint_id: targetId }, { ...user, ...context });
+          toolsCalled.push({ name: 'get_my_complaint_details', args: { complaint_id: targetId } });
+          if (!toolRes.error) {
+            return {
+              reply: `Aapki complaint **#${toolRes.id}** (${toolRes.title}) abhi **${toolRes.status}** stage par hai. Yeh **${toolRes.department}** ke officer **${toolRes.officer}** ko assign ki gayi hai. Expected resolution SLA mein abhi lagbhag **${toolRes.slaHoursLeft} ghante** bache hain.`,
+              toolsCalled,
+              actionProposal,
+              groundedData: toolRes
+            };
+          }
+        }
+
+        // Multiple complaints or general dashboard status query
+        const complaintsRes = await executeAssistantTool('get_my_complaints', {}, { ...user, ...context });
+        toolsCalled.push({ name: 'get_my_complaints', args: {} });
+        if (complaintsRes && complaintsRes.complaints && complaintsRes.complaints.length > 0) {
+          const listStr = complaintsRes.complaints.map(c => `• **#${c.id}**: ${c.title}\n  * Status: **${c.status}** | Dept: ${c.department || 'PMC'}\n  * Urgency: **${c.urgency || 'Normal'}**`).join('\n\n');
           return {
-            reply: 'Mujhe aapki complaint ka verified record nahi mil raha. Kripya complaint number check karein ya citizen dashboard par dekhein.',
-            toolsCalled
+            reply: `Namaste ${user.name || 'Citizen'}! Aapke account mein kul **${complaintsRes.count} complaints** darj hain:\n\n${listStr}\n\nAap kisi specific complaint ka detail ya timeline janne ke liye pooch sakte hain!`,
+            toolsCalled,
+            groundedData: complaintsRes
+          };
+        } else {
+          return {
+            reply: `Namaste ${user.name || 'Citizen'}! Aapke account mein abhi koi open complaint nahi hai. Agar aapko koi civic samasya hai toh aap **File Grievance** button se complaint darj kar sakte hain.`,
+            toolsCalled,
+            groundedData: complaintsRes
           };
         }
-        return {
-          reply: `Aapki complaint **#${toolRes.id}** (${toolRes.title}) abhi **${toolRes.status}** stage par hai. Yeh **${toolRes.department}** ke officer **${toolRes.officer}** ko assign ki gayi hai. Expected resolution SLA mein abhi lagbhag **${toolRes.slaHoursLeft} ghante** bache hain.`,
-          toolsCalled,
-          actionProposal,
-          groundedData: toolRes
-        };
       }
 
       if (text.includes('connect') || text.includes('cluster') || text.includes('23 report') || text.includes('incident')) {
@@ -346,12 +380,19 @@ CAPABILITIES:
 
       if (text.includes('github')) {
         return {
-          reply: `**GitHub** is a cloud-based platform that helps software developers store, manage, track, and collaborate on code using **Git** version control. It powers repositories, pull requests, automated GitHub Actions CI/CD, and global open-source development.`,
+          reply: `**GitHub** is a cloud-based developer platform that helps programmers store, manage, track, and collaborate on software projects using **Git** version control. It supports repositories, pull requests, automated testing/CI/CD pipelines, and open-source civic technology!`,
           toolsCalled: []
         };
       }
 
-      // If inquiry is not civic-related, don't blindly return complaints count
+      if (text.includes('jansahayak') || text.includes('kaise kaam') || text.includes('how does')) {
+        return {
+          reply: `**JanSahayak Platform Overview:**\n\n1. **Report & AI Understanding**: Citizen photo, audio ya text mein complaint darj karta hai; Grievance DNA™ use turant category, priority aur department mein assign karta hai.\n2. **Clustering & De-duplication**: Ek hi ilaqe ki same problems ko merge karke unified municipal incident banata hai.\n3. **Field Dispatch**: Certified municipal squad ya local verified technician ko SLA timer ke sath assign kiya jata hai.\n4. **Photographic Verification**: Kaam khatam hone par geofenced photo evidence upload hota hai jise citizen verify karke sign-off karta hai.`,
+          toolsCalled: []
+        };
+      }
+
+      // If inquiry is not civic-related, provide helpful general response
       const isCivicQuery = text.includes('complaint') || text.includes('pani') || text.includes('paani') || 
         text.includes('road') || text.includes('sadak') || text.includes('drain') || text.includes('nali') || 
         text.includes('ward') || text.includes('delhi') || text.includes('sahayak') || text.includes('officer') || 
@@ -359,7 +400,7 @@ CAPABILITIES:
 
       if (!isCivicQuery) {
         return {
-          reply: `**JanSahayak AI**: Aapne poocha: "${message}". Main general knowledge aur technical queries ke saath-saath municipal services aur grievance tracking dono mein aapki sahayata kar sakta hoon.`,
+          reply: `**JanSahayak Assistant**: Aapne poocha: "${message}".\n\nMain aapki municipal complaints aur civic services ki jankari dene ke sath-sath general sawalon ka jawab dene ke liye bhi taiyar hoon! Agar aap apni complaints ya area ki problems ke bare mein janna chahte hain, toh kripya batayein.`,
           toolsCalled: []
         };
       }
