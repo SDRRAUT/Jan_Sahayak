@@ -1257,9 +1257,7 @@ export default function Home() {
             <h2 style={{ fontSize: '38px', color: '#FFFFFF', marginBottom: '14px', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
               Don't Just Patch Complaints.<br />Fix the Real Root Cause.
             </h2>
-            <p style={{ color: 'var(--color-text-inverse-muted)', fontSize: '16px', lineHeight: 1.6, maxWidth: '680px', margin: '0 auto' }}>
-              Old government portals treat every complaint like an isolated accident. JanSahayak connects reports from neighbors so authorities fix the actual underground problem once and for all.
-            </p>
+
           </div>
 
           {/* Interactive Problem Chooser (Real-Life Scenarios) */}
