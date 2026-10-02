@@ -980,42 +980,6 @@ export default function OfficerWorkspace({ defaultSection = 'inbox' }) {
                 </div>
               </div>
 
-              {/* Fast Filter Pills */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginRight: '4px' }}>
-                  Filter:
-                </span>
-                {[
-                  { id: 'ALL', label: `All Active (${stats.active})` },
-                  { id: 'CRITICAL', label: `🚨 Urgent (${stats.critical})` },
-                  { id: 'SLA_RISK', label: `⚡ SLA At Risk (${stats.slaAtRisk || 1})` },
-                  { id: 'MY_WORK', label: '👤 Assigned to Me' },
-                  { id: 'IN_PROGRESS', label: '🔄 In Progress' },
-                  { id: 'RESOLVED', label: '✅ Resolved' }
-                ].map(f => {
-                  const isActive = inboxFilter === f.id;
-                  return (
-                    <button
-                      key={f.id}
-                      type="button"
-                      onClick={() => setInboxFilter(f.id)}
-                      style={{
-                        padding: '4px 10px',
-                        borderRadius: '999px',
-                        fontSize: '11.5px',
-                        fontWeight: isActive ? 700 : 600,
-                        border: isActive ? '1px solid #065F46' : '1px solid #E2E8F0',
-                        background: isActive ? '#065F46' : '#FFFFFF',
-                        color: isActive ? '#FFFFFF' : '#475569',
-                        cursor: 'pointer',
-                        transition: 'all 120ms ease'
-                      }}
-                    >
-                      {f.label}
-                    </button>
-                  );
-                })}
-              </div>
             </div>
 
             {/* Complaints Queue Display */}
