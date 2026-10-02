@@ -102,6 +102,18 @@ export default function Navbar() {
       color: '#4338CA',
       bg: '#EEF2FF',
       activeBorder: '#4338CA'
+    },
+    {
+      key: 'worker',
+      label: 'Technician',
+      name: 'Ramesh Jadhav',
+      badge: 'Certified Plumber',
+      email: DEMO_CREDENTIALS.worker.email,
+      password: DEMO_CREDENTIALS.worker.password,
+      icon: Wrench,
+      color: '#D97706',
+      bg: '#FFFBEB',
+      activeBorder: '#D97706'
     }
   ];
   const currentLoginRole = loginRoleOptions.find(r => r.key === loginSelectedRole) || loginRoleOptions[0];
@@ -143,6 +155,7 @@ export default function Navbar() {
       if (targetRole === 'citizen') navigate('/');
       else if (targetRole === 'civic_officer' || targetRole === 'officer' || targetRole === 'dept_admin') navigate('/officer');
       else if (targetRole === 'super_admin') navigate('/admin/super');
+      else if (targetRole === 'worker') navigate('/worker');
       else navigate('/');
     } catch (e) {
       setShowLoginModal(false);
@@ -153,6 +166,7 @@ export default function Navbar() {
       if (roleKey === 'citizen') navigate('/');
       else if (roleKey === 'civic_officer' || roleKey === 'officer' || roleKey === 'dept_admin') navigate('/officer');
       else if (roleKey === 'super_admin') navigate('/admin/super');
+      else if (roleKey === 'worker') navigate('/worker');
       else navigate('/');
     }
   };
@@ -227,6 +241,7 @@ export default function Navbar() {
       case 'officer':
       case 'dept_admin': return 'Government Officer';
       case 'super_admin': return 'Administrator';
+      case 'worker': return 'Technician / Worker';
       default: return 'User';
     }
   };
@@ -236,6 +251,7 @@ export default function Navbar() {
     if (role === 'citizen') return '/';
     if (role === 'civic_officer' || role === 'officer' || role === 'dept_admin') return '/officer';
     if (role === 'super_admin') return '/admin/super';
+    if (role === 'worker') return '/worker';
     return '/';
   };
 
@@ -342,16 +358,27 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setShowFileGrievanceModal(true)}
-                  className={`site-nav-link ${location.pathname === '/citizen/submit' ? 'active' : ''}`}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.04)'; e.currentTarget.style.boxShadow = '0 4px 18px rgba(37,99,235,0.45)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 2px 10px rgba(37,99,235,0.30)'; }}
                   style={{
-                    background: 'transparent',
+                    background: 'linear-gradient(135deg, #2563EB 0%, #4F46E5 100%)',
+                    color: '#FFFFFF',
                     border: 'none',
+                    borderRadius: '999px',
+                    padding: '6px 16px',
                     cursor: 'pointer',
                     fontFamily: 'inherit',
-                    fontSize: '13px'
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 10px rgba(37,99,235,0.30)',
+                    transition: 'all 0.18s ease',
+                    letterSpacing: '0.01em'
                   }}
                 >
-                  <Plus style={{ width: '14px', height: '14px' }} />
+                  <Plus style={{ width: '13px', height: '13px' }} />
                   <span>File Grievance</span>
                 </button>
               </>
@@ -1054,6 +1081,56 @@ export default function Navbar() {
                           </Link>
                         </>
                       )}
+
+                      {role === 'worker' && (
+                        <>
+                          <Link
+                            to="/worker"
+                            onClick={() => setShowUserMenu(false)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '7px 10px',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '12px',
+                              textDecoration: 'none',
+                              color: '#B45309',
+                              background: '#FFFBEB',
+                              border: '1px solid rgba(217, 119, 6, 0.25)',
+                              fontWeight: 600
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <Wrench style={{ width: '14px', height: '14px', color: '#D97706' }} />
+                              <span>Technician Job Console</span>
+                            </div>
+                            <span style={{ fontSize: '10.5px', color: '#D97706' }}>→</span>
+                          </Link>
+                          <Link
+                            to="/citizen/find-worker"
+                            onClick={() => setShowUserMenu(false)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '7px 10px',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '12px',
+                              textDecoration: 'none',
+                              color: 'var(--color-text-primary)',
+                              background: '#F8FAFC',
+                              border: '1px solid rgba(15, 23, 42, 0.06)'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <User style={{ width: '14px', height: '14px', color: '#065F46' }} />
+                              <span>Browse Worker Directory</span>
+                            </div>
+                            <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
+                          </Link>
+                        </>
+                      )}
                     </div>
 
                     {/* Announcements & Profile Settings */}
@@ -1339,22 +1416,24 @@ export default function Navbar() {
                     type="button"
                     onClick={() => { setShowFileGrievanceModal(true); setMobileMenuOpen(false); }}
                     style={{
-                      padding: '10px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      color: location.pathname === '/citizen/submit' ? 'var(--color-primary)' : 'var(--color-text-primary)',
-                      background: location.pathname === '/citizen/submit' ? '#EFF6FF' : '#F8FAFC',
+                      padding: '13px 16px',
+                      borderRadius: '12px',
+                      fontSize: '15px',
+                      fontWeight: 700,
+                      color: '#FFFFFF',
+                      background: 'linear-gradient(135deg, #2563EB 0%, #4F46E5 100%)',
                       border: 'none',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '8px',
+                      gap: '10px',
                       cursor: 'pointer',
                       textAlign: 'left',
-                      width: '100%'
+                      width: '100%',
+                      boxShadow: '0 2px 12px rgba(37,99,235,0.30)',
+                      letterSpacing: '0.01em'
                     }}
                   >
-                    <Plus style={{ width: '15px', height: '15px' }} />
+                    <Plus style={{ width: '17px', height: '17px' }} />
                     <span>File Grievance</span>
                   </button>
                 </>

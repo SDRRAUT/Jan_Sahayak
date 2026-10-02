@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   Plus, Search, MapPin, ThumbsUp, ArrowRight,
-  Sparkles, Bell, FileText, X, Wrench, Phone, CheckCircle2
+  Sparkles, Bell, FileText, X, Wrench, Phone, CheckCircle2,
+  Clock, Calendar, AlertCircle, Check, ChevronRight
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { INITIAL_GRIEVANCES } from '../data/mockGrievances';
@@ -538,10 +539,13 @@ export default function CitizenDashboard() {
     notifications:contextNotifs=[],
     currentWorkerProfile,
     workerOrders=[],
-    settleWorkerPayment
+    settleWorkerPayment,
+    cancelWorkerOrder
   } = useApp();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab,setActiveTab]             = useState('all');
+  const [workerOrderSubFilter, setWorkerOrderSubFilter] = useState('all'); // 'all' | 'active' | 'past'
+  const [expandedTimelineOrderId, setExpandedTimelineOrderId] = useState(null);
   const [searchQuery,setSearchQuery]         = useState('');
   const [showFileModal,setShowFileModal]     = useState(false);
   const [showRegisterWorkerModal,setShowRegisterWorkerModal] = useState(false);
@@ -595,16 +599,28 @@ export default function CitizenDashboard() {
   displayGrievances.forEach(g=>{const c=getCatConfig(g);catCounts[c.key]=(catCounts[c.key]||0)+1;});
 
   const myBookedOrders = workerOrders.filter(o => 
+    o.source === 'CITIZEN' || 
     o.requestedBy === 'CITIZEN' || 
     (o.customerPhone && citizen.phone && o.customerPhone === citizen.phone) ||
-    (o.customerName && citizen.name && o.customerName.toLowerCase().includes(citizen.name.toLowerCase().split(' ')[0]))
+    (o.requesterPhone && citizen.phone && o.requesterPhone === citizen.phone) ||
+    (o.customerName && citizen.name && o.customerName.toLowerCase().includes(citizen.name.toLowerCase().split(' ')[0])) ||
+    (o.requesterName && citizen.name && o.requesterName.toLowerCase().includes(citizen.name.toLowerCase().split(' ')[0]))
   );
+
+  const activeBookedOrders = myBookedOrders.filter(o => !['PAID', 'CLOSED', 'CANCELLED', 'REJECTED'].includes(o.status));
+  const pastBookedOrders = myBookedOrders.filter(o => ['PAID', 'CLOSED', 'CANCELLED', 'REJECTED'].includes(o.status));
+
+  const filteredBookedOrders = workerOrderSubFilter === 'active'
+    ? activeBookedOrders
+    : workerOrderSubFilter === 'past'
+    ? pastBookedOrders
+    : myBookedOrders;
 
   const TABS = [
     { key:'all',           label:`All (${displayGrievances.length})` },
     { key:'my',            label:`My Reports (${myReports.length})` },
     { key:'verification',  label:`Verify Fix (${pendingVerification.length})` },
-    { key:'booked_workers',label:`Booked Workers (${myBookedOrders.length})` },
+    { key:'booked_workers',label: activeBookedOrders.length > 0 ? `Orders & Tracking (${activeBookedOrders.length} Active)` : `Orders & Tracking (${myBookedOrders.length})` },
     { key:'active',        label:'In Progress' },
     { key:'resolved',      label:'Resolved' },
     { key:'notifications', label:`Alerts (${citizenNotifications.length})` },
@@ -702,15 +718,33 @@ export default function CitizenDashboard() {
 
               <button
                 onClick={() => { setFileModalCategory(''); setShowFileModal(true); }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'scale(1.04)';
+                  e.currentTarget.style.boxShadow = '0 0 0 4px rgba(37,99,235,0.18), 0 6px 20px rgba(37,99,235,0.45)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.15), 0 4px 14px rgba(37,99,235,0.35)';
+                }}
                 style={{
-                  height:'42px', minHeight:'42px', padding:'0 18px', borderRadius:'12px',
-                  background:'#2563EB', color:'#FFFFFF', border:'none',
-                  fontWeight:700, fontSize:'13px', cursor:'pointer',
+                  height:'46px', minHeight:'46px', padding:'0 22px', borderRadius:'12px',
+                  background:'linear-gradient(135deg, #2563EB 0%, #4F46E5 100%)',
+                  color:'#FFFFFF', border:'none',
+                  fontWeight:700, fontSize:'14px', cursor:'pointer',
                   display:'flex', alignItems:'center', gap:'8px',
-                  boxShadow:'0 2px 8px rgba(37,99,235,0.25)',
-                  transition:'all 0.15s ease'
+                  boxShadow:'0 0 0 3px rgba(37,99,235,0.15), 0 4px 14px rgba(37,99,235,0.35)',
+                  transition:'all 0.18s ease',
+                  animation:'grievance-pulse 2.4s ease-in-out infinite',
+                  position:'relative',
+                  letterSpacing:'0.01em'
                 }}
               >
+                <style>{`
+                  @keyframes grievance-pulse {
+                    0%, 100% { box-shadow: 0 0 0 3px rgba(37,99,235,0.15), 0 4px 14px rgba(37,99,235,0.35); }
+                    50%       { box-shadow: 0 0 0 6px rgba(37,99,235,0.08), 0 6px 20px rgba(37,99,235,0.45); }
+                  }
+                `}</style>
                 <Plus style={{ width:'16px', height:'16px' }} />
                 File Grievance
               </button>
@@ -856,20 +890,154 @@ export default function CitizenDashboard() {
           </div>
 
           {activeTab==='booked_workers'?(
-            <div style={{display:'flex',flexDirection:'column',gap:'14px'}}>
-              {myBookedOrders.length===0?(
-                <div style={{textAlign:'center',padding:'54px 20px',background:'#fff',borderRadius:'20px',border:'1px solid #E2E8F0'}}>
-                  <Wrench style={{width:'40px',height:'40px',color:'#CBD5E1',margin:'0 auto 12px'}}/>
-                  <h3 style={{fontSize:'17px',fontWeight:700,color:'#0F172A',marginBottom:'6px'}}>No Booked Workers Yet</h3>
-                  <p style={{color:'#64748B',fontSize:'13.5px',marginBottom:'18px'}}>Need a plumber, electrician, or mason in Wagholi? Hire trusted technicians directly.</p>
-                  <Link to="/citizen/find-worker" style={{padding:'10px 22px',background:'#065F46',color:'#fff',borderRadius:'12px',textDecoration:'none',fontWeight:700,fontSize:'13px',display:'inline-flex',alignItems:'center',gap:'6px',boxShadow:'0 2px 8px rgba(6,78,59,0.25)'}}>
-                    <Wrench style={{width:'15px',height:'15px'}}/> Browse Wagholi Workers
+            <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
+              {/* Order Status Filters & Action Bar */}
+              <div style={{
+                background: '#FFFFFF',
+                borderRadius: '16px',
+                padding: '12px 18px',
+                border: '1px solid #E2E8F0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '12px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={() => setWorkerOrderSubFilter('all')}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '999px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: 'none',
+                      background: workerOrderSubFilter === 'all' ? '#0F172A' : '#F1F5F9',
+                      color: workerOrderSubFilter === 'all' ? '#FFFFFF' : '#475569',
+                      transition: 'all 150ms ease'
+                    }}
+                  >
+                    All Bookings ({myBookedOrders.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWorkerOrderSubFilter('active')}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '999px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: 'none',
+                      background: workerOrderSubFilter === 'active' ? '#1D4ED8' : '#EFF6FF',
+                      color: workerOrderSubFilter === 'active' ? '#FFFFFF' : '#1D4ED8',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      transition: 'all 150ms ease'
+                    }}
+                  >
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: workerOrderSubFilter === 'active' ? '#FFFFFF' : '#2563EB' }} />
+                    Active Orders ({activeBookedOrders.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWorkerOrderSubFilter('past')}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '999px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: 'none',
+                      background: workerOrderSubFilter === 'past' ? '#15803D' : '#F0FDF4',
+                      color: workerOrderSubFilter === 'past' ? '#FFFFFF' : '#15803D',
+                      transition: 'all 150ms ease'
+                    }}
+                  >
+                    Past History ({pastBookedOrders.length})
+                  </button>
+                </div>
+
+                <Link
+                  to="/citizen/find-worker"
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '12px',
+                    background: '#065F46',
+                    color: '#FFFFFF',
+                    textDecoration: 'none',
+                    fontSize: '12.5px',
+                    fontWeight: 700,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 6px rgba(6,95,70,0.2)'
+                  }}
+                >
+                  <Wrench style={{ width: '14px', height: '14px' }} />
+                  <span>Hire Another Technician</span>
+                </Link>
+              </div>
+
+              {filteredBookedOrders.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '56px 20px', background: '#FFFFFF', borderRadius: '20px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+                    <Wrench style={{ width: '28px', height: '28px', color: '#64748B' }} />
+                  </div>
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}>
+                    {workerOrderSubFilter === 'active' ? 'No Active Orders In Progress' : workerOrderSubFilter === 'past' ? 'No Past Service Orders' : 'No Booked Workers Yet'}
+                  </h3>
+                  <p style={{ color: '#64748B', fontSize: '13.5px', maxWidth: '420px', margin: '0 auto 20px', lineHeight: 1.5 }}>
+                    {workerOrderSubFilter === 'active'
+                      ? 'You do not have any active or pending field technician jobs right now.'
+                      : 'Book certified plumbers, electricians, masons, and sanitation workers across Wagholi with instant live tracking.'}
+                  </p>
+                  <Link
+                    to="/citizen/find-worker"
+                    style={{
+                      padding: '11px 24px',
+                      background: '#065F46',
+                      color: '#fff',
+                      borderRadius: '12px',
+                      textDecoration: 'none',
+                      fontWeight: 700,
+                      fontSize: '13px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      boxShadow: '0 4px 14px rgba(6,95,70,0.25)'
+                    }}
+                  >
+                    <Wrench style={{ width: '15px', height: '15px' }} />
+                    Browse Verified Wagholi Workers
                   </Link>
                 </div>
-              ):(
-                myBookedOrders.map(order => {
-                  const isCompleted = order.status === 'COMPLETED';
+              ) : (
+                filteredBookedOrders.map(order => {
+                  const isCompleted = order.status === 'COMPLETED' || order.status === 'PAYMENT_PENDING';
                   const isPaid = order.status === 'PAID' || order.status === 'CLOSED';
+                  const isCancelled = order.status === 'CANCELLED' || order.status === 'REJECTED';
+                  const isInProgress = order.status === 'IN_PROGRESS';
+                  const isAccepted = order.status === 'ACCEPTED';
+                  const isRequested = order.status === 'REQUESTED' || order.status === 'BOOKED';
+
+                  // 5-step milestone tracking
+                  const stepIndex = isPaid ? 4 : isCompleted ? 3 : isInProgress ? 2 : isAccepted ? 1 : 0;
+                  const ORDER_MILESTONES = [
+                    { title: 'Order Dispatched', desc: 'Received by network' },
+                    { title: 'Technician Confirmed', desc: 'Tools packed & en route' },
+                    { title: 'Work In Progress', desc: 'On-ground remediation' },
+                    { title: 'Work Completed', desc: 'Repairs finished & inspected' },
+                    { title: 'Payment Settled', desc: 'Disbursed to technician ledger' }
+                  ];
+
+                  const latestHistoryNote = order.statusHistory && order.statusHistory.length > 0
+                    ? order.statusHistory[order.statusHistory.length - 1]?.note
+                    : null;
+
                   return (
                     <div
                       key={order.id}
@@ -877,100 +1045,377 @@ export default function CitizenDashboard() {
                         background: '#FFFFFF',
                         border: '1px solid #E2E8F0',
                         borderRadius: '20px',
-                        padding: '20px',
-                        boxShadow: '0 4px 16px -2px rgba(15, 23, 42, 0.05)'
+                        padding: 'clamp(18px, 3vw, 24px)',
+                        boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.05)',
+                        position: 'relative'
                       }}
                     >
-                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', flexWrap:'wrap', gap:'12px', marginBottom:'14px' }}>
-                        <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
+                      {/* Top Header: Order ID + Scheduled Date + Status Badge */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', paddingBottom: '16px', borderBottom: '1px solid #F1F5F9' }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{
+                              fontFamily: 'monospace',
+                              fontWeight: 800,
+                              fontSize: '13px',
+                              color: '#0F172A',
+                              background: '#F1F5F9',
+                              padding: '3px 8px',
+                              borderRadius: '6px',
+                              border: '1px solid #E2E8F0'
+                            }}>
+                              #{order.id}
+                            </span>
+                            <span style={{ fontSize: '12px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <Clock style={{ width: '13px', height: '13px' }} />
+                              {order.scheduledTime || 'Immediate Dispatch'}
+                            </span>
+                          </div>
+                          {order.createdAt && (
+                            <div style={{ fontSize: '11px', color: '#94A3B8', marginTop: '3px' }}>
+                              Booked on {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Status Badge */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{
+                            fontSize: '12px',
+                            fontWeight: 800,
+                            padding: '4px 12px',
+                            borderRadius: '999px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            background: isPaid ? '#DCFCE7' : isCompleted ? '#FEF3C7' : isInProgress ? '#ECFDF5' : isAccepted ? '#EFF6FF' : isCancelled ? '#FEE2E2' : '#FFFBEB',
+                            color: isPaid ? '#15803D' : isCompleted ? '#B45309' : isInProgress ? '#047857' : isAccepted ? '#1D4ED8' : isCancelled ? '#B91C1C' : '#D97706',
+                            border: `1px solid ${isPaid ? '#BBF7D0' : isCompleted ? '#FDE68A' : isInProgress ? '#A7F3D0' : isAccepted ? '#BFDBFE' : isCancelled ? '#FECACA' : '#FDE68A'}`
+                          }}>
+                            <span style={{
+                              width: '7px',
+                              height: '7px',
+                              borderRadius: '50%',
+                              background: isPaid ? '#16A34A' : isCompleted ? '#D97706' : isInProgress ? '#059669' : isAccepted ? '#2563EB' : isCancelled ? '#DC2626' : '#F59E0B'
+                            }} />
+                            {isPaid ? 'PAID & COMPLETED' : isCompleted ? 'WORK DONE — PENDING PAYMENT' : isInProgress ? 'IN PROGRESS (ON-SITE)' : isAccepted ? 'TECHNICIAN ACCEPTED' : isCancelled ? 'ORDER CANCELLED' : 'DISPATCH REQUESTED'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Main Info Body: Worker Profile on Left, Job Summary on Right */}
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                        gap: '16px',
+                        margin: '18px 0'
+                      }}>
+                        {/* Worker Identity Card */}
+                        <div style={{
+                          background: '#F8FAFC',
+                          borderRadius: '16px',
+                          padding: '14px 16px',
+                          border: '1px solid #E2E8F0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '14px'
+                        }}>
                           <img
                             src={order.workerAvatar || 'https://images.unsplash.com/photo-1540569014015-19a7be504e3a?auto=format&fit=crop&w=400&q=80'}
                             alt={order.workerName}
-                            style={{ width:'48px', height:'48px', borderRadius:'50%', objectFit:'cover', border:'2px solid #E2E8F0' }}
+                            style={{
+                              width: '54px',
+                              height: '54px',
+                              borderRadius: '50%',
+                              objectFit: 'cover',
+                              border: '2px solid #FFFFFF',
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                              flexShrink: 0
+                            }}
                           />
-                          <div>
-                            <div style={{ display:'flex', alignItems:'center', gap:'6px' }}>
-                              <h3 style={{ margin:0, fontSize:'16px', fontWeight:800, color:'#0F172A' }}>{order.workerName}</h3>
-                              <span style={{ fontSize:'11px', color:'#16A34A', background:'#DCFCE7', padding:'2px 8px', borderRadius:'999px', fontWeight:700 }}>
-                                {order.workerCategory}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                              <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>
+                                {order.workerName}
+                              </h4>
+                              <span style={{ fontSize: '11px', color: '#16A34A', background: '#DCFCE7', padding: '1px 7px', borderRadius: '999px', fontWeight: 700 }}>
+                                {order.workerCategory || 'Field Technician'}
                               </span>
                             </div>
-                            <div style={{ fontSize:'12px', color:'#64748B', marginTop:'2px' }}>
-                              Order #{order.id} · Scheduled: {order.scheduledTime}
+                            <div style={{ fontSize: '12px', color: '#64748B', marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span>★ 4.9 Verified</span>
+                              <span>•</span>
+                              <span>Wagholi Network</span>
+                            </div>
+                            {order.workerPhone && (
+                              <div style={{ fontSize: '12px', color: '#0F172A', fontWeight: 600, marginTop: '3px' }}>
+                                📞 {order.workerPhone}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Service and Location Details */}
+                        <div style={{
+                          background: '#F8FAFC',
+                          borderRadius: '16px',
+                          padding: '14px 16px',
+                          border: '1px solid #E2E8F0',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between'
+                        }}>
+                          <div>
+                            <div style={{ fontSize: '11px', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                              Service Task
+                            </div>
+                            <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#0F172A', marginTop: '2px', lineHeight: 1.4 }}>
+                              {order.serviceTitle}
+                            </div>
+                            <div style={{ fontSize: '12px', color: '#64748B', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <MapPin style={{ width: '12px', height: '12px', color: '#059669', flexShrink: 0 }} />
+                              <span>{order.ward || order.location?.ward || 'Wagholi Ward 29'}</span>
+                            </div>
+                            {order.complaintId && (
+                              <div style={{ fontSize: '11.5px', color: '#2563EB', marginTop: '4px', fontWeight: 600 }}>
+                                🔗 Linked to Complaint: #{order.complaintId}
+                              </div>
+                            )}
+                          </div>
+
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', paddingTop: '8px', borderTop: '1px solid #E2E8F0' }}>
+                            <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>Agreed Fare:</span>
+                            <span style={{ fontSize: '18px', fontWeight: 800, color: '#065F46', fontFamily: 'monospace' }}>
+                              ₹{order.finalFare || order.estimatedFare}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 5-Step Order Progress Stepper */}
+                      {!isCancelled && (
+                        <div style={{
+                          background: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
+                          borderRadius: '16px',
+                          padding: '16px',
+                          border: '1px solid #E2E8F0',
+                          marginBottom: '16px'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', overflowX: 'auto', padding: '4px 0' }}>
+                            {ORDER_MILESTONES.map((ms, idx) => {
+                              const isStepDone = stepIndex > idx;
+                              const isStepCurrent = stepIndex === idx;
+                              return (
+                                <React.Fragment key={ms.title}>
+                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', minWidth: '90px', zIndex: 2 }}>
+                                    <div style={{
+                                      width: '28px',
+                                      height: '28px',
+                                      borderRadius: '50%',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      background: isStepDone ? '#16A34A' : isStepCurrent ? '#1D4ED8' : '#FFFFFF',
+                                      color: (isStepDone || isStepCurrent) ? '#FFFFFF' : '#94A3B8',
+                                      border: isStepDone ? 'none' : isStepCurrent ? '2px solid #3B82F6' : '2px solid #CBD5E1',
+                                      boxShadow: isStepCurrent ? '0 0 0 4px rgba(59, 130, 246, 0.2)' : 'none',
+                                      fontSize: '12px',
+                                      fontWeight: 800
+                                    }}>
+                                      {isStepDone ? <Check style={{ width: '15px', height: '15px' }} /> : (idx + 1)}
+                                    </div>
+                                    <div style={{
+                                      fontSize: '11px',
+                                      fontWeight: isStepCurrent ? 800 : 700,
+                                      color: isStepDone ? '#166534' : isStepCurrent ? '#1D4ED8' : '#64748B',
+                                      marginTop: '6px'
+                                    }}>
+                                      {ms.title}
+                                    </div>
+                                  </div>
+                                  {idx < ORDER_MILESTONES.length - 1 && (
+                                    <div style={{
+                                      flex: 1,
+                                      height: '3px',
+                                      minWidth: '24px',
+                                      background: stepIndex > idx ? '#16A34A' : '#CBD5E1',
+                                      margin: '-14px 4px 0',
+                                      borderRadius: '999px',
+                                      zIndex: 1
+                                    }} />
+                                  )}
+                                </React.Fragment>
+                              );
+                            })}
+                          </div>
+
+                          {/* Live Status Description Callout */}
+                          <div style={{
+                            marginTop: '14px',
+                            padding: '10px 14px',
+                            background: '#FFFFFF',
+                            borderRadius: '10px',
+                            border: '1px solid #E2E8F0',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            flexWrap: 'wrap',
+                            gap: '8px'
+                          }}>
+                            <div style={{ fontSize: '12px', color: '#334155', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{ fontSize: '14px' }}>
+                                {isPaid ? '🎉' : isCompleted ? '📸' : isInProgress ? '🔧' : isAccepted ? '🛵' : '⏳'}
+                              </span>
+                              <span>
+                                <strong>Status: </strong>
+                                {latestHistoryNote || ORDER_MILESTONES[stepIndex]?.desc || 'Technician in touch'}
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setExpandedTimelineOrderId(expandedTimelineOrderId === order.id ? null : order.id)}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#2563EB',
+                                fontSize: '11.5px',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                padding: 0
+                              }}
+                            >
+                              {expandedTimelineOrderId === order.id ? 'Hide Timeline ↑' : 'View Audit Log ↓'}
+                            </button>
+                          </div>
+
+                          {/* Expanded Audit Timeline */}
+                          {expandedTimelineOrderId === order.id && order.statusHistory && (
+                            <div style={{
+                              marginTop: '10px',
+                              padding: '12px 14px',
+                              background: '#FFFFFF',
+                              borderRadius: '10px',
+                              border: '1px dashed #CBD5E1'
+                            }}>
+                              <div style={{ fontSize: '11px', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginBottom: '8px' }}>
+                                Verified Order Transition Trail
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                {order.statusHistory.map((sh, shIdx) => (
+                                  <div key={shIdx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '12px' }}>
+                                    <span style={{ fontFamily: 'monospace', color: '#64748B', minWidth: '65px', fontSize: '11px' }}>
+                                      {sh.time}
+                                    </span>
+                                    <span style={{ fontWeight: 700, color: '#0F172A', minWidth: '90px' }}>
+                                      {sh.step}:
+                                    </span>
+                                    <span style={{ color: '#475569', flex: 1 }}>
+                                      {sh.note}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Evidence Photo (if uploaded upon completion) */}
+                      {order.evidencePhoto && (
+                        <div style={{
+                          marginBottom: '16px',
+                          padding: '12px 16px',
+                          background: '#F0FDF4',
+                          border: '1px solid #BBF7D0',
+                          borderRadius: '14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px'
+                        }}>
+                          <img
+                            src={order.evidencePhoto}
+                            alt="Repair Evidence"
+                            style={{ width: '56px', height: '56px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #86EFAC' }}
+                          />
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: '12px', fontWeight: 800, color: '#166534' }}>
+                              📸 Ground Repair Proof Uploaded by Technician
+                            </div>
+                            <div style={{ fontSize: '11.5px', color: '#15803D', marginTop: '2px' }}>
+                              {order.completionSummary || 'Work completed successfully on site.'}
                             </div>
                           </div>
                         </div>
+                      )}
 
-                        <div style={{ textAlign:'right' }}>
-                          <span style={{
-                            display:'inline-block',
-                            fontSize:'11px',
-                            fontWeight:700,
-                            padding:'3px 10px',
-                            borderRadius:'999px',
-                            marginBottom:'4px',
-                            background: isPaid ? '#DCFCE7' : isCompleted ? '#FEF3C7' : '#EFF6FF',
-                            color: isPaid ? '#166534' : isCompleted ? '#B45309' : '#1D4ED8'
-                          }}>
-                            {isPaid ? 'PAID & COMPLETED' : isCompleted ? 'WORK DONE - PAYMENT PENDING' : order.status.replace('_', ' ')}
-                          </span>
-                          <div style={{ fontSize:'18px', fontWeight:800, color:'#065F46', fontFamily:'monospace' }}>
-                            ₹{order.estimatedFare}
-                          </div>
-                        </div>
-                      </div>
+                      {/* Actions Toolbar */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', paddingTop: '4px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                          {order.workerPhone && (
+                            <a
+                              href={`tel:${order.workerPhone}`}
+                              style={{
+                                padding: '8px 14px',
+                                borderRadius: '10px',
+                                background: '#F1F5F9',
+                                color: '#0F172A',
+                                textDecoration: 'none',
+                                fontSize: '12px',
+                                fontWeight: 700,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                border: '1px solid #E2E8F0'
+                              }}
+                            >
+                              <Phone style={{ width: '13px', height: '13px', color: '#059669' }} />
+                              Call Technician ({order.workerPhone})
+                            </a>
+                          )}
 
-                      {/* Work Description */}
-                      <div style={{ background:'#F8FAFC', borderRadius:'12px', padding:'12px 14px', marginBottom:'14px', fontSize:'13px', color:'#334155' }}>
-                        <strong>Service: </strong>{order.serviceTitle}
-                        {order.ward && <div style={{ fontSize:'12px', color:'#64748B', marginTop:'3px' }}>📍 {order.ward}</div>}
-                      </div>
+                          {isRequested && (
+                            <button
+                              type="button"
+                              onClick={() => cancelWorkerOrder(order.id, 'Cancelled by citizen')}
+                              style={{
+                                padding: '8px 14px',
+                                borderRadius: '10px',
+                                background: '#FFF1F2',
+                                color: '#BE123C',
+                                border: '1px solid #FECDD3',
+                                fontSize: '12px',
+                                fontWeight: 700,
+                                cursor: 'pointer'
+                              }}
+                            >
+                              Cancel Request
+                            </button>
+                          )}
+                        </div>
 
-                      {/* Progress Stepper */}
-                      <div style={{ display:'flex', alignItems:'center', gap:'6px', fontSize:'11px', fontWeight:700, marginBottom:'16px', overflowX:'auto' }}>
-                        <div style={{ color:'#065F46', display:'flex', alignItems:'center', gap:'3px' }}>
-                          <CheckCircle2 style={{ width:'13px', height:'13px' }}/> Booked
-                        </div>
-                        <div style={{ width:'16px', height:'2px', background: order.status !== 'REQUESTED' ? '#065F46' : '#E2E8F0' }}/>
-                        <div style={{ color: order.status !== 'REQUESTED' ? '#065F46' : '#94A3B8', display:'flex', alignItems:'center', gap:'3px' }}>
-                          <CheckCircle2 style={{ width:'13px', height:'13px' }}/> Accepted
-                        </div>
-                        <div style={{ width:'16px', height:'2px', background: (order.status === 'IN_PROGRESS' || isCompleted || isPaid) ? '#065F46' : '#E2E8F0' }}/>
-                        <div style={{ color: (order.status === 'IN_PROGRESS' || isCompleted || isPaid) ? '#065F46' : '#94A3B8', display:'flex', alignItems:'center', gap:'3px' }}>
-                          <CheckCircle2 style={{ width:'13px', height:'13px' }}/> In Progress
-                        </div>
-                        <div style={{ width:'16px', height:'2px', background: (isCompleted || isPaid) ? '#065F46' : '#E2E8F0' }}/>
-                        <div style={{ color: (isCompleted || isPaid) ? '#065F46' : '#94A3B8', display:'flex', alignItems:'center', gap:'3px' }}>
-                          <CheckCircle2 style={{ width:'13px', height:'13px' }}/> Completed
-                        </div>
-                      </div>
-
-                      {/* Action buttons */}
-                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'10px' }}>
-                        <a
-                          href={`tel:${order.workerPhone}`}
-                          style={{
-                            padding:'8px 14px', borderRadius:'10px', background:'#F1F5F9',
-                            color:'#0F172A', textDecoration:'none', fontSize:'12px', fontWeight:700,
-                            display:'flex', alignItems:'center', gap:'6px'
-                          }}
-                        >
-                          <Phone style={{ width:'13px', height:'13px' }}/> Call Technician ({order.workerPhone})
-                        </a>
-
+                        {/* Pay Button when completed */}
                         {isCompleted && !isPaid && (
                           <button
                             type="button"
                             onClick={() => settleWorkerPayment(order.id)}
                             style={{
-                              padding:'9px 20px', borderRadius:'10px', background:'#16A34A',
-                              color:'#FFFFFF', border:'none', fontSize:'13px', fontWeight:700,
-                              cursor:'pointer', display:'flex', alignItems:'center', gap:'6px',
-                              boxShadow:'0 4px 12px rgba(22,163,74,0.3)'
+                              padding: '10px 22px',
+                              borderRadius: '12px',
+                              background: '#16A34A',
+                              color: '#FFFFFF',
+                              border: 'none',
+                              fontSize: '13.5px',
+                              fontWeight: 800,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              boxShadow: '0 4px 14px rgba(22,163,74,0.35)',
+                              transition: 'transform 120ms ease'
                             }}
                           >
-                            <CheckCircle2 style={{ width:'15px', height:'15px' }}/>
-                            Pay & Settle Fare (₹{order.estimatedFare})
+                            <CheckCircle2 style={{ width: '16px', height: '16px' }} />
+                            Pay & Settle Fare (₹{order.finalFare || order.estimatedFare})
                           </button>
                         )}
                       </div>

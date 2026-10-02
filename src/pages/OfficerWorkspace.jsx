@@ -349,7 +349,7 @@ export default function OfficerWorkspace({ defaultSection = 'inbox' }) {
       let matchesFilter = true;
       if (inboxFilter === 'CRITICAL') matchesFilter = g.urgency === 'CRITICAL' && g.status !== 'RESOLVED';
       else if (inboxFilter === 'SLA_RISK') matchesFilter = (g.slaHoursLeft !== undefined && g.slaHoursLeft <= 6) && g.status !== 'RESOLVED';
-      else if (inboxFilter === 'MY_WORK') matchesFilter = !g.officerName || g.officerName.includes('Sanjay') || g.status === 'IN_PROGRESS' || g.urgency === 'CRITICAL';
+      else if (inboxFilter === 'MY_WORK') matchesFilter = !g.officerName || g.officerName.includes('Sanjay') || g.status === 'IN_PROGRESS' || g.urgency === 'CRITICAL' || g.createdAt === 'Just now';
       else if (inboxFilter === 'IN_PROGRESS') matchesFilter = g.status === 'IN_PROGRESS';
       else if (inboxFilter === 'RESOLVED') matchesFilter = g.status === 'RESOLVED' || g.status === 'CLOSED';
 
@@ -357,6 +357,13 @@ export default function OfficerWorkspace({ defaultSection = 'inbox' }) {
     }).sort((a, b) => {
       if (queryCaseId && a.id === queryCaseId) return -1;
       if (queryCaseId && b.id === queryCaseId) return 1;
+
+      // Prioritize brand new submissions (created "Just now" or in the past 2 hours) so they immediately catch officer attention
+      const isNewA = a.createdAt === 'Just now' || (Date.now() - new Date(a.timestamp || 0).getTime() < 2 * 3600 * 1000);
+      const isNewB = b.createdAt === 'Just now' || (Date.now() - new Date(b.timestamp || 0).getTime() < 2 * 3600 * 1000);
+      if (isNewA && !isNewB) return -1;
+      if (!isNewA && isNewB) return 1;
+
       if (a.urgency === 'CRITICAL' && b.urgency !== 'CRITICAL') return -1;
       if (b.urgency === 'CRITICAL' && a.urgency !== 'CRITICAL') return 1;
       const timeA = new Date(a.timestamp || 0).getTime();

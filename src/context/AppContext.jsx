@@ -1774,7 +1774,7 @@ export function AppProvider({ children }) {
   // WORKER & SERVICE MARKETPLACE DISPATCH METHODS
   // ══════════════════════════════════════════════════════════════════════
 
-  const currentWorkerProfile = user?.workerProfile || workers.find(w => (user?.phone && w.phone === user?.phone) || (user?.email && w.email === user?.email)) || null;
+  const currentWorkerProfile = user?.workerProfile || workers.find(w => (user?.phone && w.phone === user?.phone) || (user?.email && w.email === user?.email)) || (user?.role === 'worker' ? workers[0] : null);
 
   const registerAsWorker = (formData) => {
     const categoryInfo = WORKER_CATEGORIES.find(c => c.id === formData.category) || WORKER_CATEGORIES[0];
@@ -1841,35 +1841,47 @@ export function AppProvider({ children }) {
   };
 
   const createWorkerOrder = (orderData) => {
-    const orderId = `WO-2026-${Date.now().toString().slice(-4)}`;
+    const orderId = orderData.id || `WO-2026-${Date.now().toString().slice(-4)}`;
+    const matchedWorker = workers.find(w => w.id === orderData.workerId) || {};
     const newOrder = {
       id: orderId,
       workerId: orderData.workerId,
-      workerName: orderData.workerName,
-      workerCategory: orderData.workerCategory || 'plumbing',
-      source: orderData.source || 'CITIZEN', // 'CITIZEN' | 'GOVERNMENT'
-      requesterName: orderData.requesterName || user?.name || 'Citizen User',
-      requesterPhone: orderData.requesterPhone || user?.phone || '+91 98220-44102',
+      workerName: orderData.workerName || matchedWorker.name || 'Assigned Technician',
+      workerCategory: orderData.workerCategory || matchedWorker.category || 'plumbing',
+      workerPhone: orderData.workerPhone || matchedWorker.phone || '+91 98221-55410',
+      workerAvatar: orderData.workerAvatar || matchedWorker.avatar || 'https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=400&auto=format&fit=crop&q=80',
+      
+      // Normalized requester & customer fields for reliable cross-role sync
+      source: orderData.source || (orderData.requestedBy === 'GOVERNMENT_OFFICER' ? 'GOVERNMENT' : 'CITIZEN'),
+      requestedBy: orderData.requestedBy || (orderData.source === 'GOVERNMENT' ? 'GOVERNMENT_OFFICER' : 'CITIZEN'),
+      customerName: orderData.customerName || orderData.requesterName || user?.name || 'Citizen User',
+      requesterName: orderData.requesterName || orderData.customerName || user?.name || 'Citizen User',
+      customerPhone: orderData.customerPhone || orderData.requesterPhone || user?.phone || '+91 98220-44102',
+      requesterPhone: orderData.requesterPhone || orderData.customerPhone || user?.phone || '+91 98220-44102',
       requesterRole: orderData.requesterRole || user?.role || 'citizen',
+      
       complaintId: orderData.complaintId || null,
       complaintTitle: orderData.complaintTitle || null,
       serviceTitle: orderData.serviceTitle || 'Civic Field Maintenance',
       location: orderData.location || {
-        ward: 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',
-        area: 'Kesnand Road, Wagholi',
+        ward: orderData.ward || 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',
+        area: orderData.address || orderData.area || 'Kesnand Road, Wagholi',
         city: 'Pune'
       },
+      ward: orderData.ward || orderData.location?.ward || 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',
+      address: orderData.address || orderData.location?.area || 'Kesnand Road, Wagholi',
       urgency: orderData.urgency || 'MEDIUM',
       scheduledTime: orderData.scheduledTime || 'Today, ASAP',
-      estimatedDuration: orderData.estimatedDuration || '2 Hours',
-      estimatedFare: Number(orderData.estimatedFare) || 500,
-      finalFare: Number(orderData.estimatedFare) || 500,
+      estimatedDuration: orderData.estimatedDuration || `${orderData.durationHours || 2} Hours`,
+      estimatedFare: Number(orderData.estimatedFare || orderData.fareBreakdown?.totalEstimatedFare) || 500,
+      finalFare: Number(orderData.finalFare || orderData.estimatedFare || orderData.fareBreakdown?.totalEstimatedFare) || 500,
+      fareBreakdown: orderData.fareBreakdown || null,
       status: 'REQUESTED',
       statusHistory: [
         { 
           step: 'REQUESTED', 
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
-          note: `${orderData.source === 'GOVERNMENT' ? 'Municipal Officer Er. Sanjay Sharma' : 'Citizen ' + (orderData.requesterName || 'User')} placed request` 
+          note: `${orderData.source === 'GOVERNMENT' || orderData.requestedBy === 'GOVERNMENT_OFFICER' ? 'Municipal Officer Er. Sanjay Sharma' : 'Citizen ' + (orderData.customerName || orderData.requesterName || 'User')} placed request` 
         }
       ],
       notes: orderData.notes || '',

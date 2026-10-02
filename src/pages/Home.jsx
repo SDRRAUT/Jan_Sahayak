@@ -109,7 +109,7 @@ export default function Home() {
   const [systemicScenarioIndex, setSystemicScenarioIndex] = useState(0);
   const [systemicViewMode, setSystemicViewMode] = useState('compare'); // 'compare' (default) | 'steps'
   const [activeStoryStep, setActiveStoryStep] = useState(1);
-  const [mapBasemap, setMapBasemap] = useState('dark'); // 'dark' | 'satellite'
+  const [mapBasemap, setMapBasemap] = useState('satellite'); // 'dark' | 'satellite'
   const [mapRegion, setMapRegion] = useState('wagholi');
   const [mapZoom, setMapZoom] = useState(1);
   const [hoveredHotspot, setHoveredHotspot] = useState(null);
@@ -627,113 +627,6 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ==========================================================================
-          04. HOW JAN_SAHAYAK WORKS (FROM CITIZEN VOICE TO ACTION)
-          ========================================================================== */}
-      <section id="how-it-works" className="section-spacing" style={{ background: '#FFFFFF', borderTop: '1px solid var(--color-divider)', borderBottom: '1px solid var(--color-divider)' }}>
-        <div className="container">
-          <div className="section-header center">
-            <span className="category-pill" style={{ marginBottom: '12px' }}>
-              THE RESOLUTION PIPELINE
-            </span>
-            <h2>From Citizen Voice to Action</h2>
-            <p>
-              Four clear steps that eliminate bureaucratic dead-ends and empower both residents and public authorities.
-            </p>
-          </div>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: '24px'
-          }}>
-            {FOUR_STEPS.map((s) => {
-              const StepIcon = s.icon;
-              return (
-                <div 
-                  key={s.step}
-                  style={{ 
-                    padding: '28px',
-                    borderRadius: '20px',
-                    background: s.bg,
-                    border: s.border,
-                    boxShadow: s.shadow,
-                    transition: 'all 240ms cubic-bezier(0.16, 1, 0.3, 1)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    position: 'relative',
-                    cursor: 'default'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-4px)';
-                    e.currentTarget.style.boxShadow = s.hoverShadow;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = s.shadow;
-                  }}
-                >
-                  <div>
-                    {/* Header: Large Stylized Number + Aesthetic Pill Badge */}
-                    <div style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'space-between', 
-                      marginBottom: '16px' 
-                    }}>
-                      <span style={{ 
-                        fontSize: '34px', 
-                        fontWeight: 800, 
-                        fontFamily: 'var(--font-mono)', 
-                        color: s.accentColor, 
-                        lineHeight: 1,
-                        letterSpacing: '-0.02em'
-                      }}>
-                        {s.step}
-                      </span>
-                      <span style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                        padding: '5px 11px',
-                        borderRadius: '999px',
-                        fontSize: '11px',
-                        fontWeight: 700,
-                        background: s.tagBg,
-                        color: s.tagColor,
-                        letterSpacing: '0.01em'
-                      }}>
-                        <StepIcon style={{ width: '12px', height: '12px' }} />
-                        <span>{s.tag}</span>
-                      </span>
-                    </div>
-
-                    <h3 style={{ 
-                      fontSize: '18px', 
-                      fontWeight: 700,
-                      marginBottom: '10px', 
-                      color: '#0F172A',
-                      letterSpacing: '-0.01em'
-                    }}>
-                      {s.title}
-                    </h3>
-                    <p style={{ 
-                      fontSize: '14px', 
-                      color: '#475569', 
-                      lineHeight: 1.65,
-                      margin: 0
-                    }}>
-                      {s.desc}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
       </section>
@@ -2092,6 +1985,112 @@ export default function Home() {
                   }}>
                     {w.reports}
                   </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ==========================================================================
+          04. HOW JAN_SAHAYAK WORKS (FROM CITIZEN VOICE TO ACTION)
+          ========================================================================== */}
+      <section id="how-it-works" className="section-spacing" style={{ background: '#FFFFFF', borderTop: '1px solid var(--color-divider)', borderBottom: '1px solid var(--color-divider)' }}>
+        <div className="container">
+          <div className="section-header center">
+            <span className="category-pill" style={{ marginBottom: '12px' }}>
+              THE RESOLUTION PIPELINE
+            </span>
+            <h2>From Citizen Voice to Action</h2>
+            <p>
+              Four clear steps that eliminate bureaucratic dead-ends and empower citizens at home.
+            </p>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '24px'
+          }}>
+            {FOUR_STEPS.map((s) => {
+              const StepIcon = s.icon;
+              return (
+                <div
+                  key={s.step}
+                  style={{
+                    padding: '28px',
+                    borderRadius: '20px',
+                    background: s.bg,
+                    border: s.border,
+                    boxShadow: s.shadow,
+                    transition: 'all 240ms cubic-bezier(0.16, 1, 0.3, 1)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    position: 'relative',
+                    cursor: 'default'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.boxShadow = s.hoverShadow;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = s.shadow;
+                  }}
+                >
+                  <div>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: '16px'
+                    }}>
+                      <span style={{
+                        fontSize: '34px',
+                        fontWeight: 800,
+                        fontFamily: 'var(--font-mono)',
+                        color: s.accentColor,
+                        lineHeight: 1,
+                        letterSpacing: '-0.02em'
+                      }}>
+                        {s.step}
+                      </span>
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        padding: '5px 11px',
+                        borderRadius: '999px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        background: s.tagBg,
+                        color: s.tagColor,
+                        letterSpacing: '0.01em'
+                      }}>
+                        <StepIcon style={{ width: '12px', height: '12px' }} />
+                        <span>{s.tag}</span>
+                      </span>
+                    </div>
+
+                    <h3 style={{
+                      fontSize: '18px',
+                      fontWeight: 700,
+                      marginBottom: '10px',
+                      color: '#0F172A',
+                      letterSpacing: '-0.01em'
+                    }}>
+                      {s.title}
+                    </h3>
+                    <p style={{
+                      fontSize: '14px',
+                      color: '#475569',
+                      lineHeight: 1.65,
+                      margin: 0
+                    }}>
+                      {s.desc}
+                    </p>
+                  </div>
                 </div>
               );
             })}
