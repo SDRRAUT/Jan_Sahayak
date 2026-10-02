@@ -39,127 +39,155 @@ import CivicSignalModal from '../components/intelligence/CivicSignalModal';
 import TerritoryProblemModal from '../components/officer/TerritoryProblemModal';
 import JanSuchnaModal from '../components/officer/JanSuchnaModal';
 
-// Clean, realistic live data for Smart Department Routing
-const ROUTED_COMPLAINTS_DATA = [
+// Clean, department-first structure where Department is the main entity and contains its routed complaints
+const ROUTED_DEPARTMENTS_DATA = [
   {
-    id: 'GRV-2026-8912',
-    timestamp: '4 mins ago',
-    citizenInput: 'Kesnand Road chowk pe underground main pipeline phat gayi hai, bohot tez paani road pe beh raha hai aur traffic ruk gaya hai.',
-    channel: '🎙 Voice (Hindi/Marathi)',
-    category: 'Water Supply & Sewerage',
-    categoryKey: 'WATER',
-    department: 'PMC Water Supply Department',
-    deptIcon: '💧',
-    deptColor: '#0284C7',
-    deptBg: '#F0F9FF',
-    deptBorder: '#BAE6FD',
+    id: 'PMC-WATER',
+    name: 'PMC Water Supply Department',
+    icon: '💧',
+    themeColor: '#0284C7',
+    badgeBg: '#F0F9FF',
+    badgeBorder: '#BAE6FD',
     ward: 'Ward 29 (Kesnand Corridor)',
-    officer: 'Er. Sanjay Sharma (EE Water)',
-    confidence: '98.8%',
-    routingRule: 'Pipeline Burst Keyword + Ward 29 Geo-Fence',
-    priority: 'CRITICAL',
-    sla: '4 Hours',
-    status: 'Auto-Dispatched'
+    nodalOfficer: 'Er. Sanjay Sharma (EE Water)',
+    accuracy: '98.8%',
+    complaints: [
+      {
+        id: 'GRV-2026-8912',
+        timestamp: '4 mins ago',
+        citizenInput: 'Kesnand Road chowk pe underground main pipeline phat gayi hai, bohot tez paani road pe beh raha hai aur traffic ruk gaya hai.',
+        channel: '🎙 Voice',
+        priority: 'CRITICAL',
+        sla: '4h SLA Target',
+        status: 'Auto-Dispatched',
+        matchRule: 'Pipeline Burst Keyword + Ward 29 Geo-Fence (98.8% match)'
+      },
+      {
+        id: 'GRV-2026-8871',
+        timestamp: '35 mins ago',
+        citizenInput: 'Zero water pressure on ground floor tap line, suction pump drawing air only in Ivy Estate cluster.',
+        channel: '✍ Text',
+        priority: 'HIGH',
+        sla: '8h SLA Target',
+        status: 'Auto-Dispatched',
+        matchRule: 'Low Pressure Telemetry + Feeder Match (97.5% match)'
+      }
+    ]
   },
   {
-    id: 'GRV-2026-8909',
-    timestamp: '11 mins ago',
-    citizenInput: 'Ivy Estate gate no 2 ke paas dumper 3 din se nahi aaya. Kachre ka bada dher lag gaya hai aur badboo fail rahi hai.',
-    channel: '📷 Photo + Text',
-    category: 'Solid Waste Management',
-    categoryKey: 'WASTE',
-    department: 'PMC Solid Waste Management',
-    deptIcon: '🗑️',
-    deptColor: '#059669',
-    deptBg: '#ECFDF5',
-    deptBorder: '#A7F3D0',
-    ward: 'Ward 29 (Ivy Estate)',
-    officer: 'V. K. Shinde (Sanitary Inspector)',
-    confidence: '97.4%',
-    routingRule: 'Garbage Dump Detection + SWM Roster Match',
-    priority: 'HIGH',
-    sla: '8 Hours',
-    status: 'Auto-Dispatched'
+    id: 'PMC-SWM',
+    name: 'PMC Solid Waste Management',
+    icon: '🗑️',
+    themeColor: '#059669',
+    badgeBg: '#ECFDF5',
+    badgeBorder: '#A7F3D0',
+    ward: 'Ward 29 (Ivy Estate & Commercial Corridor)',
+    nodalOfficer: 'V. K. Shinde (Sanitary Inspector)',
+    accuracy: '97.4%',
+    complaints: [
+      {
+        id: 'GRV-2026-8909',
+        timestamp: '11 mins ago',
+        citizenInput: 'Ivy Estate gate no 2 ke paas dumper 3 din se nahi aaya. Kachre ka bada dher lag gaya hai aur badboo fail rahi hai.',
+        channel: '📷 Photo',
+        priority: 'HIGH',
+        sla: '8h SLA Target',
+        status: 'Auto-Dispatched',
+        matchRule: 'Garbage Dump Detection + SWM Roster Match (97.4% match)'
+      }
+    ]
   },
   {
-    id: 'GRV-2026-8904',
-    timestamp: '28 mins ago',
-    citizenInput: 'Pune-Nagar Highway left lane bridge approach pe 2 deep potholes ban gaye hain. Bike girte girte bachi.',
-    channel: '✍ Portal Web',
-    category: 'Roads & Infrastructure',
-    categoryKey: 'ROADS',
-    department: 'Public Works Department (PWD)',
-    deptIcon: '🛣️',
-    deptColor: '#D97706',
-    deptBg: '#FFFBEB',
-    deptBorder: '#FDE68A',
-    ward: 'Ward 28 (Highway Corridor)',
-    officer: 'A. P. Deshmukh (PWD Asst. Engineer)',
-    confidence: '96.2%',
-    routingRule: 'State Highway Corridor GPS + Asphalt Pothole Tag',
-    priority: 'CRITICAL',
-    sla: '12 Hours',
-    status: 'Dispatched to PWD'
+    id: 'PWD-ROADS',
+    name: 'Public Works Department (PWD)',
+    icon: '🛣️',
+    themeColor: '#D97706',
+    badgeBg: '#FFFBEB',
+    badgeBorder: '#FDE68A',
+    ward: 'Ward 28 (Pune-Nagar Highway Corridor)',
+    nodalOfficer: 'A. P. Deshmukh (PWD Asst. Engineer)',
+    accuracy: '96.2%',
+    complaints: [
+      {
+        id: 'GRV-2026-8904',
+        timestamp: '28 mins ago',
+        citizenInput: 'Pune-Nagar Highway left lane bridge approach pe 2 deep potholes ban gaye hain. Bike girte girte bachi.',
+        channel: '✍ Portal',
+        priority: 'CRITICAL',
+        sla: '12h SLA Target',
+        status: 'Dispatched to PWD',
+        matchRule: 'State Highway Corridor GPS + Asphalt Pothole Tag (96.2% match)'
+      }
+    ]
   },
   {
-    id: 'GRV-2026-8898',
-    timestamp: '42 mins ago',
-    citizenInput: 'Wagholi vegetable market transformer pole se sparks nikal rahe hain aur live cable neeche latak rahi hai.',
-    channel: '🎙 Voice Note',
-    category: 'Electrical & Power Grid',
-    categoryKey: 'POWER',
-    department: 'MSEDCL Wagholi Sub-Division',
-    deptIcon: '⚡',
-    deptColor: '#7C3AED',
-    deptBg: '#F5F3FF',
-    deptBorder: '#DDD6FE',
-    ward: 'Ward 27 (Central Market)',
-    officer: 'R. B. Patil (MSEDCL Feeder Officer)',
-    confidence: '99.2%',
-    routingRule: 'High-Voltage Spark Hazard + Emergency Intercept',
-    priority: 'EMERGENCY',
-    sla: '2 Hours',
-    status: 'Dispatched (Priority 1)'
+    id: 'MSEDCL-POWER',
+    name: 'MSEDCL Wagholi Sub-Division',
+    icon: '⚡',
+    themeColor: '#7C3AED',
+    badgeBg: '#F5F3FF',
+    badgeBorder: '#DDD6FE',
+    ward: 'Ward 27 (Central Vegetable Market)',
+    nodalOfficer: 'R. B. Patil (MSEDCL Feeder Officer)',
+    accuracy: '99.2%',
+    complaints: [
+      {
+        id: 'GRV-2026-8898',
+        timestamp: '42 mins ago',
+        citizenInput: 'Wagholi vegetable market transformer pole se sparks nikal rahe hain aur live cable neeche latak rahi hai.',
+        channel: '🎙 Voice',
+        priority: 'EMERGENCY',
+        sla: '2h SLA Target',
+        status: 'Dispatched (Priority 1)',
+        matchRule: 'High-Voltage Spark Hazard + Emergency Intercept (99.2% match)'
+      }
+    ]
   },
   {
-    id: 'GRV-2026-8885',
-    timestamp: '1 hour ago',
-    citizenInput: 'Ubale Nagar underpass culvert completely choked with silt, mild rainfall me bhi 1.5 feet paani bhar gaya.',
-    channel: '📷 Photo Evidence',
-    category: 'Drainage & Stormwater',
-    categoryKey: 'DRAINAGE',
-    department: 'PMC Drainage Department',
-    deptIcon: '🌊',
-    deptColor: '#2563EB',
-    deptBg: '#EFF6FF',
-    deptBorder: '#BFDBFE',
-    ward: 'Ward 30 (Ubale Nagar)',
-    officer: 'M. S. Kulkarni (Drainage Inspector)',
-    confidence: '95.6%',
-    routingRule: 'Culvert Choke Vision Model + Monsoon Hotspot',
-    priority: 'HIGH',
-    sla: '6 Hours',
-    status: 'Auto-Dispatched'
+    id: 'PMC-DRAIN',
+    name: 'PMC Drainage Department',
+    icon: '🌊',
+    themeColor: '#2563EB',
+    badgeBg: '#EFF6FF',
+    badgeBorder: '#BFDBFE',
+    ward: 'Ward 30 (Ubale Nagar Underpass)',
+    nodalOfficer: 'M. S. Kulkarni (Drainage Inspector)',
+    accuracy: '95.6%',
+    complaints: [
+      {
+        id: 'GRV-2026-8885',
+        timestamp: '1 hour ago',
+        citizenInput: 'Ubale Nagar underpass culvert completely choked with silt, mild rainfall me bhi 1.5 feet paani bhar gaya.',
+        channel: '📷 Photo',
+        priority: 'HIGH',
+        sla: '6h SLA Target',
+        status: 'Auto-Dispatched',
+        matchRule: 'Culvert Choke Vision Model + Monsoon Hotspot (95.6% match)'
+      }
+    ]
   },
   {
-    id: 'GRV-2026-8879',
-    timestamp: '1.5 hours ago',
-    citizenInput: 'Primary health center lane me stagnant dirty water pool ban gaya hai, dengue mosquito breeding ho rahi hai.',
-    channel: '✍ Citizen App',
-    category: 'Public Health & Sanitation',
-    categoryKey: 'HEALTH',
-    department: 'PMC Health Department',
-    deptIcon: '🏥',
-    deptColor: '#E11D48',
-    deptBg: '#FFF1F2',
-    deptBorder: '#FECDD3',
+    id: 'PMC-HEALTH',
+    name: 'PMC Health Department',
+    icon: '🏥',
+    themeColor: '#E11D48',
+    badgeBg: '#FFF1F2',
+    badgeBorder: '#FECDD3',
     ward: 'Ward 27 (Health Clinic Lane)',
-    officer: 'Dr. Neha Joshi (Ward Medical Officer)',
-    confidence: '94.8%',
-    routingRule: 'Vector Control Keywords + Ward Clinic Geo-Tag',
-    priority: 'MEDIUM',
-    sla: '24 Hours',
-    status: 'Auto-Dispatched'
+    nodalOfficer: 'Dr. Neha Joshi (Ward Medical Officer)',
+    accuracy: '94.8%',
+    complaints: [
+      {
+        id: 'GRV-2026-8879',
+        timestamp: '1.5 hours ago',
+        citizenInput: 'Primary health center lane me stagnant dirty water pool ban gaya hai, dengue mosquito breeding ho rahi hai.',
+        channel: '✍ Portal',
+        priority: 'MEDIUM',
+        sla: '24h SLA Target',
+        status: 'Auto-Dispatched',
+        matchRule: 'Vector Control Keywords + Ward Clinic Geo-Tag (94.8% match)'
+      }
+    ]
   }
 ];
 
@@ -270,7 +298,6 @@ export default function CivicIntelligenceDashboard() {
   const [showTerritoryModal, setShowTerritoryModal] = useState(false);
   const [showJanSuchnaModal, setShowJanSuchnaModal] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' (default) | 'detail' | 'compact' | 'table' | 'minimal'
-  const [routingFilter, setRoutingFilter] = useState('ALL');
   const [expandedClusterId, setExpandedClusterId] = useState('CLUSTER-WAG-WATER-01');
 
   const filteredIncidents = civicIncidents.filter(inc => {
@@ -894,280 +921,161 @@ export default function CivicIntelligenceDashboard() {
            ══════════════════════════════════════════════════════════ */}
         {activeTab === 'routing' && (
           <div style={{ marginBottom: '32px' }}>
-            {/* Header Description */}
-            <div style={{
-              background: '#FFFFFF',
-              borderRadius: '16px',
-              padding: '18px 22px',
-              border: '1px solid #E2E8F0',
-              marginBottom: '16px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '12px'
-            }}>
-              <div>
-                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>🎯 Smart Department Routing & Auto-Dispatch</span>
-                </h3>
-                <p style={{ fontSize: '12.5px', color: '#64748B', margin: '4px 0 0 0' }}>
-                  AI-powered domain classification, ward geo-fencing, and nodal officer dispatch in under 2 seconds.
-                </p>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, padding: '4px 10px', borderRadius: '999px', background: '#ECFDF5', color: '#059669', border: '1px solid #A7F3D0' }}>
-                  ● Dispatch Engine Live
-                </span>
-              </div>
-            </div>
-
-            {/* 4 Minimalist Performance Metrics */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-              gap: '12px',
-              marginBottom: '20px'
-            }}>
-              <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px 18px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>First-Time Routing Accuracy</span>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-                  <strong style={{ fontSize: '24px', fontWeight: 800, color: '#059669' }}>96.4%</strong>
-                  <span style={{ fontSize: '11px', color: '#059669', fontWeight: 600 }}>Zero misdirection</span>
-                </div>
-              </div>
-
-              <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px 18px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>Avg AI Dispatch Latency</span>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-                  <strong style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A' }}>1.2s</strong>
-                  <span style={{ fontSize: '11px', color: '#64748B' }}>Indic NLP triage</span>
-                </div>
-              </div>
-
-              <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px 18px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>Auto-Routed Today</span>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-                  <strong style={{ fontSize: '24px', fontWeight: 800, color: '#0284C7' }}>142</strong>
-                  <span style={{ fontSize: '11px', color: '#0284C7', fontWeight: 600 }}>Zero manual backlog</span>
-                </div>
-              </div>
-
-              <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px 18px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>Misdirection Rate</span>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-                  <strong style={{ fontSize: '24px', fontWeight: 800, color: '#059669' }}>0.3%</strong>
-                  <span style={{ fontSize: '11px', color: '#64748B' }}>Down from 28% legacy</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Department Filter Pills */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              marginBottom: '16px',
-              overflowX: 'auto',
-              WebkitOverflowScrolling: 'touch',
-              paddingBottom: '4px'
-            }}>
-              {[
-                { id: 'ALL', label: 'All Departments', count: 6 },
-                { id: 'WATER', label: '💧 Water Supply (PMC)', count: 1 },
-                { id: 'WASTE', label: '🗑️ Solid Waste (PMC)', count: 1 },
-                { id: 'ROADS', label: '🛣️ Roads & Infrastructure (PWD)', count: 1 },
-                { id: 'POWER', label: '⚡ Power Grid (MSEDCL)', count: 1 },
-                { id: 'DRAINAGE', label: '🌊 Drainage (PMC)', count: 1 },
-                { id: 'HEALTH', label: '🏥 Public Health (PMC)', count: 1 }
-              ].map((filterItem) => {
-                const isSelected = routingFilter === filterItem.id;
-                return (
-                  <button
-                    key={filterItem.id}
-                    type="button"
-                    onClick={() => setRoutingFilter(filterItem.id)}
-                    style={{
-                      padding: '7px 14px',
-                      borderRadius: '999px',
-                      fontSize: '12px',
-                      fontWeight: isSelected ? 700 : 500,
-                      background: isSelected ? '#0F172A' : '#FFFFFF',
-                      color: isSelected ? '#FFFFFF' : '#475569',
-                      border: isSelected ? '1px solid #0F172A' : '1px solid #CBD5E1',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      whiteSpace: 'nowrap',
-                      flexShrink: 0,
-                      transition: 'all 120ms ease'
-                    }}
-                  >
-                    <span>{filterItem.label}</span>
-                    <span style={{
-                      fontSize: '10px',
-                      fontWeight: 700,
-                      padding: '1px 6px',
-                      borderRadius: '999px',
-                      background: isSelected ? '#334155' : '#F1F5F9',
-                      color: isSelected ? '#38BDF8' : '#64748B'
-                    }}>
-                      {filterItem.count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Live Auto-Routed Stream */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
-              {ROUTED_COMPLAINTS_DATA
-                .filter(item => routingFilter === 'ALL' || item.categoryKey === routingFilter)
-                .map((item) => (
-                  <div
-                    key={item.id}
-                    style={{
-                      background: '#FFFFFF',
-                      borderRadius: '16px',
-                      border: '1px solid #E2E8F0',
-                      padding: '18px 20px',
-                      boxShadow: '0 2px 6px rgba(15, 23, 42, 0.02)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '12px'
-                    }}
-                  >
-                    {/* Top Row: IDs, Badges & Priority */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 8px', borderRadius: '6px', background: '#F1F5F9', color: '#0F172A', fontFamily: 'monospace' }}>
-                          {item.id}
-                        </span>
-                        <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748B' }}>
-                          • {item.timestamp}
-                        </span>
-                        <span style={{ fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '999px', background: '#F8FAFC', color: '#475569', border: '1px solid #E2E8F0' }}>
-                          {item.channel}
-                        </span>
-                      </div>
-
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{
-                          fontSize: '11px',
-                          fontWeight: 800,
-                          padding: '3px 9px',
-                          borderRadius: '999px',
-                          background: item.priority === 'CRITICAL' || item.priority === 'EMERGENCY' ? '#FEF2F2' : '#FFFBEB',
-                          color: item.priority === 'CRITICAL' || item.priority === 'EMERGENCY' ? '#DC2626' : '#D97706',
-                          border: item.priority === 'CRITICAL' || item.priority === 'EMERGENCY' ? '1px solid #FECACA' : '1px solid #FDE68A'
-                        }}>
-                          ● {item.priority}
-                        </span>
-
-                        <span style={{
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          padding: '3px 9px',
-                          borderRadius: '999px',
-                          background: '#ECFDF5',
-                          color: '#059669',
-                          border: '1px solid #A7F3D0',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '4px'
-                        }}>
-                          <Check style={{ width: '12px', height: '12px' }} /> {item.status}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Citizen Input Box */}
-                    <div style={{
-                      background: '#F8FAFC',
-                      borderRadius: '10px',
-                      padding: '12px 14px',
-                      borderLeft: `4px solid ${item.deptColor}`,
-                      borderTop: '1px solid #F1F5F9',
-                      borderRight: '1px solid #F1F5F9',
-                      borderBottom: '1px solid #F1F5F9'
-                    }}>
-                      <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', marginBottom: '4px' }}>
-                        CITIZEN INTAKE TRANSCRIPT:
-                      </div>
-                      <p style={{ margin: 0, fontSize: '13px', color: '#1E293B', lineHeight: 1.5, fontWeight: 500 }}>
-                        "{item.citizenInput}"
-                      </p>
-                    </div>
-
-                    {/* Auto-Routing Intelligence Triad */}
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                      gap: '10px',
-                      paddingTop: '6px'
-                    }}>
-                      {/* Destination Dept */}
-                      <div style={{ padding: '10px 12px', borderRadius: '10px', background: item.deptBg, border: `1px solid ${item.deptBorder}` }}>
-                        <span style={{ fontSize: '10.5px', fontWeight: 700, color: item.deptColor, textTransform: 'uppercase', display: 'block' }}>
-                          🏛️ Routed Municipal Agency
-                        </span>
-                        <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block', marginTop: '2px' }}>
-                          {item.department}
-                        </strong>
-                        <span style={{ fontSize: '11px', color: '#475569' }}>
-                          📍 {item.ward}
-                        </span>
-                      </div>
-
-                      {/* Assigned Officer */}
-                      <div style={{ padding: '10px 12px', borderRadius: '10px', background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
-                        <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', display: 'block' }}>
-                          👤 Assigned Nodal Officer
-                        </span>
-                        <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block', marginTop: '2px' }}>
-                          {item.officer}
-                        </strong>
-                        <span style={{ fontSize: '11px', color: '#059669', fontWeight: 600 }}>
-                          ⏱️ Resolution SLA: {item.sla}
-                        </span>
-                      </div>
-
-                      {/* Confidence & Rule */}
-                      <div style={{ padding: '10px 12px', borderRadius: '10px', background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
-                        <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', display: 'block' }}>
-                          ⚡ AI Match Score & Rule
-                        </span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
-                          <strong style={{ fontSize: '13px', color: '#059669' }}>{item.confidence} Match</strong>
+            {/* Department Main Cards with Complaints Inside */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {ROUTED_DEPARTMENTS_DATA.map((dept) => (
+                <div
+                  key={dept.id}
+                  style={{
+                    background: '#FFFFFF',
+                    borderRadius: '16px',
+                    border: '1px solid #E2E8F0',
+                    boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)',
+                    overflow: 'hidden'
+                  }}
+                >
+                  {/* Department Main Header */}
+                  <div style={{
+                    padding: '16px 20px',
+                    background: '#F8FAFC',
+                    borderBottom: '1px solid #E2E8F0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '12px'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span style={{
+                        fontSize: '20px',
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '10px',
+                        background: dept.badgeBg,
+                        border: `1px solid ${dept.badgeBorder}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }}>
+                        {dept.icon}
+                      </span>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                          <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>
+                            {dept.name}
+                          </h4>
+                          <span style={{
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            padding: '2px 8px',
+                            borderRadius: '999px',
+                            background: dept.badgeBg,
+                            color: dept.themeColor,
+                            border: `1px solid ${dept.badgeBorder}`
+                          }}>
+                            {dept.complaints.length} {dept.complaints.length === 1 ? 'Active Case' : 'Active Cases'}
+                          </span>
                         </div>
-                        <span style={{ fontSize: '11px', color: '#64748B', display: 'block', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                          {item.routingRule}
-                        </span>
+                        <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                          <span>📍 {dept.ward}</span>
+                          <span>•</span>
+                          <span>👤 Nodal Officer: <strong>{dept.nodalOfficer}</strong></span>
+                        </div>
                       </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{
+                        fontSize: '11.5px',
+                        fontWeight: 700,
+                        padding: '4px 10px',
+                        borderRadius: '8px',
+                        background: '#ECFDF5',
+                        color: '#059669',
+                        border: '1px solid #A7F3D0'
+                      }}>
+                        ✓ {dept.accuracy} Auto-Dispatch Accuracy
+                      </span>
                     </div>
                   </div>
-                ))}
-            </div>
 
-            {/* Smart Coordination Callout */}
-            <div style={{
-              background: '#F0FDF4',
-              borderRadius: '12px',
-              padding: '14px 18px',
-              border: '1px solid #BBF7D0',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              fontSize: '12.5px',
-              color: '#166534'
-            }}>
-              <Sparkles style={{ width: '18px', height: '18px', color: '#16A34A', flexShrink: 0 }} />
-              <div>
-                <strong>Cross-Department Coordination Rule Active: </strong>
-                <span>If a water pipeline excavation requires asphalt road cutting, an automated secondary notification is simultaneously dispatched to PWD Roads within 2 hours to avoid unpaved road craters.</span>
-              </div>
+                  {/* Complaints Nested Inside Department Card */}
+                  <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {dept.complaints.map((c) => (
+                      <div
+                        key={c.id}
+                        style={{
+                          padding: '14px 16px',
+                          borderRadius: '10px',
+                          background: '#FFFFFF',
+                          border: '1px solid #E2E8F0',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '8px',
+                          transition: 'border-color 150ms ease'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontSize: '11px', fontWeight: 800, padding: '2px 7px', borderRadius: '6px', background: '#F1F5F9', color: '#334155', fontFamily: 'monospace' }}>
+                              #{c.id}
+                            </span>
+                            <span style={{ fontSize: '11px', color: '#64748B' }}>
+                              • {c.timestamp}
+                            </span>
+                            <span style={{ fontSize: '11px', padding: '1px 7px', borderRadius: '4px', background: '#F8FAFC', color: '#475569', border: '1px solid #E2E8F0' }}>
+                              {c.channel}
+                            </span>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{
+                              fontSize: '10.5px',
+                              fontWeight: 800,
+                              padding: '2px 8px',
+                              borderRadius: '999px',
+                              background: c.priority === 'CRITICAL' || c.priority === 'EMERGENCY' ? '#FEF2F2' : '#FFFBEB',
+                              color: c.priority === 'CRITICAL' || c.priority === 'EMERGENCY' ? '#DC2626' : '#D97706',
+                              border: c.priority === 'CRITICAL' || c.priority === 'EMERGENCY' ? '1px solid #FECACA' : '1px solid #FDE68A'
+                            }}>
+                              ● {c.priority}
+                            </span>
+                            <span style={{ fontSize: '11px', color: '#059669', fontWeight: 700 }}>
+                              ⏱️ {c.sla}
+                            </span>
+                            <span style={{
+                              fontSize: '10.5px',
+                              fontWeight: 700,
+                              padding: '2px 8px',
+                              borderRadius: '999px',
+                              background: '#ECFDF5',
+                              color: '#059669',
+                              border: '1px solid #A7F3D0',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}>
+                              <Check style={{ width: '11px', height: '11px' }} /> {c.status}
+                            </span>
+                          </div>
+                        </div>
+
+                        <p style={{ margin: 0, fontSize: '13px', color: '#1E293B', lineHeight: 1.5, fontWeight: 500 }}>
+                          "{c.citizenInput}"
+                        </p>
+
+                        <div style={{ fontSize: '11px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontWeight: 700, color: '#475569' }}>AI Match Rule:</span>
+                          <span style={{ color: '#0369A1', background: '#F0F9FF', padding: '1px 6px', borderRadius: '4px', border: '1px solid #BAE6FD' }}>
+                            {c.matchRule}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
