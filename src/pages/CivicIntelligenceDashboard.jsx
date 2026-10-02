@@ -890,52 +890,577 @@ export default function CivicIntelligenceDashboard() {
         )}
 
         {/* ══════════════════════════════════════════════════════════
-            TAB 3: AI COMPLAINT CLUSTERING FLOW
+            TAB 3: SMART DEPARTMENT ROUTING & AUTO-DISPATCH
            ══════════════════════════════════════════════════════════ */}
-        {activeTab === 'clustering' && (
+        {activeTab === 'routing' && (
           <div style={{ marginBottom: '32px' }}>
+            {/* Header Description */}
             <div style={{
               background: '#FFFFFF',
               borderRadius: '16px',
-              padding: '16px 20px',
+              padding: '18px 22px',
               border: '1px solid #E2E8F0',
-              marginBottom: '16px'
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '12px'
             }}>
-              <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-                ⚡ How AI Combines 100 Citizen Complaints into 1 Action Plan
-              </h3>
-              <p style={{ fontSize: '12.5px', color: '#64748B', margin: '4px 0 0 0' }}>
-                Instead of creating 100 separate tickets for the same broken pipe, JanSahayak uses Complaint DNA & geospatial proximity to link them together into a single municipal work order.
-              </p>
+              <div>
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>🎯 Smart Department Routing & Auto-Dispatch</span>
+                </h3>
+                <p style={{ fontSize: '12.5px', color: '#64748B', margin: '4px 0 0 0' }}>
+                  AI-powered domain classification, ward geo-fencing, and nodal officer dispatch in under 2 seconds.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, padding: '4px 10px', borderRadius: '999px', background: '#ECFDF5', color: '#059669', border: '1px solid #A7F3D0' }}>
+                  ● Dispatch Engine Live
+                </span>
+              </div>
             </div>
 
-            <LiveComplaintLinkageSection />
+            {/* 4 Minimalist Performance Metrics */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+              gap: '12px',
+              marginBottom: '20px'
+            }}>
+              <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px 18px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>First-Time Routing Accuracy</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
+                  <strong style={{ fontSize: '24px', fontWeight: 800, color: '#059669' }}>96.4%</strong>
+                  <span style={{ fontSize: '11px', color: '#059669', fontWeight: 600 }}>Zero misdirection</span>
+                </div>
+              </div>
+
+              <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px 18px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>Avg AI Dispatch Latency</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
+                  <strong style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A' }}>1.2s</strong>
+                  <span style={{ fontSize: '11px', color: '#64748B' }}>Indic NLP triage</span>
+                </div>
+              </div>
+
+              <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px 18px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>Auto-Routed Today</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
+                  <strong style={{ fontSize: '24px', fontWeight: 800, color: '#0284C7' }}>142</strong>
+                  <span style={{ fontSize: '11px', color: '#0284C7', fontWeight: 600 }}>Zero manual backlog</span>
+                </div>
+              </div>
+
+              <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px 18px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>Misdirection Rate</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
+                  <strong style={{ fontSize: '24px', fontWeight: 800, color: '#059669' }}>0.3%</strong>
+                  <span style={{ fontSize: '11px', color: '#64748B' }}>Down from 28% legacy</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Department Filter Pills */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginBottom: '16px',
+              overflowX: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              paddingBottom: '4px'
+            }}>
+              {[
+                { id: 'ALL', label: 'All Departments', count: 6 },
+                { id: 'WATER', label: '💧 Water Supply (PMC)', count: 1 },
+                { id: 'WASTE', label: '🗑️ Solid Waste (PMC)', count: 1 },
+                { id: 'ROADS', label: '🛣️ Roads & Infrastructure (PWD)', count: 1 },
+                { id: 'POWER', label: '⚡ Power Grid (MSEDCL)', count: 1 },
+                { id: 'DRAINAGE', label: '🌊 Drainage (PMC)', count: 1 },
+                { id: 'HEALTH', label: '🏥 Public Health (PMC)', count: 1 }
+              ].map((filterItem) => {
+                const isSelected = routingFilter === filterItem.id;
+                return (
+                  <button
+                    key={filterItem.id}
+                    type="button"
+                    onClick={() => setRoutingFilter(filterItem.id)}
+                    style={{
+                      padding: '7px 14px',
+                      borderRadius: '999px',
+                      fontSize: '12px',
+                      fontWeight: isSelected ? 700 : 500,
+                      background: isSelected ? '#0F172A' : '#FFFFFF',
+                      color: isSelected ? '#FFFFFF' : '#475569',
+                      border: isSelected ? '1px solid #0F172A' : '1px solid #CBD5E1',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
+                      transition: 'all 120ms ease'
+                    }}
+                  >
+                    <span>{filterItem.label}</span>
+                    <span style={{
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      padding: '1px 6px',
+                      borderRadius: '999px',
+                      background: isSelected ? '#334155' : '#F1F5F9',
+                      color: isSelected ? '#38BDF8' : '#64748B'
+                    }}>
+                      {filterItem.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Live Auto-Routed Stream */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+              {ROUTED_COMPLAINTS_DATA
+                .filter(item => routingFilter === 'ALL' || item.categoryKey === routingFilter)
+                .map((item) => (
+                  <div
+                    key={item.id}
+                    style={{
+                      background: '#FFFFFF',
+                      borderRadius: '16px',
+                      border: '1px solid #E2E8F0',
+                      padding: '18px 20px',
+                      boxShadow: '0 2px 6px rgba(15, 23, 42, 0.02)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '12px'
+                    }}
+                  >
+                    {/* Top Row: IDs, Badges & Priority */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 8px', borderRadius: '6px', background: '#F1F5F9', color: '#0F172A', fontFamily: 'monospace' }}>
+                          {item.id}
+                        </span>
+                        <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748B' }}>
+                          • {item.timestamp}
+                        </span>
+                        <span style={{ fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '999px', background: '#F8FAFC', color: '#475569', border: '1px solid #E2E8F0' }}>
+                          {item.channel}
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{
+                          fontSize: '11px',
+                          fontWeight: 800,
+                          padding: '3px 9px',
+                          borderRadius: '999px',
+                          background: item.priority === 'CRITICAL' || item.priority === 'EMERGENCY' ? '#FEF2F2' : '#FFFBEB',
+                          color: item.priority === 'CRITICAL' || item.priority === 'EMERGENCY' ? '#DC2626' : '#D97706',
+                          border: item.priority === 'CRITICAL' || item.priority === 'EMERGENCY' ? '1px solid #FECACA' : '1px solid #FDE68A'
+                        }}>
+                          ● {item.priority}
+                        </span>
+
+                        <span style={{
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          padding: '3px 9px',
+                          borderRadius: '999px',
+                          background: '#ECFDF5',
+                          color: '#059669',
+                          border: '1px solid #A7F3D0',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          <Check style={{ width: '12px', height: '12px' }} /> {item.status}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Citizen Input Box */}
+                    <div style={{
+                      background: '#F8FAFC',
+                      borderRadius: '10px',
+                      padding: '12px 14px',
+                      borderLeft: `4px solid ${item.deptColor}`,
+                      borderTop: '1px solid #F1F5F9',
+                      borderRight: '1px solid #F1F5F9',
+                      borderBottom: '1px solid #F1F5F9'
+                    }}>
+                      <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', marginBottom: '4px' }}>
+                        CITIZEN INTAKE TRANSCRIPT:
+                      </div>
+                      <p style={{ margin: 0, fontSize: '13px', color: '#1E293B', lineHeight: 1.5, fontWeight: 500 }}>
+                        "{item.citizenInput}"
+                      </p>
+                    </div>
+
+                    {/* Auto-Routing Intelligence Triad */}
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                      gap: '10px',
+                      paddingTop: '6px'
+                    }}>
+                      {/* Destination Dept */}
+                      <div style={{ padding: '10px 12px', borderRadius: '10px', background: item.deptBg, border: `1px solid ${item.deptBorder}` }}>
+                        <span style={{ fontSize: '10.5px', fontWeight: 700, color: item.deptColor, textTransform: 'uppercase', display: 'block' }}>
+                          🏛️ Routed Municipal Agency
+                        </span>
+                        <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block', marginTop: '2px' }}>
+                          {item.department}
+                        </strong>
+                        <span style={{ fontSize: '11px', color: '#475569' }}>
+                          📍 {item.ward}
+                        </span>
+                      </div>
+
+                      {/* Assigned Officer */}
+                      <div style={{ padding: '10px 12px', borderRadius: '10px', background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                        <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', display: 'block' }}>
+                          👤 Assigned Nodal Officer
+                        </span>
+                        <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block', marginTop: '2px' }}>
+                          {item.officer}
+                        </strong>
+                        <span style={{ fontSize: '11px', color: '#059669', fontWeight: 600 }}>
+                          ⏱️ Resolution SLA: {item.sla}
+                        </span>
+                      </div>
+
+                      {/* Confidence & Rule */}
+                      <div style={{ padding: '10px 12px', borderRadius: '10px', background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                        <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', display: 'block' }}>
+                          ⚡ AI Match Score & Rule
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                          <strong style={{ fontSize: '13px', color: '#059669' }}>{item.confidence} Match</strong>
+                        </div>
+                        <span style={{ fontSize: '11px', color: '#64748B', display: 'block', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                          {item.routingRule}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+
+            {/* Smart Coordination Callout */}
+            <div style={{
+              background: '#F0FDF4',
+              borderRadius: '12px',
+              padding: '14px 18px',
+              border: '1px solid #BBF7D0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              fontSize: '12.5px',
+              color: '#166534'
+            }}>
+              <Sparkles style={{ width: '18px', height: '18px', color: '#16A34A', flexShrink: 0 }} />
+              <div>
+                <strong>Cross-Department Coordination Rule Active: </strong>
+                <span>If a water pipeline excavation requires asphalt road cutting, an automated secondary notification is simultaneously dispatched to PWD Roads within 2 hours to avoid unpaved road craters.</span>
+              </div>
+            </div>
           </div>
         )}
 
         {/* ══════════════════════════════════════════════════════════
-            TAB 4: MULTI-AGENCY COORDINATION & MEMORY
+            TAB 4: DUPLICATE & SIMILAR COMPLAINT DETECTION
            ══════════════════════════════════════════════════════════ */}
-        {activeTab === 'coordination' && (
+        {activeTab === 'deduplication' && (
           <div style={{ marginBottom: '32px' }}>
+            {/* Header Description */}
             <div style={{
               background: '#FFFFFF',
               borderRadius: '16px',
-              padding: '16px 20px',
+              padding: '18px 22px',
               border: '1px solid #E2E8F0',
-              marginBottom: '20px'
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '12px'
             }}>
-              <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-                🤝 Inter-Department Coordination & Historical Memory
-              </h3>
-              <p style={{ fontSize: '12.5px', color: '#64748B', margin: '4px 0 0 0' }}>
-                Clear breakdown of lead vs supporting departments to prevent blame games and check recurring problem patterns from previous years.
-              </p>
+              <div>
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>🔍 Duplicate & Similar Complaint Detection</span>
+                </h3>
+                <p style={{ fontSize: '12.5px', color: '#64748B', margin: '4px 0 0 0' }}>
+                  Spatial and semantic clustering groups redundant citizen complaints into unified municipal work orders.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, padding: '4px 10px', borderRadius: '999px', background: '#EFF6FF', color: '#1D4ED8', border: '1px solid #BFDBFE' }}>
+                  ● Deduplication Engine Active
+                </span>
+              </div>
             </div>
 
-            <div className="responsive-side-by-side" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px' }}>
-              <CrossDepartmentMatrix crossDeptData={civicIncidents[0]?.crossDepartmentImpact} />
-              <CivicMemoryCard memories={civicIncidents[0]?.civicMemory} />
+            {/* 4 Minimalist Deduplication Impact Metrics */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+              gap: '12px',
+              marginBottom: '20px'
+            }}>
+              <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px 18px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>Duplicate Work Reduction</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
+                  <strong style={{ fontSize: '24px', fontWeight: 800, color: '#059669' }}>68.5%</strong>
+                  <span style={{ fontSize: '11px', color: '#059669', fontWeight: 600 }}>Merged into single jobs</span>
+                </div>
+              </div>
+
+              <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px 18px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>Redundant Visits Saved</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
+                  <strong style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A' }}>79 Visits</strong>
+                  <span style={{ fontSize: '11px', color: '#64748B' }}>Zero duplicate fuel waste</span>
+                </div>
+              </div>
+
+              <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px 18px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>Field Hours Saved</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
+                  <strong style={{ fontSize: '24px', fontWeight: 800, color: '#0284C7' }}>37.5 hrs</strong>
+                  <span style={{ fontSize: '11px', color: '#0284C7', fontWeight: 600 }}>This week</span>
+                </div>
+              </div>
+
+              <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px 18px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>Active Problem Clusters</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
+                  <strong style={{ fontSize: '24px', fontWeight: 800, color: '#7C3AED' }}>5 Clusters</strong>
+                  <span style={{ fontSize: '11px', color: '#64748B' }}>84 reports ➔ 5 tasks</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 3-Step Deduplication Process Pill Strip */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '10px',
+              marginBottom: '20px'
+            }}>
+              <div style={{ background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#EFF6FF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '12px' }}>1</span>
+                <div>
+                  <strong style={{ fontSize: '12.5px', color: '#0F172A', display: 'block' }}>Indic NLP & Vision Match</strong>
+                  <span style={{ fontSize: '11px', color: '#64748B' }}>Semantic text & photo embedding</span>
+                </div>
+              </div>
+
+              <div style={{ background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#F0FDF4', color: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '12px' }}>2</span>
+                <div>
+                  <strong style={{ fontSize: '12.5px', color: '#0F172A', display: 'block' }}>Spatio-Temporal Radius</strong>
+                  <span style={{ fontSize: '11px', color: '#64748B' }}>Groups tickets within 150m & 72 hrs</span>
+                </div>
+              </div>
+
+              <div style={{ background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#FAF5FF', color: '#9333EA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '12px' }}>3</span>
+                <div>
+                  <strong style={{ fontSize: '12.5px', color: '#0F172A', display: 'block' }}>Unified Action & SMS Sync</strong>
+                  <span style={{ fontSize: '11px', color: '#64748B' }}>1 field order + auto-sync to citizens</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Active Problem Clusters List */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {DUPLICATE_CLUSTERS_DATA.map((cluster) => {
+                const isExpanded = expandedClusterId === cluster.id;
+                return (
+                  <div
+                    key={cluster.id}
+                    style={{
+                      background: '#FFFFFF',
+                      borderRadius: '16px',
+                      border: '1px solid #E2E8F0',
+                      boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    {/* Cluster Summary Header */}
+                    <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 8px', borderRadius: '6px', background: '#F1F5F9', color: '#334155', fontFamily: 'monospace' }}>
+                            {cluster.masterTicket}
+                          </span>
+                          <span style={{ fontSize: '11.5px', fontWeight: 700, padding: '2px 8px', borderRadius: '999px', background: '#EFF6FF', color: '#1D4ED8', border: '1px solid #DBEAFE' }}>
+                            {cluster.deptIcon} {cluster.leadDept}
+                          </span>
+                        </div>
+
+                        <span style={{
+                          fontSize: '11px',
+                          fontWeight: 800,
+                          padding: '3px 10px',
+                          borderRadius: '999px',
+                          background: cluster.severity === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB',
+                          color: cluster.severity === 'CRITICAL' ? '#DC2626' : '#D97706',
+                          border: cluster.severity === 'CRITICAL' ? '1px solid #FECACA' : '1px solid #FDE68A'
+                        }}>
+                          ● {cluster.severity}
+                        </span>
+                      </div>
+
+                      <div>
+                        <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>
+                          {cluster.title}
+                        </h4>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#475569', lineHeight: 1.5 }}>
+                          <strong>Impact: </strong>{cluster.impactSummary}
+                        </p>
+                      </div>
+
+                      {/* Cluster Indicators Strip */}
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                        gap: '8px',
+                        background: '#F8FAFC',
+                        padding: '10px 14px',
+                        borderRadius: '12px',
+                        border: '1px solid #E2E8F0'
+                      }}>
+                        <div>
+                          <span style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>Semantic Match</span>
+                          <strong style={{ fontSize: '13px', color: '#059669' }}>{cluster.similarityScore}</strong>
+                        </div>
+                        <div>
+                          <span style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>Spatial Radius</span>
+                          <strong style={{ fontSize: '13px', color: '#0284C7' }}>{cluster.geoRadius}</strong>
+                        </div>
+                        <div>
+                          <span style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>Merged Reports</span>
+                          <strong style={{ fontSize: '13px', color: '#7C3AED' }}>{cluster.totalReportsMerged} Complaints</strong>
+                        </div>
+                        <div>
+                          <span style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>Field Savings</span>
+                          <strong style={{ fontSize: '13px', color: '#D97706' }}>{cluster.dispatchesSaved}</strong>
+                        </div>
+                      </div>
+
+                      {/* Unified Action Bar */}
+                      <div style={{
+                        fontSize: '12.5px',
+                        color: '#065F46',
+                        background: '#ECFDF5',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        border: '1px solid #A7F3D0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: '8px'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <CheckCircle2 style={{ width: '15px', height: '15px', color: '#059669', flexShrink: 0 }} />
+                          <span><strong>Unified Action: </strong>{cluster.actionSummary}</span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setExpandedClusterId(isExpanded ? null : cluster.id)}
+                          style={{
+                            background: '#FFFFFF',
+                            border: '1px solid #A7F3D0',
+                            borderRadius: '6px',
+                            padding: '4px 10px',
+                            fontSize: '11.5px',
+                            fontWeight: 700,
+                            color: '#065F46',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <span>{isExpanded ? 'Hide Grouped Reports' : `Inspect Grouped Signals (${cluster.groupedSignals.length})`}</span>
+                          {isExpanded ? <ChevronUp style={{ width: '13px', height: '13px' }} /> : <ChevronDown style={{ width: '13px', height: '13px' }} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Expandable Grouped Citizen Signals */}
+                    {isExpanded && (
+                      <div style={{
+                        borderTop: '1px solid #E2E8F0',
+                        background: '#FAFAFA',
+                        padding: '16px 20px'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                          <span style={{ fontSize: '12px', fontWeight: 800, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                            Individual Citizen Signals Grouped Under Master Case:
+                          </span>
+                          <span style={{ fontSize: '11px', color: '#059669', fontWeight: 700 }}>
+                            All citizens auto-synced with single ticket updates
+                          </span>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          {cluster.groupedSignals.map((sig) => (
+                            <div
+                              key={sig.id}
+                              style={{
+                                background: '#FFFFFF',
+                                borderRadius: '10px',
+                                border: '1px solid #E2E8F0',
+                                padding: '10px 14px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                flexWrap: 'wrap',
+                                gap: '10px'
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: '240px' }}>
+                                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', fontFamily: 'monospace' }}>
+                                  {sig.id}
+                                </span>
+                                <span style={{ fontSize: '11px', fontWeight: 600, padding: '2px 6px', borderRadius: '4px', background: '#F1F5F9', color: '#475569' }}>
+                                  {sig.type}
+                                </span>
+                                <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#0F172A' }}>
+                                  {sig.citizen}
+                                </span>
+                                <span style={{ fontSize: '11px', color: '#94A3B8' }}>
+                                  • {sig.time}
+                                </span>
+                              </div>
+
+                              <div style={{ flex: 2, minWidth: '260px', fontSize: '12px', color: '#334155' }}>
+                                "{sig.input}"
+                              </div>
+
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669', background: '#ECFDF5', padding: '2px 8px', borderRadius: '999px', border: '1px solid #A7F3D0' }}>
+                                  {sig.score}% Match
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
