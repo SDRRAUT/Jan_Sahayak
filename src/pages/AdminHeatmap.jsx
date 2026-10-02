@@ -77,26 +77,21 @@ export default function AdminHeatmap() {
       <div className="container">
         {/* Header */}
         <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '16px',
-          marginBottom: '24px',
+          textAlign: 'center',
+          maxWidth: '820px',
+          margin: '0 auto 24px auto',
           paddingBottom: '20px',
           borderBottom: '1px solid var(--color-divider)'
         }}>
-          <div>
-            <div className="category-pill" style={{ marginBottom: '8px' }}>
-              MUNICIPAL COMMAND CENTER • GEOSPATIAL INTELLIGENCE
-            </div>
-            <h1 style={{ fontSize: '32px', color: 'var(--color-text-primary)' }}>
-              Civic Intelligence Map & Hotspot Matrix
-            </h1>
-            <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
-              Answering <strong>WHERE</strong> public problems are emerging with real-time ward clustering & root-cause detection.
-            </p>
+          <div className="category-pill" style={{ marginBottom: '10px' }}>
+            MUNICIPAL COMMAND CENTER • GEOSPATIAL INTELLIGENCE
           </div>
+          <h1 style={{ fontSize: '32px', color: 'var(--color-text-primary)', margin: '0 0 8px 0', fontWeight: 800 }}>
+            Civic Intelligence Map & Hotspot Matrix
+          </h1>
+          <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', margin: '0 auto', lineHeight: 1.5 }}>
+            Answering <strong>WHERE</strong> public problems are emerging with real-time ward clustering & root-cause detection.
+          </p>
         </div>
 
         {/* SECTION 17: EMERGING THIS WEEK CALLOUT BANNER */}
