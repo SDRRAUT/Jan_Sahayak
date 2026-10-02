@@ -632,6 +632,679 @@ export default function Home() {
       </section>
 
       {/* ==========================================================================
+          04. HOW JAN_SAHAYAK WORKS (FROM CITIZEN VOICE TO ACTION)
+          ========================================================================== */}
+      <section id="how-it-works" className="section-spacing" style={{ background: '#FFFFFF', borderTop: '1px solid var(--color-divider)', borderBottom: '1px solid var(--color-divider)' }}>
+        <div className="container">
+          <div className="section-header center">
+            <span className="category-pill" style={{ marginBottom: '12px' }}>
+              THE RESOLUTION PIPELINE
+            </span>
+            <h2>From Citizen Voice to Action</h2>
+            <p>
+              Four clear steps that eliminate bureaucratic dead-ends and empower citizens at home.
+            </p>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '24px'
+          }}>
+            {FOUR_STEPS.map((s) => {
+              const StepIcon = s.icon;
+              return (
+                <div
+                  key={s.step}
+                  style={{
+                    padding: '28px',
+                    borderRadius: '20px',
+                    background: s.bg,
+                    border: s.border,
+                    boxShadow: s.shadow,
+                    transition: 'all 240ms cubic-bezier(0.16, 1, 0.3, 1)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    position: 'relative',
+                    cursor: 'default'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.boxShadow = s.hoverShadow;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = s.shadow;
+                  }}
+                >
+                  <div>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: '16px'
+                    }}>
+                      <span style={{
+                        fontSize: '34px',
+                        fontWeight: 800,
+                        fontFamily: 'var(--font-mono)',
+                        color: s.accentColor,
+                        lineHeight: 1,
+                        letterSpacing: '-0.02em'
+                      }}>
+                        {s.step}
+                      </span>
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        padding: '5px 11px',
+                        borderRadius: '999px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        background: s.tagBg,
+                        color: s.tagColor,
+                        letterSpacing: '0.01em'
+                      }}>
+                        <StepIcon style={{ width: '12px', height: '12px' }} />
+                        <span>{s.tag}</span>
+                      </span>
+                    </div>
+
+                    <h3 style={{
+                      fontSize: '18px',
+                      fontWeight: 700,
+                      marginBottom: '10px',
+                      color: '#0F172A',
+                      letterSpacing: '-0.01em'
+                    }}>
+                      {s.title}
+                    </h3>
+                    <p style={{
+                      fontSize: '14px',
+                      color: '#475569',
+                      lineHeight: 1.65,
+                      margin: 0
+                    }}>
+                      {s.desc}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ==========================================================================
+          07. CIVIC INTELLIGENCE MAP PREVIEW (Interactive Wagholi Pune GIS Radar)
+          ========================================================================== */}
+      <section className="section-spacing" style={{ background: '#F8F9FA' }}>
+        <div className="container">
+          {/* Header - Centered Layout */}
+          <div style={{ textAlign: 'center', maxWidth: '820px', margin: '0 auto 36px auto' }}>
+            <span className="category-pill" style={{ background: '#E8F7F0', color: '#0E5E3A', borderColor: 'rgba(14, 94, 58, 0.2)', marginBottom: '12px', display: 'inline-flex' }}>
+              🛰️ GEOSPATIAL CLUSTER RADAR
+            </span>
+            <h2 style={{ marginTop: '4px', fontSize: '36px', letterSpacing: '-0.02em', color: '#0F172A', marginBottom: '10px', lineHeight: 1.2 }}>
+              Where Are Problems Happening Across Wagholi, Pune?
+            </h2>
+            <p style={{ color: '#64748B', fontSize: '16px', lineHeight: 1.6, maxWidth: '680px', margin: '0 auto 22px auto' }}>
+              Click any hotspot on the live satellite radar to see real-time cluster density, root cause diagnosis, and dispatched municipal response teams.
+            </p>
+
+            {/* Category Filter Pills - Centered */}
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
+              {[
+                { key: 'ALL', label: 'All Hotspots', icon: '📍' },
+                { key: 'WATER', label: 'Water Supply', icon: '💧' },
+                { key: 'ROADS', label: 'Roads & Works', icon: '🛣️' },
+                { key: 'SANITATION', label: 'Sanitation', icon: '🗑️' },
+                { key: 'ELECTRICITY', label: 'Power Grid', icon: '⚡' }
+              ].map((cat) => (
+                <button
+                  key={cat.key}
+                  type="button"
+                  onClick={() => setMapCategory(cat.key)}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '999px',
+                    fontSize: '12.5px',
+                    fontWeight: mapCategory === cat.key ? 700 : 500,
+                    cursor: 'pointer',
+                    border: mapCategory === cat.key ? '1.5px solid #0E5E3A' : '1px solid #E2E8F0',
+                    background: mapCategory === cat.key ? '#0E5E3A' : '#FFFFFF',
+                    color: mapCategory === cat.key ? '#FFFFFF' : '#475569',
+                    boxShadow: mapCategory === cat.key ? '0 3px 10px rgba(14, 94, 58, 0.22)' : '0 1px 3px rgba(0,0,0,0.04)',
+                    transition: 'all 150ms ease',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <span>{cat.icon}</span>
+                  <span>{cat.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Interactive Map Visual Container */}
+          <div className="map-radar-grid">
+            {/* Left Column: Interactive Wagholi Pune GIS Radar Canvas */}
+            <div
+              style={{
+                position: 'relative',
+                borderRadius: '24px',
+                overflow: 'hidden',
+                background: '#0B1520',
+                border: '1.5px solid #1E293B',
+                boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.15)',
+                minHeight: '520px',
+                display: 'flex',
+                flexDirection: 'column'
+              }}
+            >
+              {/* REAL INTERACTIVE LEAFLET MAP BASEMAP */}
+              <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 1 }}>
+                <LeafletSpreadMap
+                  defaultTile={mapBasemap === 'satellite' ? 'satellite' : 'dark'}
+                  region={mapRegion}
+                  height="100%"
+                />
+              </div>
+
+              {/* Geographic Mesh & Cybernetic Radar Overlay */}
+              <div 
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: mapBasemap === 'satellite'
+                    ? 'radial-gradient(ellipse at center, rgba(0,0,0,0.1) 0%, rgba(10,25,35,0.7) 100%)'
+                    : 'radial-gradient(ellipse at center, rgba(11,21,32,0.15) 0%, rgba(11,21,32,0.65) 100%)',
+                  pointerEvents: 'none'
+                }} 
+              />
+
+              {/* Map Controls Header (Basemap Mode + Zoom Controls) */}
+              <div style={{
+                position: 'relative',
+                zIndex: 3,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '16px 20px',
+                background: 'linear-gradient(180deg, rgba(11, 21, 32, 0.85) 0%, rgba(11, 21, 32, 0) 100%)'
+              }}>
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'rgba(15, 23, 42, 0.75)',
+                  backdropFilter: 'blur(8px)',
+                  padding: '6px 12px',
+                  borderRadius: '999px',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  color: '#F8FAFC',
+                  fontSize: '11.5px',
+                  fontWeight: 600
+                }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', display: 'inline-block', boxShadow: '0 0 8px #10B981' }} />
+                  <span>📍 Wagholi, Pune Grid (PMC Wards 27-31) • Live GIS Feed</span>
+                </div>
+
+                {/* Region Selector & Basemap Switcher & Zoom Tools */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  {/* Region Switcher */}
+                  <div style={{
+                    display: 'flex',
+                    background: 'rgba(15, 23, 42, 0.75)',
+                    backdropFilter: 'blur(8px)',
+                    padding: '3px',
+                    borderRadius: '10px',
+                    border: '1px solid rgba(255, 255, 255, 0.15)'
+                  }}>
+                    <button
+                      type="button"
+                      onClick={() => setMapRegion('wagholi')}
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: '700',
+                        padding: '4px 10px',
+                        borderRadius: '7px',
+                        background: '#0284C7',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      🚩 Wagholi, Pune (PMC)
+                    </button>
+                  </div>
+
+                  <div style={{
+                    display: 'flex',
+                    background: 'rgba(15, 23, 42, 0.75)',
+                    backdropFilter: 'blur(8px)',
+                    padding: '3px',
+                    borderRadius: '10px',
+                    border: '1px solid rgba(255, 255, 255, 0.15)'
+                  }}>
+                    <button
+                      type="button"
+                      onClick={() => setMapBasemap('dark')}
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: mapBasemap === 'dark' ? 700 : 500,
+                        padding: '4px 10px',
+                        borderRadius: '7px',
+                        background: mapBasemap === 'dark' ? '#10B981' : 'transparent',
+                        color: mapBasemap === 'dark' ? '#0B1914' : '#CBD5E1',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'all 150ms ease'
+                      }}
+                    >
+                      🗺️ Dark Radar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMapBasemap('satellite')}
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: mapBasemap === 'satellite' ? 700 : 500,
+                        padding: '4px 10px',
+                        borderRadius: '7px',
+                        background: mapBasemap === 'satellite' ? '#10B981' : 'transparent',
+                        color: mapBasemap === 'satellite' ? '#0B1914' : '#CBD5E1',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'all 150ms ease'
+                      }}
+                    >
+                      🛰️ Satellite
+                    </button>
+                  </div>
+
+                  {/* Zoom In/Out */}
+                  <div style={{
+                    display: 'flex',
+                    gap: '2px',
+                    background: 'rgba(15, 23, 42, 0.75)',
+                    backdropFilter: 'blur(8px)',
+                    padding: '3px',
+                    borderRadius: '10px',
+                    border: '1px solid rgba(255, 255, 255, 0.15)'
+                  }}>
+                    <button
+                      type="button"
+                      title="Zoom In"
+                      onClick={() => setMapZoom(prev => Math.min(1.5, prev + 0.15))}
+                      style={{ background: 'none', border: 'none', color: '#FFFFFF', padding: '4px 7px', cursor: 'pointer', borderRadius: '6px' }}
+                    >
+                      <ZoomIn style={{ width: '14px', height: '14px' }} />
+                    </button>
+                    <button
+                      type="button"
+                      title="Zoom Out"
+                      onClick={() => setMapZoom(prev => Math.max(1, prev - 0.15))}
+                      style={{ background: 'none', border: 'none', color: '#FFFFFF', padding: '4px 7px', cursor: 'pointer', borderRadius: '6px' }}
+                    >
+                      <ZoomOut style={{ width: '14px', height: '14px' }} />
+                    </button>
+                    <button
+                      type="button"
+                      title="Reset View"
+                      onClick={() => setMapZoom(1)}
+                      style={{ background: 'none', border: 'none', color: '#FFFFFF', padding: '4px 7px', cursor: 'pointer', borderRadius: '6px' }}
+                    >
+                      <RotateCcw style={{ width: '13px', height: '13px' }} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Interactive Hotspot Radar Pins Overlay */}
+              <div style={{
+                position: 'relative',
+                flex: 1,
+                zIndex: 2,
+                transform: `scale(${mapZoom})`,
+                transformOrigin: 'center center',
+                transition: 'transform 300ms cubic-bezier(0.16, 1, 0.3, 1)'
+              }}>
+                {filteredMapWards.map((w, idx) => {
+                  const isSelected = activeWardIndex === idx;
+                  const isHovered = hoveredHotspot === w.id;
+                  return (
+                    <div
+                      key={w.id}
+                      onClick={() => setActiveWardIndex(idx)}
+                      onMouseEnter={() => setHoveredHotspot(w.id)}
+                      onMouseLeave={() => setHoveredHotspot(null)}
+                      style={{
+                        position: 'absolute',
+                        left: `${w.posX}%`,
+                        top: `${w.posY}%`,
+                        transform: 'translate(-50%, -50%)',
+                        cursor: 'pointer',
+                        zIndex: isSelected ? 10 : 5
+                      }}
+                    >
+                      {/* Concentric Radar Pulsing Beacon Ring */}
+                      <div 
+                        className="radar-beacon"
+                        style={{
+                          background: `${w.color}25`,
+                          border: `1.5px solid ${w.color}`
+                        }}
+                      />
+
+                      {/* Hotspot Central Badge */}
+                      <div 
+                        style={{
+                          position: 'relative',
+                          zIndex: 2,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '6px 12px',
+                          borderRadius: '999px',
+                          background: isSelected ? w.color : '#0F172A',
+                          border: `2px solid ${w.color}`,
+                          boxShadow: `0 4px 20px ${w.color}66, 0 0 0 ${isSelected ? '4px' : '2px'} rgba(255, 255, 255, 0.3)`,
+                          color: '#FFFFFF',
+                          transition: 'all 200ms cubic-bezier(0.16, 1, 0.3, 1)',
+                          transform: isSelected || isHovered ? 'scale(1.12)' : 'scale(1)'
+                        }}
+                      >
+                        <span style={{ fontSize: '14px' }}>{w.icon}</span>
+                        <span style={{ fontSize: '12px', fontWeight: 800 }}>
+                          {w.reports}
+                        </span>
+                      </div>
+
+                      {/* Floating Tooltip on Hover / Selected */}
+                      {(isHovered || isSelected) && (
+                        <div style={{
+                          position: 'absolute',
+                          bottom: '100%',
+                          left: '50%',
+                          transform: 'translateX(-50%) translateY(-10px)',
+                          background: 'rgba(15, 23, 42, 0.94)',
+                          backdropFilter: 'blur(12px)',
+                          border: `1.5px solid ${w.color}`,
+                          borderRadius: '12px',
+                          padding: '10px 14px',
+                          minWidth: '200px',
+                          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+                          pointerEvents: 'none',
+                          zIndex: 20
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', color: w.color }}>
+                              {w.severity}
+                            </span>
+                            <span style={{ fontSize: '10px', color: '#94A3B8' }}>{w.radiusMeters}</span>
+                          </div>
+                          <strong style={{ fontSize: '12.5px', color: '#FFFFFF', display: 'block', marginBottom: '2px' }}>
+                            {w.shortName}
+                          </strong>
+                          <span style={{ fontSize: '11px', color: '#CBD5E1', display: 'block' }}>
+                            {w.hotspotName}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Bottom Interactive Simulation Bar & Live Marquee */}
+              <div style={{
+                position: 'relative',
+                zIndex: 3,
+                padding: '14px 20px',
+                background: 'linear-gradient(0deg, rgba(11, 21, 32, 0.95) 0%, rgba(11, 21, 32, 0.6) 100%)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '12px'
+              }}>
+                {/* Live Signal Simulation Button */}
+                <button
+                  type="button"
+                  onClick={() => handleSimulateSignal(activeWard.id)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 16px',
+                    borderRadius: '10px',
+                    background: '#10B981',
+                    border: 'none',
+                    color: '#0B1914',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 14px rgba(16, 185, 129, 0.4)',
+                    transition: 'all 150ms ease'
+                  }}
+                >
+                  <Radio style={{ width: '14px', height: '14px' }} />
+                  <span>Simulate Inbound Citizen Voice (+1 Report)</span>
+                </button>
+
+                {recentSignalFlash && (
+                  <div style={{
+                    fontSize: '12px',
+                    color: '#34D399',
+                    fontWeight: 600,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#34D399', animation: 'radarPing 1s infinite' }} />
+                    <span>Signal Triaged via Gemini Voice in {activeWard.shortName}! (+1 Count Updated)</span>
+                  </div>
+                )}
+
+                <div style={{ fontSize: '11.5px', color: '#94A3B8' }}>
+                  Click any hotspot to inspect root-cause diagnosis.
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Mission Control Ward Action Hub */}
+            <div
+              style={{
+                padding: '28px',
+                background: '#FFFFFF',
+                borderRadius: '24px',
+                border: '1.5px solid #E2E8F0',
+                boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.08)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between'
+              }}
+            >
+              <div>
+                {/* Top Badge & Live Status */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: activeWard.color }} />
+                    <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: activeWard.color }}>
+                      {activeWard.status.replace('_', ' ')}
+                    </span>
+                  </div>
+                  <span style={{
+                    fontSize: '10.5px',
+                    fontWeight: 700,
+                    padding: '3px 8px',
+                    borderRadius: '999px',
+                    background: activeWard.severity === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB',
+                    color: activeWard.severity === 'CRITICAL' ? '#991B1B' : '#92400E'
+                  }}>
+                    {activeWard.severity}
+                  </span>
+                </div>
+
+                {/* Ward Title & Sector */}
+                <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', marginBottom: '4px', letterSpacing: '-0.01em' }}>
+                  {activeWard.ward}
+                </h3>
+                <span style={{ fontSize: '13px', color: '#64748B', display: 'block', marginBottom: '18px' }}>
+                  {activeWard.zone} • {activeWard.radiusMeters} Cluster
+                </span>
+
+                {/* Root Cause Problem Card */}
+                <div style={{
+                  padding: '16px',
+                  borderRadius: '16px',
+                  background: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  marginBottom: '16px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '16px' }}>{activeWard.icon}</span>
+                    <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#0E5E3A' }}>
+                      {activeWard.dept}
+                    </span>
+                  </div>
+                  <strong style={{ fontSize: '14px', color: '#0F172A', display: 'block', marginBottom: '6px' }}>
+                    {activeWard.hotspotName}
+                  </strong>
+                  <div style={{ fontSize: '12px', color: '#475569', lineHeight: 1.4 }}>
+                    <span style={{ color: '#0E5E3A', fontWeight: 700 }}>Intervention: </span>
+                    <span>{activeWard.actionRequired}</span>
+                  </div>
+                </div>
+
+                {/* Live Field Squad Dispatch Tracker */}
+                <div style={{
+                  padding: '16px',
+                  borderRadius: '16px',
+                  background: '#ECFDF5',
+                  border: '1px solid #A7F3D0',
+                  marginBottom: '20px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#065F46' }}>
+                      Field Crew Deployment
+                    </span>
+                    <span style={{ fontSize: '11px', fontWeight: 800, color: '#065F46', background: '#D1FAE5', padding: '2px 8px', borderRadius: '999px' }}>
+                      ETA: {activeWard.eta}
+                    </span>
+                  </div>
+                  <strong style={{ fontSize: '13px', color: '#065F46', display: 'block', marginBottom: '4px' }}>
+                    {activeWard.dispatchedUnit}
+                  </strong>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11.5px', color: '#047857' }}>
+                    <span>Impact Protected:</span>
+                    <strong>{activeWard.peopleImpacted}</strong>
+                  </div>
+                </div>
+
+                {/* Live Metrics Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '24px' }}>
+                  <div style={{ padding: '12px', borderRadius: '12px', background: '#F1F5F9', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+                    <span style={{ fontSize: '10.5px', color: '#64748B', display: 'block', marginBottom: '2px' }}>Total Reports</span>
+                    <strong style={{ fontSize: '18px', color: '#0F172A', fontWeight: 800 }}>{activeWard.reports}</strong>
+                  </div>
+                  <div style={{ padding: '12px', borderRadius: '12px', background: '#F1F5F9', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+                    <span style={{ fontSize: '10.5px', color: '#64748B', display: 'block', marginBottom: '2px' }}>Resolution Target</span>
+                    <strong style={{ fontSize: '13px', color: '#0E5E3A', fontWeight: 800, display: 'block', marginTop: '4px' }}>Within 12h</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <Link
+                  to={`/officer/complaints/PN-2026-WAG-0102`}
+                  className="btn-primary"
+                  style={{ width: '100%', justifyContent: 'center', padding: '12px 18px', borderRadius: '12px' }}
+                >
+                  <span>Inspect Dispatched Work Order</span>
+                  <ArrowRight style={{ width: '14px', height: '14px' }} />
+                </Link>
+
+                <Link
+                  to="/admin"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    padding: '10px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    color: '#0E5E3A',
+                    textDecoration: 'none'
+                  }}
+                >
+                  <span>Open Full Municipal GIS Explorer</span>
+                  <ArrowUpRight style={{ width: '13px', height: '13px' }} />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Ward Navigation Strip */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '12px',
+            marginTop: '20px'
+          }}>
+            {filteredMapWards.map((w, idx) => {
+              const isSelected = activeWardIndex === idx;
+              return (
+                <div
+                  key={w.id}
+                  onClick={() => setActiveWardIndex(idx)}
+                  style={{
+                    padding: '14px 18px',
+                    borderRadius: '16px',
+                    cursor: 'pointer',
+                    background: isSelected ? '#FFFFFF' : '#FFFFFF',
+                    border: isSelected ? `2px solid ${w.color}` : '1px solid #E2E8F0',
+                    boxShadow: isSelected ? `0 8px 24px ${w.color}22` : '0 2px 6px rgba(15, 23, 42, 0.04)',
+                    transition: 'all 150ms ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ fontSize: '20px' }}>{w.icon}</span>
+                    <div>
+                      <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block' }}>{w.shortName}</strong>
+                      <span style={{ fontSize: '11px', color: '#64748B' }}>{w.category} • {w.trend}</span>
+                    </div>
+                  </div>
+
+                  <span style={{
+                    fontSize: '12px',
+                    fontWeight: 800,
+                    padding: '4px 8px',
+                    borderRadius: '999px',
+                    background: isSelected ? w.color : '#F1F5F9',
+                    color: isSelected ? '#FFFFFF' : '#0F172A'
+                  }}>
+                    {w.reports}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ==========================================================================
           05. REAL CIVIC EXAMPLES (Everyday problems. Smarter understanding.)
           ========================================================================== */}
       <section className="section-spacing">
@@ -1424,679 +2097,6 @@ export default function Home() {
         </div>
       </div>
     </section>
-
-      {/* ==========================================================================
-          07. CIVIC INTELLIGENCE MAP PREVIEW (Interactive Wagholi Pune GIS Radar)
-          ========================================================================== */}
-      <section className="section-spacing" style={{ background: '#F8F9FA' }}>
-        <div className="container">
-          {/* Header - Centered Layout */}
-          <div style={{ textAlign: 'center', maxWidth: '820px', margin: '0 auto 36px auto' }}>
-            <span className="category-pill" style={{ background: '#E8F7F0', color: '#0E5E3A', borderColor: 'rgba(14, 94, 58, 0.2)', marginBottom: '12px', display: 'inline-flex' }}>
-              🛰️ GEOSPATIAL CLUSTER RADAR
-            </span>
-            <h2 style={{ marginTop: '4px', fontSize: '36px', letterSpacing: '-0.02em', color: '#0F172A', marginBottom: '10px', lineHeight: 1.2 }}>
-              Where Are Problems Happening Across Wagholi, Pune?
-            </h2>
-            <p style={{ color: '#64748B', fontSize: '16px', lineHeight: 1.6, maxWidth: '680px', margin: '0 auto 22px auto' }}>
-              Click any hotspot on the live satellite radar to see real-time cluster density, root cause diagnosis, and dispatched municipal response teams.
-            </p>
-
-            {/* Category Filter Pills - Centered */}
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
-              {[
-                { key: 'ALL', label: 'All Hotspots', icon: '📍' },
-                { key: 'WATER', label: 'Water Supply', icon: '💧' },
-                { key: 'ROADS', label: 'Roads & Works', icon: '🛣️' },
-                { key: 'SANITATION', label: 'Sanitation', icon: '🗑️' },
-                { key: 'ELECTRICITY', label: 'Power Grid', icon: '⚡' }
-              ].map((cat) => (
-                <button
-                  key={cat.key}
-                  type="button"
-                  onClick={() => setMapCategory(cat.key)}
-                  style={{
-                    padding: '8px 16px',
-                    borderRadius: '999px',
-                    fontSize: '12.5px',
-                    fontWeight: mapCategory === cat.key ? 700 : 500,
-                    cursor: 'pointer',
-                    border: mapCategory === cat.key ? '1.5px solid #0E5E3A' : '1px solid #E2E8F0',
-                    background: mapCategory === cat.key ? '#0E5E3A' : '#FFFFFF',
-                    color: mapCategory === cat.key ? '#FFFFFF' : '#475569',
-                    boxShadow: mapCategory === cat.key ? '0 3px 10px rgba(14, 94, 58, 0.22)' : '0 1px 3px rgba(0,0,0,0.04)',
-                    transition: 'all 150ms ease',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                  }}
-                >
-                  <span>{cat.icon}</span>
-                  <span>{cat.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Interactive Map Visual Container */}
-          <div className="map-radar-grid">
-            {/* Left Column: Interactive Wagholi Pune GIS Radar Canvas */}
-            <div
-              style={{
-                position: 'relative',
-                borderRadius: '24px',
-                overflow: 'hidden',
-                background: '#0B1520',
-                border: '1.5px solid #1E293B',
-                boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.15)',
-                minHeight: '520px',
-                display: 'flex',
-                flexDirection: 'column'
-              }}
-            >
-              {/* REAL INTERACTIVE LEAFLET MAP BASEMAP */}
-              <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 1 }}>
-                <LeafletSpreadMap
-                  defaultTile={mapBasemap === 'satellite' ? 'satellite' : 'dark'}
-                  region={mapRegion}
-                  height="100%"
-                />
-              </div>
-
-              {/* Geographic Mesh & Cybernetic Radar Overlay */}
-              <div 
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: mapBasemap === 'satellite'
-                    ? 'radial-gradient(ellipse at center, rgba(0,0,0,0.1) 0%, rgba(10,25,35,0.7) 100%)'
-                    : 'radial-gradient(ellipse at center, rgba(11,21,32,0.15) 0%, rgba(11,21,32,0.65) 100%)',
-                  pointerEvents: 'none'
-                }} 
-              />
-
-              {/* Map Controls Header (Basemap Mode + Zoom Controls) */}
-              <div style={{
-                position: 'relative',
-                zIndex: 3,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '16px 20px',
-                background: 'linear-gradient(180deg, rgba(11, 21, 32, 0.85) 0%, rgba(11, 21, 32, 0) 100%)'
-              }}>
-                <div style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  background: 'rgba(15, 23, 42, 0.75)',
-                  backdropFilter: 'blur(8px)',
-                  padding: '6px 12px',
-                  borderRadius: '999px',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  color: '#F8FAFC',
-                  fontSize: '11.5px',
-                  fontWeight: 600
-                }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', display: 'inline-block', boxShadow: '0 0 8px #10B981' }} />
-                  <span>📍 Wagholi, Pune Grid (PMC Wards 27-31) • Live GIS Feed</span>
-                </div>
-
-                {/* Region Selector & Basemap Switcher & Zoom Tools */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  {/* Region Switcher */}
-                  <div style={{
-                    display: 'flex',
-                    background: 'rgba(15, 23, 42, 0.75)',
-                    backdropFilter: 'blur(8px)',
-                    padding: '3px',
-                    borderRadius: '10px',
-                    border: '1px solid rgba(255, 255, 255, 0.15)'
-                  }}>
-                    <button
-                      type="button"
-                      onClick={() => setMapRegion('wagholi')}
-                      style={{
-                        fontSize: '11px',
-                        fontWeight: '700',
-                        padding: '4px 10px',
-                        borderRadius: '7px',
-                        background: '#0284C7',
-                        color: '#FFFFFF',
-                        border: 'none',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      🚩 Wagholi, Pune (PMC)
-                    </button>
-                  </div>
-
-                  <div style={{
-                    display: 'flex',
-                    background: 'rgba(15, 23, 42, 0.75)',
-                    backdropFilter: 'blur(8px)',
-                    padding: '3px',
-                    borderRadius: '10px',
-                    border: '1px solid rgba(255, 255, 255, 0.15)'
-                  }}>
-                    <button
-                      type="button"
-                      onClick={() => setMapBasemap('dark')}
-                      style={{
-                        fontSize: '11px',
-                        fontWeight: mapBasemap === 'dark' ? 700 : 500,
-                        padding: '4px 10px',
-                        borderRadius: '7px',
-                        background: mapBasemap === 'dark' ? '#10B981' : 'transparent',
-                        color: mapBasemap === 'dark' ? '#0B1914' : '#CBD5E1',
-                        border: 'none',
-                        cursor: 'pointer',
-                        transition: 'all 150ms ease'
-                      }}
-                    >
-                      🗺️ Dark Radar
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMapBasemap('satellite')}
-                      style={{
-                        fontSize: '11px',
-                        fontWeight: mapBasemap === 'satellite' ? 700 : 500,
-                        padding: '4px 10px',
-                        borderRadius: '7px',
-                        background: mapBasemap === 'satellite' ? '#10B981' : 'transparent',
-                        color: mapBasemap === 'satellite' ? '#0B1914' : '#CBD5E1',
-                        border: 'none',
-                        cursor: 'pointer',
-                        transition: 'all 150ms ease'
-                      }}
-                    >
-                      🛰️ Satellite
-                    </button>
-                  </div>
-
-                  {/* Zoom In/Out */}
-                  <div style={{
-                    display: 'flex',
-                    gap: '2px',
-                    background: 'rgba(15, 23, 42, 0.75)',
-                    backdropFilter: 'blur(8px)',
-                    padding: '3px',
-                    borderRadius: '10px',
-                    border: '1px solid rgba(255, 255, 255, 0.15)'
-                  }}>
-                    <button
-                      type="button"
-                      title="Zoom In"
-                      onClick={() => setMapZoom(prev => Math.min(1.5, prev + 0.15))}
-                      style={{ background: 'none', border: 'none', color: '#FFFFFF', padding: '4px 7px', cursor: 'pointer', borderRadius: '6px' }}
-                    >
-                      <ZoomIn style={{ width: '14px', height: '14px' }} />
-                    </button>
-                    <button
-                      type="button"
-                      title="Zoom Out"
-                      onClick={() => setMapZoom(prev => Math.max(1, prev - 0.15))}
-                      style={{ background: 'none', border: 'none', color: '#FFFFFF', padding: '4px 7px', cursor: 'pointer', borderRadius: '6px' }}
-                    >
-                      <ZoomOut style={{ width: '14px', height: '14px' }} />
-                    </button>
-                    <button
-                      type="button"
-                      title="Reset View"
-                      onClick={() => setMapZoom(1)}
-                      style={{ background: 'none', border: 'none', color: '#FFFFFF', padding: '4px 7px', cursor: 'pointer', borderRadius: '6px' }}
-                    >
-                      <RotateCcw style={{ width: '13px', height: '13px' }} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Interactive Hotspot Radar Pins Overlay */}
-              <div style={{
-                position: 'relative',
-                flex: 1,
-                zIndex: 2,
-                transform: `scale(${mapZoom})`,
-                transformOrigin: 'center center',
-                transition: 'transform 300ms cubic-bezier(0.16, 1, 0.3, 1)'
-              }}>
-                {filteredMapWards.map((w, idx) => {
-                  const isSelected = activeWardIndex === idx;
-                  const isHovered = hoveredHotspot === w.id;
-                  return (
-                    <div
-                      key={w.id}
-                      onClick={() => setActiveWardIndex(idx)}
-                      onMouseEnter={() => setHoveredHotspot(w.id)}
-                      onMouseLeave={() => setHoveredHotspot(null)}
-                      style={{
-                        position: 'absolute',
-                        left: `${w.posX}%`,
-                        top: `${w.posY}%`,
-                        transform: 'translate(-50%, -50%)',
-                        cursor: 'pointer',
-                        zIndex: isSelected ? 10 : 5
-                      }}
-                    >
-                      {/* Concentric Radar Pulsing Beacon Ring */}
-                      <div 
-                        className="radar-beacon"
-                        style={{
-                          background: `${w.color}25`,
-                          border: `1.5px solid ${w.color}`
-                        }}
-                      />
-
-                      {/* Hotspot Central Badge */}
-                      <div 
-                        style={{
-                          position: 'relative',
-                          zIndex: 2,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '6px 12px',
-                          borderRadius: '999px',
-                          background: isSelected ? w.color : '#0F172A',
-                          border: `2px solid ${w.color}`,
-                          boxShadow: `0 4px 20px ${w.color}66, 0 0 0 ${isSelected ? '4px' : '2px'} rgba(255, 255, 255, 0.3)`,
-                          color: '#FFFFFF',
-                          transition: 'all 200ms cubic-bezier(0.16, 1, 0.3, 1)',
-                          transform: isSelected || isHovered ? 'scale(1.12)' : 'scale(1)'
-                        }}
-                      >
-                        <span style={{ fontSize: '14px' }}>{w.icon}</span>
-                        <span style={{ fontSize: '12px', fontWeight: 800 }}>
-                          {w.reports}
-                        </span>
-                      </div>
-
-                      {/* Floating Tooltip on Hover / Selected */}
-                      {(isHovered || isSelected) && (
-                        <div style={{
-                          position: 'absolute',
-                          bottom: '100%',
-                          left: '50%',
-                          transform: 'translateX(-50%) translateY(-10px)',
-                          background: 'rgba(15, 23, 42, 0.94)',
-                          backdropFilter: 'blur(12px)',
-                          border: `1.5px solid ${w.color}`,
-                          borderRadius: '12px',
-                          padding: '10px 14px',
-                          minWidth: '200px',
-                          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
-                          pointerEvents: 'none',
-                          zIndex: 20
-                        }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', color: w.color }}>
-                              {w.severity}
-                            </span>
-                            <span style={{ fontSize: '10px', color: '#94A3B8' }}>{w.radiusMeters}</span>
-                          </div>
-                          <strong style={{ fontSize: '12.5px', color: '#FFFFFF', display: 'block', marginBottom: '2px' }}>
-                            {w.shortName}
-                          </strong>
-                          <span style={{ fontSize: '11px', color: '#CBD5E1', display: 'block' }}>
-                            {w.hotspotName}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Bottom Interactive Simulation Bar & Live Marquee */}
-              <div style={{
-                position: 'relative',
-                zIndex: 3,
-                padding: '14px 20px',
-                background: 'linear-gradient(0deg, rgba(11, 21, 32, 0.95) 0%, rgba(11, 21, 32, 0.6) 100%)',
-                borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '12px'
-              }}>
-                {/* Live Signal Simulation Button */}
-                <button
-                  type="button"
-                  onClick={() => handleSimulateSignal(activeWard.id)}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 16px',
-                    borderRadius: '10px',
-                    background: '#10B981',
-                    border: 'none',
-                    color: '#0B1914',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 14px rgba(16, 185, 129, 0.4)',
-                    transition: 'all 150ms ease'
-                  }}
-                >
-                  <Radio style={{ width: '14px', height: '14px' }} />
-                  <span>Simulate Inbound Citizen Voice (+1 Report)</span>
-                </button>
-
-                {recentSignalFlash && (
-                  <div style={{
-                    fontSize: '12px',
-                    color: '#34D399',
-                    fontWeight: 600,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                  }}>
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#34D399', animation: 'radarPing 1s infinite' }} />
-                    <span>Signal Triaged via Gemini Voice in {activeWard.shortName}! (+1 Count Updated)</span>
-                  </div>
-                )}
-
-                <div style={{ fontSize: '11.5px', color: '#94A3B8' }}>
-                  Click any hotspot to inspect root-cause diagnosis.
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column: Mission Control Ward Action Hub */}
-            <div
-              style={{
-                padding: '28px',
-                background: '#FFFFFF',
-                borderRadius: '24px',
-                border: '1.5px solid #E2E8F0',
-                boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.08)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between'
-              }}
-            >
-              <div>
-                {/* Top Badge & Live Status */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: activeWard.color }} />
-                    <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: activeWard.color }}>
-                      {activeWard.status.replace('_', ' ')}
-                    </span>
-                  </div>
-                  <span style={{
-                    fontSize: '10.5px',
-                    fontWeight: 700,
-                    padding: '3px 8px',
-                    borderRadius: '999px',
-                    background: activeWard.severity === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB',
-                    color: activeWard.severity === 'CRITICAL' ? '#991B1B' : '#92400E'
-                  }}>
-                    {activeWard.severity}
-                  </span>
-                </div>
-
-                {/* Ward Title & Sector */}
-                <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', marginBottom: '4px', letterSpacing: '-0.01em' }}>
-                  {activeWard.ward}
-                </h3>
-                <span style={{ fontSize: '13px', color: '#64748B', display: 'block', marginBottom: '18px' }}>
-                  {activeWard.zone} • {activeWard.radiusMeters} Cluster
-                </span>
-
-                {/* Root Cause Problem Card */}
-                <div style={{
-                  padding: '16px',
-                  borderRadius: '16px',
-                  background: '#F8FAFC',
-                  border: '1px solid #E2E8F0',
-                  marginBottom: '16px'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '16px' }}>{activeWard.icon}</span>
-                    <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#0E5E3A' }}>
-                      {activeWard.dept}
-                    </span>
-                  </div>
-                  <strong style={{ fontSize: '14px', color: '#0F172A', display: 'block', marginBottom: '6px' }}>
-                    {activeWard.hotspotName}
-                  </strong>
-                  <div style={{ fontSize: '12px', color: '#475569', lineHeight: 1.4 }}>
-                    <span style={{ color: '#0E5E3A', fontWeight: 700 }}>Intervention: </span>
-                    <span>{activeWard.actionRequired}</span>
-                  </div>
-                </div>
-
-                {/* Live Field Squad Dispatch Tracker */}
-                <div style={{
-                  padding: '16px',
-                  borderRadius: '16px',
-                  background: '#ECFDF5',
-                  border: '1px solid #A7F3D0',
-                  marginBottom: '20px'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#065F46' }}>
-                      Field Crew Deployment
-                    </span>
-                    <span style={{ fontSize: '11px', fontWeight: 800, color: '#065F46', background: '#D1FAE5', padding: '2px 8px', borderRadius: '999px' }}>
-                      ETA: {activeWard.eta}
-                    </span>
-                  </div>
-                  <strong style={{ fontSize: '13px', color: '#065F46', display: 'block', marginBottom: '4px' }}>
-                    {activeWard.dispatchedUnit}
-                  </strong>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11.5px', color: '#047857' }}>
-                    <span>Impact Protected:</span>
-                    <strong>{activeWard.peopleImpacted}</strong>
-                  </div>
-                </div>
-
-                {/* Live Metrics Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '24px' }}>
-                  <div style={{ padding: '12px', borderRadius: '12px', background: '#F1F5F9', border: '1px solid #E2E8F0', textAlign: 'center' }}>
-                    <span style={{ fontSize: '10.5px', color: '#64748B', display: 'block', marginBottom: '2px' }}>Total Reports</span>
-                    <strong style={{ fontSize: '18px', color: '#0F172A', fontWeight: 800 }}>{activeWard.reports}</strong>
-                  </div>
-                  <div style={{ padding: '12px', borderRadius: '12px', background: '#F1F5F9', border: '1px solid #E2E8F0', textAlign: 'center' }}>
-                    <span style={{ fontSize: '10.5px', color: '#64748B', display: 'block', marginBottom: '2px' }}>Resolution Target</span>
-                    <strong style={{ fontSize: '13px', color: '#0E5E3A', fontWeight: 800, display: 'block', marginTop: '4px' }}>Within 12h</strong>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <Link
-                  to={`/officer/complaints/PN-2026-WAG-0102`}
-                  className="btn-primary"
-                  style={{ width: '100%', justifyContent: 'center', padding: '12px 18px', borderRadius: '12px' }}
-                >
-                  <span>Inspect Dispatched Work Order</span>
-                  <ArrowRight style={{ width: '14px', height: '14px' }} />
-                </Link>
-
-                <Link
-                  to="/admin"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    padding: '10px',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    color: '#0E5E3A',
-                    textDecoration: 'none'
-                  }}
-                >
-                  <span>Open Full Municipal GIS Explorer</span>
-                  <ArrowUpRight style={{ width: '13px', height: '13px' }} />
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Ward Navigation Strip */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: '12px',
-            marginTop: '20px'
-          }}>
-            {filteredMapWards.map((w, idx) => {
-              const isSelected = activeWardIndex === idx;
-              return (
-                <div
-                  key={w.id}
-                  onClick={() => setActiveWardIndex(idx)}
-                  style={{
-                    padding: '14px 18px',
-                    borderRadius: '16px',
-                    cursor: 'pointer',
-                    background: isSelected ? '#FFFFFF' : '#FFFFFF',
-                    border: isSelected ? `2px solid ${w.color}` : '1px solid #E2E8F0',
-                    boxShadow: isSelected ? `0 8px 24px ${w.color}22` : '0 2px 6px rgba(15, 23, 42, 0.04)',
-                    transition: 'all 150ms ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ fontSize: '20px' }}>{w.icon}</span>
-                    <div>
-                      <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block' }}>{w.shortName}</strong>
-                      <span style={{ fontSize: '11px', color: '#64748B' }}>{w.category} • {w.trend}</span>
-                    </div>
-                  </div>
-
-                  <span style={{
-                    fontSize: '12px',
-                    fontWeight: 800,
-                    padding: '4px 8px',
-                    borderRadius: '999px',
-                    background: isSelected ? w.color : '#F1F5F9',
-                    color: isSelected ? '#FFFFFF' : '#0F172A'
-                  }}>
-                    {w.reports}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ==========================================================================
-          04. HOW JAN_SAHAYAK WORKS (FROM CITIZEN VOICE TO ACTION)
-          ========================================================================== */}
-      <section id="how-it-works" className="section-spacing" style={{ background: '#FFFFFF', borderTop: '1px solid var(--color-divider)', borderBottom: '1px solid var(--color-divider)' }}>
-        <div className="container">
-          <div className="section-header center">
-            <span className="category-pill" style={{ marginBottom: '12px' }}>
-              THE RESOLUTION PIPELINE
-            </span>
-            <h2>From Citizen Voice to Action</h2>
-            <p>
-              Four clear steps that eliminate bureaucratic dead-ends and empower citizens at home.
-            </p>
-          </div>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: '24px'
-          }}>
-            {FOUR_STEPS.map((s) => {
-              const StepIcon = s.icon;
-              return (
-                <div
-                  key={s.step}
-                  style={{
-                    padding: '28px',
-                    borderRadius: '20px',
-                    background: s.bg,
-                    border: s.border,
-                    boxShadow: s.shadow,
-                    transition: 'all 240ms cubic-bezier(0.16, 1, 0.3, 1)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    position: 'relative',
-                    cursor: 'default'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-4px)';
-                    e.currentTarget.style.boxShadow = s.hoverShadow;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = s.shadow;
-                  }}
-                >
-                  <div>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      marginBottom: '16px'
-                    }}>
-                      <span style={{
-                        fontSize: '34px',
-                        fontWeight: 800,
-                        fontFamily: 'var(--font-mono)',
-                        color: s.accentColor,
-                        lineHeight: 1,
-                        letterSpacing: '-0.02em'
-                      }}>
-                        {s.step}
-                      </span>
-                      <span style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                        padding: '5px 11px',
-                        borderRadius: '999px',
-                        fontSize: '11px',
-                        fontWeight: 700,
-                        background: s.tagBg,
-                        color: s.tagColor,
-                        letterSpacing: '0.01em'
-                      }}>
-                        <StepIcon style={{ width: '12px', height: '12px' }} />
-                        <span>{s.tag}</span>
-                      </span>
-                    </div>
-
-                    <h3 style={{
-                      fontSize: '18px',
-                      fontWeight: 700,
-                      marginBottom: '10px',
-                      color: '#0F172A',
-                      letterSpacing: '-0.01em'
-                    }}>
-                      {s.title}
-                    </h3>
-                    <p style={{
-                      fontSize: '14px',
-                      color: '#475569',
-                      lineHeight: 1.65,
-                      margin: 0
-                    }}>
-                      {s.desc}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
       {/* ==========================================================================
           11. IMPACT / PROOF (Transparent Benchmark Metrics)

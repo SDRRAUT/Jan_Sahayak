@@ -10,7 +10,7 @@
 
 export class AIProvider {
   constructor() {
-    this.modelName = process.env.AI_MODEL || 'gemini-1.5-flash';
+    this.modelName = process.env.AI_MODEL || 'gemini-3.5-flash';
     this.lastEmbeddingSource = 'deterministic_fallback';
   }
 
@@ -28,7 +28,7 @@ export class AIProvider {
   async generateStructuredJSON(prompt, systemInstruction = '', fallbackData = {}) {
     const apiKey = this.getApiKey();
     if (apiKey) {
-      const modelsToTry = [this.modelName, 'gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest'];
+      const modelsToTry = [this.modelName, 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.8-flash'].filter((v, i, a) => a.indexOf(v) === i);
       for (const m of modelsToTry) {
         try {
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`;
@@ -98,7 +98,7 @@ export class AIProvider {
 
     // Clean base64 header if present (e.g. data:image/jpeg;base64,...)
     const cleanBase64 = base64Data.includes('base64,') ? base64Data.split('base64,')[1] : base64Data;
-    const modelsToTry = [this.modelName, 'gemini-1.5-flash', 'gemini-2.0-flash'];
+    const modelsToTry = [this.modelName, 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.8-flash'].filter((v, i, a) => a.indexOf(v) === i);
 
     if (apiKey) {
       for (const m of modelsToTry) {
@@ -259,7 +259,7 @@ Respond ONLY with valid JSON with this exact structure:
     }
 
     const cleanBase64 = base64Audio.includes('base64,') ? base64Audio.split('base64,')[1] : base64Audio;
-    const modelsToTry = [this.modelName, 'gemini-1.5-flash', 'gemini-2.0-flash'];
+    const modelsToTry = [this.modelName, 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.8-flash'].filter((v, i, a) => a.indexOf(v) === i);
 
     for (const m of modelsToTry) {
       try {
@@ -327,26 +327,30 @@ Respond ONLY with valid JSON with this exact structure:
   async generateEmbedding(text = '') {
     const apiKey = this.getApiKey();
     if (apiKey && text.trim().length > 0) {
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${apiKey}`;
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'models/text-embedding-004',
-            content: { parts: [{ text: text.slice(0, 2048) }] }
-          })
-        });
+      const models = ['gemini-embedding-001', 'gemini-embedding-2-preview'];
+      for (const m of models) {
+        try {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:embedContent?key=${apiKey}`;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: `models/${m}`,
+              content: { parts: [{ text: text.slice(0, 2048) }] },
+              outputDimensionality: 768
+            })
+          });
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.embedding?.values && data.embedding.values.length === 768) {
-            this.lastEmbeddingSource = 'gemini';
-            return data.embedding.values;
+          if (res.ok) {
+            const data = await res.json();
+            if (data.embedding?.values && data.embedding.values.length === 768) {
+              this.lastEmbeddingSource = 'gemini';
+              return data.embedding.values;
+            }
           }
+        } catch (err) {
+          console.warn(`[AIProvider Embedding] Gemini ${m} failed:`, err.message);
         }
-      } catch (err) {
-        console.warn('[AIProvider Embedding] Gemini text-embedding-004 failed:', err.message);
       }
     }
 

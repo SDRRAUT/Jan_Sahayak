@@ -33,8 +33,8 @@ if (fs.existsSync(envFilePath)) {
 
 export class GeminiAssistantService {
   constructor() {
-    this.defaultModel = process.env.AI_MODEL || 'gemini-flash-latest';
-    this.modelsToTry = ['gemini-flash-latest', 'gemini-3.6-flash', 'gemini-flash-lite-latest'];
+    this.defaultModel = process.env.AI_MODEL || 'gemini-3.5-flash';
+    this.modelsToTry = ['gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-flash-lite-latest'];
   }
 
   getApiKey() {

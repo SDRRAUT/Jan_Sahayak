@@ -65,7 +65,7 @@ export async function analyzeCivicPhoto(base64Data, mimeType = 'image/jpeg', con
   if (GEMINI_API_KEY) {
     try {
       const cleanBase64 = base64Data.includes('base64,') ? base64Data.split('base64,')[1] : base64Data;
-      const models = ['gemini-1.5-flash', 'gemini-2.0-flash'];
+      const models = ['gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.8-flash'];
 
       for (const model of models) {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
