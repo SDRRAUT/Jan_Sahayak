@@ -13,7 +13,9 @@ import {
   Building2, 
   ShieldCheck,
   Sparkles,
-  Activity
+  Activity,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { useApp, DEMO_CREDENTIALS } from '../context/AppContext';
 
@@ -24,6 +26,7 @@ export default function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [useOtp, setUseOtp] = useState(false);
   const [otpCode, setOtpCode] = useState('');
   const [otpSent, setOtpSent] = useState(false);
@@ -260,7 +263,7 @@ export default function Login() {
         {/* 1-Click Role Switcher Demo Cards */}
         <div style={{ marginBottom: '36px' }}>
           <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-text-muted)', display: 'block', marginBottom: '12px', textAlign: 'center' }}>
-            Select Persona to Access Portal (Prototype Environment):
+            Select Role to Access Portal:
           </span>
 
           <div className="login-roles-grid" style={{
@@ -328,16 +331,16 @@ export default function Login() {
               style={{
                 padding: '18px',
                 textAlign: 'left',
-                border: '1px solid rgba(67, 56, 202, 0.2)',
+                border: '1px solid rgba(14, 94, 58, 0.2)',
                 background: '#FFFFFF'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                <div className="icon-squircle" style={{ width: '32px', height: '32px', background: '#EEF2FF' }}>
-                  <ShieldCheck style={{ width: '16px', height: '16px', color: '#4338CA' }} />
+                <div className="icon-squircle" style={{ width: '32px', height: '32px', background: '#ECFDF5' }}>
+                  <ShieldCheck style={{ width: '16px', height: '16px', color: '#0E5E3A' }} />
                 </div>
                 <div>
-                  <strong style={{ fontSize: '14px', color: '#4338CA', display: 'block' }}>🛡️ Administrator / Admin</strong>
+                  <strong style={{ fontSize: '14px', color: '#0E5E3A', display: 'block' }}>🛡️ Administrator / Admin</strong>
                   <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Municipal Boss & Citywide Head</span>
                 </div>
               </div>
@@ -406,7 +409,7 @@ export default function Login() {
                 <div style={{ position: 'relative' }}>
                   <Lock style={{ position: 'absolute', left: '12px', top: '14px', width: '16px', height: '16px', color: 'var(--color-text-muted)' }} />
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password..."
@@ -417,12 +420,32 @@ export default function Login() {
                       borderRadius: 'var(--radius-md)',
                       border: '1px solid var(--color-border-medium)',
                       paddingLeft: '38px',
-                      paddingRight: '12px',
+                      paddingRight: '40px',
                       fontSize: '13.5px',
                       background: '#FFFFFF'
                     }}
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '12px',
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: 'var(--color-text-muted)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '2px'
+                    }}
+                  >
+                    {showPassword ? <EyeOff style={{ width: '18px', height: '18px' }} /> : <Eye style={{ width: '18px', height: '18px' }} />}
+                  </button>
                 </div>
               </div>
             ) : (

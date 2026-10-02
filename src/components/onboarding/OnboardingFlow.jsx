@@ -11,7 +11,9 @@ import {
   Activity, 
   Zap,
   Lock,
-  Mail
+  Mail,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { useApp, DEMO_CREDENTIALS, DEMO_USERS } from '../../context/AppContext';
 import complaintKeyImg from '../../assets/complaint-key.jpg';
@@ -52,15 +54,15 @@ const STEP_THEMES = {
     dotInactive: '#C4B5FD'
   },
   4: {
-    name: 'clean_sky',
-    bg: 'linear-gradient(155deg, #F0F9FF 0%, #E0F2FE 100%)',
-    border: '#93C5FD',
-    shadow: '0 25px 60px -10px rgba(2, 132, 199, 0.20), 0 0 0 1px rgba(56, 189, 248, 0.22)',
-    divider: 'rgba(2, 132, 199, 0.16)',
-    accent: '#0284C7',
-    buttonBg: '#0284C7',
-    dotActive: '#0284C7',
-    dotInactive: '#93C5FD'
+    name: 'clean_emerald',
+    bg: 'linear-gradient(155deg, #F0FDF4 0%, #DCFCE7 100%)',
+    border: '#86EFAC',
+    shadow: '0 25px 60px -10px rgba(16, 185, 129, 0.20), 0 0 0 1px rgba(52, 211, 153, 0.22)',
+    divider: 'rgba(16, 185, 129, 0.16)',
+    accent: '#059669',
+    buttonBg: '#059669',
+    dotActive: '#059669',
+    dotInactive: '#86EFAC'
   }
 };
 
@@ -78,13 +80,14 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
 
   // Persona Selection State for Step 4
   const [selectedRole, setSelectedRole] = useState('citizen');
+  const [showPassword, setShowPassword] = useState(true);
   
   // 3-Second Verification Simulation State
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifyProgress, setVerifyProgress] = useState(0);
   const [verifyStageMessage, setVerifyStageMessage] = useState('');
 
-  // Role definitions for Step 4
+  // Role definitions for Step 4 - Unified Green Theme
   const roleOptions = [
     {
       key: 'citizen',
@@ -94,9 +97,9 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
       email: DEMO_CREDENTIALS.citizen.email,
       password: DEMO_CREDENTIALS.citizen.password,
       icon: User,
-      color: '#2563EB',
-      bg: '#EFF6FF',
-      activeBorder: '#2563EB'
+      color: '#059669',
+      bg: '#ECFDF5',
+      activeBorder: '#059669'
     },
     {
       key: 'civic_officer',
@@ -118,9 +121,9 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
       email: DEMO_CREDENTIALS.super_admin.email,
       password: DEMO_CREDENTIALS.super_admin.password,
       icon: ShieldCheck,
-      color: '#4338CA',
-      bg: '#EEF2FF',
-      activeBorder: '#4338CA'
+      color: '#059669',
+      bg: '#ECFDF5',
+      activeBorder: '#059669'
     }
   ];
 
@@ -292,29 +295,6 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
               </div>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={handleDirectEnter}
-            style={{
-              background: 'rgba(255, 255, 255, 0.85)',
-              border: `1px solid ${currentTheme.border}`,
-              borderRadius: '999px',
-              padding: '4px 12px',
-              fontSize: '11.5px',
-              fontWeight: 700,
-              color: currentTheme.accent,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
-              transition: 'all 200ms ease',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
-            }}
-            title="Enter platform directly as public guest"
-          >
-            <span>Enter App</span>
-            <ArrowRight style={{ width: '12px', height: '12px' }} />
-          </button>
         </div>
 
         {/* 3-Second Security Clearance Simulation Overlay (Step 4) */}
@@ -649,20 +629,20 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
               })}
             </div>
 
-            {/* Username & Password Form Fields (Pre-filled for seamless 1-click test) */}
+            {/* Username & Password Form Fields */}
             <div style={{
-              background: 'rgba(255, 255, 255, 0.60)',
+              background: 'rgba(255, 255, 255, 0.70)',
               backdropFilter: 'blur(4px)',
               borderRadius: '12px',
-              border: '1px solid #BAE6FD',
+              border: '1px solid #A7F3D0',
               padding: '10px 14px',
               marginBottom: '10px',
               display: 'flex',
               flexDirection: 'column',
               gap: '8px'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255, 255, 255, 0.85)', padding: '6px 10px', borderRadius: '8px', border: '1px solid #BAE6FD' }}>
-                <Mail style={{ width: '14px', height: '14px', color: '#0284C7' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255, 255, 255, 0.90)', padding: '6px 10px', borderRadius: '8px', border: '1px solid #D1FAE5' }}>
+                <Mail style={{ width: '14px', height: '14px', color: '#059669' }} />
                 <div style={{ flex: 1 }}>
                   <span style={{ fontSize: '9.5px', color: '#64748B', display: 'block', textTransform: 'uppercase', fontWeight: 700 }}>Username / Email</span>
                   <input 
@@ -672,21 +652,38 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
                     style={{ border: 'none', background: 'transparent', width: '100%', fontSize: '12px', fontWeight: 600, color: '#0F172A', outline: 'none', padding: 0 }}
                   />
                 </div>
-                <span style={{ fontSize: '10px', color: '#0284C7', fontWeight: 700, background: '#E0F2FE', padding: '2px 6px', borderRadius: '4px' }}>Demo ID</span>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255, 255, 255, 0.85)', padding: '6px 10px', borderRadius: '8px', border: '1px solid #BAE6FD' }}>
-                <Lock style={{ width: '14px', height: '14px', color: '#0284C7' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255, 255, 255, 0.90)', padding: '6px 10px', borderRadius: '8px', border: '1px solid #D1FAE5' }}>
+                <Lock style={{ width: '14px', height: '14px', color: '#059669' }} />
                 <div style={{ flex: 1 }}>
                   <span style={{ fontSize: '9.5px', color: '#64748B', display: 'block', textTransform: 'uppercase', fontWeight: 700 }}>Password</span>
                   <input 
-                    type="password" 
+                    type={showPassword ? 'text' : 'password'} 
                     readOnly 
                     value={currentRoleData.password} 
                     style={{ border: 'none', background: 'transparent', width: '100%', fontSize: '12px', fontWeight: 600, color: '#0F172A', outline: 'none', padding: 0 }}
                   />
                 </div>
-                <span style={{ fontSize: '10px', color: '#64748B', fontFamily: 'monospace' }}>••••••••</span>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    padding: '4px',
+                    cursor: 'pointer',
+                    color: '#059669',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '4px'
+                  }}
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff style={{ width: '15px', height: '15px' }} /> : <Eye style={{ width: '15px', height: '15px' }} />}
+                </button>
               </div>
             </div>
 
@@ -699,7 +696,7 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
                   height: '42px',
                   padding: '0 24px',
                   borderRadius: '999px',
-                  background: '#1E2653',
+                  background: '#059669',
                   color: '#FFFFFF',
                   border: 'none',
                   fontSize: '13px',
@@ -708,11 +705,11 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
-                  boxShadow: '0 4px 14px rgba(30, 38, 83, 0.35)',
+                  boxShadow: '0 4px 14px rgba(5, 150, 105, 0.35)',
                   transition: 'transform 150ms ease'
                 }}
               >
-                <span>⚡ 1-Click Demo Login as {currentRoleData.label} (3s Check)</span>
+                <span>Login as {currentRoleData.label}</span>
                 <ArrowRight style={{ width: '15px', height: '15px' }} />
               </button>
             </div>
@@ -844,7 +841,7 @@ export default function OnboardingFlow({ onComplete, initialStep = 1 }) {
                   boxShadow: '0 4px 12px rgba(16, 185, 129, 0.35)',
                   transition: 'transform 150ms ease'
                 }}
-                title="1-Click Login"
+                title="Login"
               >
                 <CheckCircle2 style={{ width: '20px', height: '20px' }} />
               </button>
