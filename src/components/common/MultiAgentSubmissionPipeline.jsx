@@ -1,18 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  ShieldCheck, 
-  MapPin, 
-  Layers, 
   Clock, 
-  FileText, 
-  CheckCircle2, 
   Loader2, 
   Activity, 
-  Check, 
   Zap, 
-  Eye, 
-  Volume2, 
-  Building2,
   ArrowRight,
   Sparkles
 } from 'lucide-react';
@@ -295,128 +286,6 @@ export default function MultiAgentSubmissionPipeline({
         </div>
       </div>
 
-      {/* 8-Agent Vertical Top-to-Bottom List (One by One) */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px',
-        marginBottom: '22px'
-      }}>
-        {AGENT_SPECS.map((agent, index) => {
-          const isStarted = elapsedSec >= agent.startSec;
-          const isDone = elapsedSec >= agent.endSec;
-          const isWorking = isStarted && !isDone;
-          const IconComponent = agent.icon;
-
-          const agentProgress = !isStarted 
-            ? 0 
-            : isDone 
-            ? 100 
-            : Math.round(((elapsedSec - agent.startSec) / (agent.endSec - agent.startSec)) * 100);
-
-          return (
-            <div
-              key={agent.id}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '12px 16px',
-                borderRadius: '14px',
-                background: isWorking ? agent.bgLight : isDone ? '#F0FDF4' : '#F8FAFC',
-                border: `1.5px solid ${isWorking ? agent.color : isDone ? '#86EFAC' : '#E2E8F0'}`,
-                boxShadow: isWorking ? `0 4px 14px ${agent.color}20` : 'none',
-                transition: 'all 200ms ease',
-                gap: '12px'
-              }}
-            >
-              {/* Left Column: Number + Icon + Name & Role */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: '220px' }}>
-                <div style={{
-                  width: '34px',
-                  height: '34px',
-                  borderRadius: '10px',
-                  background: isWorking ? agent.color : isDone ? '#10B981' : '#94A3B8',
-                  color: '#FFFFFF',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  transition: 'all 200ms ease'
-                }}>
-                  {isWorking ? (
-                    <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1.5s linear infinite' }} />
-                  ) : isDone ? (
-                    <Check style={{ width: '16px', height: '16px', strokeWidth: 3 }} />
-                  ) : (
-                    <span style={{ fontSize: '12px', fontWeight: 800 }}>{agent.id}</span>
-                  )}
-                </div>
-
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <strong style={{ fontSize: '13px', color: '#0F172A', lineHeight: 1.2 }}>
-                      Agent {agent.id}: {agent.name}
-                    </strong>
-                  </div>
-                  <span style={{ fontSize: '11px', color: isWorking ? '#1E293B' : isDone ? '#065F46' : '#64748B', display: 'block' }}>
-                    {isDone ? agent.completedDescription : isWorking ? agent.activeDescription : agent.role}
-                  </span>
-                </div>
-              </div>
-
-              {/* Right Column: Status Badge */}
-              <div style={{ flexShrink: 0 }}>
-                {isDone ? (
-                  <span style={{
-                    fontSize: '11px',
-                    fontWeight: 800,
-                    padding: '3px 10px',
-                    borderRadius: '999px',
-                    background: '#DCFCE7',
-                    color: '#15803D',
-                    border: '1px solid #86EFAC',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}>
-                    <CheckCircle2 style={{ width: '12px', height: '12px' }} />
-                    Done
-                  </span>
-                ) : isWorking ? (
-                  <span style={{
-                    fontSize: '11px',
-                    fontWeight: 800,
-                    padding: '3px 10px',
-                    borderRadius: '999px',
-                    background: '#FFFFFF',
-                    color: agent.color,
-                    border: `1.5px solid ${agent.borderLight}`,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '5px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
-                  }}>
-                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: agent.color, animation: 'pulse 1s infinite' }} />
-                    Processing ({agentProgress}%)
-                  </span>
-                ) : (
-                  <span style={{
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    padding: '3px 8px',
-                    borderRadius: '999px',
-                    background: '#F1F5F9',
-                    color: '#94A3B8'
-                  }}>
-                    Queued
-                  </span>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
 
       {/* Action Submit Button that Appears When 15s Finishes */}
       {isDoneAll ? (
