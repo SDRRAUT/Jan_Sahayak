@@ -298,7 +298,6 @@ export default function CivicIntelligenceDashboard() {
   const [showTerritoryModal, setShowTerritoryModal] = useState(false);
   const [showJanSuchnaModal, setShowJanSuchnaModal] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' (default) | 'detail' | 'compact' | 'table' | 'minimal'
-  const [expandedClusterId, setExpandedClusterId] = useState('CLUSTER-WAG-WATER-01');
 
   const filteredIncidents = civicIncidents.filter(inc => {
     const matchesStage = selectedStage === 'ALL' || inc.stage === selectedStage;
@@ -1085,290 +1084,182 @@ export default function CivicIntelligenceDashboard() {
            ══════════════════════════════════════════════════════════ */}
         {activeTab === 'deduplication' && (
           <div style={{ marginBottom: '32px' }}>
-            {/* Header Description */}
-            <div style={{
-              background: '#FFFFFF',
-              borderRadius: '16px',
-              padding: '18px 22px',
-              border: '1px solid #E2E8F0',
-              marginBottom: '16px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '12px'
-            }}>
-              <div>
-                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>🔍 Duplicate & Similar Complaint Detection</span>
-                </h3>
-                <p style={{ fontSize: '12.5px', color: '#64748B', margin: '4px 0 0 0' }}>
-                  Spatial and semantic clustering groups redundant citizen complaints into unified municipal work orders.
-                </p>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, padding: '4px 10px', borderRadius: '999px', background: '#EFF6FF', color: '#1D4ED8', border: '1px solid #BFDBFE' }}>
-                  ● Deduplication Engine Active
-                </span>
-              </div>
-            </div>
-
-            {/* 4 Minimalist Deduplication Impact Metrics */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-              gap: '12px',
-              marginBottom: '20px'
-            }}>
-              <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px 18px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>Duplicate Work Reduction</span>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-                  <strong style={{ fontSize: '24px', fontWeight: 800, color: '#059669' }}>68.5%</strong>
-                  <span style={{ fontSize: '11px', color: '#059669', fontWeight: 600 }}>Merged into single jobs</span>
-                </div>
-              </div>
-
-              <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px 18px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>Redundant Visits Saved</span>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-                  <strong style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A' }}>79 Visits</strong>
-                  <span style={{ fontSize: '11px', color: '#64748B' }}>Zero duplicate fuel waste</span>
-                </div>
-              </div>
-
-              <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px 18px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>Field Hours Saved</span>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-                  <strong style={{ fontSize: '24px', fontWeight: 800, color: '#0284C7' }}>37.5 hrs</strong>
-                  <span style={{ fontSize: '11px', color: '#0284C7', fontWeight: 600 }}>This week</span>
-                </div>
-              </div>
-
-              <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px 18px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>Active Problem Clusters</span>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-                  <strong style={{ fontSize: '24px', fontWeight: 800, color: '#7C3AED' }}>5 Clusters</strong>
-                  <span style={{ fontSize: '11px', color: '#64748B' }}>84 reports ➔ 5 tasks</span>
-                </div>
-              </div>
-            </div>
-
-            {/* 3-Step Deduplication Process Pill Strip */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-              gap: '10px',
-              marginBottom: '20px'
-            }}>
-              <div style={{ background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#EFF6FF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '12px' }}>1</span>
-                <div>
-                  <strong style={{ fontSize: '12.5px', color: '#0F172A', display: 'block' }}>Indic NLP & Vision Match</strong>
-                  <span style={{ fontSize: '11px', color: '#64748B' }}>Semantic text & photo embedding</span>
-                </div>
-              </div>
-
-              <div style={{ background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#F0FDF4', color: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '12px' }}>2</span>
-                <div>
-                  <strong style={{ fontSize: '12.5px', color: '#0F172A', display: 'block' }}>Spatio-Temporal Radius</strong>
-                  <span style={{ fontSize: '11px', color: '#64748B' }}>Groups tickets within 150m & 72 hrs</span>
-                </div>
-              </div>
-
-              <div style={{ background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#FAF5FF', color: '#9333EA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '12px' }}>3</span>
-                <div>
-                  <strong style={{ fontSize: '12.5px', color: '#0F172A', display: 'block' }}>Unified Action & SMS Sync</strong>
-                  <span style={{ fontSize: '11px', color: '#64748B' }}>1 field order + auto-sync to citizens</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Active Problem Clusters List */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {DUPLICATE_CLUSTERS_DATA.map((cluster) => {
-                const isExpanded = expandedClusterId === cluster.id;
-                return (
-                  <div
-                    key={cluster.id}
-                    style={{
-                      background: '#FFFFFF',
-                      borderRadius: '16px',
-                      border: '1px solid #E2E8F0',
-                      boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)',
-                      overflow: 'hidden'
-                    }}
-                  >
-                    {/* Cluster Summary Header */}
-                    <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                          <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 8px', borderRadius: '6px', background: '#F1F5F9', color: '#334155', fontFamily: 'monospace' }}>
-                            {cluster.masterTicket}
-                          </span>
-                          <span style={{ fontSize: '11.5px', fontWeight: 700, padding: '2px 8px', borderRadius: '999px', background: '#EFF6FF', color: '#1D4ED8', border: '1px solid #DBEAFE' }}>
-                            {cluster.deptIcon} {cluster.leadDept}
-                          </span>
-                        </div>
-
-                        <span style={{
-                          fontSize: '11px',
-                          fontWeight: 800,
-                          padding: '3px 10px',
-                          borderRadius: '999px',
-                          background: cluster.severity === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB',
-                          color: cluster.severity === 'CRITICAL' ? '#DC2626' : '#D97706',
-                          border: cluster.severity === 'CRITICAL' ? '1px solid #FECACA' : '1px solid #FDE68A'
-                        }}>
-                          ● {cluster.severity}
-                        </span>
-                      </div>
-
-                      <div>
-                        <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>
-                          {cluster.title}
-                        </h4>
-                        <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#475569', lineHeight: 1.5 }}>
-                          <strong>Impact: </strong>{cluster.impactSummary}
-                        </p>
-                      </div>
-
-                      {/* Cluster Indicators Strip */}
-                      <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                        gap: '8px',
-                        background: '#F8FAFC',
-                        padding: '10px 14px',
-                        borderRadius: '12px',
-                        border: '1px solid #E2E8F0'
-                      }}>
-                        <div>
-                          <span style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>Semantic Match</span>
-                          <strong style={{ fontSize: '13px', color: '#059669' }}>{cluster.similarityScore}</strong>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>Spatial Radius</span>
-                          <strong style={{ fontSize: '13px', color: '#0284C7' }}>{cluster.geoRadius}</strong>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>Merged Reports</span>
-                          <strong style={{ fontSize: '13px', color: '#7C3AED' }}>{cluster.totalReportsMerged} Complaints</strong>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>Field Savings</span>
-                          <strong style={{ fontSize: '13px', color: '#D97706' }}>{cluster.dispatchesSaved}</strong>
-                        </div>
-                      </div>
-
-                      {/* Unified Action Bar */}
-                      <div style={{
-                        fontSize: '12.5px',
-                        color: '#065F46',
-                        background: '#ECFDF5',
-                        padding: '8px 12px',
-                        borderRadius: '8px',
-                        border: '1px solid #A7F3D0',
+            {/* Cluster Main Cards with Grouped Complaints Inside */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {DUPLICATE_CLUSTERS_DATA.map((cluster) => (
+                <div
+                  key={cluster.id}
+                  style={{
+                    background: '#FFFFFF',
+                    borderRadius: '16px',
+                    border: '1px solid #E2E8F0',
+                    boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)',
+                    overflow: 'hidden'
+                  }}
+                >
+                  {/* Cluster Main Header */}
+                  <div style={{
+                    padding: '16px 20px',
+                    background: '#F8FAFC',
+                    borderBottom: '1px solid #E2E8F0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '12px'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span style={{
+                        fontSize: '20px',
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '10px',
+                        background: '#EFF6FF',
+                        border: '1px solid #DBEAFE',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between',
-                        flexWrap: 'wrap',
-                        gap: '8px'
+                        justifyContent: 'center',
+                        flexShrink: 0
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <CheckCircle2 style={{ width: '15px', height: '15px', color: '#059669', flexShrink: 0 }} />
-                          <span><strong>Unified Action: </strong>{cluster.actionSummary}</span>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => setExpandedClusterId(isExpanded ? null : cluster.id)}
-                          style={{
-                            background: '#FFFFFF',
-                            border: '1px solid #A7F3D0',
-                            borderRadius: '6px',
-                            padding: '4px 10px',
-                            fontSize: '11.5px',
+                        {cluster.deptIcon}
+                      </span>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                          <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>
+                            {cluster.title}
+                          </h4>
+                          <span style={{ fontSize: '11px', fontWeight: 800, padding: '2px 7px', borderRadius: '6px', background: '#F1F5F9', color: '#334155', fontFamily: 'monospace' }}>
+                            {cluster.masterTicket}
+                          </span>
+                          <span style={{
+                            fontSize: '11px',
                             fontWeight: 700,
-                            color: '#065F46',
-                            cursor: 'pointer',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px'
-                          }}
-                        >
-                          <span>{isExpanded ? 'Hide Grouped Reports' : `Inspect Grouped Signals (${cluster.groupedSignals.length})`}</span>
-                          {isExpanded ? <ChevronUp style={{ width: '13px', height: '13px' }} /> : <ChevronDown style={{ width: '13px', height: '13px' }} />}
-                        </button>
+                            padding: '2px 8px',
+                            borderRadius: '999px',
+                            background: '#EFF6FF',
+                            color: '#1D4ED8',
+                            border: '1px solid #DBEAFE'
+                          }}>
+                            {cluster.totalReportsMerged} Merged Complaints
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                          <span>🏛️ {cluster.leadDept}</span>
+                          <span>•</span>
+                          <span>📍 {cluster.geoRadius}</span>
+                          <span>•</span>
+                          <span>👥 {cluster.impactSummary}</span>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Expandable Grouped Citizen Signals */}
-                    {isExpanded && (
-                      <div style={{
-                        borderTop: '1px solid #E2E8F0',
-                        background: '#FAFAFA',
-                        padding: '16px 20px'
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{
+                        fontSize: '11px',
+                        fontWeight: 800,
+                        padding: '3px 9px',
+                        borderRadius: '999px',
+                        background: cluster.severity === 'CRITICAL' ? '#FEF2F2' : '#FFFBEB',
+                        color: cluster.severity === 'CRITICAL' ? '#DC2626' : '#D97706',
+                        border: cluster.severity === 'CRITICAL' ? '1px solid #FECACA' : '1px solid #FDE68A'
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                          <span style={{ fontSize: '12px', fontWeight: 800, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                            Individual Citizen Signals Grouped Under Master Case:
+                        ● {cluster.severity}
+                      </span>
+
+                      <span style={{
+                        fontSize: '11.5px',
+                        fontWeight: 700,
+                        padding: '4px 10px',
+                        borderRadius: '8px',
+                        background: '#ECFDF5',
+                        color: '#059669',
+                        border: '1px solid #A7F3D0'
+                      }}>
+                        ⚡ {cluster.similarityScore}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Unified Squad Action Bar */}
+                  <div style={{
+                    padding: '10px 20px',
+                    background: '#F0FDF4',
+                    borderBottom: '1px solid #DCFCE7',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '8px',
+                    fontSize: '12px',
+                    color: '#166534'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <CheckCircle2 style={{ width: '14px', height: '14px', color: '#059669', flexShrink: 0 }} />
+                      <span><strong>Unified Municipal Action: </strong>{cluster.actionSummary}</span>
+                    </div>
+                    <span style={{ fontWeight: 700, color: '#047857' }}>
+                      🛡️ {cluster.dispatchesSaved}
+                    </span>
+                  </div>
+
+                  {/* Grouped Complaints Nested Directly Inside Cluster Card */}
+                  <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      Grouped Citizen Complaints Linked to this Unified Work Order:
+                    </div>
+
+                    {cluster.groupedSignals.map((sig) => (
+                      <div
+                        key={sig.id}
+                        style={{
+                          padding: '12px 14px',
+                          borderRadius: '10px',
+                          background: '#FFFFFF',
+                          border: '1px solid #E2E8F0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          flexWrap: 'wrap',
+                          gap: '10px'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                          <span style={{ fontSize: '11px', fontWeight: 800, padding: '2px 7px', borderRadius: '6px', background: '#F1F5F9', color: '#334155', fontFamily: 'monospace' }}>
+                            #{sig.id}
                           </span>
-                          <span style={{ fontSize: '11px', color: '#059669', fontWeight: 700 }}>
-                            All citizens auto-synced with single ticket updates
+                          <span style={{ fontSize: '11px', padding: '1px 6px', borderRadius: '4px', background: '#F8FAFC', color: '#475569', border: '1px solid #E2E8F0' }}>
+                            {sig.type}
+                          </span>
+                          <strong style={{ fontSize: '12.5px', color: '#0F172A' }}>
+                            {sig.citizen}
+                          </strong>
+                          <span style={{ fontSize: '11px', color: '#94A3B8' }}>
+                            • {sig.time}
                           </span>
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                          {cluster.groupedSignals.map((sig) => (
-                            <div
-                              key={sig.id}
-                              style={{
-                                background: '#FFFFFF',
-                                borderRadius: '10px',
-                                border: '1px solid #E2E8F0',
-                                padding: '10px 14px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                flexWrap: 'wrap',
-                                gap: '10px'
-                              }}
-                            >
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: '240px' }}>
-                                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', fontFamily: 'monospace' }}>
-                                  {sig.id}
-                                </span>
-                                <span style={{ fontSize: '11px', fontWeight: 600, padding: '2px 6px', borderRadius: '4px', background: '#F1F5F9', color: '#475569' }}>
-                                  {sig.type}
-                                </span>
-                                <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#0F172A' }}>
-                                  {sig.citizen}
-                                </span>
-                                <span style={{ fontSize: '11px', color: '#94A3B8' }}>
-                                  • {sig.time}
-                                </span>
-                              </div>
+                        <div style={{ flex: 1, minWidth: '220px', fontSize: '12.5px', color: '#334155' }}>
+                          "{sig.input}"
+                        </div>
 
-                              <div style={{ flex: 2, minWidth: '260px', fontSize: '12px', color: '#334155' }}>
-                                "{sig.input}"
-                              </div>
-
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669', background: '#ECFDF5', padding: '2px 8px', borderRadius: '999px', border: '1px solid #A7F3D0' }}>
-                                  {sig.score}% Match
-                                </span>
-                              </div>
-                            </div>
-                          ))}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                          <span style={{
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            color: '#059669',
+                            background: '#ECFDF5',
+                            padding: '2px 8px',
+                            borderRadius: '999px',
+                            border: '1px solid #A7F3D0'
+                          }}>
+                            {sig.score}% Match
+                          </span>
                         </div>
                       </div>
-                    )}
+                    ))}
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </div>
         )}
