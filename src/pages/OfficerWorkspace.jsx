@@ -168,7 +168,13 @@ export default function OfficerWorkspace({ defaultSection = 'inbox' }) {
   // Filters & View Toggles for Inbox
   const [searchQuery, setSearchQuery] = useState('');
   const [inboxFilter, setInboxFilter] = useState('ALL'); // 'ALL' | 'CRITICAL' | 'SLA_RISK' | 'MY_WORK' | 'IN_PROGRESS' | 'RESOLVED'
-  const [inboxViewMode, setInboxViewMode] = useState('table'); // 'table' | 'cards'
+  const [inboxViewMode, setInboxViewMode] = useState('cards'); // 'table' | 'cards' (Default to 'cards' as requested)
+  const [visibleCardsCount, setVisibleCardsCount] = useState(4); // Show 4 cards in single row initially
+
+  // Reset pagination when filter or search changes
+  useEffect(() => {
+    setVisibleCardsCount(4);
+  }, [inboxFilter, searchQuery]);
 
   // Subtabs for Case Studio (investigation)
   // 'action_plan' | 'workers' | 'resolve' | 'collaborate' | 'intelligence'
@@ -1124,25 +1130,87 @@ export default function OfficerWorkspace({ defaultSection = 'inbox' }) {
               </div>
             ) : (
               /* Visual Cards Grid View */
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
-                {filteredGrievances.map((g) => (
-                  <EditorialComplaintCard
-                    key={g.id}
-                    item={g}
-                    role={currentOfficer?.role || 'officer'}
-                    currentUser={currentOfficer}
-                    onOpen={(item) => setSelectedModalGrievance(item)}
-                    onInspect={(caseId, subTab) => openCaseStudio(caseId, subTab)}
-                    onResolve={(caseId) => {
-                      setSelectedId(caseId);
-                      setShowResolutionModal(true);
-                    }}
-                    onReassign={(caseId) => {
-                      setSelectedId(caseId);
-                      setShowReassignModal(true);
-                    }}
-                  />
-                ))}
+              <div>
+                {filteredGrievances.length === 0 ? (
+                  <div style={{
+                    background: '#FFFFFF',
+                    borderRadius: '14px',
+                    border: '1px solid #E2E8F0',
+                    padding: '40px 20px',
+                    textAlign: 'center',
+                    color: '#64748B',
+                    fontSize: '13px'
+                  }}>
+                    No complaints found matching this filter criteria.
+                  </div>
+                ) : (
+                  <>
+                    <div
+                      className="officer-workspace-card-grid"
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+                        gap: '14px',
+                        marginBottom: '16px'
+                      }}
+                    >
+                      {filteredGrievances.slice(0, visibleCardsCount).map((g) => (
+                        <EditorialComplaintCard
+                          key={g.id}
+                          item={g}
+                          compact={true}
+                          role={currentOfficer?.role || 'officer'}
+                          currentUser={currentOfficer}
+                          onOpen={(item) => setSelectedModalGrievance(item)}
+                          onInspect={(caseId, subTab) => openCaseStudio(caseId, subTab)}
+                          onResolve={(caseId) => {
+                            setSelectedId(caseId);
+                            setShowResolutionModal(true);
+                          }}
+                          onReassign={(caseId) => {
+                            setSelectedId(caseId);
+                            setShowReassignModal(true);
+                          }}
+                        />
+                      ))}
+                    </div>
+
+                    {filteredGrievances.length > visibleCardsCount && (
+                      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px', marginBottom: '8px' }}>
+                        <button
+                          type="button"
+                          onClick={() => setVisibleCardsCount(prev => prev + 4)}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '10px 24px',
+                            borderRadius: '999px',
+                            background: '#FFFFFF',
+                            border: '1.5px solid #CBD5E1',
+                            color: '#0F172A',
+                            fontSize: '13px',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            boxShadow: '0 2px 6px rgba(15,23,42,0.06)',
+                            transition: 'all 150ms ease'
+                          }}
+                          onMouseEnter={e => {
+                            e.currentTarget.style.background = '#F8FAFC';
+                            e.currentTarget.style.borderColor = '#94A3B8';
+                          }}
+                          onMouseLeave={e => {
+                            e.currentTarget.style.background = '#FFFFFF';
+                            e.currentTarget.style.borderColor = '#CBD5E1';
+                          }}
+                        >
+                          <span>View More ({Math.min(4, filteredGrievances.length - visibleCardsCount)} more of {filteredGrievances.length - visibleCardsCount} remaining)</span>
+                          <ChevronDown style={{ width: '15px', height: '15px', color: '#64748B' }} />
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             )}
           </div>

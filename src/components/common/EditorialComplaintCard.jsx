@@ -77,7 +77,8 @@ export default function EditorialComplaintCard({
   onResolve,
   onReassign,
   onUpvote,
-  customAction
+  customAction,
+  compact = false
 }) {
   if (!item) return null;
 
@@ -112,7 +113,7 @@ export default function EditorialComplaintCard({
     <div
       onClick={handleCardClick}
       style={{
-        borderRadius: '24px',
+        borderRadius: compact ? '16px' : '24px',
         background: '#FFFFFF',
         border: '1px solid #E2E8F0',
         boxShadow: '0 4px 18px -2px rgba(15, 23, 42, 0.05)',
@@ -124,8 +125,8 @@ export default function EditorialComplaintCard({
         position: 'relative'
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.transform = 'translateY(-5px)';
-        e.currentTarget.style.boxShadow = '0 20px 38px -8px rgba(15, 23, 42, 0.12)';
+        e.currentTarget.style.transform = 'translateY(-4px)';
+        e.currentTarget.style.boxShadow = '0 16px 32px -6px rgba(15, 23, 42, 0.10)';
       }}
       onMouseLeave={e => {
         e.currentTarget.style.transform = '';
@@ -135,7 +136,7 @@ export default function EditorialComplaintCard({
       {/* ── Top Photo Header (Matching Reference 2 Card Visuals) ── */}
       <div style={{
         position: 'relative',
-        height: '185px',
+        height: compact ? '120px' : '185px',
         width: '100%',
         overflow: 'hidden',
         background: '#F1F5F9'
@@ -160,30 +161,30 @@ export default function EditorialComplaintCard({
 
         {/* Floating Top-Left Category Badge */}
         <div style={{
-          position: 'absolute', top: '14px', left: '14px',
+          position: 'absolute', top: compact ? '8px' : '14px', left: compact ? '8px' : '14px',
           background: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(8px)',
           borderRadius: '999px',
-          padding: '4px 12px',
-          display: 'flex', alignItems: 'center', gap: '6px',
+          padding: compact ? '2px 8px' : '4px 12px',
+          display: 'flex', alignItems: 'center', gap: compact ? '4px' : '6px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.12)'
         }}>
-          <span style={{ fontSize: '13px' }}>{catCfg.emoji}</span>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A' }}>
+          <span style={{ fontSize: compact ? '11px' : '13px' }}>{catCfg.emoji}</span>
+          <span style={{ fontSize: compact ? '10px' : '11px', fontWeight: 700, color: '#0F172A' }}>
             {catCfg.label}
           </span>
         </div>
 
         {/* Floating Top-Right Badges */}
-        <div style={{ position: 'absolute', top: '14px', right: '14px', display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+        <div style={{ position: 'absolute', top: compact ? '8px' : '14px', right: compact ? '8px' : '14px', display: 'flex', gap: compact ? '4px' : '6px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {isMine && (
             <span style={{
               background: 'rgba(37, 99, 235, 0.95)',
               backdropFilter: 'blur(6px)',
               color: '#FFFFFF',
               borderRadius: '999px',
-              padding: '4px 10px',
-              fontSize: '10.5px',
+              padding: compact ? '2px 7px' : '4px 10px',
+              fontSize: compact ? '9.5px' : '10.5px',
               fontWeight: 700,
               boxShadow: '0 2px 6px rgba(37,99,235,0.3)'
             }}>
@@ -196,8 +197,8 @@ export default function EditorialComplaintCard({
               backdropFilter: 'blur(6px)',
               color: '#FFFFFF',
               borderRadius: '999px',
-              padding: '4px 10px',
-              fontSize: '10.5px',
+              padding: compact ? '2px 7px' : '4px 10px',
+              fontSize: compact ? '9.5px' : '10.5px',
               fontWeight: 700,
               boxShadow: '0 2px 6px rgba(220,38,38,0.3)'
             }}>
@@ -209,8 +210,8 @@ export default function EditorialComplaintCard({
               backdropFilter: 'blur(6px)',
               color: '#FFFFFF',
               borderRadius: '999px',
-              padding: '4px 10px',
-              fontSize: '10.5px',
+              padding: compact ? '2px 7px' : '4px 10px',
+              fontSize: compact ? '9.5px' : '10.5px',
               fontWeight: 700,
               boxShadow: '0 2px 6px rgba(217,119,6,0.3)'
             }}>
@@ -224,8 +225,8 @@ export default function EditorialComplaintCard({
               backdropFilter: 'blur(6px)',
               color: '#FFFFFF',
               borderRadius: '999px',
-              padding: '4px 10px',
-              fontSize: '10.5px',
+              padding: compact ? '2px 7px' : '4px 10px',
+              fontSize: compact ? '9.5px' : '10.5px',
               fontWeight: 700,
               boxShadow: '0 2px 6px rgba(5,150,105,0.3)'
             }}>
@@ -236,9 +237,9 @@ export default function EditorialComplaintCard({
 
         {/* Bottom of Image Metadata Bar */}
         <div style={{
-          position: 'absolute', bottom: '12px', left: '16px', right: '16px',
+          position: 'absolute', bottom: compact ? '6px' : '12px', left: compact ? '10px' : '16px', right: compact ? '10px' : '16px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          color: '#FFFFFF', fontSize: '11px', fontWeight: 600,
+          color: '#FFFFFF', fontSize: compact ? '10px' : '11px', fontWeight: 600,
           textShadow: '0 1px 3px rgba(0,0,0,0.7)'
         }}>
           <span style={{ fontFamily: 'monospace', opacity: 0.9, letterSpacing: '0.5px' }}>
@@ -247,39 +248,39 @@ export default function EditorialComplaintCard({
           <span style={{
             background: slaStatus === 'OVERDUE' ? 'rgba(220, 38, 38, 0.85)' : 'rgba(0, 0, 0, 0.55)',
             backdropFilter: 'blur(6px)',
-            padding: '2px 8px', borderRadius: '6px', fontSize: '10.5px'
+            padding: compact ? '1px 6px' : '2px 8px', borderRadius: '6px', fontSize: compact ? '9.5px' : '10.5px'
           }}>
-            ⏱️ SLA: {item.slaDeadline || `${itemHours}h`} {slaStatus === 'OVERDUE' ? '(Breached)' : ''}
+            ⏱️ {item.slaDeadline || `${itemHours}h`} {slaStatus === 'OVERDUE' ? '(Breached)' : ''}
           </span>
         </div>
       </div>
 
       {/* ── Card Body (Inspired by Reference 2 Layout) ── */}
-      <div style={{ padding: '18px 20px 20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+      <div style={{ padding: compact ? '12px 14px 14px' : '18px 20px 20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         {/* Title */}
         <h3 style={{
-          fontSize: '15.5px',
+          fontSize: compact ? '13.5px' : '15.5px',
           fontWeight: 800,
           color: '#0F172A',
-          lineHeight: 1.35,
-          margin: '0 0 6px 0',
+          lineHeight: 1.3,
+          margin: compact ? '0 0 4px 0' : '0 0 6px 0',
           display: '-webkit-box',
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',
           overflow: 'hidden',
-          minHeight: '42px'
+          minHeight: compact ? '35px' : '42px'
         }}>
           {item.title}
         </h3>
 
         {/* Snippet */}
         <p style={{
-          fontSize: '12.5px',
+          fontSize: compact ? '11.5px' : '12.5px',
           color: '#64748B',
-          lineHeight: 1.45,
-          margin: '0 0 14px 0',
+          lineHeight: 1.4,
+          margin: compact ? '0 0 8px 0' : '0 0 14px 0',
           display: '-webkit-box',
-          WebkitLineClamp: 2,
+          WebkitLineClamp: compact ? 1 : 2,
           WebkitBoxOrient: 'vertical',
           overflow: 'hidden'
         }}>
@@ -291,15 +292,15 @@ export default function EditorialComplaintCard({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '10px 0',
+          padding: compact ? '6px 0' : '10px 0',
           borderTop: '1px solid #F1F5F9',
           borderBottom: '1px solid #F1F5F9',
-          marginBottom: '14px',
-          fontSize: '11.5px',
+          marginBottom: compact ? '8px' : '14px',
+          fontSize: compact ? '10.5px' : '11.5px',
           color: '#475569'
         }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '4px', maxWidth: '38%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            <MapPin style={{ width: '12px', height: '12px', color: '#94A3B8', flexShrink: 0 }} />
+            <MapPin style={{ width: compact ? '11px' : '12px', height: compact ? '11px' : '12px', color: '#94A3B8', flexShrink: 0 }} />
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.location?.area || item.location?.ward || 'Ward Area'}</span>
           </span>
           <span style={{ color: '#E2E8F0' }}>|</span>
@@ -322,17 +323,17 @@ export default function EditorialComplaintCard({
         </div>
 
         {/* Step Progress Bar */}
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '5px' }}>
+        <div style={{ marginBottom: compact ? '10px' : '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: compact ? '4px' : '6px' }}>
+            <span style={{ fontSize: compact ? '10.5px' : '11.5px', fontWeight: 700, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '4px' }}>
               <span>{STATUS_STEPS[stepIdx]?.icon}</span>
               <span>{STATUS_STEPS[stepIdx]?.label}</span>
             </span>
-            <span style={{ fontSize: '11px', color: '#94A3B8', fontWeight: 600 }}>
-              Step {stepIdx + 1} of {STATUS_STEPS.length}
+            <span style={{ fontSize: compact ? '10px' : '11px', color: '#94A3B8', fontWeight: 600 }}>
+              Step {stepIdx + 1}/{STATUS_STEPS.length}
             </span>
           </div>
-          <div style={{ height: '5px', background: '#F1F5F9', borderRadius: '999px', overflow: 'hidden' }}>
+          <div style={{ height: compact ? '3.5px' : '5px', background: '#F1F5F9', borderRadius: '999px', overflow: 'hidden' }}>
             <div style={{
               height: '100%',
               width: `${((stepIdx + 0.2) / (STATUS_STEPS.length - 1)) * 100}%`,
@@ -344,7 +345,7 @@ export default function EditorialComplaintCard({
         </div>
 
         {/* Action Row */}
-        <div style={{ marginTop: 'auto', display: 'flex', gap: '8px' }} onClick={e => e.stopPropagation()}>
+        <div style={{ marginTop: 'auto', display: 'flex', gap: compact ? '6px' : '8px' }} onClick={e => e.stopPropagation()}>
           {customAction ? (
             customAction
           ) : isOfficerOrAdmin ? (
@@ -354,50 +355,51 @@ export default function EditorialComplaintCard({
                 onClick={() => onInspect ? onInspect(item.id) : (onOpen ? onOpen(item) : null)}
                 style={{
                   flex: 1,
-                  height: '42px',
+                  height: compact ? '32px' : '42px',
                   borderRadius: '999px',
                   background: '#0F172A',
                   color: '#FFFFFF',
-                  fontSize: '12.5px',
+                  fontSize: compact ? '11.5px' : '12.5px',
                   fontWeight: 700,
                   border: 'none',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '6px',
+                  gap: '5px',
+                  padding: compact ? '0 10px' : '0 14px',
                   boxShadow: '0 2px 8px rgba(15,23,42,0.18)',
                   transition: 'background 0.15s ease'
                 }}
                 onMouseEnter={e => e.currentTarget.style.background = '#1E293B'}
                 onMouseLeave={e => e.currentTarget.style.background = '#0F172A'}
               >
-                <Eye style={{ width: '13px', height: '13px' }} />
-                <span>Inspect Case</span>
+                <Eye style={{ width: compact ? '12px' : '13px', height: compact ? '12px' : '13px' }} />
+                <span>{compact ? 'Inspect' : 'Inspect Case'}</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => onInspect ? onInspect(item.id, 'workers') : (onOpen ? onOpen(item) : null)}
                 style={{
-                  height: '42px',
-                  padding: '0 12px',
+                  height: compact ? '32px' : '42px',
+                  padding: compact ? '0 8px' : '0 12px',
                   borderRadius: '999px',
                   background: '#ECFDF5',
                   border: '1px solid #A7F3D0',
                   color: '#065F46',
-                  fontSize: '12px',
+                  fontSize: compact ? '10.5px' : '12px',
                   fontWeight: 700,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '5px',
+                  gap: '4px',
                   boxShadow: '0 1px 3px rgba(6, 95, 70, 0.1)',
                   transition: 'background 0.15s ease'
                 }}
                 title="AI Worker Recommendation & Dispatch"
               >
-                <Wrench style={{ width: '13px', height: '13px', color: '#059669' }} />
+                <Wrench style={{ width: compact ? '11px' : '13px', height: compact ? '11px' : '13px', color: '#059669' }} />
                 <span>Worker</span>
               </button>
 
@@ -406,12 +408,12 @@ export default function EditorialComplaintCard({
                   type="button"
                   onClick={() => onResolve(item.id)}
                   style={{
-                    height: '42px',
-                    padding: '0 14px',
+                    height: compact ? '32px' : '42px',
+                    padding: compact ? '0 8px' : '0 14px',
                     borderRadius: '999px',
                     background: '#ECFDF5',
                     color: '#059669',
-                    fontSize: '12px',
+                    fontSize: compact ? '10.5px' : '12px',
                     fontWeight: 700,
                     border: '1px solid #A7F3D0',
                     cursor: 'pointer',
@@ -422,7 +424,7 @@ export default function EditorialComplaintCard({
                   }}
                   title="Mark Resolved"
                 >
-                  <CheckCircle2 style={{ width: '13px', height: '13px' }} />
+                  <CheckCircle2 style={{ width: compact ? '11px' : '13px', height: compact ? '11px' : '13px' }} />
                   <span>Resolve</span>
                 </button>
               )}
@@ -432,12 +434,12 @@ export default function EditorialComplaintCard({
                   type="button"
                   onClick={() => onReassign(item.id)}
                   style={{
-                    height: '42px',
-                    padding: '0 12px',
+                    height: compact ? '32px' : '42px',
+                    padding: compact ? '0 8px' : '0 12px',
                     borderRadius: '999px',
                     background: '#F8FAFC',
                     color: '#475569',
-                    fontSize: '12px',
+                    fontSize: compact ? '11px' : '12px',
                     fontWeight: 600,
                     border: '1px solid #E2E8F0',
                     cursor: 'pointer',
@@ -448,7 +450,7 @@ export default function EditorialComplaintCard({
                   }}
                   title="Reassign Officer"
                 >
-                  <UserCheck style={{ width: '13px', height: '13px' }} />
+                  <UserCheck style={{ width: compact ? '11px' : '13px', height: compact ? '11px' : '13px' }} />
                 </button>
               )}
             </>
