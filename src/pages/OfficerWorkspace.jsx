@@ -696,17 +696,15 @@ export default function OfficerWorkspace({ defaultSection = 'inbox' }) {
             type="button"
             onClick={() => switchView('inbox')}
             style={{
-              flex: 1,
-              minWidth: '160px',
-              padding: '10px 16px',
+              padding: '10px 18px',
               borderRadius: '8px',
               border: 'none',
-              background: activeView === 'inbox' ? '#065F46' : 'transparent',
-              color: activeView === 'inbox' ? '#FFFFFF' : '#475569',
+              background: '#065F46',
+              color: '#FFFFFF',
               fontSize: '13px',
               fontWeight: 700,
               cursor: 'pointer',
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
@@ -719,79 +717,10 @@ export default function OfficerWorkspace({ defaultSection = 'inbox' }) {
               fontSize: '11px',
               padding: '1px 6px',
               borderRadius: '999px',
-              background: activeView === 'inbox' ? 'rgba(255,255,255,0.25)' : '#F1F5F9',
-              color: activeView === 'inbox' ? '#FFFFFF' : '#64748B'
+              background: 'rgba(255,255,255,0.25)',
+              color: '#FFFFFF'
             }}>
               {stats.active}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => switchView('investigation')}
-            style={{
-              flex: 1,
-              minWidth: '180px',
-              padding: '10px 16px',
-              borderRadius: '8px',
-              border: 'none',
-              background: activeView === 'investigation' ? '#065F46' : 'transparent',
-              color: activeView === 'investigation' ? '#FFFFFF' : '#475569',
-              fontSize: '13px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              transition: 'all 120ms ease'
-            }}
-          >
-            <Eye style={{ width: '15px', height: '15px' }} />
-            <span>2. Case Resolution Studio</span>
-            <span style={{
-              fontSize: '11px',
-              padding: '1px 6px',
-              borderRadius: '999px',
-              background: activeView === 'investigation' ? 'rgba(255,255,255,0.25)' : '#F1F5F9',
-              color: activeView === 'investigation' ? '#FFFFFF' : '#64748B',
-              fontFamily: 'monospace'
-            }}>
-              #{activeItem.id.slice(-4)}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => switchView('operations')}
-            style={{
-              flex: 1,
-              minWidth: '170px',
-              padding: '10px 16px',
-              borderRadius: '8px',
-              border: 'none',
-              background: activeView === 'operations' ? '#065F46' : 'transparent',
-              color: activeView === 'operations' ? '#FFFFFF' : '#475569',
-              fontSize: '13px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              transition: 'all 120ms ease'
-            }}
-          >
-            <Activity style={{ width: '15px', height: '15px' }} />
-            <span>3. Operations & Oversight</span>
-            <span style={{
-              fontSize: '11px',
-              padding: '1px 6px',
-              borderRadius: '999px',
-              background: activeView === 'operations' ? 'rgba(255,255,255,0.25)' : '#F1F5F9',
-              color: activeView === 'operations' ? '#FFFFFF' : '#64748B'
-            }}>
-              {officerRoster.length} Crew
             </span>
           </button>
         </div>
