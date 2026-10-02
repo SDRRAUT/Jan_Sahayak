@@ -643,6 +643,167 @@ export const CIVIC_INCIDENTS = [
     ],
     relatedGrievanceIds: ["PN-2026-WAG-0104", "PN-2026-WAG-0113", "PN-2026-WAG-0119"],
     humanDecisions: []
+  },
+  {
+    id: "INC-2026-DEL-43",
+    title: "Rohini Sector 14 Subsurface Water Line Fracture & Cavity Formation",
+    summary: "Deep subsurface water main rupture in Sector 14 is softening road subgrade, leading to asphalt cavity and cross-contamination with adjacent stormwater line.",
+    incidentType: "INFRASTRUCTURE_FAILURE",
+    status: "Investigating",
+    stage: "GROWING",
+    stageVelocity: "+18.4 m/hr corridor spread",
+    severity: "CRITICAL",
+    confidence: "High (91% signal correlation)",
+    signalCount: 26,
+    formalComplaintsCount: 14,
+    citizenObservationsCount: 12,
+    affectedArea: "Ward 14 (Rohini Sector 14 - Pocket 1 & 2 Corridor)",
+    affectedPopulation: "~2,400 Citizens (550 Households)",
+    firstDetectedAt: "2026-09-28 09:15 AM",
+    lastUpdatedAt: "8 mins ago",
+    departments: [
+      { name: "Delhi Jal Board (DJB)", lead: true, cases: 14, role: "Main potable carrier isolation, trench excavation & cast-iron replacement" },
+      { name: "Public Works Department (PWD Delhi)", lead: false, cases: 8, role: "Road pavement stabilizing & subsoil drainage rehabilitation" },
+      { name: "Municipal Corporation of Delhi (MCD)", lead: false, cases: 4, role: "Adjacent storm drain culvert de-silting & sanitization" }
+    ],
+    complaintDna: {
+      issueType: "Water Infrastructure & Road Cavity",
+      subIssue: "Negative-Pressure Siphonage & Subgrade Cavity",
+      service: "Municipal Potable Water Distribution",
+      asset: "1988 Cast-Iron Feeder Main (Sector 14 Alignment)",
+      locationContext: "Roadside utility corridor near Mother Dairy Booth #14, Sector 14 (Depth 1.8m)",
+      department: "Delhi Jal Board (DJB)",
+      subDepartment: "Rohini Zone North-West Maintenance",
+      severity: "CRITICAL",
+      urgency: "HIGH",
+      symptoms: [
+        "Severe water discoloration (brownish tap discharge)",
+        "Foul odor during low-pressure evening hours",
+        "35cm structural road depression outside Mother Dairy",
+        "Loss of drinking water pressure across Pocket 1 & 2"
+      ],
+      entities: [
+        "Mother Dairy Booth #14",
+        "Pocket 1 Market Chowk",
+        "Sector 14 Arterial Ring Road",
+        "DAV Public School Rohini"
+      ],
+      possibleCauses: [
+        "Aged cast-iron pipe installed in 1988 exceeding design life",
+        "Monsoon drainage backwash eroding sub-base soil compaction",
+        "Heavy commercial goods traffic causing vibrational shear"
+      ],
+      affectedPopulation: [
+        "550 residential households in Pocket 1 & 2",
+        "24 shops in Sector 14 Market",
+        "DAV Public School (~420 students)"
+      ],
+      temporalPattern: "Severe during 06:00–09:30 AM DJB pumping cycle",
+      environmentalContext: "Subsoil saturation from pipe breach accelerating pavement cavitation."
+    },
+    timeline: [
+      { date: "28 Sept", time: "09:15 AM", stage: "First Weak Signal Detected", desc: "Citizen reported damp asphalt and minor pressure dip near Mother Dairy booth #14.", count: 1, source: "Citizen Signal" },
+      { date: "29 Sept", time: "10:30 AM", stage: "Signal Cluster Formation", desc: "5 related citizen reports logged in Sector 14 Pocket 1 reporting brown tap water.", count: 6, source: "AI Clustering" },
+      { date: "30 Sept", time: "11:45 AM", stage: "Formal Complaint Wave", desc: "14 formal citizen grievances aggregated into Incident INC-2026-DEL-43.", count: 18, source: "Incident Engine" },
+      { date: "01 Oct", time: "08:15 AM", stage: "Geographic Spread Detected", desc: "Road depression deepened to 35cm outside market; puddle spreading toward school.", count: 22, source: "Geographic Engine" },
+      { date: "01 Oct", time: "12:00 PM", stage: "Cross-Department Linkage", desc: "PWD alerted for road cave-in hazard; MCD alerted for storm culvert overflow.", count: 24, source: "Cross-Dept Detector" },
+      { date: "01 Oct", time: "02:30 PM", stage: "Escalation to GROWING Stage", desc: "Corridor spread velocity reached +18.4 m/hr. Critical supervisory alert sent.", count: 26, source: "Escalation Engine" }
+    ],
+    spreadGeo: [
+      { step: "Day 1 (Sep 28)", ward: "Rohini Sector 14 (Origin)", lat: 28.7180, lng: 77.1280, radiusMeters: 110, signalCount: 2, label: "Initial fissure at Mother Dairy booth", color: "#10B981" },
+      { step: "Day 3 (Sep 30)", ward: "Rohini Sector 14 (Pocket 1)", lat: 28.7192, lng: 77.1295, radiusMeters: 320, signalCount: 14, label: "Subsurface spread into Pocket 1 residential loop", color: "#F59E0B" },
+      { step: "Day 5 (Oct 01)", ward: "Rohini Sector 14 (Arterial Corridor)", lat: 28.7210, lng: 77.1320, radiusMeters: 750, signalCount: 26, label: "Full corridor impact: tap contamination + 35cm road depression", color: "#EF4444" }
+    ],
+    rootCauseHypotheses: [
+      {
+        id: "RCH-DEL-01",
+        title: "Negative-Pressure Siphonage in 1988 Cast-Iron Feeder Line",
+        confidence: "HIGH",
+        confidenceScore: 91,
+        evidence: [
+          "26 correlated citizen signals & complaints clustered along Sector 14 utility alignment",
+          "DJB asset register confirms 1988 installation vintage exceeding 30-year design life",
+          "Water quality testing showed chlorine residual dropped to 0.02 ppm",
+          "Acoustic leak signature confirmed near Mother Dairy valve pit #12"
+        ],
+        verificationRequired: true,
+        recommendedVerification: "Deploy acoustic leak correlator & ultrasonic pipe sensor at Sector 14 Gate #2"
+      },
+      {
+        id: "RCH-DEL-02",
+        title: "Sub-Base Soil Compaction Loss from Storm Drain Backwash",
+        confidence: "MEDIUM",
+        confidenceScore: 74,
+        evidence: [
+          "MCD storm culvert inspection reported cracked masonry and silt backing",
+          "Road depression aligns directly with adjacent stormwater culvert line"
+        ],
+        verificationRequired: true,
+        recommendedVerification: "Inspect stormwater culvert wall using CCTV crawler camera"
+      }
+    ],
+    crossDepartmentImpact: {
+      primaryDepartment: "Delhi Jal Board (DJB)",
+      sharedProblemSummary: "Underground water main rupture is softening road base and causing drain overflow — affecting 3 separate civic authorities.",
+      departments: [
+        { dept: "Delhi Jal Board (DJB)", cases: 14, icon: "Droplet", badgeColor: "#0E5E3A", impactSummary: "Main potable water pressure loss & contamination risk across 550 households." },
+        { dept: "Public Works Department (PWD Delhi)", cases: 8, icon: "Wrench", badgeColor: "#D97706", impactSummary: "Road subgrade saturation causing 35cm asphalt depression outside market." },
+        { dept: "Municipal Corporation of Delhi (MCD)", cases: 4, icon: "Building2", badgeColor: "#7C3AED", impactSummary: "Storm drain blockage and standing water pools near market boundary." }
+      ],
+      coordinationRecommendation: "Initiate Unified Joint Action: DJB isolates feeder at 11:00 AM; PWD inspects road sub-base concurrently before asphalt re-bedding; MCD flushes storm drain barriers."
+    },
+    simulations: [
+      {
+        id: "SIM-DEL-A",
+        optionKey: "A",
+        title: "A. External Emergency Clamping",
+        shortTitle: "External Emergency Clamping",
+        time: "4–6h",
+        risk: "High (65%)",
+        riskLevel: "high",
+        cost: "₹18,000",
+        verdict: "Sub-optimal",
+        verdictType: "suboptimal"
+      },
+      {
+        id: "SIM-DEL-B",
+        optionKey: "B",
+        title: "B. Ductile Iron Replacement & PWD Road Re-bedding",
+        shortTitle: "Ductile Iron Replacement",
+        time: "24–36h",
+        risk: "Very Low (<5%)",
+        riskLevel: "low",
+        cost: "₹1.45L",
+        verdict: "Recommended",
+        verdictType: "recommended"
+      },
+      {
+        id: "SIM-DEL-C",
+        optionKey: "C",
+        title: "C. Acoustic & Ground Radar Probe",
+        shortTitle: "Acoustic & Ground Radar Probe",
+        time: "2–3h",
+        risk: "N/A",
+        riskLevel: "neutral",
+        cost: "₹8,000",
+        verdict: "Essential (1st step)",
+        verdictType: "essential"
+      },
+      {
+        id: "SIM-DEL-D",
+        optionKey: "D",
+        title: "D. Valve Rationing Only",
+        shortTitle: "Valve Rationing Only",
+        time: "Immediate",
+        risk: "Critical (100%)",
+        riskLevel: "critical",
+        cost: "₹3,000",
+        verdict: "Rejected",
+        verdictType: "rejected"
+      }
+    ],
+    relatedGrievanceIds: ["DL-2026-W14-0892"],
+    humanDecisions: []
   }
 ];
 

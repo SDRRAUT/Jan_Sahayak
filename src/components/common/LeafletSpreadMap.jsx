@@ -324,12 +324,13 @@ export const WAGHOLI_SPREAD_POINTS = [
   }
 ];
 
-// Coordinate sanitization: ensure coordinates fall within Wagholi, Pune bounds
+// Coordinate sanitization: ensure coordinates fall within valid geographic bounds
 const sanitizeCoord = (pt, fallbackLat = 18.5785, fallbackLng = 73.9820) => {
   if (!pt) return { lat: fallbackLat, lng: fallbackLng };
   const lat = Number(pt.lat);
   const lng = Number(pt.lng);
-  if (isNaN(lat) || isNaN(lng) || lat > 20 || lat < 17 || lng < 72 || lng > 76) {
+  // Valid India latitude: 8°N to 36°N, longitude: 68°E to 98°E
+  if (isNaN(lat) || isNaN(lng) || lat < 8 || lat > 36 || lng < 68 || lng > 98) {
     return { ...pt, lat: fallbackLat, lng: fallbackLng };
   }
   return { ...pt, lat, lng };
@@ -345,9 +346,20 @@ export default function LeafletSpreadMap({
   region = 'wagholi'
 }) {
   const [selectedHotspot, setSelectedHotspot] = useState(null);
-  const initialCenter = React.useMemo(() => [18.5785, 73.9820], []);
 
-  // Clean dataPoints with Wagholi coordinates (memoized to prevent re-render loops)
+  // Dynamic initial center based on passed data points (e.g. Rohini Delhi vs Wagholi Pune)
+  const initialCenter = React.useMemo(() => {
+    if (dataPoints && dataPoints.length > 0 && dataPoints[0].lat && dataPoints[0].lng) {
+      const lat = Number(dataPoints[0].lat);
+      const lng = Number(dataPoints[0].lng);
+      if (!isNaN(lat) && !isNaN(lng) && lat >= 8 && lat <= 36 && lng >= 68 && lng <= 98) {
+        return [lat, lng];
+      }
+    }
+    return [18.5785, 73.9820];
+  }, [dataPoints]);
+
+  // Clean dataPoints with fallback coordinates (memoized to prevent re-render loops)
   const rawPoints = (dataPoints && dataPoints.length > 0) ? dataPoints : WAGHOLI_SPREAD_POINTS;
   const points = React.useMemo(() => {
     return rawPoints.map((pt, idx) => {

@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   Plus, Search, MapPin, ThumbsUp, ArrowRight,
-  Sparkles, Bell, FileText, X
+  Sparkles, Bell, FileText, X, Wrench, Phone, CheckCircle2
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { INITIAL_GRIEVANCES } from '../data/mockGrievances';
 import { normalizeStatus, getRoleStatusLabel, getStatusConfig } from '../utils/statuses';
 import WhyExplainer from '../components/common/WhyExplainer';
 import FileGrievanceModal from '../components/common/FileGrievanceModal';
+import RegisterWorkerModal from '../components/worker/RegisterWorkerModal';
 
 const PROBLEM_CATEGORIES = [
   { key:'Water Supply & Contamination', label:'Water Supply',    emoji:'💧', light:'#F0F9FF', border:'#BAE6FD', text:'#0369A1', badgeBg:'#E0F2FE' },
@@ -527,11 +528,23 @@ function GrievanceCard({ item, citizen, onOpen }) {
 }
 
 export default function CitizenDashboard() {
-  const {grievances=[],upvoteGrievance,user,token,currentCitizen:contextCitizen,civicIncidents=[],notifications:contextNotifs=[]} = useApp();
+  const {
+    grievances=[],
+    upvoteGrievance,
+    user,
+    token,
+    currentCitizen:contextCitizen,
+    civicIncidents=[],
+    notifications:contextNotifs=[],
+    currentWorkerProfile,
+    workerOrders=[],
+    settleWorkerPayment
+  } = useApp();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab,setActiveTab]             = useState('all');
   const [searchQuery,setSearchQuery]         = useState('');
   const [showFileModal,setShowFileModal]     = useState(false);
+  const [showRegisterWorkerModal,setShowRegisterWorkerModal] = useState(false);
   const [fileModalCategory,setFileModalCategory] = useState('');
   const [selectedGrievance,setSelectedGrievance] = useState(null);
   const [dashboardData,setDashboardData]     = useState(null);
@@ -581,10 +594,17 @@ export default function CitizenDashboard() {
   const catCounts={};
   displayGrievances.forEach(g=>{const c=getCatConfig(g);catCounts[c.key]=(catCounts[c.key]||0)+1;});
 
+  const myBookedOrders = workerOrders.filter(o => 
+    o.requestedBy === 'CITIZEN' || 
+    (o.customerPhone && citizen.phone && o.customerPhone === citizen.phone) ||
+    (o.customerName && citizen.name && o.customerName.toLowerCase().includes(citizen.name.toLowerCase().split(' ')[0]))
+  );
+
   const TABS = [
     { key:'all',           label:`All (${displayGrievances.length})` },
     { key:'my',            label:`My Reports (${myReports.length})` },
     { key:'verification',  label:`Verify Fix (${pendingVerification.length})` },
+    { key:'booked_workers',label:`Booked Workers (${myBookedOrders.length})` },
     { key:'active',        label:'In Progress' },
     { key:'resolved',      label:'Resolved' },
     { key:'notifications', label:`Alerts (${citizenNotifications.length})` },
@@ -637,6 +657,49 @@ export default function CitizenDashboard() {
             </div>
 
             <div style={{ display:'flex', gap:'10px', flexWrap:'wrap' }}>
+              <Link
+                to="/citizen/find-worker"
+                style={{
+                  height:'42px', minHeight:'42px', padding:'0 16px', borderRadius:'12px',
+                  background:'#ECFDF5', color:'#065F46', border:'1px solid #A7F3D0',
+                  fontWeight:700, fontSize:'13px', textDecoration:'none',
+                  display:'flex', alignItems:'center', gap:'8px',
+                  transition:'all 0.15s ease'
+                }}
+              >
+                <Wrench style={{ width:'15px', height:'15px' }} />
+                <span>Find Worker</span>
+              </Link>
+
+              {currentWorkerProfile ? (
+                <Link
+                  to="/worker"
+                  style={{
+                    height:'42px', minHeight:'42px', padding:'0 16px', borderRadius:'12px',
+                    background:'#EFF6FF', color:'#1D4ED8', border:'1px solid #BFDBFE',
+                    fontWeight:700, fontSize:'13px', textDecoration:'none',
+                    display:'flex', alignItems:'center', gap:'8px'
+                  }}
+                >
+                  <Sparkles style={{ width:'15px', height:'15px' }} />
+                  <span>Worker Portal</span>
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowRegisterWorkerModal(true)}
+                  style={{
+                    height:'42px', minHeight:'42px', padding:'0 16px', borderRadius:'12px',
+                    background:'#F8FAFC', color:'#334155', border:'1px solid #CBD5E1',
+                    fontWeight:700, fontSize:'13px', cursor:'pointer',
+                    display:'flex', alignItems:'center', gap:'8px'
+                  }}
+                >
+                  <Plus style={{ width:'15px', height:'15px' }} />
+                  <span>Register as Worker</span>
+                </button>
+              )}
+
               <button
                 onClick={() => { setFileModalCategory(''); setShowFileModal(true); }}
                 style={{
@@ -792,7 +855,131 @@ export default function CitizenDashboard() {
             )}
           </div>
 
-          {activeTab==='notifications'?(
+          {activeTab==='booked_workers'?(
+            <div style={{display:'flex',flexDirection:'column',gap:'14px'}}>
+              {myBookedOrders.length===0?(
+                <div style={{textAlign:'center',padding:'54px 20px',background:'#fff',borderRadius:'20px',border:'1px solid #E2E8F0'}}>
+                  <Wrench style={{width:'40px',height:'40px',color:'#CBD5E1',margin:'0 auto 12px'}}/>
+                  <h3 style={{fontSize:'17px',fontWeight:700,color:'#0F172A',marginBottom:'6px'}}>No Booked Workers Yet</h3>
+                  <p style={{color:'#64748B',fontSize:'13.5px',marginBottom:'18px'}}>Need a plumber, electrician, or mason in Wagholi? Hire trusted technicians directly.</p>
+                  <Link to="/citizen/find-worker" style={{padding:'10px 22px',background:'#065F46',color:'#fff',borderRadius:'12px',textDecoration:'none',fontWeight:700,fontSize:'13px',display:'inline-flex',alignItems:'center',gap:'6px',boxShadow:'0 2px 8px rgba(6,78,59,0.25)'}}>
+                    <Wrench style={{width:'15px',height:'15px'}}/> Browse Wagholi Workers
+                  </Link>
+                </div>
+              ):(
+                myBookedOrders.map(order => {
+                  const isCompleted = order.status === 'COMPLETED';
+                  const isPaid = order.status === 'PAID' || order.status === 'CLOSED';
+                  return (
+                    <div
+                      key={order.id}
+                      style={{
+                        background: '#FFFFFF',
+                        border: '1px solid #E2E8F0',
+                        borderRadius: '20px',
+                        padding: '20px',
+                        boxShadow: '0 4px 16px -2px rgba(15, 23, 42, 0.05)'
+                      }}
+                    >
+                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', flexWrap:'wrap', gap:'12px', marginBottom:'14px' }}>
+                        <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
+                          <img
+                            src={order.workerAvatar || 'https://images.unsplash.com/photo-1540569014015-19a7be504e3a?auto=format&fit=crop&w=400&q=80'}
+                            alt={order.workerName}
+                            style={{ width:'48px', height:'48px', borderRadius:'50%', objectFit:'cover', border:'2px solid #E2E8F0' }}
+                          />
+                          <div>
+                            <div style={{ display:'flex', alignItems:'center', gap:'6px' }}>
+                              <h3 style={{ margin:0, fontSize:'16px', fontWeight:800, color:'#0F172A' }}>{order.workerName}</h3>
+                              <span style={{ fontSize:'11px', color:'#16A34A', background:'#DCFCE7', padding:'2px 8px', borderRadius:'999px', fontWeight:700 }}>
+                                {order.workerCategory}
+                              </span>
+                            </div>
+                            <div style={{ fontSize:'12px', color:'#64748B', marginTop:'2px' }}>
+                              Order #{order.id} · Scheduled: {order.scheduledTime}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div style={{ textAlign:'right' }}>
+                          <span style={{
+                            display:'inline-block',
+                            fontSize:'11px',
+                            fontWeight:700,
+                            padding:'3px 10px',
+                            borderRadius:'999px',
+                            marginBottom:'4px',
+                            background: isPaid ? '#DCFCE7' : isCompleted ? '#FEF3C7' : '#EFF6FF',
+                            color: isPaid ? '#166534' : isCompleted ? '#B45309' : '#1D4ED8'
+                          }}>
+                            {isPaid ? 'PAID & COMPLETED' : isCompleted ? 'WORK DONE - PAYMENT PENDING' : order.status.replace('_', ' ')}
+                          </span>
+                          <div style={{ fontSize:'18px', fontWeight:800, color:'#065F46', fontFamily:'monospace' }}>
+                            ₹{order.estimatedFare}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Work Description */}
+                      <div style={{ background:'#F8FAFC', borderRadius:'12px', padding:'12px 14px', marginBottom:'14px', fontSize:'13px', color:'#334155' }}>
+                        <strong>Service: </strong>{order.serviceTitle}
+                        {order.ward && <div style={{ fontSize:'12px', color:'#64748B', marginTop:'3px' }}>📍 {order.ward}</div>}
+                      </div>
+
+                      {/* Progress Stepper */}
+                      <div style={{ display:'flex', alignItems:'center', gap:'6px', fontSize:'11px', fontWeight:700, marginBottom:'16px', overflowX:'auto' }}>
+                        <div style={{ color:'#065F46', display:'flex', alignItems:'center', gap:'3px' }}>
+                          <CheckCircle2 style={{ width:'13px', height:'13px' }}/> Booked
+                        </div>
+                        <div style={{ width:'16px', height:'2px', background: order.status !== 'REQUESTED' ? '#065F46' : '#E2E8F0' }}/>
+                        <div style={{ color: order.status !== 'REQUESTED' ? '#065F46' : '#94A3B8', display:'flex', alignItems:'center', gap:'3px' }}>
+                          <CheckCircle2 style={{ width:'13px', height:'13px' }}/> Accepted
+                        </div>
+                        <div style={{ width:'16px', height:'2px', background: (order.status === 'IN_PROGRESS' || isCompleted || isPaid) ? '#065F46' : '#E2E8F0' }}/>
+                        <div style={{ color: (order.status === 'IN_PROGRESS' || isCompleted || isPaid) ? '#065F46' : '#94A3B8', display:'flex', alignItems:'center', gap:'3px' }}>
+                          <CheckCircle2 style={{ width:'13px', height:'13px' }}/> In Progress
+                        </div>
+                        <div style={{ width:'16px', height:'2px', background: (isCompleted || isPaid) ? '#065F46' : '#E2E8F0' }}/>
+                        <div style={{ color: (isCompleted || isPaid) ? '#065F46' : '#94A3B8', display:'flex', alignItems:'center', gap:'3px' }}>
+                          <CheckCircle2 style={{ width:'13px', height:'13px' }}/> Completed
+                        </div>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'10px' }}>
+                        <a
+                          href={`tel:${order.workerPhone}`}
+                          style={{
+                            padding:'8px 14px', borderRadius:'10px', background:'#F1F5F9',
+                            color:'#0F172A', textDecoration:'none', fontSize:'12px', fontWeight:700,
+                            display:'flex', alignItems:'center', gap:'6px'
+                          }}
+                        >
+                          <Phone style={{ width:'13px', height:'13px' }}/> Call Technician ({order.workerPhone})
+                        </a>
+
+                        {isCompleted && !isPaid && (
+                          <button
+                            type="button"
+                            onClick={() => settleWorkerPayment(order.id)}
+                            style={{
+                              padding:'9px 20px', borderRadius:'10px', background:'#16A34A',
+                              color:'#FFFFFF', border:'none', fontSize:'13px', fontWeight:700,
+                              cursor:'pointer', display:'flex', alignItems:'center', gap:'6px',
+                              boxShadow:'0 4px 12px rgba(22,163,74,0.3)'
+                            }}
+                          >
+                            <CheckCircle2 style={{ width:'15px', height:'15px' }}/>
+                            Pay & Settle Fare (₹{order.estimatedFare})
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          ):activeTab==='notifications'?(
             <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
               {citizenNotifications.length===0?(
                 <div style={{textAlign:'center',padding:'48px',background:'#fff',borderRadius:'16px',border:'1px solid #E2E8F0'}}><Bell style={{width:'36px',height:'36px',color:'#CBD5E1',margin:'0 auto 12px'}}/><p style={{color:'#94A3B8',fontSize:'14px'}}>No notifications yet</p></div>
@@ -825,6 +1012,7 @@ export default function CitizenDashboard() {
 
       {selectedGrievance&&<GrievanceDetailPopup item={selectedGrievance} onClose={()=>setSelectedGrievance(null)} citizen={citizen} upvoteGrievance={upvoteGrievance}/>}
       <FileGrievanceModal isOpen={showFileModal} onClose={()=>setShowFileModal(false)} defaultCategory={fileModalCategory}/>
+      <RegisterWorkerModal isOpen={showRegisterWorkerModal} onClose={()=>setShowRegisterWorkerModal(false)}/>
     </div>
   );
 }

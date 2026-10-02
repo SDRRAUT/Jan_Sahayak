@@ -3,7 +3,7 @@
  * Calculates fair, transparent estimates based on category, duration, travel distance, urgency and experience.
  */
 
-import { WORKER_CATEGORIES } from '../data/mockWorkers';
+import { WORKER_CATEGORIES } from '../data/mockWorkers.js';
 
 export const WAGHOLI_WARD_DISTANCES = {
   'Ward 28 - Ivy Estate / Pune-Nagar Hwy': {

@@ -14,9 +14,11 @@ import {
   ShieldCheck, 
   ExternalLink,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Wrench
 } from 'lucide-react';
 import { maskCitizenName, maskCitizenPhone } from '../../utils/privacy';
+import SuggestedWorkersCard from '../officer/SuggestedWorkersCard';
 
 export const CATEGORY_IMAGES = {
   'Water Supply & Contamination': '/civic-problems/water_pipe_leak.jpg',
@@ -372,6 +374,31 @@ export default function EditorialComplaintCard({
               >
                 <Eye style={{ width: '13px', height: '13px' }} />
                 <span>Inspect Case</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onInspect ? onInspect(item.id, 'workers') : (onOpen ? onOpen(item) : null)}
+                style={{
+                  height: '42px',
+                  padding: '0 12px',
+                  borderRadius: '999px',
+                  background: '#ECFDF5',
+                  border: '1px solid #A7F3D0',
+                  color: '#065F46',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  boxShadow: '0 1px 3px rgba(6, 95, 70, 0.1)',
+                  transition: 'background 0.15s ease'
+                }}
+                title="AI Worker Recommendation & Dispatch"
+              >
+                <Wrench style={{ width: '13px', height: '13px', color: '#059669' }} />
+                <span>Worker</span>
               </button>
 
               {onResolve && item.status !== 'RESOLVED' && item.status !== 'RESOLVED_CONFIRMED' && (
@@ -807,6 +834,13 @@ export function ComplaintDetailModal({
             <strong style={{ color: '#0F172A' }}>{item.officerName || 'Er. Sanjay Sharma'}</strong>
           </div>
         </div>
+
+        {/* Field Workforce AI Recommendations & Dispatches (Officers & Admins) */}
+        {isOfficerOrAdmin && (
+          <div style={{ margin: '0 24px 20px' }}>
+            <SuggestedWorkersCard complaint={item} />
+          </div>
+        )}
 
         {/* Bottom Actions */}
         <div style={{ padding: '0 24px 24px', display: 'flex', gap: '10px' }}>

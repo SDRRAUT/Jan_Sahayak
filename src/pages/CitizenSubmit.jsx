@@ -140,6 +140,35 @@ export default function CitizenSubmit() {
   const audioChunksRef = useRef([]);
   const speechRecognitionRef = useRef(null);
   const timerIntervalRef = useRef(null);
+  const verifiedKeyRef = useRef('');
+
+  // Re-verify attached photo when title or category is altered by citizen
+  useEffect(() => {
+    if (!photoPreview || isAnalyzingImage || !visionAnalysis) return;
+    const currentKey = `${title.trim()}|${manualCategory}|${(description || '').slice(0, 40)}`;
+    if (verifiedKeyRef.current && verifiedKeyRef.current !== currentKey) {
+      const timer = setTimeout(async () => {
+        setIsAnalyzingImage(true);
+        try {
+          const result = await analyzeCivicPhoto(
+            photoPreview, 
+            photoFile?.type || 'image/jpeg', 
+            {
+              title: title || '',
+              description: description || '',
+              category: manualCategory || liveUnderstanding?.category || ''
+            }
+          );
+          setVisionAnalysis(result);
+          verifiedKeyRef.current = currentKey;
+        } catch (e) {
+        } finally {
+          setIsAnalyzingImage(false);
+        }
+      }, 900);
+      return () => clearTimeout(timer);
+    }
+  }, [title, manualCategory, description, photoPreview]);
 
   // Real-time debounced AI synthesis trigger
   useEffect(() => {
@@ -300,7 +329,7 @@ export default function CitizenSubmit() {
     setIsRecording(false);
   };
 
-  // 2. REAL PHOTO UPLOAD & GEMINI COMPUTER VISION
+  // 2. REAL PHOTO UPLOAD & STRICT GEMINI COMPUTER VISION
   const handlePhotoSelect = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -316,24 +345,27 @@ export default function CitizenSubmit() {
       const base64Data = event.target.result;
       setPhotoPreview(base64Data);
       setIsAnalyzingImage(true);
-      setPhotoTag(`Uploaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
+      setPhotoTag(`Uploaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB) — Verifying...`);
 
       try {
         const result = await analyzeCivicPhoto(
           base64Data, 
           file.type || 'image/jpeg', 
-          description || manualCategory || 'Civic infrastructure complaint'
+          {
+            title: title || '',
+            description: description || '',
+            category: manualCategory || liveUnderstanding?.category || ''
+          }
         );
 
         setVisionAnalysis(result);
-        if (result.isValidCivic) {
-          const prefix = result.source === 'client_gemini' || result.source === 'gemini' ? 'Gemini Vision' : 'Visual Feature Scan';
-          setPhotoTag(`${prefix}: ${result.observedHazard} (${Math.round(result.confidence * 100)}% match)`);
+        if (result.isValidCivic && result.matchesComplaint !== false) {
+          setPhotoTag(`Image verified: ${result.observedHazard} (${Math.round((result.confidence || 0.9) * 100)}% match)`);
           if (result.category && !manualCategory) {
             setManualCategory(result.category);
           }
         } else {
-          setPhotoTag(`⚠️ Non-Civic Image Detected: ${result.rejectionReason || 'Please capture an authentic ground photo of the problem.'}`);
+          setPhotoTag(`Image doesn't appear to match this complaint: ${result.rejectionReason || 'Please upload a photo that clearly shows the reported issue.'}`);
         }
       } catch (err) {
         console.warn('Vision analysis fallback notice:', err.message);
@@ -1120,44 +1152,140 @@ export default function CitizenSubmit() {
                   </div>
                 )}
 
-                {/* Inline Photo Preview & Vision Hazard Badge */}
+                {/* Mandatory Photo Notice when no photo is attached yet */}
+                {!photoPreview && (
+                  <div style={{
+                    marginTop: '12px',
+                    padding: '12px 16px',
+                    borderRadius: '12px',
+                    background: '#FFFBEB',
+                    border: '1.5px dashed #F59E0B',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                  }}>
+                    <AlertTriangle style={{ width: '20px', height: '20px', color: '#D97706', flexShrink: 0 }} />
+                    <div style={{ flex: 1, fontSize: '13px', color: '#92400E', lineHeight: 1.4 }}>
+                      <strong style={{ display: 'block', marginBottom: '2px' }}>📷 Photo Evidence is Mandatory</strong>
+                      A real-world photo matching your complaint is strictly required to file a municipal grievance. Click <strong>Upload / Camera</strong> below to attach proof.
+                    </div>
+                  </div>
+                )}
+
+                {/* Inline Photo Preview & 3-State AI Vision Verification Card */}
                 {photoPreview && (
                   <div style={{
-                    marginTop: '10px',
-                    padding: '12px',
-                    borderRadius: '12px',
-                    background: visionAnalysis && !visionAnalysis.isValidCivic ? '#FEF2F2' : '#F8FAFC',
-                    border: visionAnalysis && !visionAnalysis.isValidCivic ? '1.5px solid #FECACA' : '1px solid #E2E8F0',
+                    marginTop: '12px',
+                    padding: '14px',
+                    borderRadius: '14px',
+                    background: isAnalyzingImage 
+                      ? '#F5F3FF' 
+                      : (visionAnalysis && (!visionAnalysis.isValidCivic || visionAnalysis.matchesComplaint === false))
+                      ? '#FEF2F2' 
+                      : '#ECFDF5',
+                    border: isAnalyzingImage 
+                      ? '1.5px solid #C4B5FD' 
+                      : (visionAnalysis && (!visionAnalysis.isValidCivic || visionAnalysis.matchesComplaint === false))
+                      ? '1.5px solid #FCA5A5' 
+                      : '1.5px solid #6EE7B7',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '10px'
+                    gap: '12px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
                       <img 
                         src={photoPreview} 
                         alt="Complaint Evidence" 
-                        style={{ width: '64px', height: '64px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #CBD5E1' }} 
+                        style={{ 
+                          width: '72px', 
+                          height: '72px', 
+                          borderRadius: '10px', 
+                          objectFit: 'cover', 
+                          border: '2px solid #CBD5E1',
+                          flexShrink: 0
+                        }} 
                       />
                       <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <strong style={{ fontSize: '13px', color: visionAnalysis && !visionAnalysis.isValidCivic ? '#991B1B' : '#0F172A' }}>
-                            {visionAnalysis && !visionAnalysis.isValidCivic ? '⚠️ Non-Civic Image Detected' : 'Visual Evidence Attached'}
-                          </strong>
-                          {isAnalyzingImage && (
-                            <span style={{ fontSize: '11px', color: '#4F46E5', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <Loader2 className="animate-spin" style={{ width: '11px', height: '11px' }} />
-                              <span>AI analyzing...</span>
+                        {/* State 1: Verifying image… */}
+                        {isAnalyzingImage && (
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#6D28D9', fontWeight: 800, fontSize: '13.5px' }}>
+                              <Loader2 className="animate-spin" style={{ width: '15px', height: '15px' }} />
+                              <span>Verifying image…</span>
+                            </div>
+                            <span style={{ fontSize: '12.5px', color: '#5B21B6', display: 'block', marginTop: '3px' }}>
+                              Analyzing photo evidence against complaint title and issue details...
                             </span>
-                          )}
-                        </div>
-                        <span style={{ fontSize: '12px', color: visionAnalysis && !visionAnalysis.isValidCivic ? '#B91C1C' : '#475569', display: 'block', marginTop: '2px', lineHeight: 1.4 }}>
-                          {photoTag || 'Photo ready for municipal verification.'}
-                        </span>
+                          </div>
+                        )}
+
+                        {/* State 2: Image verified */}
+                        {!isAnalyzingImage && visionAnalysis && visionAnalysis.isValidCivic && visionAnalysis.matchesComplaint !== false && (
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#065F46', fontWeight: 800, fontSize: '13.5px' }}>
+                              <CheckCircle2 style={{ width: '16px', height: '16px', color: '#059669' }} />
+                              <span>Image verified</span>
+                              <span style={{ 
+                                fontSize: '11px', 
+                                background: '#D1FAE5', 
+                                color: '#065F46', 
+                                padding: '1px 8px', 
+                                borderRadius: '999px',
+                                fontWeight: 700 
+                              }}>
+                                Match Confirmed
+                              </span>
+                            </div>
+                            <span style={{ fontSize: '12.5px', color: '#047857', display: 'block', marginTop: '3px', lineHeight: 1.4 }}>
+                              {visionAnalysis.observedHazard || 'Visual evidence confirmed matching this complaint.'}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* State 3: Image doesn't appear to match this complaint */}
+                        {!isAnalyzingImage && visionAnalysis && (!visionAnalysis.isValidCivic || visionAnalysis.matchesComplaint === false) && (
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#991B1B', fontWeight: 800, fontSize: '13.5px' }}>
+                              <AlertTriangle style={{ width: '16px', height: '16px', color: '#DC2626' }} />
+                              <span>Image doesn't appear to match this complaint</span>
+                            </div>
+                            <span style={{ fontSize: '12.5px', color: '#B91C1C', display: 'block', marginTop: '4px', lineHeight: 1.4 }}>
+                              {visionAnalysis.rejectionReason || 'The uploaded image does not sufficiently provide visual evidence for this specific issue. Please upload a more relevant photo.'}
+                            </span>
+                            <div style={{ marginTop: '8px' }}>
+                              <button
+                                type="button"
+                                onClick={() => photoInputRef.current?.click()}
+                                style={{
+                                  padding: '5px 12px',
+                                  borderRadius: '8px',
+                                  border: '1px solid #DC2626',
+                                  background: '#FFFFFF',
+                                  color: '#DC2626',
+                                  fontSize: '12px',
+                                  fontWeight: 700,
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                Upload More Relevant Image
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Default / Unanalyzed fallback */}
+                        {!isAnalyzingImage && !visionAnalysis && (
+                          <div style={{ fontSize: '12.5px', color: '#64748B' }}>
+                            {photoTag || 'Photo attached. Ready for verification.'}
+                          </div>
+                        )}
                       </div>
+
                       <button 
                         type="button" 
                         onClick={handleRemovePhoto} 
-                        style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#EF4444', padding: '6px' }}
+                        style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#94A3B8', padding: '6px' }}
                         title="Remove Photo"
                       >
                         <Trash2 style={{ width: '16px', height: '16px' }} />
@@ -1579,7 +1707,41 @@ export default function CitizenSubmit() {
                 </div>
 
                 {(() => {
-                  const isFormValid = Boolean(title.trim().length >= 3 && description.trim().length >= 8 && (!photoPreview || (visionAnalysis && visionAnalysis.isValidCivic)));
+                  const hasPhoto = Boolean(photoPreview);
+                  const isPhotoVerified = Boolean(
+                    photoPreview && 
+                    !isAnalyzingImage && 
+                    visionAnalysis && 
+                    visionAnalysis.isValidCivic && 
+                    visionAnalysis.matchesComplaint !== false
+                  );
+                  const isPhotoRejected = Boolean(
+                    photoPreview && 
+                    !isAnalyzingImage && 
+                    visionAnalysis && 
+                    (!visionAnalysis.isValidCivic || visionAnalysis.matchesComplaint === false)
+                  );
+                  const isFormValid = Boolean(
+                    title.trim().length >= 3 && 
+                    description.trim().length >= 8 && 
+                    isPhotoVerified
+                  );
+
+                  let submitLabel = 'Submit Grievance & Dispatch Authority (शिकायत दर्ज करें)';
+                  let tooltip = '';
+                  if (!hasPhoto) {
+                    submitLabel = '📷 Photo Evidence Required to Submit';
+                    tooltip = 'Photo evidence is mandatory. Please capture or upload a photo to proceed.';
+                  } else if (isAnalyzingImage) {
+                    submitLabel = 'Verifying Image Evidence...';
+                    tooltip = 'AI is checking if the photo matches your complaint.';
+                  } else if (isPhotoRejected) {
+                    submitLabel = '⚠️ Upload Matching Photo to Submit';
+                    tooltip = 'The uploaded photo does not match this complaint. Please attach relevant photo proof.';
+                  } else if (title.trim().length < 3 || description.trim().length < 8) {
+                    tooltip = 'Please provide a clear title and description.';
+                  }
+
                   return (
                     <button
                       type="submit"
@@ -1587,26 +1749,35 @@ export default function CitizenSubmit() {
                       className="btn-primary citizen-submit-btn"
                       style={{
                         borderRadius: '12px',
-                        background: isFormValid ? 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)' : '#94A3B8',
+                        background: isFormValid 
+                          ? 'linear-gradient(135deg, #0E5E3A 0%, #064E3B 100%)' 
+                          : isPhotoRejected 
+                          ? '#EF4444' 
+                          : '#94A3B8',
                         boxShadow: isFormValid ? '0 4px 16px rgba(14, 94, 58, 0.32)' : 'none',
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '10px',
                         cursor: !isFormValid || isSubmitting ? 'not-allowed' : 'pointer',
-                        opacity: !isFormValid || isSubmitting ? 0.65 : 1,
+                        opacity: !isFormValid || isSubmitting ? 0.75 : 1,
                         transition: 'all 150ms ease'
                       }}
-                      title={!isFormValid ? 'Please enter a Problem Title (min 3 chars) and Description (min 8 chars) to submit.' : ''}
+                      title={tooltip}
                     >
                       {isSubmitting ? (
                         <>
                           <Loader2 className="animate-spin" style={{ width: '18px', height: '18px' }} />
                           <span>Registering with Authority...</span>
                         </>
+                      ) : isAnalyzingImage ? (
+                        <>
+                          <Loader2 className="animate-spin" style={{ width: '18px', height: '18px' }} />
+                          <span>{submitLabel}</span>
+                        </>
                       ) : (
                         <>
-                          <span>Submit Grievance & Dispatch Authority (शिकायत दर्ज करें)</span>
-                          <ArrowRight style={{ width: '18px', height: '18px' }} />
+                          <span>{submitLabel}</span>
+                          {isFormValid && <ArrowRight style={{ width: '18px', height: '18px' }} />}
                         </>
                       )}
                     </button>

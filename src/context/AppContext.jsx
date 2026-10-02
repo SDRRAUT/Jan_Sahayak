@@ -10,6 +10,9 @@ import { NotificationService } from '../services/NotificationService';
 import { CANONICAL_STATUSES, normalizeStatus } from '../utils/statuses';
 import { CANONICAL_EVENTS } from '../utils/events';
 import { hasPermission, getRoleLabel, PERMISSIONS, ROLES } from '../utils/permissions';
+import { INITIAL_WORKERS, INITIAL_WORKER_ORDERS, WORKER_CATEGORIES } from '../data/mockWorkers';
+import { calculateEstimatedFare } from '../services/fareEstimationService';
+import { detectWorkerCategoryFromComplaint, matchWorkersForComplaint } from '../services/workerMatchingService';
 
 const AppContext = createContext();
 
@@ -18,6 +21,7 @@ export const DEMO_CREDENTIALS = {
   citizen: { email: 'santosh@citizen.in', password: 'citizen123', label: 'Citizen (Santosh Gawade)' },
   civic_officer: { email: 'civic.officer@pmc.punecorp.gov.in', password: 'civicofficer123', label: 'Civic Officer (Er. Sanjay Sharma - PMC Water)' },
   super_admin: { email: 'superadmin@pmc.pune.gov.in', password: 'superadmin123', label: 'Super Admin (Dr. Suhas Diwase, IAS)' },
+  worker: { email: 'ramesh.plumbing@jansahayak.in', password: 'worker123', label: 'Technician (Ramesh Jadhav - PMC Certified Plumber)' },
   // Backward-compatible aliases for legacy credentials
   officer: { email: 'civic.officer@pmc.punecorp.gov.in', password: 'civicofficer123', label: 'Civic Officer (Field Engineering Lead)' },
   dept_admin: { email: 'civic.officer@pmc.punecorp.gov.in', password: 'civicofficer123', label: 'Civic Officer (Department Operations Lead)' }
@@ -112,6 +116,19 @@ export const DEMO_USERS = {
     role: 'super_admin',
     designation: 'Municipal Commissioner (PMC Pune)',
     phone: '+91 020-2550-1000'
+  },
+  worker: {
+    id: 'WRK-WAG-01',
+    name: 'Ramesh Jadhav',
+    email: 'ramesh.plumbing@jansahayak.in',
+    role: 'worker',
+    phone: '+91 98221-55410',
+    ward: 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',
+    pincode: '412207',
+    category: 'plumbing',
+    categoryLabel: 'Plumbing & Water Supply',
+    workerProfile: INITIAL_WORKERS[0],
+    verified: true
   }
 };
 
@@ -228,6 +245,33 @@ export function AppProvider({ children }) {
   useEffect(() => {
     localStorage.setItem('jansahayk_jan_suchna_v7', JSON.stringify(janSuchnaList));
   }, [janSuchnaList]);
+
+  // Worker Marketplace State (Persisted locally)
+  const [workers, setWorkers] = useState(() => {
+    try {
+      const saved = localStorage.getItem('jansahayk_workers_v1');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    localStorage.setItem('jansahayk_workers_v1', JSON.stringify(INITIAL_WORKERS));
+    return INITIAL_WORKERS;
+  });
+
+  const [workerOrders, setWorkerOrders] = useState(() => {
+    try {
+      const saved = localStorage.getItem('jansahayk_worker_orders_v1');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    localStorage.setItem('jansahayk_worker_orders_v1', JSON.stringify(INITIAL_WORKER_ORDERS));
+    return INITIAL_WORKER_ORDERS;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('jansahayk_workers_v1', JSON.stringify(workers));
+  }, [workers]);
+
+  useEffect(() => {
+    localStorage.setItem('jansahayk_worker_orders_v1', JSON.stringify(workerOrders));
+  }, [workerOrders]);
 
   const [auditLogs, setAuditLogs] = useState([]);
   const [slaRules, setSlaRules] = useState([]);
@@ -392,7 +436,24 @@ export function AppProvider({ children }) {
     try {
       const complaints = await ComplaintService.getComplaints(token);
       if (Array.isArray(complaints) && complaints.length > 0) {
-        setGrievances(complaints);
+        setGrievances(prev => {
+          const map = new Map();
+          // Remote authoritative complaints
+          complaints.forEach(c => { if (c && c.id) map.set(c.id, c); });
+          // Preserve any local un-synced / just-created complaints
+          prev.forEach(p => {
+            if (p && p.id && !map.has(p.id)) {
+              map.set(p.id, p);
+            }
+          });
+          const merged = Array.from(map.values()).sort((a, b) => {
+            const timeA = new Date(a.timestamp || 0).getTime();
+            const timeB = new Date(b.timestamp || 0).getTime();
+            return timeB - timeA;
+          });
+          localStorage.setItem('jansahayk_grievances_v7', JSON.stringify(merged));
+          return merged;
+        });
       }
     } catch (e) {
       // Network failure
@@ -787,7 +848,7 @@ export function AppProvider({ children }) {
 
         setGrievances(prev => {
           const updated = [created, ...prev.filter(g => g.id !== created.id)];
-          localStorage.setItem('jansahayk_grievances_v5', JSON.stringify(updated));
+          localStorage.setItem('jansahayk_grievances_v7', JSON.stringify(updated));
           return updated;
         });
         return created;
@@ -861,7 +922,7 @@ export function AppProvider({ children }) {
 
     setGrievances(prev => {
       const updated = [fallbackItem, ...prev.filter(g => g.id !== fallbackId)];
-      localStorage.setItem('jansahayk_grievances_v5', JSON.stringify(updated));
+      localStorage.setItem('jansahayk_grievances_v7', JSON.stringify(updated));
       return updated;
     });
     return fallbackItem;
@@ -1709,6 +1770,417 @@ export function AppProvider({ children }) {
     };
   };
 
+  // ══════════════════════════════════════════════════════════════════════
+  // WORKER & SERVICE MARKETPLACE DISPATCH METHODS
+  // ══════════════════════════════════════════════════════════════════════
+
+  const currentWorkerProfile = user?.workerProfile || workers.find(w => (user?.phone && w.phone === user?.phone) || (user?.email && w.email === user?.email)) || null;
+
+  const registerAsWorker = (formData) => {
+    const categoryInfo = WORKER_CATEGORIES.find(c => c.id === formData.category) || WORKER_CATEGORIES[0];
+    const newWorkerId = `WRK-WAG-${Date.now().toString().slice(-4)}`;
+    const newWorker = {
+      id: newWorkerId,
+      name: formData.name || user?.name || 'Citizen Worker',
+      avatar: formData.avatar || user?.avatar || 'https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=400&auto=format&fit=crop&q=80',
+      category: formData.category || 'plumbing',
+      categoryLabel: categoryInfo.name,
+      skills: formData.skills && formData.skills.length > 0 ? formData.skills : ['General Maintenance', 'Inspection'],
+      experienceYears: Number(formData.experienceYears) || 3,
+      rating: 5.0,
+      reviewCount: 1,
+      ward: formData.ward || user?.ward || 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',
+      area: formData.area || user?.address || 'Wagholi, Pune',
+      distanceKm: 0.5,
+      baseFare: Number(formData.baseFare) || categoryInfo.baseRate,
+      hourlyRate: Number(formData.hourlyRate) || categoryInfo.hourlyRate,
+      availability: 'AVAILABLE',
+      verificationStatus: formData.verificationDoc ? 'VERIFIED_GOV_SKILL' : 'POLICE_VERIFIED',
+      verificationBadge: formData.verificationDoc ? 'PMKVY Certified Specialist' : 'Verified Local Technician',
+      badgeText: 'New Verified Partner',
+      phone: formData.phone || user?.phone || '+91 98220-44102',
+      email: formData.email || user?.email || 'worker@jansahayak.in',
+      bio: formData.bio || `Certified civic technician providing reliable ${categoryInfo.name} services across Wagholi wards.`,
+      jobsCompleted: 0,
+      completionRate: 100,
+      preferredWorkingHours: formData.workingHours || '08:00 AM - 08:00 PM',
+      aadhaarVerified: Boolean(formData.aadhaarNumber),
+      createdAt: new Date().toISOString()
+    };
+
+    setWorkers(prev => [newWorker, ...prev.filter(w => w.id !== newWorkerId)]);
+    
+    // Attach worker profile to active user session
+    const updatedUser = {
+      ...(user || {}),
+      workerProfile: newWorker,
+      isRegisteredWorker: true
+    };
+    setUser(updatedUser);
+    localStorage.setItem('jansahayk_user', JSON.stringify(updatedUser));
+
+    addLocalNotification({
+      type: 'WORKER_REGISTERED',
+      title: '🎉 Worker Profile Verified & Activated!',
+      message: `Congratulations ${newWorker.name}! Your ${newWorker.categoryLabel} profile is active in the JanSahayak Wagholi network. You can now receive citizen and municipal orders.`
+    });
+
+    return newWorker;
+  };
+
+  const updateWorkerAvailability = (workerId, newAvailability) => {
+    setWorkers(prev => prev.map(w => w.id === workerId ? { ...w, availability: newAvailability } : w));
+    if (user?.workerProfile?.id === workerId) {
+      const updatedUser = {
+        ...user,
+        workerProfile: { ...user.workerProfile, availability: newAvailability }
+      };
+      setUser(updatedUser);
+      localStorage.setItem('jansahayk_user', JSON.stringify(updatedUser));
+    }
+  };
+
+  const createWorkerOrder = (orderData) => {
+    const orderId = `WO-2026-${Date.now().toString().slice(-4)}`;
+    const newOrder = {
+      id: orderId,
+      workerId: orderData.workerId,
+      workerName: orderData.workerName,
+      workerCategory: orderData.workerCategory || 'plumbing',
+      source: orderData.source || 'CITIZEN', // 'CITIZEN' | 'GOVERNMENT'
+      requesterName: orderData.requesterName || user?.name || 'Citizen User',
+      requesterPhone: orderData.requesterPhone || user?.phone || '+91 98220-44102',
+      requesterRole: orderData.requesterRole || user?.role || 'citizen',
+      complaintId: orderData.complaintId || null,
+      complaintTitle: orderData.complaintTitle || null,
+      serviceTitle: orderData.serviceTitle || 'Civic Field Maintenance',
+      location: orderData.location || {
+        ward: 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',
+        area: 'Kesnand Road, Wagholi',
+        city: 'Pune'
+      },
+      urgency: orderData.urgency || 'MEDIUM',
+      scheduledTime: orderData.scheduledTime || 'Today, ASAP',
+      estimatedDuration: orderData.estimatedDuration || '2 Hours',
+      estimatedFare: Number(orderData.estimatedFare) || 500,
+      finalFare: Number(orderData.estimatedFare) || 500,
+      status: 'REQUESTED',
+      statusHistory: [
+        { 
+          step: 'REQUESTED', 
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
+          note: `${orderData.source === 'GOVERNMENT' ? 'Municipal Officer Er. Sanjay Sharma' : 'Citizen ' + (orderData.requesterName || 'User')} placed request` 
+        }
+      ],
+      notes: orderData.notes || '',
+      createdAt: new Date().toISOString()
+    };
+
+    setWorkerOrders(prev => [newOrder, ...prev]);
+
+    // Send instant notification
+    addLocalNotification({
+      type: 'WORKER_ORDER_NEW',
+      title: '🚨 New Work Order Dispatched!',
+      message: `${newOrder.requesterName} placed order #${orderId} (${newOrder.serviceTitle}) in ${newOrder.location.ward}. Payout: ₹${newOrder.estimatedFare}.`,
+      orderId: orderId,
+      workerId: newOrder.workerId
+    });
+
+    // If attached to a grievance, append to grievance internalNotes and update status
+    if (orderData.complaintId) {
+      setGrievances(prev => prev.map(g => {
+        if (g.id === orderData.complaintId) {
+          const notes = g.internalNotes || [];
+          return {
+            ...g,
+            status: 'ACTION_IN_PROGRESS',
+            assignedWorker: {
+              workerId: newOrder.workerId,
+              name: newOrder.workerName,
+              category: newOrder.workerCategory,
+              orderId: orderId,
+              fare: newOrder.estimatedFare
+            },
+            internalNotes: [
+              {
+                id: `NOTE-${Date.now()}`,
+                author: 'System (Smart Action Dispatch)',
+                text: `Work order #${orderId} assigned to technician ${newOrder.workerName} (${newOrder.serviceTitle}). Estimated contract fare: ₹${newOrder.estimatedFare}.`,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              },
+              ...notes
+            ]
+          };
+        }
+        return g;
+      }));
+    }
+
+    return newOrder;
+  };
+
+  const batchStartIncidentResolution = ({
+    incidentId,
+    workerId,
+    workerName,
+    workerCategory,
+    estimatedFare,
+    serviceTitle,
+    location,
+    selectedComplaintIds = [],
+    actionSelected,
+    officerNotes
+  }) => {
+    // 1. Create a worker order with source: 'GOVERNMENT'
+    const newOrder = createWorkerOrder({
+      workerId,
+      workerName,
+      workerCategory,
+      source: 'GOVERNMENT',
+      requesterName: user?.name || 'Er. Sanjay Sharma',
+      requesterPhone: user?.phone || '+91 98111-90021',
+      requesterRole: 'officer',
+      complaintId: selectedComplaintIds[0] || null,
+      serviceTitle: serviceTitle || 'Municipal Rapid Infrastructure Repair',
+      location: location || {
+        ward: 'Target Incident Corridor',
+        area: 'Municipal Work Site',
+        city: 'Pune/Delhi'
+      },
+      urgency: 'HIGH',
+      estimatedFare: Number(estimatedFare) || 500,
+      notes: officerNotes || `Dispatched to resolve incident ${incidentId} and ${selectedComplaintIds.length} bundled complaints.`
+    });
+
+    const orderId = newOrder?.id || `WO-2026-${Date.now().toString().slice(-4)}`;
+
+    // 2. Batch update all selected complaints to ACTION_IN_PROGRESS
+    if (selectedComplaintIds.length > 0) {
+      setGrievances(prev => prev.map(g => {
+        if (selectedComplaintIds.includes(g.id)) {
+          const notes = g.internalNotes || [];
+          return {
+            ...g,
+            status: 'ACTION_IN_PROGRESS',
+            assignedWorker: {
+              workerId,
+              name: workerName,
+              category: workerCategory,
+              orderId,
+              fare: Number(estimatedFare) || 500
+            },
+            internalNotes: [
+              {
+                id: `NOTE-${Date.now()}-${Math.random()}`,
+                author: `${user?.name || 'Municipal Officer'} (Cluster Resolution)`,
+                text: `Work order #${orderId} assigned to technician ${workerName}. Ground resolution initiated for incident cluster.`,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              },
+              ...notes
+            ]
+          };
+        }
+        return g;
+      }));
+
+      // Send status change notifications for each affected citizen
+      selectedComplaintIds.forEach(cId => {
+        addLocalNotification({
+          type: 'STATUS_CHANGE',
+          title: '🛠️ Resolution In Progress!',
+          message: `Municipal officer initiated resolution for your grievance ${cId}. Assigned technician: ${workerName}.`,
+          grievanceId: cId
+        });
+      });
+    }
+
+    // 3. Update the incident status in civicIncidents
+    setCivicIncidents(prev => prev.map(inc => {
+      if (inc.id === incidentId) {
+        return {
+          ...inc,
+          status: 'Action In Progress',
+          actionChoice: actionSelected || inc.actionChoice,
+          assignedWorker: {
+            workerId,
+            name: workerName,
+            category: workerCategory,
+            orderId,
+            fare: Number(estimatedFare) || 500,
+            dispatchedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          },
+          lastUpdatedAt: 'Just now'
+        };
+      }
+      return inc;
+    }));
+
+    return newOrder;
+  };
+
+  const acceptWorkerOrder = (orderId) => {
+    setWorkerOrders(prev => prev.map(o => {
+      if (o.id === orderId) {
+        return {
+          ...o,
+          status: 'ACCEPTED',
+          statusHistory: [
+            ...o.statusHistory,
+            { step: 'ACCEPTED', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), note: 'Worker confirmed order and is preparing tools' }
+          ]
+        };
+      }
+      return o;
+    }));
+
+    addLocalNotification({
+      type: 'WORKER_ORDER_ACCEPTED',
+      title: '✅ Technician Accepted Order!',
+      message: `Order #${orderId} has been confirmed. Technician will reach site shortly.`,
+      orderId
+    });
+  };
+
+  const startWorkerOrder = (orderId) => {
+    setWorkerOrders(prev => prev.map(o => {
+      if (o.id === orderId) {
+        return {
+          ...o,
+          status: 'IN_PROGRESS',
+          statusHistory: [
+            ...o.statusHistory,
+            { step: 'IN_PROGRESS', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), note: 'Technician reached site and started physical remediation' }
+          ]
+        };
+      }
+      return o;
+    }));
+
+    addLocalNotification({
+      type: 'WORKER_ORDER_STARTED',
+      title: '🔧 Work In Progress On Site',
+      message: `Work has commenced for Order #${orderId}.`,
+      orderId
+    });
+  };
+
+  const completeWorkerOrder = (orderId, completionData = {}) => {
+    setWorkerOrders(prev => prev.map(o => {
+      if (o.id === orderId) {
+        const completed = {
+          ...o,
+          status: 'PAYMENT_PENDING',
+          evidencePhoto: completionData.photo || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500&auto=format&fit=crop&q=80',
+          completionSummary: completionData.summary || 'Physical repair work completed successfully on site.',
+          statusHistory: [
+            ...o.statusHistory,
+            { step: 'COMPLETED', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), note: 'Technician reported job completion with field evidence' },
+            { step: 'PAYMENT_PENDING', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), note: 'Invoice generated. Pending payment settlement.' }
+          ]
+        };
+
+        // If linked to grievance, update grievance status toward completion
+        if (o.complaintId) {
+          setGrievances(prevG => prevG.map(g => {
+            if (g.id === o.complaintId) {
+              return {
+                ...g,
+                status: 'ACTION_COMPLETED',
+                internalNotes: [
+                  {
+                    id: `NOTE-${Date.now()}`,
+                    author: `${o.workerName} (Technician)`,
+                    text: `Field repairs completed for Work Order #${orderId}. Municipal verification pending.`,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                  },
+                  ...(g.internalNotes || [])
+                ]
+              };
+            }
+            return g;
+          }));
+        }
+
+        return completed;
+      }
+      return o;
+    }));
+
+    addLocalNotification({
+      type: 'WORKER_ORDER_COMPLETED',
+      title: '📸 Job Completed — Verification Ready',
+      message: `Work Order #${orderId} marked completed. Please verify work and approve payment release.`,
+      orderId
+    });
+  };
+
+  const settleWorkerPayment = (orderId, paymentMethod = 'UPI / NetBanking') => {
+    setWorkerOrders(prev => prev.map(o => {
+      if (o.id === orderId) {
+        return {
+          ...o,
+          status: 'PAID',
+          paymentMethod,
+          paidAt: new Date().toISOString(),
+          statusHistory: [
+            ...o.statusHistory,
+            { step: 'PAID', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), note: `Payment of ₹${o.finalFare || o.estimatedFare} settled via ${paymentMethod}` }
+          ]
+        };
+      }
+      return o;
+    }));
+
+    addLocalNotification({
+      type: 'WORKER_PAYMENT_SETTLED',
+      title: '💰 Payment Settled!',
+      message: `Payment for Order #${orderId} was processed successfully. Funds credited to technician ledger.`,
+      orderId
+    });
+  };
+
+  const rejectWorkerOrder = (orderId, reason = 'Unavailable at requested time') => {
+    setWorkerOrders(prev => prev.map(o => {
+      if (o.id === orderId) {
+        return {
+          ...o,
+          status: 'REJECTED',
+          rejectionReason: reason,
+          statusHistory: [
+            ...o.statusHistory,
+            { step: 'REJECTED', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), note: `Declined: ${reason}` }
+          ]
+        };
+      }
+      return o;
+    }));
+
+    addLocalNotification({
+      type: 'WORKER_ORDER_DECLINED',
+      title: 'Order Declined by Worker',
+      message: `Order #${orderId} was declined (${reason}). Re-routing to another nearby technician.`,
+      orderId
+    });
+  };
+
+  const cancelWorkerOrder = (orderId, reason = 'Cancelled by user') => {
+    setWorkerOrders(prev => prev.map(o => {
+      if (o.id === orderId) {
+        return {
+          ...o,
+          status: 'CANCELLED',
+          cancellationReason: reason,
+          statusHistory: [
+            ...o.statusHistory,
+            { step: 'CANCELLED', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), note: `Order cancelled: ${reason}` }
+          ]
+        };
+      }
+      return o;
+    }));
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -1772,7 +2244,25 @@ export function AppProvider({ children }) {
         can: (perm) => hasPermission(user, perm),
         hasPermission: (perm) => hasPermission(user, perm),
         getRoleLabel: () => getRoleLabel(user?.role),
-        PERMISSIONS
+        PERMISSIONS,
+        // Worker Marketplace Exports
+        workers,
+        workerOrders,
+        currentWorkerProfile,
+        WORKER_CATEGORIES,
+        registerAsWorker,
+        updateWorkerAvailability,
+        createWorkerOrder,
+        acceptWorkerOrder,
+        startWorkerOrder,
+        completeWorkerOrder,
+        settleWorkerPayment,
+        rejectWorkerOrder,
+        cancelWorkerOrder,
+        calculateEstimatedFare,
+        detectWorkerCategoryFromComplaint,
+        matchWorkersForComplaint,
+        batchStartIncidentResolution
       }}
     >
       {children}

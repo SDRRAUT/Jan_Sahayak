@@ -44,7 +44,7 @@ export default function CivicIntelligenceDashboard() {
   const [showSignalModal, setShowSignalModal] = useState(false);
   const [showTerritoryModal, setShowTerritoryModal] = useState(false);
   const [showJanSuchnaModal, setShowJanSuchnaModal] = useState(false);
-  const [viewMode, setViewMode] = useState('detail'); // 'detail' | 'compact' | 'grid' | 'table' | 'minimal'
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' (default) | 'detail' | 'compact' | 'table' | 'minimal'
 
   const filteredIncidents = civicIncidents.filter(inc => {
     const matchesStage = selectedStage === 'ALL' || inc.stage === selectedStage;

@@ -52,66 +52,66 @@ app.use('/uploads', express.static(path.resolve(__dirname, '../public/uploads'))
 const USERS = [
   {
     id: 'USR-CITIZEN-01',
-    name: 'Aditya Verma',
-    email: 'aditya@citizen.in',
+    name: 'Santosh Gawade',
+    email: 'santosh@citizen.in',
     password: 'citizen123',
     role: 'citizen',
-    phone: '+91 98712-88210',
-    ward: 'Ward 14 (Rohini Sector 14)',
-    pincode: '110085',
+    phone: '+91 98220-44102',
+    ward: 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',
+    pincode: '412207',
     verified: true
   },
   {
     id: 'USR-OFFICER-01',
     name: 'Er. Sanjay Sharma',
-    email: 'sanjay.sharma@djb.gov.in',
+    email: 'sanjay.sharma@pmc.gov.in',
     password: 'officer123',
-    role: 'officer',
-    department: 'Delhi Jal Board (DJB)',
-    designation: 'Assistant Executive Engineer',
-    zone: 'Zone North-West (Rohini)',
-    phone: '+91 98111-90021'
+    role: 'civic_officer',
+    department: 'PMC Water Supply Department',
+    designation: 'Executive Engineer (Wagholi Sub-Division)',
+    zone: 'Zone East (Wagholi Sub-Division, Pune)',
+    phone: '+91 98221-90021'
   },
   {
     id: 'USR-DEPTADMIN-01',
-    name: 'Er. Rajiv Malhotra',
-    email: 'admin.djb@delhi.gov.in',
+    name: 'Er. Sachin Patil',
+    email: 'admin.water@pune.gov.in',
     password: 'deptadmin123',
-    role: 'dept_admin',
-    department: 'Delhi Jal Board (DJB)',
-    designation: 'Chief Engineer & Department Administrator',
-    phone: '+91 99100-11223'
+    role: 'civic_officer',
+    department: 'PMC Water Supply Department',
+    designation: 'Superintending Engineer (Water Works)',
+    phone: '+91 98220-11223'
   },
   {
     id: 'USR-SUPERADMIN-01',
-    name: 'Dr. Meenakshi Sundaram, IAS',
-    email: 'superadmin@delhi.gov.in',
+    name: 'Dr. Suhas Diwase, IAS',
+    email: 'commissioner@pmc.gov.in',
     password: 'superadmin123',
     role: 'super_admin',
-    designation: 'Principal Secretary (IT & Public Grievance)',
-    phone: '+91 11-2339-2000'
+    designation: 'Municipal Commissioner (PMC Pune)',
+    phone: '+91 020-2550-1000'
   },
   {
     id: 'USR-CIVICOFFICER-01',
     name: 'Er. Sanjay Sharma',
-    email: 'civic.officer@djb.gov.in',
+    email: 'civic.officer@pmc.punecorp.gov.in',
     password: 'civicofficer123',
     role: 'civic_officer',
-    department: 'Delhi Jal Board (DJB)',
+    department: 'PMC Water Supply Department',
     designation: 'Executive Engineer & Department Administrator',
-    zone: 'Zone North-West (Rohini)',
-    phone: '+91 98111-90021'
+    zone: 'Zone East (Wagholi Sub-Division, Pune)',
+    phone: '+91 98221-90021'
   },
   {
-    id: 'USR-CIVICOFFICER-02',
-    name: 'Er. Sanjay Sharma',
-    email: 'officer.djb@delhi.gov.in',
-    password: 'officer123',
-    role: 'civic_officer',
-    department: 'Delhi Jal Board (DJB)',
-    designation: 'Government Officer & Assistant Executive Engineer',
-    zone: 'Zone North-West (Rohini)',
-    phone: '+91 98111-90021'
+    id: 'WRK-WAG-01',
+    name: 'Ramesh Jadhav',
+    email: 'ramesh.plumbing@jansahayak.in',
+    password: 'worker123',
+    role: 'worker',
+    department: 'PMC Verified Technician',
+    ward: 'Wagholi Ward 29 (Ivy Estate & Kesnand Road)',
+    phone: '+91 98221-55410',
+    category: 'plumbing'
   }
 ];
 
@@ -120,7 +120,8 @@ let SESSIONS = {
   'demo_token_officer': USERS[1],
   'demo_token_dept_admin': USERS[2],
   'demo_token_super_admin': USERS[3],
-  'demo_token_civic_officer': USERS[4]
+  'demo_token_civic_officer': USERS[4],
+  'demo_token_worker': USERS[5]
 }; // token -> user
 
 let AUDIT_LOGS = (db.getAuditLogs && db.getAuditLogs().length > 0)
@@ -683,11 +684,37 @@ app.get('/api/grievances', async (req, res) => {
   try {
     list = await postgresDB.getAllGrievances();
   } catch (err) {
-    console.warn('Error fetching grievances:', err.message);
+    console.warn('Error fetching grievances from postgres:', err.message);
   }
-  if (!list || list.length === 0) {
-    list = (GRIEVANCES_DB && GRIEVANCES_DB.length > 0) ? GRIEVANCES_DB : db.getComplaints();
-  }
+
+  // Authoritatively merge PostgreSQL rows with in-memory GRIEVANCES_DB & local store
+  // so no newly submitted complaint is lost or dropped upon reload
+  const localList = (GRIEVANCES_DB && GRIEVANCES_DB.length > 0) 
+    ? GRIEVANCES_DB 
+    : (db.getComplaints ? db.getComplaints() : []);
+  
+  const combinedMap = new Map();
+  // Add in-memory / local items first (these have newest submissions)
+  (localList || []).forEach(g => {
+    if (g && g.id) combinedMap.set(g.id, g);
+  });
+  // Overlay/merge with postgres records
+  (list || []).forEach(g => {
+    if (g && g.id) {
+      if (!combinedMap.has(g.id)) {
+        combinedMap.set(g.id, g);
+      } else {
+        const existing = combinedMap.get(g.id);
+        combinedMap.set(g.id, { ...g, ...existing });
+      }
+    }
+  });
+
+  const mergedGrievances = Array.from(combinedMap.values()).sort((a, b) => {
+    const timeA = new Date(a.timestamp || a.created_at || 0).getTime();
+    const timeB = new Date(b.timestamp || b.created_at || 0).getTime();
+    return timeB - timeA;
+  });
 
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -703,18 +730,10 @@ app.get('/api/grievances', async (req, res) => {
     if (!user) user = SESSIONS[token];
   }
 
-  if (!user || user.role === 'citizen') {
-    return res.json({ grievances: list });
-  } else if (user.role === 'officer' || user.role === 'civic_officer') {
-    if (req.query.all === 'true') {
-      return res.json({ grievances: list });
-    }
-    const officerDept = user.department;
-    const filtered = list.filter(g => !officerDept || g.department === officerDept || g.department.includes(officerDept.split(' ')[0]));
-    return res.json({ grievances: filtered.length > 0 ? filtered : list });
-  } else {
-    return res.json({ grievances: list });
-  }
+  // All roles (Citizen, Officer, Admin) receive the authoritative merged list.
+  // The frontend OfficerWorkspace handles domain/status filtering while guaranteeing
+  // newly created cases appear immediately at the top of the queue.
+  return res.json({ grievances: mergedGrievances });
 });
 
 // GET Single Grievance by ID
@@ -820,7 +839,7 @@ Respond ONLY with valid JSON with this exact schema:
 
 // 2. Multimodal Computer Vision Analysis via Gemini
 app.post('/api/complaints/vision-analyze', aiEndpointLimiter, async (req, res) => {
-  const { imageBase64, mimeType, contextPrompt } = req.body;
+  const { imageBase64, mimeType, contextPrompt, title, description, category } = req.body;
   if (!imageBase64) {
     return sendError(res, 400, 'VALIDATION_ERROR', 'Image base64 data required for vision analysis.');
   }
@@ -829,7 +848,11 @@ app.post('/api/complaints/vision-analyze', aiEndpointLimiter, async (req, res) =
     const vision = await aiProvider.analyzeImageEvidence(
       imageBase64,
       mimeType || 'image/jpeg',
-      contextPrompt || 'Civic infrastructure complaint'
+      {
+        title: title || '',
+        description: description || contextPrompt || '',
+        category: category || ''
+      }
     );
     res.json({
       success: true,
@@ -1039,8 +1062,7 @@ app.post('/api/grievances', authenticateToken, requireRole(['citizen', 'super_ad
     newGrievance.incidentId = orchestration.incident.id;
   }
 
-  GRIEVANCES_DB.unshift(newGrievance);
-  db.saveComplaint(newGrievance);
+  await persistGrievanceRecord(newGrievance);
 
   recordAuditLog({
     id: `LOG-${Date.now()}`,

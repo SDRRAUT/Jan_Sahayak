@@ -16,14 +16,30 @@ import {
   Shield, 
   Smartphone, 
   MessageSquare, 
-  RefreshCw
+  RefreshCw,
+  Wrench,
+  ArrowRight,
+  Sparkles,
+  ExternalLink
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useApp, DEMO_USERS } from '../../context/AppContext';
+import RegisterWorkerModal from '../worker/RegisterWorkerModal';
+import { WORKER_CATEGORIES } from '../../data/mockWorkers';
 
 export default function UserProfileModal({ isOpen, onClose, initialTab = 'profile' }) {
-  const { user, role, updateUserSettings } = useApp();
+  const { 
+    user, 
+    role, 
+    updateUserSettings,
+    currentWorkerProfile,
+    registerAsWorker,
+    updateWorkerAvailability
+  } = useApp();
+  const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState(initialTab); // 'profile' or 'settings'
+  const [activeTab, setActiveTab] = useState(initialTab); // 'profile' | 'worker' | 'settings'
+  const [showRegisterWorkerModal, setShowRegisterWorkerModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -328,10 +344,10 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
             </div>
           </div>
 
-          {/* Tab Switcher: My Profile vs Account Settings */}
+          {/* Tab Switcher: Basic Info vs Worker Profile vs Account Settings */}
           <div style={{
             display: 'flex',
-            gap: '8px',
+            gap: '6px',
             marginTop: '14px',
             background: 'rgba(255, 255, 255, 0.7)',
             padding: '3px',
@@ -343,24 +359,54 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
               onClick={() => { setActiveTab('profile'); setErrorMsg(''); }}
               style={{
                 flex: 1,
-                padding: '7px 12px',
+                padding: '7px 10px',
                 borderRadius: '8px',
                 border: 'none',
                 background: activeTab === 'profile' ? '#FFFFFF' : 'transparent',
                 color: activeTab === 'profile' ? '#0F172A' : '#64748B',
                 fontWeight: activeTab === 'profile' ? 700 : 500,
-                fontSize: '12.5px',
+                fontSize: '12px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '6px',
+                gap: '5px',
                 boxShadow: activeTab === 'profile' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
                 transition: 'all 150ms ease'
               }}
             >
               <User style={{ width: '13px', height: '13px', color: activeTab === 'profile' ? roleMeta.accent : '#64748B' }} />
-              <span>Basic Info & Profile</span>
+              <span>Basic Info</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => { setActiveTab('worker'); setErrorMsg(''); }}
+              style={{
+                flex: 1,
+                padding: '7px 10px',
+                borderRadius: '8px',
+                border: 'none',
+                background: activeTab === 'worker' ? '#FFFFFF' : 'transparent',
+                color: activeTab === 'worker' ? '#065F46' : '#64748B',
+                fontWeight: activeTab === 'worker' ? 700 : 500,
+                fontSize: '12px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '5px',
+                boxShadow: activeTab === 'worker' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
+                transition: 'all 150ms ease'
+              }}
+            >
+              <Wrench style={{ width: '13px', height: '13px', color: activeTab === 'worker' ? '#065F46' : '#64748B' }} />
+              <span>Worker Profile</span>
+              {currentWorkerProfile && (
+                <span style={{ fontSize: '9px', background: '#DCFCE7', color: '#166534', padding: '1px 5px', borderRadius: '999px', fontWeight: 800 }}>
+                  ACTIVE
+                </span>
+              )}
             </button>
 
             <button
@@ -368,24 +414,24 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
               onClick={() => { setActiveTab('settings'); setErrorMsg(''); }}
               style={{
                 flex: 1,
-                padding: '7px 12px',
+                padding: '7px 10px',
                 borderRadius: '8px',
                 border: 'none',
                 background: activeTab === 'settings' ? '#FFFFFF' : 'transparent',
                 color: activeTab === 'settings' ? '#0F172A' : '#64748B',
                 fontWeight: activeTab === 'settings' ? 700 : 500,
-                fontSize: '12.5px',
+                fontSize: '12px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '6px',
+                gap: '5px',
                 boxShadow: activeTab === 'settings' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
                 transition: 'all 150ms ease'
               }}
             >
               <Settings style={{ width: '13px', height: '13px', color: activeTab === 'settings' ? roleMeta.accent : '#64748B' }} />
-              <span>Basic Settings & Alerts</span>
+              <span>Settings</span>
             </button>
           </div>
         </div>
@@ -677,6 +723,267 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
             )}
 
             {/* =====================================================================
+                TAB: WORKER PROFILE & PORTAL (Requested in Profile Section)
+                ===================================================================== */}
+            {activeTab === 'worker' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {!currentWorkerProfile ? (
+                  <div style={{
+                    background: '#FFFFFF',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '20px',
+                    padding: '24px 20px',
+                    textAlign: 'center',
+                    boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)'
+                  }}>
+                    <div style={{
+                      width: '64px',
+                      height: '64px',
+                      borderRadius: '20px',
+                      background: '#ECFDF5',
+                      color: '#065F46',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 16px',
+                      border: '1px solid #A7F3D0'
+                    }}>
+                      <Wrench style={{ width: '30px', height: '30px' }} />
+                    </div>
+
+                    <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', margin: '0 0 8px' }}>
+                      Jan_Sahayak Wagholi Worker Portal
+                    </h2>
+                    <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.5, maxWidth: '480px', margin: '0 auto 20px' }}>
+                      Join Wagholi’s verified civic technician network. Receive direct paid service orders from local citizens and government field officers without middleman commissions.
+                    </p>
+
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                      gap: '10px',
+                      textAlign: 'left',
+                      marginBottom: '24px'
+                    }}>
+                      <div style={{ padding: '14px', background: '#F8FAFC', borderRadius: '14px', border: '1px solid #E2E8F0' }}>
+                        <div style={{ fontSize: '12.5px', fontWeight: 800, color: '#0F172A', marginBottom: '4px' }}>
+                          ⚡ Instant Direct Orders
+                        </div>
+                        <div style={{ fontSize: '11.5px', color: '#64748B', lineHeight: 1.4 }}>
+                          Get real-time booking alerts when residents or PMC engineers need repairs in your ward.
+                        </div>
+                      </div>
+
+                      <div style={{ padding: '14px', background: '#F8FAFC', borderRadius: '14px', border: '1px solid #E2E8F0' }}>
+                        <div style={{ fontSize: '12.5px', fontWeight: 800, color: '#0F172A', marginBottom: '4px' }}>
+                          💰 Transparent Dynamic Fares
+                        </div>
+                        <div style={{ fontSize: '11.5px', color: '#64748B', lineHeight: 1.4 }}>
+                          Fair distance and duration pricing with automatic priority surges for emergency jobs.
+                        </div>
+                      </div>
+
+                      <div style={{ padding: '14px', background: '#F8FAFC', borderRadius: '14px', border: '1px solid #E2E8F0' }}>
+                        <div style={{ fontSize: '12.5px', fontWeight: 800, color: '#0F172A', marginBottom: '4px' }}>
+                          🏛️ PMC Municipal Dispatch
+                        </div>
+                        <div style={{ fontSize: '11.5px', color: '#64748B', lineHeight: 1.4 }}>
+                          Direct institutional contracting for grievance resolution across Wagholi wards.
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        onClick={() => setShowRegisterWorkerModal(true)}
+                        style={{
+                          padding: '11px 24px',
+                          borderRadius: '12px',
+                          border: 'none',
+                          background: '#065F46',
+                          color: '#FFFFFF',
+                          fontWeight: 700,
+                          fontSize: '13px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          boxShadow: '0 4px 14px rgba(6, 78, 59, 0.25)'
+                        }}
+                      >
+                        <span>Register as Worker Profile</span>
+                        <ArrowRight style={{ width: '15px', height: '15px' }} />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          registerAsWorker({
+                            name: name || user?.name || 'Rahul Raut (Technician)',
+                            phone: phone || user?.phone || '+91 98234 56789',
+                            ward: ward || 'Ward 28 - Ivy Estate / Pune-Nagar Hwy',
+                            category: 'plumbing',
+                            skills: ['Pipe Repair', 'HDPE Welding', 'Motor Overhaul', 'Leak Detection'],
+                            experienceYears: 6,
+                            baseFarePerHour: 250,
+                            verificationType: 'PMC Enrolled Contractor',
+                            verificationId: 'PMC-WAG-TECH-8824',
+                            avatar: 'https://images.unsplash.com/photo-1540569014015-19a7be504e3a?auto=format&fit=crop&w=400&q=80',
+                            isVerified: true,
+                            availability: 'AVAILABLE'
+                          });
+                        }}
+                        style={{
+                          padding: '11px 18px',
+                          borderRadius: '12px',
+                          border: '1px solid #CBD5E1',
+                          background: '#FFFFFF',
+                          color: '#334155',
+                          fontWeight: 600,
+                          fontSize: '13px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        1-Click Quick Demo Profile
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{
+                    background: '#FFFFFF',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '20px',
+                    padding: '20px',
+                    boxShadow: '0 2px 12px rgba(15, 23, 42, 0.04)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <img
+                          src={currentWorkerProfile.avatar}
+                          alt={currentWorkerProfile.name}
+                          style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #065F46' }}
+                        />
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#0F172A' }}>
+                              {currentWorkerProfile.name}
+                            </h3>
+                            <span style={{ fontSize: '11px', color: '#065F46', background: '#D1FAE5', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>
+                              PMC Partner
+                            </span>
+                          </div>
+                          <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>
+                            {currentWorkerProfile.category} · {currentWorkerProfile.experienceYears || 5} yrs exp · Base ₹{currentWorkerProfile.baseFarePerHour}/hr
+                          </div>
+                        </div>
+                      </div>
+
+                      <span style={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        padding: '3px 10px',
+                        borderRadius: '999px',
+                        background: currentWorkerProfile.availability === 'AVAILABLE' ? '#DCFCE7' : '#FEF3C7',
+                        color: currentWorkerProfile.availability === 'AVAILABLE' ? '#166534' : '#B45309'
+                      }}>
+                        {currentWorkerProfile.availability === 'AVAILABLE' ? '🟢 AVAILABLE' : '🟡 BUSY'}
+                      </span>
+                    </div>
+
+                    <div style={{ background: '#F8FAFC', borderRadius: '12px', padding: '12px 14px', marginBottom: '16px', fontSize: '12px', color: '#475569' }}>
+                      <div style={{ marginBottom: '6px' }}>
+                        <strong style={{ color: '#0F172A' }}>Assigned Ward: </strong>{currentWorkerProfile.ward}
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                        {(currentWorkerProfile.skills || []).map((sk, i) => (
+                          <span key={i} style={{ background: '#FFFFFF', border: '1px solid #CBD5E1', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 600 }}>
+                            {sk}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: '20px' }}>
+                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
+                        Change Availability Status
+                      </label>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        {['AVAILABLE', 'BUSY', 'OFFLINE'].map(status => (
+                          <button
+                            key={status}
+                            type="button"
+                            onClick={() => updateWorkerAvailability(currentWorkerProfile.id, status)}
+                            style={{
+                              flex: 1,
+                              padding: '7px 10px',
+                              borderRadius: '8px',
+                              border: currentWorkerProfile.availability === status ? '2px solid #065F46' : '1px solid #CBD5E1',
+                              background: currentWorkerProfile.availability === status ? '#ECFDF5' : '#FFFFFF',
+                              color: currentWorkerProfile.availability === status ? '#065F46' : '#64748B',
+                              fontWeight: 700,
+                              fontSize: '11.5px',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {status === 'AVAILABLE' ? '🟢 Available' : status === 'BUSY' ? '🟡 Busy' : '⚪ Offline'}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setShowRegisterWorkerModal(true)}
+                        style={{
+                          flex: 1,
+                          padding: '10px 14px',
+                          borderRadius: '10px',
+                          border: '1px solid #CBD5E1',
+                          background: '#FFFFFF',
+                          color: '#334155',
+                          fontWeight: 700,
+                          fontSize: '12.5px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Edit Profile
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onClose();
+                          navigate('/worker');
+                        }}
+                        style={{
+                          flex: 1.5,
+                          padding: '10px 14px',
+                          borderRadius: '10px',
+                          border: 'none',
+                          background: '#065F46',
+                          color: '#FFFFFF',
+                          fontWeight: 700,
+                          fontSize: '12.5px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          boxShadow: '0 4px 12px rgba(6, 78, 59, 0.25)'
+                        }}
+                      >
+                        <span>Open Full Dashboard</span>
+                        <ArrowRight style={{ width: '14px', height: '14px' }} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* =====================================================================
                 TAB 2: BASIC SETTINGS & NOTIFICATIONS
                 ===================================================================== */}
             {activeTab === 'settings' && (
@@ -861,60 +1168,95 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = 'profil
           </div>
 
           {/* Modal Footer with Actions */}
-          <div className="user-profile-modal-footer">
-            <button
-              type="button"
-              onClick={onClose}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '10px',
-                border: '1px solid #CBD5E1',
-                background: '#FFFFFF',
-                color: '#475569',
-                fontSize: '12.5px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 150ms ease'
-              }}
-            >
-              Cancel
-            </button>
+          {activeTab === 'worker' ? (
+            <div className="user-profile-modal-footer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ fontSize: '12px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Wrench style={{ width: '13px', height: '13px', color: '#065F46' }} />
+                <span>{currentWorkerProfile ? 'Verified PMC Civic Technician' : 'PMC Wagholi Technician Network'}</span>
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                style={{
+                  padding: '8px 18px',
+                  borderRadius: '10px',
+                  border: '1px solid #CBD5E1',
+                  background: '#FFFFFF',
+                  color: '#334155',
+                  fontSize: '12.5px',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                Close
+              </button>
+            </div>
+          ) : (
+            <div className="user-profile-modal-footer">
+              <button
+                type="button"
+                onClick={onClose}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '10px',
+                  border: '1px solid #CBD5E1',
+                  background: '#FFFFFF',
+                  color: '#475569',
+                  fontSize: '12.5px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 150ms ease'
+                }}
+              >
+                Cancel
+              </button>
 
-            <button
-              type="submit"
-              disabled={isSaving}
-              style={{
-                padding: '8px 20px',
-                borderRadius: '10px',
-                border: 'none',
-                background: '#1E2653',
-                color: '#FFFFFF',
-                fontSize: '12.5px',
-                fontWeight: 700,
-                cursor: isSaving ? 'not-allowed' : 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                boxShadow: '0 2px 8px rgba(30, 38, 83, 0.25)',
-                transition: 'all 150ms ease'
-              }}
-            >
-              {isSaving ? (
-                <>
-                  <RefreshCw className="animate-spin" style={{ width: '14px', height: '14px' }} />
-                  <span>Saving...</span>
-                </>
-              ) : (
-                <>
-                  <Save style={{ width: '14px', height: '14px' }} />
-                  <span>Save Changes</span>
-                </>
-              )}
-            </button>
-          </div>
+              <button
+                type="submit"
+                disabled={isSaving}
+                style={{
+                  padding: '8px 20px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: '#1E2653',
+                  color: '#FFFFFF',
+                  fontSize: '12.5px',
+                  fontWeight: 700,
+                  cursor: isSaving ? 'not-allowed' : 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 2px 8px rgba(30, 38, 83, 0.25)',
+                  transition: 'all 150ms ease'
+                }}
+              >
+                {isSaving ? (
+                  <>
+                    <RefreshCw className="animate-spin" style={{ width: '14px', height: '14px' }} />
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save style={{ width: '14px', height: '14px' }} />
+                    <span>Save Changes</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
         </form>
 
       </div>
+
+      {/* Embedded Register Worker Modal */}
+      <RegisterWorkerModal
+        isOpen={showRegisterWorkerModal}
+        onClose={() => setShowRegisterWorkerModal(false)}
+        onSuccess={() => {
+          setShowRegisterWorkerModal(false);
+          setActiveTab('worker');
+        }}
+      />
     </div>
   );
 }
