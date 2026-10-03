@@ -22,45 +22,59 @@ import LawEnforcementReportModal from './LawEnforcementReportModal';
 
 export const VIOLATION_DOSSIERS = [
   {
-    id: 'INC-2026-PUNE-0043',
-    reportNumber: 'PMC-ENF-2026-0043',
-    title: 'Wagholi Lakefront Illegal Waste Dumping',
-    area: 'Wagholi Lake Perimeter & Kesnand Culvert (Ward 29)',
-    problem: 'Illegal dumping of plastic waste sacks directly into natural waterbody from motorcycle',
-    offenderDetails: 'Motorcycle Rider • Hero Splendor (MH-12-EA-9142)',
-    timestamp: 'Today, 12:40 IST',
-    camera: 'CAM-WAG-07 (Perimeter)',
-    aiConfidence: 96,
-    imageUrl: '/surveillance/violation_dumping_lake.jpg',
-    legalClause: 'Section 268/269 IPC & Solid Waste Management Rules 2016',
+    id: 'INC-2026-PUNE-0045',
+    reportNumber: 'PMC-ENF-2026-0045',
+    title: 'Chemical Drum Waste Dumping',
+    area: 'Wagholi Commercial Market & Auto Stand (Ward 29)',
+    problem: 'Individual unloading and dumping industrial sludge from large blue drum directly into public street heap',
+    offenderDetails: 'Male in yellow shirt • Hand dumping beside auto-rickshaw',
+    timestamp: 'Today, 14:15 IST',
+    camera: 'CAM-WAG-04 (Arterial Main)',
+    aiConfidence: 98,
+    imageUrl: '/surveillance/violation_drum_dumping.jpg',
+    legalClause: 'Section 268/277 IPC & Hazardous/Commercial Waste Rules',
     status: 'Evidence Captured'
   },
   {
     id: 'INC-2026-PUNE-0044',
     reportNumber: 'PMC-ENF-2026-0044',
-    title: 'Baif Road Commercial Roadside Waste Dumping',
+    title: 'Roadside Red Bucket Waste Dumping',
     area: 'Baif Road Commercial Market & Highway Corridor (Ward 29)',
-    problem: 'Unauthorized dumping of commercial garbage bucket into public roadway shoulder',
-    offenderDetails: 'Individual in grey shirt • Handcart & Commercial Ingress',
+    problem: 'Unauthorized dumping of commercial garbage container directly onto public roadway lane',
+    offenderDetails: 'Individual emptying red bucket • Adjacent to handcart & auto',
     timestamp: 'Today, 09:20 IST',
     camera: 'CAM-WAG-02 (Junction)',
     aiConfidence: 97,
-    imageUrl: '/surveillance/violation_dumping_street.jpg',
+    imageUrl: '/surveillance/violation_bucket_dumping.jpg',
     legalClause: 'PMC Municipal Solid Waste Bylaws 2024 & Clean City Code',
     status: 'Detected'
   },
   {
-    id: 'INC-2026-PUNE-0042',
-    reportNumber: 'PMC-ENF-2026-0042',
-    title: 'Corridor Daytime Heavy Vehicle Ban Breach',
-    area: 'Wagholi Main Road Restricted Zone (Sector-B)',
-    problem: 'Unauthorized commercial heavy dumper entry during peak traffic restriction hours (08:00–20:00)',
-    offenderDetails: 'Heavy Dumper Truck (MH-12-Q-4029)',
-    timestamp: 'Today, 14:32 IST',
-    camera: 'CAM-WAG-04 (Arterial Main)',
+    id: 'INC-2026-PUNE-0046',
+    reportNumber: 'PMC-ENF-2026-0046',
+    title: 'Two-Wheeler Plastic Plate Littering',
+    area: 'Wagholi Main Arterial Road (Near Laxmi Chowk)',
+    problem: 'Open littering and illegal dumping of single-use disposable plastic plates and debris on roadway margin',
+    offenderDetails: 'Two-Wheeler Riders • White Honda Activa (MH-12-P-3318)',
+    timestamp: 'Today, 12:40 IST',
+    camera: 'CAM-WAG-07 (Perimeter)',
+    aiConfidence: 95,
+    imageUrl: '/surveillance/violation_scooter_litter.jpg',
+    legalClause: 'Maharashtra Non-Biodegradable Garbage Control Act & SWM Rules',
+    status: 'Evidence Captured'
+  },
+  {
+    id: 'INC-2026-PUNE-0047',
+    reportNumber: 'PMC-ENF-2026-0047',
+    title: 'Market Entry Roadside Garbage Heap',
+    area: 'Wagholi Commercial Market Entry (Ward 29)',
+    problem: 'Persistent illegal roadside garbage dumping and plastic accumulation obstructing highway lane',
+    offenderDetails: 'Multiple Commercial Transporters & Two-Wheelers',
+    timestamp: 'Today, 11:30 IST',
+    camera: 'CAM-WAG-02 (Junction)',
     aiConfidence: 94,
-    imageUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=80',
-    legalClause: 'Section 115/177 Motor Vehicles Act & PMC Corridor Regulation',
+    imageUrl: '/surveillance/violation_market_road_dump.jpg',
+    legalClause: 'Section 133 CrPC (Removal of Public Nuisance) & PMC Sanitation Bylaws',
     status: 'Detected'
   }
 ];
@@ -160,7 +174,7 @@ export default function LawEnforcementReportCard({
       </div>
 
       {/* ─── Selector Tabs Between Rule Breakers ───────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '6px' }}>
         {VIOLATION_DOSSIERS.map((dossier, idx) => {
           const isSelected = idx === activeDossierIndex;
           const isSent = Boolean(sentReports[dossier.id]);
@@ -172,21 +186,27 @@ export default function LawEnforcementReportCard({
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'space-between',
                 gap: '6px',
-                padding: '6px 12px',
+                padding: '7px 10px',
                 borderRadius: '8px',
                 fontSize: '11.5px',
                 fontWeight: isSelected ? 800 : 600,
                 background: isSelected ? '#0F172A' : '#F1F5F9',
                 color: isSelected ? '#FFFFFF' : '#475569',
-                border: isSelected ? '1px solid #0F172A' : '1px solid #E2E8F0',
+                border: isSelected ? '1px solid #0F172A' : '1px solid #CBD5E1',
                 cursor: 'pointer',
-                transition: 'all 0.15s ease'
+                transition: 'all 0.15s ease',
+                textAlign: 'left'
               }}
             >
-              <span>{idx + 1}. {dossier.title}</span>
-              {isSent && (
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34D399' }} title="Sent to Administrator" />
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                #{idx + 1} {dossier.title}
+              </span>
+              {isSent ? (
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#34D399', flexShrink: 0 }} title="Sent to Administrator" />
+              ) : (
+                <span style={{ fontSize: '10px', opacity: 0.75, flexShrink: 0 }}>{dossier.aiConfidence}%</span>
               )}
             </button>
           );
@@ -465,9 +485,13 @@ export default function LawEnforcementReportCard({
           isOpen={showModal}
           onClose={() => setShowModal(false)}
           reportData={currentDossier}
-          onSendToAdministrator={() => handleSendToAdministrator(currentDossier)}
+          allDossiers={VIOLATION_DOSSIERS}
+          onSelectDossier={(dossier, idx) => {
+            setActiveDossierIndex(idx);
+          }}
+          onSendToAdministrator={(rep) => handleSendToAdministrator(rep || currentDossier)}
           onDispatchSquad={(rep) => {
-            if (onDispatchSquad) onDispatchSquad(rep);
+            if (onDispatchSquad) onDispatchSquad(rep || currentDossier);
           }}
         />
       )}

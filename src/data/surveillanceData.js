@@ -137,15 +137,15 @@ export const INITIAL_SURVEILLANCE_INCIDENTS = [
     humanVerificationNotes: 'Assigned to duty officer for license verification.'
   },
   {
-    id: 'INC-2026-PUNE-0043',
+    id: 'INC-2026-PUNE-0045',
     hotspotId: 'HOTSPOT-WAG-01',
-    violation: 'Illegal Solid Waste & Plastic Sacks Dumping in Lake Waterbody',
-    location: 'Wagholi Lake Perimeter & Kesnand Culvert (Ward 29)',
-    timestamp: 'Today, 12:40',
-    camera: 'CAM-WAG-07 (Perimeter)',
-    vehicleDetails: 'Two-Wheeler Motorcycle (MH-12-EA-9142)',
-    offenderDetails: 'Male rider dumping heavy sacks of plastic & household waste into lake embankment',
-    aiConfidence: 96,
+    violation: 'Chemical Drum Waste Dumping on Public Street',
+    location: 'Wagholi Commercial Market & Auto Stand (Ward 29)',
+    timestamp: 'Today, 14:15',
+    camera: 'CAM-WAG-04 (Arterial Main)',
+    vehicleDetails: 'Commercial Transit & Auto-Rickshaw',
+    offenderDetails: 'Male in yellow shirt unloading and dumping industrial sludge from blue barrel',
+    aiConfidence: 98,
     status: 'Evidence Captured',
     authorityRecipient: null,
     officialReference: null,
@@ -153,19 +153,19 @@ export const INITIAL_SURVEILLANCE_INCIDENTS = [
       {
         id: 'EV-04',
         type: 'OFFENDER_ACTION_FRAME',
-        label: 'Offender Caught Dumping Waste from Motorcycle at Lakefront',
-        url: '/surveillance/violation_dumping_lake.jpg',
-        timestamp: '12:39:44',
-        capturedBy: 'CCTV-WAG-07 Environmental Patrol Camera'
+        label: 'Blue Drum Sludge Waste Dump beside Auto',
+        url: '/surveillance/violation_drum_dumping.jpg',
+        timestamp: '14:14:22',
+        capturedBy: 'CCTV-WAG-04 High-Definition PTZ Camera'
       }
     ],
     auditLog: [
-      { time: '12:39:10', message: 'Two-wheeler parked in non-parking lake conservation buffer' },
-      { time: '12:39:35', message: 'Surveillance AI flagged hazardous waste disposal behavior' },
-      { time: '12:39:44', message: 'Photographic evidence frame captured with license #MH-12-EA-9142' },
-      { time: '12:39:48', message: 'Incident Ticket INC-2026-PUNE-0043 compiled by Evidence Agent' }
+      { time: '14:13:50', message: 'Unauthorized chemical transport parked in transit corridor' },
+      { time: '14:14:12', message: 'Surveillance AI flagged hazardous chemical drum unloading' },
+      { time: '14:14:22', message: 'Photographic evidence captured showing offender emptying blue drum' },
+      { time: '14:14:30', message: 'Incident Ticket INC-2026-PUNE-0045 compiled by Evidence Agent' }
     ],
-    humanVerificationNotes: 'Awaiting human officer approval for municipal environmental penalty notice.'
+    humanVerificationNotes: 'Forwarded for urgent pollution control inspection.'
   },
   {
     id: 'INC-2026-PUNE-0044',
@@ -185,7 +185,7 @@ export const INITIAL_SURVEILLANCE_INCIDENTS = [
         id: 'EV-05',
         type: 'OFFENDER_ACTION_FRAME',
         label: 'Individual Dumping Red Bucket Garbage onto Public Road',
-        url: '/surveillance/violation_dumping_street.jpg',
+        url: '/surveillance/violation_bucket_dumping.jpg',
         timestamp: '09:19:15',
         capturedBy: 'CCTV-WAG-02 Market Perimeter Camera'
       }
@@ -196,5 +196,65 @@ export const INITIAL_SURVEILLANCE_INCIDENTS = [
       { time: '09:19:20', message: 'Incident Ticket INC-2026-PUNE-0044 compiled by Evidence Agent' }
     ],
     humanVerificationNotes: 'Ready for dispatch to Ward 29 Sanitary Inspector.'
+  },
+  {
+    id: 'INC-2026-PUNE-0046',
+    hotspotId: 'HOTSPOT-WAG-01',
+    violation: 'Open Littering of Disposable Plastic Plates on Road Shoulder',
+    location: 'Wagholi Main Arterial Road (Near Laxmi Chowk)',
+    timestamp: 'Today, 12:40',
+    camera: 'CAM-WAG-07 (Perimeter)',
+    vehicleDetails: 'White Honda Activa (MH-12-P-3318)',
+    offenderDetails: 'Scooter riders and food vendors discarding bulk single-use plastic plates',
+    aiConfidence: 95,
+    status: 'Evidence Captured',
+    authorityRecipient: null,
+    officialReference: null,
+    evidenceFiles: [
+      {
+        id: 'EV-06',
+        type: 'OFFENDER_ACTION_FRAME',
+        label: 'Scooter Transit beside Disposable Plastic Plate Roadside Heap',
+        url: '/surveillance/violation_scooter_litter.jpg',
+        timestamp: '12:39:40',
+        capturedBy: 'CCTV-WAG-07 Perimeter AI Optical Camera'
+      }
+    ],
+    auditLog: [
+      { time: '12:38:10', message: 'Plastic plate pile accumulation detected on road shoulder' },
+      { time: '12:39:40', message: 'AI classified non-biodegradable food service waste violation' },
+      { time: '12:39:50', message: 'Incident Ticket INC-2026-PUNE-0046 generated' }
+    ],
+    humanVerificationNotes: 'Awaiting sanitary squad notification.'
+  },
+  {
+    id: 'INC-2026-PUNE-0047',
+    hotspotId: 'HOTSPOT-WAG-01',
+    violation: 'Chronic Roadside Garbage Heap Obstructing Highway Lane',
+    location: 'Wagholi Commercial Market Entry (Ward 29)',
+    timestamp: 'Today, 11:30',
+    camera: 'CAM-WAG-02 (Junction)',
+    vehicleDetails: 'Multiple Commercial Carriers & Auto Transit',
+    offenderDetails: 'Persistent roadside illegal waste accumulation & commercial garbage dumping',
+    aiConfidence: 94,
+    status: 'Detected',
+    authorityRecipient: null,
+    officialReference: null,
+    evidenceFiles: [
+      {
+        id: 'EV-07',
+        type: 'OFFENDER_ACTION_FRAME',
+        label: 'Market Roadway Obstructed by Severe Garbage Heap',
+        url: '/surveillance/violation_market_road_dump.jpg',
+        timestamp: '11:29:10',
+        capturedBy: 'CCTV-WAG-02 Junction Traffic Camera'
+      }
+    ],
+    auditLog: [
+      { time: '11:25:00', message: 'Roadway lane obstruction flagged by geometric flow detector' },
+      { time: '11:29:10', message: 'Photographic evidence captured showing major public nuisance' },
+      { time: '11:29:25', message: 'Incident Ticket INC-2026-PUNE-0047 registered' }
+    ],
+    humanVerificationNotes: 'Notice issued for immediate municipal clean-up and squad patrol.'
   }
 ];

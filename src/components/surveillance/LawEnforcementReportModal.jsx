@@ -24,29 +24,42 @@ export default function LawEnforcementReportModal({
   isOpen = true,
   onClose,
   reportData,
+  allDossiers = [],
+  onSelectDossier,
   onSendToAdministrator,
   onDispatchSquad
 }) {
+  const [activeReport, setActiveReport] = useState(reportData);
   const [isSent, setIsSent] = useState(false);
   const [copiedRef, setCopiedRef] = useState(false);
   const [adminNote, setAdminNote] = useState(
     'Directing Municipal Enforcement Unit to initiate statutory penalty under solid waste & public transit guidelines.'
   );
 
-  if (!isOpen || !reportData) return null;
+  // Sync active report if reportData prop changes from parent
+  React.useEffect(() => {
+    if (reportData) {
+      setActiveReport(reportData);
+      setIsSent(false);
+    }
+  }, [reportData]);
+
+  if (!isOpen || !activeReport) return null;
 
   const {
-    id = 'INC-2026-PUNE-0043',
-    reportNumber = `PMC-ENF-2026-${String(reportData?.id || '0043').replace(/\D/g, '').slice(-4)}`,
-    area = reportData?.location || 'Wagholi Lake Perimeter & Kesnand Culvert (Ward 29)',
-    problem = reportData?.violation || 'Illegal Solid Waste & Plastic Sacks Dumping in Lake Waterbody',
-    offenderDetails = reportData?.offenderDetails || reportData?.vehicleDetails || 'Motorcycle Rider (MH-12-EA-9142)',
-    timestamp = reportData?.timestamp || 'Today, 12:40',
-    camera = reportData?.camera || 'CAM-WAG-07 (Perimeter)',
-    aiConfidence = reportData?.aiConfidence ?? 96,
-    imageUrl = reportData?.evidenceFiles?.[0]?.url || '/surveillance/violation_dumping_lake.jpg',
-    legalClause = 'Under Section 268/269 of Indian Penal Code & PMC Solid Waste Rules 2016'
-  } = reportData;
+    id = 'INC-2026-PUNE-0045',
+    reportNumber = activeReport?.reportNumber || `PMC-ENF-2026-${String(activeReport?.id || '0045').replace(/\D/g, '').slice(-4)}`,
+    area = activeReport?.area || activeReport?.location || 'Wagholi Commercial Market & Auto Stand (Ward 29)',
+    problem = activeReport?.problem || activeReport?.violation || 'Illegal Dumping of Commercial Waste on Public Roadway',
+    offenderDetails = activeReport?.offenderDetails || activeReport?.vehicleDetails || 'Offender Caught on CCTV',
+    timestamp = activeReport?.timestamp || 'Today, 14:15 IST',
+    camera = activeReport?.camera || 'CAM-WAG-04 (Arterial Main)',
+    aiConfidence = activeReport?.aiConfidence ?? 98,
+    imageUrl = activeReport?.imageUrl || activeReport?.evidenceFiles?.[0]?.url || '/surveillance/violation_drum_dumping.jpg',
+    legalClause = activeReport?.legalClause || 'Under Section 268/277 IPC & Solid Waste Management Rules 2016'
+  } = activeReport;
+
+  const officialAdminRef = `REF-2026-ADM-${String(id).replace(/\D/g, '').slice(-4) || '0045'}`;
 
   const handlePrint = () => {
     window.print();
@@ -58,7 +71,7 @@ export default function LawEnforcementReportModal({
       confetti({ particleCount: 35, spread: 60, origin: { y: 0.7 } });
     } catch (_) {}
     if (onSendToAdministrator) {
-      onSendToAdministrator(reportData, adminNote);
+      onSendToAdministrator(activeReport, adminNote);
     }
   };
 
@@ -327,6 +340,73 @@ export default function LawEnforcementReportModal({
                 </span>
               </div>
             </div>
+            {/* ─── 4-Photo Evidence Gallery Switcher ─── */}
+            {allDossiers && allDossiers.length > 0 && (
+              <div style={{ marginTop: '4px' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', marginBottom: '6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span>Select Evidence Photo to Review ({allDossiers.length} Violations Logged):</span>
+                  <span style={{ color: '#2563EB', fontSize: '10.5px', fontWeight: 600 }}>Click photo to switch report</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: `repeat(${allDossiers.length}, 1fr)`, gap: '8px' }}>
+                  {allDossiers.map((dossier, idx) => {
+                    const isSelected = activeReport?.id === dossier.id;
+                    return (
+                      <button
+                        key={dossier.id}
+                        type="button"
+                        onClick={() => {
+                          setActiveReport(dossier);
+                          setIsSent(false);
+                          if (onSelectDossier) onSelectDossier(dossier, idx);
+                        }}
+                        style={{
+                          border: isSelected ? '2px solid #DC2626' : '1px solid #CBD5E1',
+                          borderRadius: '10px',
+                          overflow: 'hidden',
+                          padding: 0,
+                          background: '#0F172A',
+                          cursor: 'pointer',
+                          position: 'relative',
+                          aspectRatio: '16 / 11',
+                          boxShadow: isSelected ? '0 0 0 2px rgba(220, 38, 38, 0.35)' : 'none',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        <img
+                          src={dossier.imageUrl}
+                          alt={dossier.title}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            opacity: isSelected ? 1 : 0.65
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            background: isSelected ? 'rgba(220, 38, 38, 0.95)' : 'rgba(15, 23, 42, 0.8)',
+                            color: '#FFFFFF',
+                            fontSize: '9.5px',
+                            fontWeight: 700,
+                            padding: '3px 4px',
+                            textAlign: 'center',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}
+                        >
+                          Proof #{idx + 1}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Success Banner if Sent to Administrator */}
@@ -351,13 +431,13 @@ export default function LawEnforcementReportModal({
                     Dossier Successfully Forwarded to Ward Administrator!
                   </div>
                   <div style={{ fontSize: '11px', color: '#047857' }}>
-                    Official Notice REF-2026-ADM-0043 registered for statutory penalty & enforcement.
+                    Official Notice {officialAdminRef} registered for statutory penalty & enforcement.
                   </div>
                 </div>
               </div>
               <button
                 type="button"
-                onClick={() => handleCopy('REF-2026-ADM-0043')}
+                onClick={() => handleCopy(officialAdminRef)}
                 style={{
                   background: '#FFFFFF',
                   border: '1px solid #A7F3D0',
@@ -373,7 +453,7 @@ export default function LawEnforcementReportModal({
                 }}
               >
                 {copiedRef ? <Check style={{ width: '12px', height: '12px' }} /> : <Copy style={{ width: '12px', height: '12px' }} />}
-                REF-2026-ADM-0043
+                {officialAdminRef}
               </button>
             </div>
           )}
@@ -459,7 +539,7 @@ export default function LawEnforcementReportModal({
             <button
               type="button"
               onClick={() => {
-                if (onDispatchSquad) onDispatchSquad(reportData);
+                if (onDispatchSquad) onDispatchSquad(activeReport);
                 onClose();
               }}
               style={{
