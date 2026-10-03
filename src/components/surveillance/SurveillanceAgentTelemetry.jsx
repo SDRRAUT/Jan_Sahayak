@@ -40,7 +40,7 @@ export default function SurveillanceAgentTelemetry({
   const [copied, setCopied] = useState(false);
   const [autoScroll, setAutoScroll] = useState(true);
   const [filterType, setFilterType] = useState('ALL'); // ALL | OPTICAL | DETECTION | VIOLATION
-  const terminalEndRef = useRef(null);
+  const terminalContainerRef = useRef(null);
 
   // Initial telemetry logs
   const [logs, setLogs] = useState([
@@ -237,10 +237,10 @@ export default function SurveillanceAgentTelemetry({
     }
   }, [simStep]);
 
-  // Auto-scroll terminal to bottom
+  // Auto-scroll ONLY inner terminal box to bottom without moving the page/window
   useEffect(() => {
-    if (autoScroll && terminalEndRef.current) {
-      terminalEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (autoScroll && terminalContainerRef.current) {
+      terminalContainerRef.current.scrollTop = terminalContainerRef.current.scrollHeight;
     }
   }, [logs, autoScroll]);
 
@@ -724,6 +724,7 @@ export default function SurveillanceAgentTelemetry({
 
         {/* Terminal Log Output Window */}
         <div 
+          ref={terminalContainerRef}
           style={{
             height: '180px',
             overflowY: 'auto',
@@ -774,7 +775,6 @@ export default function SurveillanceAgentTelemetry({
               </div>
             );
           })}
-          <div ref={terminalEndRef} />
         </div>
       </div>
     </div>

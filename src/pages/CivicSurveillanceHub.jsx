@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   ShieldAlert, 
@@ -59,6 +59,11 @@ export default function CivicSurveillanceHub() {
     updateSurveillanceIncidentStatus,
     addSurveillanceIncident
   } = useApp();
+
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
 
   // Active Hotspot
   const currentHotspot = useMemo(() => {
