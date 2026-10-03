@@ -81,7 +81,7 @@ export default function AuthorityEscalationModal({
       setSubmissionResult(result);
       setIsSubmitted(true);
 
-      // Trigger soft celebratory confetti for successful governance escalation
+      // Trigger celebratory confetti for successful governance escalation
       try {
         confetti({
           particleCount: 45,
@@ -116,7 +116,18 @@ export default function AuthorityEscalationModal({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-sm overflow-y-auto"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 1000,
+        background: 'rgba(15, 23, 42, 0.75)',
+        backdropFilter: 'blur(4px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+        overflowY: 'auto'
+      }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="escalation-modal-title"
@@ -125,20 +136,60 @@ export default function AuthorityEscalationModal({
       }}
     >
       <div 
-        className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col my-auto max-h-[92vh] animate-in fade-in zoom-in-95 duration-200"
+        style={{
+          background: '#FFFFFF',
+          width: '100%',
+          maxWidth: '640px',
+          borderRadius: '20px',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          border: '1px solid #E2E8F0',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          maxHeight: '92vh'
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="bg-slate-900 text-white px-5 py-4 flex items-center justify-between border-b border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-600/30 border border-blue-500/40 text-blue-400 flex items-center justify-center font-bold">
-              <Shield className="w-5 h-5 text-blue-400" />
+        {/* ─── Header ──────────────────────────────────────────────────────── */}
+        <div 
+          style={{
+            background: '#0F172A',
+            color: '#FFFFFF',
+            padding: '16px 22px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: '1px solid #1E293B'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div 
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '10px',
+                background: 'rgba(37, 99, 235, 0.25)',
+                border: '1px solid rgba(59, 130, 246, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <Shield style={{ width: '18px', height: '18px', color: '#60A5FA' }} />
             </div>
             <div>
-              <h2 id="escalation-modal-title" className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <h2 
+                id="escalation-modal-title" 
+                style={{
+                  fontSize: '17px',
+                  fontWeight: 800,
+                  color: '#FFFFFF',
+                  margin: 0
+                }}
+              >
                 Forward Incident Report to Authority
               </h2>
-              <p className="text-xs text-slate-400">
+              <p style={{ fontSize: '12px', color: '#94A3B8', margin: '3px 0 0 0' }}>
                 Official Municipal Escalation & Law Enforcement Dispatch
               </p>
             </div>
@@ -147,41 +198,70 @@ export default function AuthorityEscalationModal({
             type="button"
             onClick={handleClose}
             aria-label="Close modal"
-            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400"
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              background: '#1E293B',
+              border: 'none',
+              color: '#94A3B8',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
           >
-            <X className="w-4 h-4" />
+            <X style={{ width: '16px', height: '16px' }} />
           </button>
         </div>
 
-        {/* Modal Body */}
-        <div className="p-5 sm:p-6 overflow-y-auto space-y-5">
+        {/* ─── Modal Body ─────────────────────────────────────────────────── */}
+        <div style={{ padding: '20px 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '18px' }}>
           {!isSubmitted ? (
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               {/* Report Preview Summary Card */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 shadow-xs">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2.5 block">
+              <div 
+                style={{
+                  background: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '14px',
+                  padding: '16px'
+                }}
+              >
+                <span 
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    color: '#64748B',
+                    display: 'block',
+                    marginBottom: '10px'
+                  }}
+                >
                   Report Preview Summary
                 </span>
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div className="bg-white border border-slate-200/80 p-2.5 rounded-lg">
-                    <span className="text-slate-400 block font-medium">Incident</span>
-                    <span className="font-mono font-bold text-slate-900 text-xs sm:text-sm">{incidentId}</span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px', fontSize: '12px' }}>
+                  <div style={{ background: '#FFFFFF', border: '1px solid #CBD5E1', padding: '10px', borderRadius: '10px' }}>
+                    <span style={{ color: '#64748B', display: 'block', fontSize: '11px', fontWeight: 600 }}>Incident</span>
+                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 800, color: '#0F172A', fontSize: '13px' }}>{incidentId}</span>
                   </div>
-                  <div className="bg-white border border-slate-200/80 p-2.5 rounded-lg">
-                    <span className="text-slate-400 block font-medium">Issue</span>
-                    <span className="font-semibold text-rose-700 text-xs sm:text-sm">{issue}</span>
+                  <div style={{ background: '#FFFFFF', border: '1px solid #CBD5E1', padding: '10px', borderRadius: '10px' }}>
+                    <span style={{ color: '#64748B', display: 'block', fontSize: '11px', fontWeight: 600 }}>Issue</span>
+                    <span style={{ fontWeight: 700, color: '#B91C1C', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>{issue}</span>
                   </div>
-                  <div className="bg-white border border-slate-200/80 p-2.5 rounded-lg">
-                    <span className="text-slate-400 block font-medium">Evidence</span>
-                    <span className="font-semibold text-slate-800 flex items-center gap-1.5 mt-0.5">
-                      <FileCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      {evidenceCount} Verified Media Files
+                  <div style={{ background: '#FFFFFF', border: '1px solid #CBD5E1', padding: '10px', borderRadius: '10px' }}>
+                    <span style={{ color: '#64748B', display: 'block', fontSize: '11px', fontWeight: 600 }}>Evidence</span>
+                    <span style={{ fontWeight: 700, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                      <FileCheck style={{ width: '13px', height: '13px', color: '#059669', flexShrink: 0 }} />
+                      {evidenceCount} Verified Files
                     </span>
                   </div>
-                  <div className="bg-white border border-slate-200/80 p-2.5 rounded-lg">
-                    <span className="text-slate-400 block font-medium">Location</span>
-                    <span className="font-semibold text-slate-800 flex items-center gap-1 mt-0.5 truncate" title={location}>
-                      <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                  <div style={{ background: '#FFFFFF', border: '1px solid #CBD5E1', padding: '10px', borderRadius: '10px' }}>
+                    <span style={{ color: '#64748B', display: 'block', fontSize: '11px', fontWeight: 600 }}>Location</span>
+                    <span style={{ fontWeight: 700, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={location}>
+                      <MapPin style={{ width: '13px', height: '13px', color: '#2563EB', flexShrink: 0 }} />
                       {location}
                     </span>
                   </div>
@@ -189,21 +269,28 @@ export default function AuthorityEscalationModal({
               </div>
 
               {/* Authority Selection Radio Options */}
-              <div className="space-y-2.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#334155', display: 'block' }}>
                   Select Authority Destination
                 </label>
-                <div className="space-y-2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {AUTHORITIES.map((auth) => {
                     const isSelected = selectedAuthority === auth.label;
                     return (
                       <label
                         key={auth.id}
-                        className={`flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
-                          isSelected 
-                            ? 'bg-blue-50/70 border-blue-500 shadow-sm ring-1 ring-blue-500/20' 
-                            : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
-                        }`}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '12px',
+                          padding: '14px',
+                          borderRadius: '12px',
+                          border: isSelected ? '2px solid #2563EB' : '1px solid #CBD5E1',
+                          background: isSelected ? '#EFF6FF' : '#FFFFFF',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                          boxShadow: isSelected ? '0 2px 8px rgba(37, 99, 235, 0.12)' : 'none'
+                        }}
                       >
                         <input
                           type="radio"
@@ -211,16 +298,16 @@ export default function AuthorityEscalationModal({
                           value={auth.label}
                           checked={isSelected}
                           onChange={() => setSelectedAuthority(auth.label)}
-                          className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300"
+                          style={{ marginTop: '3px', accentColor: '#2563EB', cursor: 'pointer' }}
                         />
-                        <div className="space-y-0.5 flex-1">
-                          <div className="text-sm font-semibold text-slate-900">
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 }}>
+                          <div style={{ fontSize: '13.5px', fontWeight: 700, color: isSelected ? '#1E40AF' : '#0F172A' }}>
                             {auth.label}
                           </div>
-                          <div className="text-xs text-slate-500">
+                          <div style={{ fontSize: '12px', color: '#64748B' }}>
                             {auth.subtitle}
                           </div>
-                          <div className="text-[11px] text-blue-700 font-medium">
+                          <div style={{ fontSize: '11px', color: '#2563EB', fontWeight: 600, marginTop: '2px' }}>
                             {auth.department}
                           </div>
                         </div>
@@ -231,12 +318,12 @@ export default function AuthorityEscalationModal({
               </div>
 
               {/* Officer Dispatch Notes / Remarks */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label htmlFor="dispatch-notes" className="text-xs font-bold uppercase tracking-wider text-slate-700">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <label htmlFor="dispatch-notes" style={{ fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#334155' }}>
                     Officer Dispatch Notes / Remarks
                   </label>
-                  <span className="text-[11px] text-slate-400">Attached to official civic dispatch</span>
+                  <span style={{ fontSize: '11px', color: '#94A3B8' }}>Attached to official civic dispatch</span>
                 </div>
                 <textarea
                   id="dispatch-notes"
@@ -244,39 +331,74 @@ export default function AuthorityEscalationModal({
                   value={dispatchNotes}
                   onChange={(e) => setDispatchNotes(e.target.value)}
                   placeholder="Enter dispatch notes, vehicle description, or specific inspection instructions..."
-                  className="w-full text-xs sm:text-sm p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-800 placeholder-slate-400 bg-white"
+                  style={{
+                    width: '100%',
+                    fontSize: '13px',
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: '1px solid #CBD5E1',
+                    background: '#FFFFFF',
+                    color: '#0F172A',
+                    fontFamily: 'inherit',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
                 />
               </div>
 
               {errorMsg && (
-                <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+                <div style={{ padding: '10px 14px', background: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', borderRadius: '10px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <AlertCircle style={{ width: '16px', height: '16px', flexShrink: 0, color: '#DC2626' }} />
                   <span>{errorMsg}</span>
                 </div>
               )}
 
               {/* Submit Buttons */}
-              <div className="pt-2 flex flex-col sm:flex-row items-center justify-end gap-2.5">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px', paddingTop: '6px' }}>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+                  style={{
+                    padding: '10px 16px',
+                    borderRadius: '10px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: '#475569',
+                    background: '#F1F5F9',
+                    border: '1px solid #CBD5E1',
+                    cursor: 'pointer'
+                  }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '10px 20px',
+                    borderRadius: '10px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    background: isSubmitting ? '#93C5FD' : '#2563EB',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                    boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)',
+                    transition: 'all 0.15s ease'
+                  }}
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />
                       <span>Sending Official Report...</span>
                     </>
                   ) : (
                     <>
-                      <Send className="w-4 h-4" />
+                      <Send style={{ width: '15px', height: '15px' }} />
                       <span>Send Official Report</span>
                     </>
                   )}
@@ -285,62 +407,117 @@ export default function AuthorityEscalationModal({
             </form>
           ) : (
             /* Success Confirmation State */
-            <div className="space-y-5 py-2 text-center sm:text-left">
-              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 sm:p-6 space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                    <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              <div 
+                style={{
+                  background: '#ECFDF5',
+                  border: '1px solid #A7F3D0',
+                  borderRadius: '16px',
+                  padding: '20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '14px'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div 
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      background: '#D1FAE5',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}
+                  >
+                    <CheckCircle2 style={{ width: '24px', height: '24px', color: '#059669' }} />
                   </div>
                   <div>
-                    <h3 className="text-base sm:text-lg font-bold text-emerald-950">
+                    <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#064E3B', margin: 0 }}>
                       ✅ Report successfully forwarded to {selectedAuthority}
                     </h3>
-                    <p className="text-xs text-emerald-700 mt-0.5">
+                    <p style={{ fontSize: '12px', color: '#047857', margin: '3px 0 0 0' }}>
                       The official enforcement package has been logged in the Municipal Central Dispatch registry.
                     </p>
                   </div>
                 </div>
 
-                <div className="bg-white/90 border border-emerald-200 rounded-xl p-4 space-y-2.5 text-xs text-slate-800">
-                  <div className="flex items-center justify-between pb-2 border-b border-emerald-100">
-                    <span className="font-semibold text-slate-600">Official Reference:</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono font-bold text-slate-900 text-sm">
+                <div 
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.9)',
+                    border: '1px solid #A7F3D0',
+                    borderRadius: '12px',
+                    padding: '14px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                    fontSize: '12.5px',
+                    color: '#0F172A'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '8px', borderBottom: '1px solid #D1FAE5' }}>
+                    <span style={{ fontWeight: 600, color: '#475569' }}>Official Reference:</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 800, color: '#0F172A', fontSize: '13px' }}>
                         {submissionResult?.officialReference || 'REF-2026-0042'}
                       </span>
                       <button
                         type="button"
                         onClick={() => handleCopyRef(submissionResult?.officialReference || 'REF-2026-0042')}
-                        className="p-1 rounded hover:bg-slate-100 text-slate-500"
+                        style={{
+                          background: '#F1F5F9',
+                          border: '1px solid #CBD5E1',
+                          borderRadius: '4px',
+                          padding: '3px 6px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          color: '#475569'
+                        }}
                         title="Copy Reference"
                       >
-                        {copiedRef ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copiedRef ? <Check style={{ width: '13px', height: '13px', color: '#059669' }} /> : <Copy style={{ width: '13px', height: '13px' }} />}
                       </button>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-600">Status updated to:</span>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontWeight: 600, color: '#475569' }}>Status updated to:</span>
+                    <span 
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        padding: '3px 9px',
+                        borderRadius: '999px',
+                        fontSize: '11.5px',
+                        fontWeight: 700,
+                        background: '#DBEAFE',
+                        color: '#1E40AF',
+                        border: '1px solid #93C5FD'
+                      }}
+                    >
                       {submissionResult?.status || 'Forwarded to Authority'}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-600">Target Authority:</span>
-                    <span className="font-medium text-slate-800">{selectedAuthority}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontWeight: 600, color: '#475569' }}>Target Authority:</span>
+                    <span style={{ fontWeight: 600, color: '#0F172A' }}>{selectedAuthority}</span>
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-600">Time Dispatched:</span>
-                    <span className="font-mono text-slate-700 flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-slate-400" />
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontWeight: 600, color: '#475569' }}>Time Dispatched:</span>
+                    <span style={{ fontFamily: 'monospace', color: '#334155', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Clock style={{ width: '12px', height: '12px', color: '#64748B' }} />
                       {submissionResult?.timestamp || 'Today, 14:35 IST'}
                     </span>
                   </div>
 
                   {dispatchNotes && (
-                    <div className="pt-2 border-t border-emerald-100 text-slate-600 text-[11px] italic bg-slate-50/60 p-2 rounded">
+                    <div style={{ paddingTop: '8px', borderTop: '1px solid #D1FAE5', color: '#475569', fontSize: '11.5px', fontStyle: 'italic', background: 'rgba(248, 250, 252, 0.7)', padding: '8px', borderRadius: '6px' }}>
                       &quot;{dispatchNotes}&quot;
                     </div>
                   )}
@@ -348,11 +525,22 @@ export default function AuthorityEscalationModal({
               </div>
 
               {/* Success Action Buttons */}
-              <div className="flex items-center justify-end gap-2.5 pt-1">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingTop: '4px' }}>
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-900 hover:bg-slate-800 text-white shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  style={{
+                    padding: '10px 20px',
+                    borderRadius: '10px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    background: '#0F172A',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(15, 23, 42, 0.25)',
+                    transition: 'all 0.15s ease'
+                  }}
                 >
                   Close & Return
                 </button>
