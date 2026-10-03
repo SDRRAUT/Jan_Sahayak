@@ -44,7 +44,9 @@ import {
   SurveillanceAgentTelemetry,
   SurveillanceTicketCard,
   EvidencePackageModal,
-  AuthorityEscalationModal
+  AuthorityEscalationModal,
+  LawEnforcementReportCard,
+  LawEnforcementReportModal
 } from '../components/surveillance';
 
 export default function CivicSurveillanceHub() {
@@ -644,18 +646,20 @@ export default function CivicSurveillanceHub() {
           </div>
 
           {/* ─────────────────────────────────────────────────────────────────
-              RIGHT COLUMN: INCIDENTS LOG, EVIDENCE DRAWER & ESCALATION TABLE
+              RIGHT COLUMN: INCIDENTS LOG & LAW ENFORCEMENT REPORT DOSSIERS
              ───────────────────────────────────────────────────────────────── */}
-          <div style={{
-            background: '#FFFFFF',
-            borderRadius: '16px',
-            border: '1px solid #E2E8F0',
-            padding: '20px 24px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px'
-          }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {/* 1. Incidents & Evidence Box */}
+            <div style={{
+              background: '#FFFFFF',
+              borderRadius: '16px',
+              border: '1px solid #E2E8F0',
+              padding: '20px 24px',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px'
+            }}>
             {/* Section Header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', borderBottom: '1px solid #F1F5F9', pb: '14px', paddingBottom: '14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -922,6 +926,23 @@ export default function CivicSurveillanceHub() {
                 <strong>Autonomous Chain of Custody:</strong> All CCTV snapshots and bounding boxes are cryptographically sealed with timestamp watermarks. No automatic legal fines are issued without authorized human verification.
               </span>
             </div>
+          </div>
+
+          {/* 2. Law Breaker Incident Dossier & Minimalist Reports (In that free space) */}
+            <LawEnforcementReportCard
+              onEscalateToAdmin={(dossier) => {
+                if (escalateSurveillanceIncident) {
+                  escalateSurveillanceIncident(
+                    dossier.id,
+                    '🏛️ Government Administrator (Municipal Ward Executive)',
+                    `Official civic violation report: ${dossier.problem} at ${dossier.area}. Identified offender: ${dossier.offenderDetails}. Requesting administrative penalty order.`
+                  );
+                }
+              }}
+              onDispatchSquad={(dossier) => {
+                handleOpenActionDialog(dossier, 'Action Taken');
+              }}
+            />
           </div>
         </div>
       </div>

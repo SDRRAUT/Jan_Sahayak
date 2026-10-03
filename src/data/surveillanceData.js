@@ -135,5 +135,66 @@ export const INITIAL_SURVEILLANCE_INCIDENTS = [
       { time: '11:14:07', message: 'Incident Ticket INC-2026-PUNE-0041 generated and escalated' }
     ],
     humanVerificationNotes: 'Assigned to duty officer for license verification.'
+  },
+  {
+    id: 'INC-2026-PUNE-0043',
+    hotspotId: 'HOTSPOT-WAG-01',
+    violation: 'Illegal Solid Waste & Plastic Sacks Dumping in Lake Waterbody',
+    location: 'Wagholi Lake Perimeter & Kesnand Culvert (Ward 29)',
+    timestamp: 'Today, 12:40',
+    camera: 'CAM-WAG-07 (Perimeter)',
+    vehicleDetails: 'Two-Wheeler Motorcycle (MH-12-EA-9142)',
+    offenderDetails: 'Male rider dumping heavy sacks of plastic & household waste into lake embankment',
+    aiConfidence: 96,
+    status: 'Evidence Captured',
+    authorityRecipient: null,
+    officialReference: null,
+    evidenceFiles: [
+      {
+        id: 'EV-04',
+        type: 'OFFENDER_ACTION_FRAME',
+        label: 'Offender Caught Dumping Waste from Motorcycle at Lakefront',
+        url: '/surveillance/violation_dumping_lake.jpg',
+        timestamp: '12:39:44',
+        capturedBy: 'CCTV-WAG-07 Environmental Patrol Camera'
+      }
+    ],
+    auditLog: [
+      { time: '12:39:10', message: 'Two-wheeler parked in non-parking lake conservation buffer' },
+      { time: '12:39:35', message: 'Surveillance AI flagged hazardous waste disposal behavior' },
+      { time: '12:39:44', message: 'Photographic evidence frame captured with license #MH-12-EA-9142' },
+      { time: '12:39:48', message: 'Incident Ticket INC-2026-PUNE-0043 compiled by Evidence Agent' }
+    ],
+    humanVerificationNotes: 'Awaiting human officer approval for municipal environmental penalty notice.'
+  },
+  {
+    id: 'INC-2026-PUNE-0044',
+    hotspotId: 'HOTSPOT-WAG-01',
+    violation: 'Unauthorized Dumping of Commercial Garbage on Public Roadway',
+    location: 'Baif Road Commercial Market & Highway Corridor (Ward 29)',
+    timestamp: 'Today, 09:20',
+    camera: 'CAM-WAG-02 (Junction)',
+    vehicleDetails: 'Commercial Waste Handcart & Auto-Rickshaw',
+    offenderDetails: 'Individual dumping red plastic waste bucket directly onto pedestrian corridor',
+    aiConfidence: 97,
+    status: 'Detected',
+    authorityRecipient: null,
+    officialReference: null,
+    evidenceFiles: [
+      {
+        id: 'EV-05',
+        type: 'OFFENDER_ACTION_FRAME',
+        label: 'Individual Dumping Red Bucket Garbage onto Public Road',
+        url: '/surveillance/violation_dumping_street.jpg',
+        timestamp: '09:19:15',
+        capturedBy: 'CCTV-WAG-02 Market Perimeter Camera'
+      }
+    ],
+    auditLog: [
+      { time: '09:18:50', message: 'Commercial garbage accumulation threshold exceeded' },
+      { time: '09:19:15', message: 'Individual detected discarding red bucket contents into public corridor' },
+      { time: '09:19:20', message: 'Incident Ticket INC-2026-PUNE-0044 compiled by Evidence Agent' }
+    ],
+    humanVerificationNotes: 'Ready for dispatch to Ward 29 Sanitary Inspector.'
   }
 ];

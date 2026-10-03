@@ -3,3 +3,5 @@ export { default as SurveillanceAgentTelemetry } from './SurveillanceAgentTeleme
 export { default as SurveillanceTicketCard } from './SurveillanceTicketCard';
 export { default as EvidencePackageModal } from './EvidencePackageModal';
 export { default as AuthorityEscalationModal } from './AuthorityEscalationModal';
+export { default as LawEnforcementReportModal } from './LawEnforcementReportModal';
+export { default as LawEnforcementReportCard } from './LawEnforcementReportCard';
