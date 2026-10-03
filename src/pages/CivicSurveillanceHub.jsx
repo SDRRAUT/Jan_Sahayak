@@ -18,6 +18,8 @@ import {
   Clock, 
   MapPin, 
   ChevronRight, 
+  ChevronDown,
+  ChevronUp,
   FileText, 
   ShieldCheck, 
   Zap, 
@@ -99,6 +101,7 @@ export default function CivicSurveillanceHub() {
   const [activeFilterTab, setActiveFilterTab] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('cards'); // 'cards' | 'table'
+  const [showAllIncidents, setShowAllIncidents] = useState(false);
 
   // Modal states
   const [selectedEvidenceIncident, setSelectedEvidenceIncident] = useState(null);
@@ -150,6 +153,12 @@ export default function CivicSurveillanceHub() {
       return true; // 'ALL'
     });
   }, [surveillanceIncidents, activeFilterTab, searchQuery]);
+
+  // Show only top 3 problems by default, toggleable via View More
+  const displayedIncidents = useMemo(() => {
+    if (showAllIncidents) return filteredIncidents;
+    return filteredIncidents.slice(0, 3);
+  }, [filteredIncidents, showAllIncidents]);
 
   // Tab counts
   const tabCounts = useMemo(() => {
@@ -662,11 +671,24 @@ export default function CivicSurveillanceHub() {
             }}>
             {/* Section Header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', borderBottom: '1px solid #F1F5F9', pb: '14px', paddingBottom: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <ShieldAlert style={{ width: '18px', height: '18px', color: '#D97706' }} />
                 <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
                   Surveillance Incidents & Evidence
                 </h3>
+                {filteredIncidents.length > 3 && (
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    padding: '2px 8px',
+                    borderRadius: '999px',
+                    background: showAllIncidents ? '#F1F5F9' : '#FEF3C7',
+                    color: showAllIncidents ? '#475569' : '#92400E',
+                    border: showAllIncidents ? '1px solid #E2E8F0' : '1px solid #FDE68A'
+                  }}>
+                    {showAllIncidents ? `All ${filteredIncidents.length} Problems` : `Top 3 of ${filteredIncidents.length}`}
+                  </span>
+                )}
               </div>
               
               {/* View Mode Toggle: Cards / Table */}
@@ -777,7 +799,7 @@ export default function CivicSurveillanceHub() {
             ) : viewMode === 'cards' ? (
               /* Cards View */
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                {filteredIncidents.map(inc => (
+                {displayedIncidents.map(inc => (
                   <SurveillanceTicketCard
                     key={inc.id}
                     incident={inc}
@@ -804,7 +826,7 @@ export default function CivicSurveillanceHub() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredIncidents.map(inc => {
+                    {displayedIncidents.map(inc => {
                       const badgeStyle = getStatusBadgeStyle(inc.status);
                       return (
                         <tr key={inc.id} style={{ borderBottom: '1px solid #F1F5F9', background: '#FFFFFF' }}>
@@ -907,6 +929,44 @@ export default function CivicSurveillanceHub() {
                   </tbody>
                 </table>
               </div>
+            )}
+
+            {/* View More / Show Less Toggle Button when > 3 incidents */}
+            {filteredIncidents.length > 3 && (
+              <button
+                type="button"
+                id="view-more-problems-toggle-btn"
+                onClick={() => setShowAllIncidents(prev => !prev)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  width: '100%',
+                  padding: '11px 16px',
+                  borderRadius: '10px',
+                  border: showAllIncidents ? '1px solid #CBD5E1' : '1px dashed #059669',
+                  background: showAllIncidents ? '#F8FAFC' : '#ECFDF5',
+                  color: showAllIncidents ? '#475569' : '#047857',
+                  fontSize: '12.5px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                  transition: 'all 150ms ease'
+                }}
+              >
+                {showAllIncidents ? (
+                  <>
+                    <ChevronUp style={{ width: '16px', height: '16px', color: '#64748B' }} />
+                    <span>Show Top 3 Problems Only</span>
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown style={{ width: '16px', height: '16px', color: '#059669' }} />
+                    <span>View More Problems (+{filteredIncidents.length - 3} More Incidents)</span>
+                  </>
+                )}
+              </button>
             )}
 
             {/* Chain of Custody Notice */}
