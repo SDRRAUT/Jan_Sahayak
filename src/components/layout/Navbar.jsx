@@ -25,7 +25,8 @@ import {
   Volume2,
   VolumeX,
   Radio,
-  Wrench
+  Wrench,
+  Video
 } from 'lucide-react';
 import { useApp, DEMO_CREDENTIALS } from '../../context/AppContext';
 import FileGrievanceModal from '../common/FileGrievanceModal';
@@ -378,21 +379,21 @@ export default function Navbar() {
               <>
                 <Link
                   to="/officer"
-                  className={`site-nav-link ${location.pathname.startsWith('/officer') ? 'active' : ''}`}
+                  className={`site-nav-link ${(location.pathname === '/officer' || (location.pathname.startsWith('/officer') && !location.pathname.startsWith('/officer/surveillance'))) ? 'active' : ''}`}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
                     padding: '6px 14px',
                     borderRadius: '999px',
-                    background: location.pathname.startsWith('/officer')
+                    background: (location.pathname === '/officer' || (location.pathname.startsWith('/officer') && !location.pathname.startsWith('/officer/surveillance')))
                       ? '#065F46'
                       : '#ECFDF5',
-                    color: location.pathname.startsWith('/officer') ? '#FFFFFF' : '#065F46',
+                    color: (location.pathname === '/officer' || (location.pathname.startsWith('/officer') && !location.pathname.startsWith('/officer/surveillance'))) ? '#FFFFFF' : '#065F46',
                     border: '1px solid #A7F3D0',
                     fontWeight: 700,
                     fontSize: '13px',
-                    boxShadow: location.pathname.startsWith('/officer')
+                    boxShadow: (location.pathname === '/officer' || (location.pathname.startsWith('/officer') && !location.pathname.startsWith('/officer/surveillance')))
                       ? '0 2px 8px rgba(6, 95, 70, 0.25)'
                       : 'none',
                     transition: 'all 150ms ease'
@@ -400,6 +401,26 @@ export default function Navbar() {
                 >
                   <Briefcase style={{ width: '14px', height: '14px', flexShrink: 0 }} />
                   <span>Officer Workspace</span>
+                </Link>
+                <Link
+                  to="/officer/surveillance"
+                  className={`site-nav-link ${location.pathname.startsWith('/officer/surveillance') ? 'active' : ''}`}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Video style={{ width: '14px', height: '14px', color: '#059669' }} />
+                  <span>Surveillance AI</span>
+                  <span style={{
+                    display: 'inline-block',
+                    width: '7px',
+                    height: '7px',
+                    borderRadius: '50%',
+                    background: '#10B981',
+                    boxShadow: '0 0 6px #10B981'
+                  }} />
                 </Link>
                 <Link
                   to="/intelligence"
@@ -973,6 +994,36 @@ export default function Navbar() {
                             <span style={{ fontSize: '10.5px', color: 'var(--color-text-muted)' }}>→</span>
                           </Link>
                           <Link
+                            to="/officer/surveillance"
+                            onClick={() => setShowUserMenu(false)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '7px 10px',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '12px',
+                              textDecoration: 'none',
+                              color: '#047857',
+                              background: '#ECFDF5',
+                              border: '1px solid rgba(5, 150, 105, 0.2)',
+                              fontWeight: 600
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <Video style={{ width: '14px', height: '14px', color: '#059669' }} />
+                              <span>Surveillance AI (CCTV)</span>
+                            </div>
+                            <span style={{
+                              display: 'inline-block',
+                              width: '7px',
+                              height: '7px',
+                              borderRadius: '50%',
+                              background: '#10B981',
+                              boxShadow: '0 0 6px #10B981'
+                            }} />
+                          </Link>
+                          <Link
                             to="/officer?section=investigation&subtab=workers"
                             onClick={() => setShowUserMenu(false)}
                             style={{
@@ -1449,6 +1500,34 @@ export default function Navbar() {
                   >
                     <Briefcase style={{ width: '16px', height: '16px', color: '#059669' }} />
                     <span>🏛️ Officer Workspace</span>
+                  </Link>
+                  <Link
+                    to="/officer/surveillance"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: location.pathname.startsWith('/officer/surveillance') ? '#059669' : 'var(--color-text-primary)',
+                      background: location.pathname.startsWith('/officer/surveillance') ? '#ECFDF5' : '#F8FAFC',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <Video style={{ width: '16px', height: '16px', color: '#059669' }} />
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <span>Surveillance AI</span>
+                      <span style={{
+                        display: 'inline-block',
+                        width: '7px',
+                        height: '7px',
+                        borderRadius: '50%',
+                        background: '#10B981',
+                        boxShadow: '0 0 6px #10B981'
+                      }} />
+                    </span>
                   </Link>
                   <Link
                     to="/intelligence"

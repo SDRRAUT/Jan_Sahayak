@@ -31,7 +31,8 @@ import {
   GitFork,
   Check,
   CornerDownRight,
-  Boxes
+  Boxes,
+  Video
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import ProblemSpreadMap from '../components/intelligence/ProblemSpreadMap';
@@ -730,12 +731,104 @@ export default function CivicIntelligenceDashboard() {
 
             {/* ═══ MULTI-VIEW INCIDENT RENDERER ═══ */}
 
+            {/* Wagholi High-Density Hotspot Monitoring Zone Banner */}
+            <div style={{
+              background: 'linear-gradient(135deg, #FFF1F2 0%, #FFFFFF 100%)',
+              border: '1.5px solid #FECDD3',
+              borderRadius: '16px',
+              padding: '16px 20px',
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '14px',
+              boxShadow: '0 4px 16px rgba(225, 29, 72, 0.06)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '12px',
+                  background: '#FFE4E6',
+                  border: '1px solid #FECDD3',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <Video style={{ width: '20px', height: '20px', color: '#E11D48' }} />
+                </div>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '3px' }}>
+                    <span style={{
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      padding: '3px 10px',
+                      borderRadius: '999px',
+                      background: '#FFE4E6',
+                      color: '#BE123C',
+                      border: '1px solid #FECDD3',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px'
+                    }}>
+                      <span style={{
+                        width: '6px',
+                        height: '6px',
+                        borderRadius: '50%',
+                        background: '#E11D48',
+                        boxShadow: '0 0 6px #E11D48'
+                      }} />
+                      🔴 Civic Monitoring Zone: 12 Clustered Complaints
+                    </span>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', fontFamily: 'monospace' }}>HOTSPOT-WAG-01</span>
+                    <span style={{ fontSize: '11px', fontWeight: 600, color: '#047857', background: '#ECFDF5', padding: '2px 8px', borderRadius: '6px', border: '1px solid #A7F3D0' }}>
+                      3 Cameras Live
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>
+                    Wagholi Nagar Road & Kesnand Feeder Corridor — Autonomous Visual Telemetry Active
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>
+                    Continuous AI CCTV stream cross-referenced against 12 incoming citizen complaints and 7 historical incident logs.
+                  </div>
+                </div>
+              </div>
+
+              <Link
+                to="/officer/surveillance?hotspot=HOTSPOT-WAG-01"
+                style={{
+                  height: '40px',
+                  padding: '0 18px',
+                  borderRadius: '999px',
+                  background: '#E11D48',
+                  color: '#FFFFFF',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  boxShadow: '0 4px 12px rgba(225, 29, 72, 0.3)',
+                  transition: 'all 150ms ease'
+                }}
+              >
+                <Video style={{ width: '15px', height: '15px' }} />
+                <span>🎥 View Live CCTV Surveillance</span>
+                <ArrowRight style={{ width: '14px', height: '14px' }} />
+              </Link>
+            </div>
+
             {/* VIEW 1 — DETAIL (default): Full expanded cards */}
             {viewMode === 'detail' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', marginBottom: '32px' }}>
                 {filteredIncidents.map((incident) => {
                   const isCritical = incident.stage === 'CRITICAL';
                   const isGrowing  = incident.stage === 'GROWING';
+                  const isWagholiHotspot = incident.id === 'INC-2026-PUNE-WAG-01' || 
+                    (incident.title || '').toLowerCase().includes('wagholi') || 
+                    (incident.affectedArea || '').toLowerCase().includes('wagholi');
                   return (
                     <div key={incident.id} style={{ background: '#FFFFFF', borderRadius: '20px', border: isCritical ? '1.5px solid #FECACA' : isGrowing ? '1.5px solid #FED7AA' : '1px solid #E2E8F0', padding: '24px', boxShadow: '0 4px 18px rgba(15,23,42,0.05)' }}>
                       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px', marginBottom: '14px' }}>
@@ -744,27 +837,77 @@ export default function CivicIntelligenceDashboard() {
                             <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 10px', borderRadius: '999px', background: isCritical ? '#FEF2F2' : isGrowing ? '#FFF7ED' : '#F0FDF4', color: isCritical ? '#DC2626' : isGrowing ? '#EA580C' : '#16A34A', border: isCritical ? '1px solid #FCA5A5' : isGrowing ? '1px solid #FDBA74' : '1px solid #86EFAC' }}>● {incident.stage || 'ACTIVE'}</span>
                             <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', fontFamily: 'monospace', background: '#F1F5F9', padding: '3px 8px', borderRadius: '6px' }}>{incident.id}</span>
                             <span style={{ fontSize: '11px', color: '#0369A1', fontWeight: 600, background: '#F0F9FF', padding: '3px 8px', borderRadius: '6px', border: '1px solid #BAE6FD' }}>📍 {incident.affectedArea || 'Ward 29'}</span>
+                            {isWagholiHotspot && (
+                              <span style={{
+                                fontSize: '11px',
+                                fontWeight: 800,
+                                padding: '3px 10px',
+                                borderRadius: '999px',
+                                background: '#FEF2F2',
+                                color: '#DC2626',
+                                border: '1px solid #FCA5A5',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                boxShadow: '0 1px 4px rgba(220, 38, 38, 0.12)'
+                              }}>
+                                <span style={{
+                                  width: '6px',
+                                  height: '6px',
+                                  borderRadius: '50%',
+                                  background: '#EF4444',
+                                  boxShadow: '0 0 6px #EF4444'
+                                }} />
+                                🔴 Civic Monitoring Zone: 12 Clustered Complaints
+                              </span>
+                            )}
                           </div>
                           <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: 0, lineHeight: 1.3 }}>{incident.title}</h3>
                         </div>
-                        {/* Green Investigate Action Plan Button */}
-                        <Link to={`/intelligence/incidents/${incident.id}`} style={{
-                          height: '42px',
-                          padding: '0 20px',
-                          borderRadius: '999px',
-                          background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-                          color: '#FFFFFF',
-                          fontSize: '13px',
-                          fontWeight: 700,
-                          textDecoration: 'none',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)',
-                          transition: 'all 150ms ease'
-                        }}>
-                          <span>Investigate Action Plan</span><ArrowRight style={{ width: '15px', height: '15px' }} />
-                        </Link>
+                        {/* Action buttons */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                          {isWagholiHotspot && (
+                            <Link
+                              to="/officer/surveillance?hotspot=HOTSPOT-WAG-01"
+                              style={{
+                                height: '42px',
+                                padding: '0 18px',
+                                borderRadius: '999px',
+                                background: '#FEF2F2',
+                                border: '1.5px solid #FCA5A5',
+                                color: '#DC2626',
+                                fontSize: '13px',
+                                fontWeight: 700,
+                                textDecoration: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                boxShadow: '0 2px 8px rgba(220, 38, 38, 0.12)',
+                                transition: 'all 150ms ease'
+                              }}
+                            >
+                              <Video style={{ width: '15px', height: '15px', color: '#DC2626' }} />
+                              <span>🎥 View Live CCTV Surveillance</span>
+                            </Link>
+                          )}
+                          <Link to={`/intelligence/incidents/${incident.id}`} style={{
+                            height: '42px',
+                            padding: '0 20px',
+                            borderRadius: '999px',
+                            background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                            color: '#FFFFFF',
+                            fontSize: '13px',
+                            fontWeight: 700,
+                            textDecoration: 'none',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)',
+                            transition: 'all 150ms ease'
+                          }}>
+                            <span>Investigate Action Plan</span><ArrowRight style={{ width: '15px', height: '15px' }} />
+                          </Link>
+                        </div>
                       </div>
                       <p style={{ fontSize: '13.5px', color: '#334155', lineHeight: 1.5, marginBottom: '16px', background: '#F8FAFC', padding: '12px 16px', borderRadius: '12px', border: '1px solid #E2E8F0' }}><strong>Problem Summary: </strong>{incident.summary}</p>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', marginBottom: '16px' }}>
@@ -810,19 +953,72 @@ export default function CivicIntelligenceDashboard() {
                 {filteredIncidents.map((incident) => {
                   const isCritical = incident.stage === 'CRITICAL';
                   const isGrowing  = incident.stage === 'GROWING';
+                  const isWagholiHotspot = incident.id === 'INC-2026-PUNE-WAG-01' || 
+                    (incident.title || '').toLowerCase().includes('wagholi') || 
+                    (incident.affectedArea || '').toLowerCase().includes('wagholi');
                   return (
                     <div key={incident.id} style={{ background: '#FFFFFF', borderRadius: '16px', border: isCritical ? '1.5px solid #FECACA' : isGrowing ? '1.5px solid #FED7AA' : '1px solid #E2E8F0', padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '6px' }}>
                         <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 10px', borderRadius: '999px', background: isCritical ? '#FEF2F2' : isGrowing ? '#FFF7ED' : '#F0FDF4', color: isCritical ? '#DC2626' : isGrowing ? '#EA580C' : '#16A34A' }}>● {incident.stage || 'ACTIVE'}</span>
                         <span style={{ fontSize: '10px', color: '#94A3B8', fontFamily: 'monospace' }}>{incident.id}</span>
                       </div>
+                      {isWagholiHotspot && (
+                        <div style={{
+                          fontSize: '11px',
+                          fontWeight: 800,
+                          padding: '4px 10px',
+                          borderRadius: '8px',
+                          background: '#FEF2F2',
+                          color: '#DC2626',
+                          border: '1px solid #FCA5A5',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}>
+                          <span style={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            background: '#EF4444',
+                            boxShadow: '0 0 6px #EF4444'
+                          }} />
+                          🔴 Civic Monitoring Zone: 12 Clustered Complaints
+                        </div>
+                      )}
                       <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: '#0F172A', lineHeight: 1.35 }}>{incident.title}</h4>
                       <p style={{ margin: 0, fontSize: '12px', color: '#64748B', lineHeight: 1.4, flex: 1 }}>{(incident.summary || '').slice(0, 100)}{incident.summary?.length > 100 ? '…' : ''}</p>
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         <span style={{ fontSize: '11px', color: '#0369A1', background: '#F0F9FF', padding: '2px 8px', borderRadius: '6px', border: '1px solid #BAE6FD' }}>📍 {incident.affectedArea?.split('(')[0]?.trim() || 'Ward 29'}</span>
                         <span style={{ fontSize: '11px', color: '#92400E', background: '#FEF3C7', padding: '2px 8px', borderRadius: '6px', border: '1px solid #FDE68A' }}>⏱️ {incident.slaHoursLeft ? `${incident.slaHoursLeft}h` : '24h'}</span>
                       </div>
-                      <Link to={`/intelligence/incidents/${incident.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', height: '36px', borderRadius: '8px', background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)', color: '#FFFFFF', fontSize: '12px', fontWeight: 700, textDecoration: 'none', boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)' }}>Investigate <ArrowRight style={{ width: '13px', height: '13px' }} /></Link>
+                      <div style={{ display: 'flex', gap: '8px', marginTop: 'auto', flexWrap: 'wrap' }}>
+                        {isWagholiHotspot && (
+                          <Link
+                            to="/officer/surveillance?hotspot=HOTSPOT-WAG-01"
+                            title="View Live CCTV Surveillance"
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              height: '36px',
+                              padding: '0 12px',
+                              borderRadius: '8px',
+                              background: '#FEF2F2',
+                              border: '1px solid #FCA5A5',
+                              color: '#DC2626',
+                              fontSize: '11.5px',
+                              fontWeight: 700,
+                              textDecoration: 'none',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            <Video style={{ width: '13px', height: '13px', color: '#DC2626' }} />
+                            <span>🎥 View Live CCTV</span>
+                          </Link>
+                        )}
+                        <Link to={`/intelligence/incidents/${incident.id}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', height: '36px', borderRadius: '8px', background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)', color: '#FFFFFF', fontSize: '12px', fontWeight: 700, textDecoration: 'none', boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)', whiteSpace: 'nowrap', minWidth: '100px' }}>Investigate <ArrowRight style={{ width: '13px', height: '13px' }} /></Link>
+                      </div>
                     </div>
                   );
                 })}
@@ -1142,6 +1338,29 @@ export default function CivicIntelligenceDashboard() {
                           }}>
                             {cluster.totalReportsMerged} Merged Complaints
                           </span>
+                          {(cluster.id === 'CLUSTER-WAG-WATER-01' || (cluster.title || '').toLowerCase().includes('wagholi')) && (
+                            <span style={{
+                              fontSize: '11px',
+                              fontWeight: 800,
+                              padding: '2px 8px',
+                              borderRadius: '999px',
+                              background: '#FEF2F2',
+                              color: '#DC2626',
+                              border: '1px solid #FCA5A5',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}>
+                              <span style={{
+                                width: '5px',
+                                height: '5px',
+                                borderRadius: '50%',
+                                background: '#EF4444',
+                                boxShadow: '0 0 4px #EF4444'
+                              }} />
+                              🔴 Civic Monitoring Zone: 12 Clustered Complaints
+                            </span>
+                          )}
                         </div>
                         <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                           <span>🏛️ {cluster.leadDept}</span>
@@ -1153,7 +1372,30 @@ export default function CivicIntelligenceDashboard() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      {(cluster.id === 'CLUSTER-WAG-WATER-01' || (cluster.title || '').toLowerCase().includes('wagholi')) && (
+                        <Link
+                          to="/officer/surveillance?hotspot=HOTSPOT-WAG-01"
+                          style={{
+                            height: '32px',
+                            padding: '0 12px',
+                            borderRadius: '999px',
+                            background: '#FEF2F2',
+                            border: '1px solid #FCA5A5',
+                            color: '#DC2626',
+                            fontSize: '11.5px',
+                            fontWeight: 700,
+                            textDecoration: 'none',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            boxShadow: '0 1px 4px rgba(220, 38, 38, 0.1)'
+                          }}
+                        >
+                          <Video style={{ width: '13px', height: '13px', color: '#DC2626' }} />
+                          <span>🎥 View Live CCTV Surveillance</span>
+                        </Link>
+                      )}
                       <span style={{
                         fontSize: '11px',
                         fontWeight: 800,

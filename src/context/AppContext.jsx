@@ -13,6 +13,7 @@ import { hasPermission, getRoleLabel, PERMISSIONS, ROLES } from '../utils/permis
 import { INITIAL_WORKERS, INITIAL_WORKER_ORDERS, WORKER_CATEGORIES } from '../data/mockWorkers';
 import { calculateEstimatedFare } from '../services/fareEstimationService';
 import { detectWorkerCategoryFromComplaint, matchWorkersForComplaint } from '../services/workerMatchingService';
+import { SURVEILLANCE_HOTSPOTS, INITIAL_SURVEILLANCE_INCIDENTS, SURVEILLANCE_AUTHORITIES, SURVEILLANCE_STATUSES } from '../data/surveillanceData';
 
 const AppContext = createContext();
 
@@ -272,6 +273,39 @@ export function AppProvider({ children }) {
   useEffect(() => {
     localStorage.setItem('jansahayk_worker_orders_v1', JSON.stringify(workerOrders));
   }, [workerOrders]);
+
+  // Autonomous Two-Agent Surveillance & Evidence Pipeline State
+  const [surveillanceHotspots, setSurveillanceHotspots] = useState(() => {
+    try {
+      const saved = localStorage.getItem('jansahayk_surveillance_hotspots_v1');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    localStorage.setItem('jansahayk_surveillance_hotspots_v1', JSON.stringify(SURVEILLANCE_HOTSPOTS));
+    return SURVEILLANCE_HOTSPOTS;
+  });
+
+  const [surveillanceIncidents, setSurveillanceIncidents] = useState(() => {
+    try {
+      const saved = localStorage.getItem('jansahayk_surveillance_incidents_v1');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    localStorage.setItem('jansahayk_surveillance_incidents_v1', JSON.stringify(INITIAL_SURVEILLANCE_INCIDENTS));
+    return INITIAL_SURVEILLANCE_INCIDENTS;
+  });
+
+  const [activeSurveillanceHotspot, setActiveSurveillanceHotspot] = useState('HOTSPOT-WAG-01');
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('jansahayk_surveillance_hotspots_v1', JSON.stringify(surveillanceHotspots));
+    } catch (e) {}
+  }, [surveillanceHotspots]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('jansahayk_surveillance_incidents_v1', JSON.stringify(surveillanceIncidents));
+    } catch (e) {}
+  }, [surveillanceIncidents]);
 
   const [auditLogs, setAuditLogs] = useState([]);
   const [slaRules, setSlaRules] = useState([]);
@@ -2193,6 +2227,107 @@ export function AppProvider({ children }) {
     }));
   };
 
+  // Autonomous Two-Agent Surveillance Pipeline Actions
+  const activateHotspotSurveillance = (hotspotId) => {
+    setSurveillanceHotspots(prev => prev.map(h => {
+      if (h.id === hotspotId) {
+        return { ...h, monitoringStatus: 'ACTIVE' };
+      }
+      return h;
+    }));
+    setActiveSurveillanceHotspot(hotspotId);
+  };
+
+  const addSurveillanceIncident = (newIncident) => {
+    const timeNow = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const formattedIncident = {
+      id: newIncident.id || `INC-2026-PUNE-${Math.floor(1000 + Math.random() * 9000)}`,
+      hotspotId: newIncident.hotspotId || activeSurveillanceHotspot || 'HOTSPOT-WAG-01',
+      violation: newIncident.violation || 'Restricted Area Entry Violation',
+      location: newIncident.location || 'Wagholi Restricted Zone (CAM-WAG-04)',
+      timestamp: newIncident.timestamp || 'Today, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      camera: newIncident.camera || 'CAM-WAG-04',
+      vehicleDetails: newIncident.vehicleDetails || 'Unknown Vehicle',
+      aiConfidence: newIncident.aiConfidence || 92,
+      status: newIncident.status || 'Detected',
+      evidenceFiles: newIncident.evidenceFiles || [],
+      auditLog: newIncident.auditLog || [
+        { time: timeNow, message: 'Vehicle entered restricted geofence polygon' },
+        { time: timeNow, message: 'Surveillance Agent identified rule violation match' },
+        { time: timeNow, message: 'Evidence Agent captured dual-frame snapshot package' }
+      ],
+      authorityRecipient: newIncident.authorityRecipient || null,
+      officialReference: newIncident.officialReference || null,
+      humanVerificationNotes: newIncident.humanVerificationNotes || '',
+      ...newIncident
+    };
+
+    setSurveillanceIncidents(prev => [formattedIncident, ...prev]);
+
+    addLocalNotification({
+      type: 'SURVEILLANCE_BREACH',
+      title: '⚠️ Geofence Breach Detected',
+      message: `${formattedIncident.violation} on ${formattedIncident.camera} (${formattedIncident.vehicleDetails}). Evidence agent captured frames.`,
+      incidentId: formattedIncident.id
+    });
+
+    return formattedIncident;
+  };
+
+  const escalateSurveillanceIncident = (incidentId, authorityTarget, notes = '') => {
+    const timeNow = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const officialRef = `REF-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    setSurveillanceIncidents(prev => prev.map(inc => {
+      if (inc.id === incidentId) {
+        const auditEntry = {
+          time: timeNow,
+          message: `Forwarded to ${authorityTarget || 'Enforcement Authority'} (Ref: ${officialRef})${notes ? ` - Notes: ${notes}` : ''}`
+        };
+        return {
+          ...inc,
+          status: 'Forwarded',
+          authorityRecipient: authorityTarget || 'Police Station (Wagholi Traffic & Law Enforcement)',
+          officialReference: officialRef,
+          humanVerificationNotes: notes ? (inc.humanVerificationNotes ? `${inc.humanVerificationNotes} | ${notes}` : notes) : inc.humanVerificationNotes,
+          auditLog: [...(inc.auditLog || []), auditEntry]
+        };
+      }
+      return inc;
+    }));
+
+    addLocalNotification({
+      type: 'SURVEILLANCE_ESCALATED',
+      title: '🚨 Surveillance Incident Escalated',
+      message: `Incident #${incidentId} forwarded to ${authorityTarget || 'Enforcement Authority'} (Official Ref: ${officialRef}).`,
+      incidentId
+    });
+
+    return officialRef;
+  };
+
+  const updateSurveillanceIncidentStatus = (incidentId, newStatus, additionalNote = '') => {
+    const timeNow = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    setSurveillanceIncidents(prev => prev.map(inc => {
+      if (inc.id === incidentId) {
+        const auditEntry = {
+          time: timeNow,
+          message: additionalNote 
+            ? `Status updated to '${newStatus}': ${additionalNote}` 
+            : `Status transitioned to '${newStatus}'`
+        };
+        return {
+          ...inc,
+          status: newStatus,
+          auditLog: [...(inc.auditLog || []), auditEntry],
+          humanVerificationNotes: additionalNote ? (inc.humanVerificationNotes ? `${inc.humanVerificationNotes} | ${additionalNote}` : additionalNote) : inc.humanVerificationNotes
+        };
+      }
+      return inc;
+    }));
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -2274,7 +2409,20 @@ export function AppProvider({ children }) {
         calculateEstimatedFare,
         detectWorkerCategoryFromComplaint,
         matchWorkersForComplaint,
-        batchStartIncidentResolution
+        batchStartIncidentResolution,
+        // Autonomous Surveillance & Evidence Pipeline Exports
+        surveillanceHotspots,
+        setSurveillanceHotspots,
+        surveillanceIncidents,
+        setSurveillanceIncidents,
+        activeSurveillanceHotspot,
+        setActiveSurveillanceHotspot,
+        activateHotspotSurveillance,
+        addSurveillanceIncident,
+        escalateSurveillanceIncident,
+        updateSurveillanceIncidentStatus,
+        SURVEILLANCE_AUTHORITIES,
+        SURVEILLANCE_STATUSES
       }}
     >
       {children}

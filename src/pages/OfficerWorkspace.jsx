@@ -90,8 +90,19 @@ export default function OfficerWorkspace({ defaultSection = 'inbox' }) {
     janSuchnaList = [],
     user,
     workers = [],
-    workerOrders = []
+    workerOrders = [],
+    surveillanceIncidents = []
   } = useApp();
+
+  // Pending surveillance violations count
+  const pendingViolationsCount = useMemo(() => {
+    return surveillanceIncidents.filter(i => 
+      i.status === 'Detected' || 
+      i.status === 'Evidence Captured' || 
+      i.status === 'Report Generated' ||
+      i.status === 'Under Human Review'
+    ).length || 1;
+  }, [surveillanceIncidents]);
 
   // Modals state
   const [showTerritoryModal, setShowTerritoryModal] = useState(false);
@@ -673,6 +684,37 @@ export default function OfficerWorkspace({ defaultSection = 'inbox' }) {
                 <MapPin style={{ width: '13px', height: '13px', color: '#059669' }} />
                 <span>Ward Heatmap</span>
               </Link>
+
+              {/* AI Surveillance Hub Quick Link */}
+              <Link
+                to="/officer/surveillance"
+                style={{
+                  height: '36px',
+                  padding: '0 12px',
+                  borderRadius: '9px',
+                  background: '#FEF2F2',
+                  border: '1px solid #FECACA',
+                  color: '#991B1B',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <Camera style={{ width: '13px', height: '13px', color: '#DC2626' }} />
+                <span>AI Surveillance</span>
+                <span style={{
+                  fontSize: '10px',
+                  padding: '1px 5px',
+                  borderRadius: '999px',
+                  background: '#DC2626',
+                  color: '#FFFFFF'
+                }}>
+                  LIVE
+                </span>
+              </Link>
             </div>
           </div>
         </div>
@@ -821,6 +863,90 @@ export default function OfficerWorkspace({ defaultSection = 'inbox' }) {
                 </div>
                 <span style={{ fontSize: '11.5px', color: '#059669', fontWeight: 600 }}>94.8% on-time speed</span>
               </div>
+            </div>
+
+            {/* AI Civic Surveillance & Hotspot Monitoring Highlight Banner */}
+            <div style={{
+              background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+              borderRadius: '14px',
+              padding: '14px 18px',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '14px',
+              flexWrap: 'wrap',
+              marginBottom: '16px',
+              boxShadow: '0 4px 12px rgba(15, 23, 42, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.08)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '10px',
+                  background: 'rgba(239, 68, 68, 0.18)',
+                  border: '1px solid rgba(239, 68, 68, 0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <Camera style={{ width: '20px', height: '20px', color: '#F87171' }} />
+                </div>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <span style={{
+                      fontSize: '10.5px',
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      color: '#F87171',
+                      background: 'rgba(239, 68, 68, 0.2)',
+                      padding: '2px 7px',
+                      borderRadius: '5px'
+                    }}>
+                      AI Civic Surveillance & Hotspot Monitoring
+                    </span>
+                    <span style={{ fontSize: '11.5px', color: '#94A3B8' }}>
+                      Ward 29 High-Density Geofence
+                    </span>
+                  </div>
+                  <div style={{
+                    fontSize: '13.5px',
+                    fontWeight: 600,
+                    color: '#F1F5F9',
+                    marginTop: '3px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <span>🔴 Wagholi Restricted Corridor (CAM-WAG-04 Live) • {pendingViolationsCount} Pending Violation{pendingViolationsCount > 1 ? 's' : ''}</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => navigate('/officer/surveillance')}
+                style={{
+                  background: '#059669',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: '9px',
+                  padding: '9px 16px',
+                  fontSize: '12.5px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 150ms ease',
+                  boxShadow: '0 2px 6px rgba(5, 150, 105, 0.25)'
+                }}
+              >
+                <span>Open AI Surveillance Hub →</span>
+              </button>
             </div>
 
             {/* Filter Bar & View Toggles */}
@@ -1841,6 +1967,92 @@ export default function OfficerWorkspace({ defaultSection = 'inbox' }) {
            ══════════════════════════════════════════════════════════════════════ */}
         {activeView === 'operations' && (
           <div>
+            {/* AI Civic Surveillance & Hotspot Monitoring Highlight Banner */}
+            <div style={{
+              background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+              borderRadius: '14px',
+              padding: '16px 20px',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '16px',
+              flexWrap: 'wrap',
+              marginBottom: '16px',
+              boxShadow: '0 4px 12px rgba(15, 23, 42, 0.12)',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '10px',
+                  background: 'rgba(239, 68, 68, 0.18)',
+                  border: '1px solid rgba(239, 68, 68, 0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <Camera style={{ width: '22px', height: '22px', color: '#F87171' }} />
+                </div>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <span style={{
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      color: '#F87171',
+                      background: 'rgba(239, 68, 68, 0.2)',
+                      padding: '2px 8px',
+                      borderRadius: '6px'
+                    }}>
+                      AI Civic Surveillance & Hotspot Monitoring
+                    </span>
+                    <span style={{ fontSize: '12px', color: '#94A3B8' }}>
+                      Ward 29 High-Density Geofence
+                    </span>
+                  </div>
+                  <div style={{
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    color: '#F1F5F9',
+                    marginTop: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <span>🔴 Wagholi Restricted Corridor (CAM-WAG-04 Live) • {pendingViolationsCount} Pending Violation{pendingViolationsCount > 1 ? 's' : ''}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => navigate('/officer/surveillance')}
+                  style={{
+                    background: '#059669',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '10px',
+                    padding: '10px 18px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    transition: 'all 150ms ease',
+                    boxShadow: '0 2px 6px rgba(5, 150, 105, 0.3)'
+                  }}
+                >
+                  <span>Open AI Surveillance Hub →</span>
+                </button>
+              </div>
+            </div>
+
             {/* Sub-view Navigation Pills */}
             <div style={{
               display: 'flex',

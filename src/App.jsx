@@ -20,6 +20,7 @@ import OfficerWorkspace from './pages/OfficerWorkspace';
 import AdminHeatmap from './pages/AdminHeatmap';
 import DeptAdmin from './pages/DeptAdmin';
 import SuperAdmin from './pages/SuperAdmin';
+import CivicSurveillanceHub from './pages/CivicSurveillanceHub';
 import Onboarding from './pages/Onboarding';
 import FindWorker from './pages/FindWorker';
 import WorkerDashboard from './pages/WorkerDashboard';
@@ -235,6 +236,14 @@ export default function App() {
             element={
               <ProtectedRoute allowedRoles={['civic_officer', 'officer', 'dept_admin', 'super_admin']}>
                 <OfficerWorkspace />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/officer/surveillance" 
+            element={
+              <ProtectedRoute allowedRoles={['civic_officer', 'officer', 'dept_admin', 'super_admin']}>
+                <CivicSurveillanceHub />
               </ProtectedRoute>
             } 
           />

@@ -13,7 +13,8 @@ import {
   BarChart3, 
   LogIn,
   Wrench,
-  Building2
+  Building2,
+  Video
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import FileGrievanceModal from '../common/FileGrievanceModal';
@@ -158,14 +159,15 @@ export default function MobileBottomNav() {
         label: 'Workspace',
         to: '/officer',
         icon: Briefcase,
-        isActive: location.pathname === '/officer'
+        isActive: location.pathname === '/officer' || (location.pathname.startsWith('/officer') && !location.pathname.startsWith('/officer/surveillance'))
       },
       {
-        id: 'intelligence',
-        label: 'Intelligence',
-        to: '/intelligence',
-        icon: Sparkles,
-        isActive: location.pathname.startsWith('/intelligence')
+        id: 'surveillance',
+        label: 'Surveillance',
+        to: '/officer/surveillance',
+        icon: Video,
+        isActive: location.pathname.startsWith('/officer/surveillance'),
+        hasLivePulse: true
       }
     ];
 
@@ -179,19 +181,18 @@ export default function MobileBottomNav() {
 
     rightItems = [
       {
+        id: 'intelligence',
+        label: 'Intelligence',
+        to: '/intelligence',
+        icon: Sparkles,
+        isActive: location.pathname.startsWith('/intelligence')
+      },
+      {
         id: 'heatmap',
         label: 'Heatmap',
         to: '/admin',
         icon: MapPin,
         isActive: location.pathname === '/admin'
-      },
-      {
-        id: 'profile',
-        label: 'Profile',
-        isAction: true,
-        onClick: () => setShowProfileModal(true),
-        icon: User,
-        isActive: showProfileModal
       }
     ];
   } else if (activeRole === 'super_admin') {
@@ -268,7 +269,8 @@ export default function MobileBottomNav() {
             justifyContent: 'center',
             marginBottom: '3px',
             transform: item.isActive ? 'scale(1.04)' : 'scale(1)',
-            transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+            transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+            position: 'relative'
           }}
         >
           <item.icon
@@ -280,6 +282,20 @@ export default function MobileBottomNav() {
               transition: 'color 0.2s ease, stroke-width 0.2s ease'
             }}
           />
+          {item.hasLivePulse && (
+            <span
+              style={{
+                position: 'absolute',
+                top: '3px',
+                right: '7px',
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: '#10B981',
+                boxShadow: '0 0 6px #10B981'
+              }}
+            />
+          )}
         </div>
 
         {/* Micro-label with refined typography */}
